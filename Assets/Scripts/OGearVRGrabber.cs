@@ -90,8 +90,6 @@ public class OGearVRGrabber : MonoBehaviour
         // Update values from inputs
         m_prevIsGrabbing = OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger, m_controller);
 
-        Debug.Log(m_prevIsGrabbing);
-
         CheckForGrabOrRelease(prevIsGrabbing);
     }
 
