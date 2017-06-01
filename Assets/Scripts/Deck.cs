@@ -1,54 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Random = UnityEngine.Random;
 
-public class Deck
+public class Deck : Queue<Card>, IDeck
 {
-    private List<Card> cards;
-    public List<Card> Cards { get { return cards; } }
+    private Random random;
 
     public Deck()
     {
-        cards = new List<Card>(52);
-
-        var vals = Enum.GetValues(typeof (Card.Values)).Cast<Card.Values>();
-        var suits = Enum.GetValues(typeof (Card.Suits)).Cast<Card.Suits>();
+        var vals = Enum.GetValues(typeof(Values)).Cast<Values>();
+        var suits = Enum.GetValues(typeof(Suits)).Cast<Suits>();
         foreach (var suit in suits)
         {
             foreach (var val in vals)
             {
-                cards.Add(new Card(suit, val));
+                Enqueue(new Card(suit, val));
             }
         }
     }
 
     public Deck Shuffle()
     {
-        for (var i = 0; i < cards.Count; i++)
+        var queueAsList = this.ToList();
+        var random = new Random((int)(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond));
+        for (var i = 0; i < queueAsList.Count; i++)
         {
-            var num = Random.Range(0, cards.Count - 1);
-            var c = cards[num];
-            cards[num] = cards[i];
-            cards[i] = c;
+            var num = random.Next(0, queueAsList.Count - 1);
+            var c = queueAsList[num];
+            queueAsList[num] = queueAsList[i];
+            queueAsList[i] = c;
         }
+
+        Clear();
+        foreach (var card in queueAsList)
+        {
+            Enqueue(card);
+        }
+
         return this;
     }
 
     public Card RemoveFromTop()
     {
-        var c = cards[cards.Count - 1];
-        cards.RemoveAt(cards.Count - 1);
-        return c;
+        return Dequeue();
     }
 
-    public void ReturnCards(IList<Card> _cards)
+    public void RemoveFromTop(int _amount, IList<Card> _cards)
     {
-        foreach (var _card in _cards)
+        for (var i = 0; i < _amount; i++)
         {
-            cards.Add(_card);
+            _cards.Add(RemoveFromTop());
         }
-        _cards.Clear();
+    }
+
+    public void ReturnCard(Card _card)
+    {
+        Enqueue(_card);
+        Shuffle();
+    }
+
+    public void ReturnCards(IEnumerable<Card> _cards)
+    {
+        foreach (var card in _cards)
+        {
+            Enqueue(card);
+        }
         Shuffle();
     }
 }
