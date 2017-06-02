@@ -7,7 +7,6 @@ public class PlayerMotor : MonoBehaviour, IPlayerMotor
     public IPlayerController PlayerController { get { return m_playerController; } }
 
     private Rigidbody m_rb;
-
     private OVRInput.Controller m_controller;
 
     // Use this for initialization
@@ -26,12 +25,9 @@ public class PlayerMotor : MonoBehaviour, IPlayerMotor
             return;
         }
 
-        if (m_playerController == null) return;
-
-        Vector2 touchPosition = Vector2.zero;
-        if (OVRInput.Get(OVRInput.Button.PrimaryTouchpad))
-            touchPosition = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
-        m_playerController.HandleMovement(transform, touchPosition, Input.GetKey(KeyCode.LeftShift));
+        bool running = OVRInput.Get(OVRInput.Button.PrimaryTouchpad);
+        Vector2 touchPosition = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
+        m_playerController.HandleMovement(transform, touchPosition, running);
     }
 
     private void FixedUpdate()

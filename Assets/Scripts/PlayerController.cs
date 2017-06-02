@@ -22,16 +22,18 @@ public class PlayerController : IPlayerController
         m_velocity = Vector3.zero;
     }
 
-    public void HandleMovement(Transform _transform, Vector2 input, bool _isRunning)
+    public void HandleMovement(Transform _transform, Vector2 _input, bool _isRunning)
     {
-        Vector3 _movHorizontal = _transform.right * input.x;
-        Vector3 _movVerical = _transform.forward * input.y;
+        Vector3 _movHorizontal = _transform.right * _input.x;
+        Vector3 _movVerical = _transform.forward * _input.y;
 
         var speed = WALK_SPEED;
         if (_isRunning && playerStats.Stamina > 0.01f)
         {
             speed = RUN_SPEED;
         }
-        m_velocity = (_movHorizontal + _movVerical).normalized * speed;
+
+        Vector3 _calculatedVeloity = (_movHorizontal + _movVerical).normalized * speed;
+        m_velocity = _calculatedVeloity;
     }
 }

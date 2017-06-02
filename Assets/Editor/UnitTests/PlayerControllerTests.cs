@@ -67,6 +67,6 @@ public class PlayerControllerTests
         pControllerUnderTest.HandleMovement(transform, new Vector2(0f, 0f), false);
 
         var expectedVelocityVector = Vector3.zero;
-        Assert.That(pControllerUnderTest.Velocity == expectedVelocityVector);
+        Assert.AreEqual(pControllerUnderTest.Velocity, expectedVelocityVector);
     }
 }
