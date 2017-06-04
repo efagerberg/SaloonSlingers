@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Throw cards
@@ -23,7 +22,15 @@ public class CardThrower : MonoBehaviour
     protected Quaternion m_anchorOffsetRotation;
     protected Vector3 m_anchorOffsetPosition;
 
-    void Start()
+    // Temporary velocity until OVRPlugin includes Gear VR Controller velocity
+    private float m_controllerSpeed;
+    Vector3 m_lastPosition = Vector3.zero;
+
+    // Used to check input on the update frame but apply physics on the fixed update frame
+    private bool m_isThrowing = false;
+    private bool m_isDrawing = false;
+
+    private void Start()
     {
         if (m_parentTransform == null)
         {
@@ -46,15 +53,28 @@ public class CardThrower : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    private void Update()
     {
-        if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, m_controller) && m_grabbedObj == null)
-            DrawCard();
-        if (OVRInput.GetUp(OVRInput.Button.PrimaryIndexTrigger, m_controller) && m_grabbedObj != null)
-            Throw();
+        m_isDrawing = (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, m_controller) && m_grabbedObj == null);
+        m_isThrowing = (OVRInput.GetUp(OVRInput.Button.PrimaryIndexTrigger, m_controller) && m_grabbedObj != null);
     }
 
-    protected void Throw()
+
+    private void FixedUpdate()
+    {
+        // Calculate controller speed
+        Vector3 _deltaDist = transform.position - m_lastPosition;
+        m_controllerSpeed = (_deltaDist / Time.fixedDeltaTime).magnitude;
+        m_lastPosition = transform.position;
+
+        // Check inputs
+        if (m_isDrawing)
+            DrawCard();
+        else if (m_isThrowing)
+            ThrowCard();
+    }
+
+    protected void ThrowCard()
     {
         if (m_grabbedObj != null)
         {
@@ -63,7 +83,9 @@ public class CardThrower : MonoBehaviour
             localPose = localPose * offsetPose;
 
             OVRPose trackingSpace = transform.ToOVRPose() * localPose.Inverse();
-            Vector3 linearVelocity = trackingSpace.orientation * OVRInput.GetLocalControllerVelocity(m_controller);
+            // Vector3 linearVelocity = trackingSpace.orientation * OVRInput.GetLocalControllerVelocity(m_controller);
+            // Temporary velocity until OVRPlugin includes Gear VR Controller velocity
+            Vector3 linearVelocity = trackingSpace.orientation * transform.forward * m_controllerSpeed;
             Vector3 angularVelocity = trackingSpace.orientation * OVRInput.GetLocalControllerAngularVelocity(m_controller);
 
             Rigidbody rb = m_grabbedObj.GetComponent<Rigidbody>();
@@ -74,16 +96,20 @@ public class CardThrower : MonoBehaviour
             Destroy(m_grabbedObj, 2f);
             m_grabbedObj.transform.parent = null;
             m_grabbedObj = null;
+
+            m_isThrowing = false;
         }
     }
 
     protected void DrawCard()
     {
-        m_grabbedObj = m_deck.GetComponent<DeckComponent>().SpawnCard();
+        m_grabbedObj = m_deck.SpawnCard();
         m_grabbedObj.transform.SetParent(m_parentTransform);
         Rigidbody rb = m_grabbedObj.GetComponent<Rigidbody>();
         rb.isKinematic = true;
         m_grabbedObj.transform.localPosition = Vector3.zero;
         m_grabbedObj.transform.localRotation = Quaternion.Euler(0f, 90f, 90f);
+
+        m_isDrawing = false;
     }
 }
