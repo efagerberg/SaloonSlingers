@@ -7,8 +7,7 @@ public class PlayerStatsManager : MonoBehaviour, IPlayerStatsManager
     public event OnDeathEvent OnDeath;
     public event OnRespawnEvent OnRespawn;
 
-    private IPlayerStats m_playerStats = new PlayerStats();
-    public IPlayerStats PlayerStats { get { return m_playerStats; } }
+    public IPlayerStats PlayerStats { get; private set; } = new PlayerStats();
 
     private GameObject[] spawnPoints;
 
@@ -22,7 +21,7 @@ public class PlayerStatsManager : MonoBehaviour, IPlayerStatsManager
         var inputInfo = new Dictionary<string, bool>();
         inputInfo["IsJumping"] = Input.GetButton("Jump");
         inputInfo["IsRunning"] = Input.GetKey(KeyCode.LeftShift);
-        m_playerStats.Update(inputInfo, Time.deltaTime);
+        PlayerStats.Update(inputInfo, Time.deltaTime);
     }
 
     public void Die()
@@ -41,7 +40,7 @@ public class PlayerStatsManager : MonoBehaviour, IPlayerStatsManager
         Transform _spawnPointTransform = spawnPoints[spawnPointIndex].transform;
         transform.position = _spawnPointTransform.position;
         transform.rotation = _spawnPointTransform.rotation;
-        m_playerStats.Reset();
+        PlayerStats.Reset();
         // Buffer for particle spawning
         yield return new WaitForSeconds(0.1f);
 
@@ -51,9 +50,9 @@ public class PlayerStatsManager : MonoBehaviour, IPlayerStatsManager
 
     public void TakeDamage(float _amount)
     {
-        m_playerStats.TakeDamage(_amount);
-        Debug.Log(transform.name + " now has " + m_playerStats.Health + " health.");
-        if (m_playerStats.IsDead)
+        PlayerStats.TakeDamage(_amount);
+        Debug.Log(transform.name + " now has " + PlayerStats.Health + " health.");
+        if (PlayerStats.IsDead)
         {
             Die();
         }

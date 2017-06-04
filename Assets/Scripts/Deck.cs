@@ -22,7 +22,7 @@ public class Deck : Queue<Card>, IDeck
     public Deck Shuffle()
     {
         var queueAsList = this.ToList();
-        var random = new Random((int)(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond));
+        random = new Random((int)(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond));
         for (var i = 0; i < queueAsList.Count; i++)
         {
             var num = random.Next(0, queueAsList.Count - 1);

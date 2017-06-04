@@ -7,8 +7,7 @@ public class PlayerController : IPlayerController
     private const float RUN_SPEED = 3f;
     private const float WALK_SPEED = 1f;
 
-    private Vector3 m_velocity;
-    public Vector3 Velocity { get { return m_velocity; } }
+    public Vector3 Velocity { get; private set; }
 
     private IPlayerStats playerStats;
 
@@ -19,7 +18,7 @@ public class PlayerController : IPlayerController
 
     public void HandlePause()
     {
-        m_velocity = Vector3.zero;
+        Velocity = Vector3.zero;
     }
 
     public void HandleMovement(Transform _transform, Vector2 _input, bool _isRunning)
@@ -34,6 +33,7 @@ public class PlayerController : IPlayerController
         }
 
         Vector3 _calculatedVeloity = (_movHorizontal + _movVerical).normalized * speed;
-        m_velocity = _calculatedVeloity;
+        Velocity = _calculatedVeloity;
+        
     }
 }

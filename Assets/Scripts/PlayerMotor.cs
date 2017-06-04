@@ -3,8 +3,7 @@
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMotor : MonoBehaviour, IPlayerMotor
 {
-    private IPlayerController m_playerController;
-    public IPlayerController PlayerController { get { return m_playerController; } }
+    public IPlayerController PlayerController { get; private set; }
 
     private Rigidbody m_rb;
     private OVRInput.Controller m_controller;
@@ -13,7 +12,7 @@ public class PlayerMotor : MonoBehaviour, IPlayerMotor
     private void Start()
     {
         m_rb = GetComponent<Rigidbody>();
-        m_playerController = new PlayerController(GetComponent<IPlayerStatsManager>().PlayerStats);
+        PlayerController = new PlayerController(GetComponent<IPlayerStatsManager>().PlayerStats);
         m_controller = OVRInput.GetActiveController();
     }
 
@@ -21,13 +20,13 @@ public class PlayerMotor : MonoBehaviour, IPlayerMotor
     {
         if (PauseMenu.IsOn)
         {
-            m_playerController.HandlePause();
+            PlayerController.HandlePause();
             return;
         }
 
         bool running = OVRInput.Get(OVRInput.Button.PrimaryTouchpad);
         Vector2 touchPosition = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
-        m_playerController.HandleMovement(transform, touchPosition, running);
+        PlayerController.HandleMovement(transform, touchPosition, running);
     }
 
     private void FixedUpdate()
@@ -37,9 +36,9 @@ public class PlayerMotor : MonoBehaviour, IPlayerMotor
 
     private void PerformMovement()
     {
-        if (m_playerController.Velocity != Vector3.zero)
+        if (PlayerController.Velocity != Vector3.zero)
         {
-            m_rb.MovePosition(m_rb.position + m_playerController.Velocity * Time.fixedDeltaTime);
+            m_rb.MovePosition(m_rb.position + PlayerController.Velocity * Time.fixedDeltaTime);
         }
     }
 }

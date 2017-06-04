@@ -6,12 +6,7 @@ using UnityEngine;
 [Serializable]
 public class PlayerStats : IPlayerStats
 {
-    private bool isDead = false;
-    public bool IsDead
-    {
-        get { return isDead; }
-        private set { isDead = value; }
-    }
+    public bool IsDead { get; private set; } = false;
 
     private float health = 1f;
     private float healthRegen = 0.01f;
@@ -46,8 +41,8 @@ public class PlayerStats : IPlayerStats
     public void Reset()
     {
         Stamina = 1f;
-        IsDead = false;
         Health = 1f;
+        IsDead = false;
     }
 
     public void EmptyStats()
@@ -58,7 +53,7 @@ public class PlayerStats : IPlayerStats
 
     public void TakeDamage(float _amount)
     {
-        if (isDead) return;
+        if (IsDead) return;
         Health -= _amount;
         if (Health == 0)
         {

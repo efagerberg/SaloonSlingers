@@ -15,7 +15,7 @@ public class DeckTests
         deckUnderTest.Shuffle();
     }
 
-    [SetUp]
+    [TearDown]
     public void Dispose()
     {
         deckUnderTest = null;
