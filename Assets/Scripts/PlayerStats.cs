@@ -27,14 +27,14 @@ public class PlayerStats : IPlayerStats
 
     public PlayerStats() { }
 
-    public void Update(Dictionary<string, bool> inputInfo, float deltaTime)
+    public void Update(bool _running, float _deltaTime)
     {
-        Stamina += staminaRegen * deltaTime;
-        Health += healthRegen * deltaTime;
+        Stamina += staminaRegen * _deltaTime;
+        Health += healthRegen * _deltaTime;
         if (PauseMenu.IsOn) return;
-        if (inputInfo["IsRunning"] && Stamina > 0.01f)
+        if (_running && Stamina > 0.01f)
         {
-            Stamina -= staminaBurn * deltaTime;
+            Stamina -= staminaBurn * _deltaTime;
         }
     }
 

@@ -8,6 +8,6 @@ public interface IPlayerStats
 
     void Reset();
     void TakeDamage(float _amount);
-    void Update(Dictionary<string, bool> inputInfo, float deltaTime);
+    void Update(bool _isRunning, float _deltaTime);
     void EmptyStats();
 }

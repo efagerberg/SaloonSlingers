@@ -10,9 +10,6 @@ public class PlayerStatsTests
     public void Init()
     {
         playerStatsUnderTests = new PlayerStats();
-        inputs = new Dictionary<string, bool>();
-        inputs["IsRunning"] = false;
-        inputs["IsJumping"] = false;
         PauseMenu.IsOn = false;
     }
 
@@ -32,7 +29,7 @@ public class PlayerStatsTests
         Assert.AreEqual(playerStatsUnderTests.Health, 0);
         Assert.AreEqual(playerStatsUnderTests.Stamina, 0);
 
-        playerStatsUnderTests.Update(inputs, 0.5f);
+        playerStatsUnderTests.Update(false, 0.5f);
         Assert.That(playerStatsUnderTests.Health > 0);
         Assert.That(playerStatsUnderTests.Stamina > 0);
     }
@@ -41,7 +38,7 @@ public class PlayerStatsTests
     public void Update_ShouldNotRegenStats_PastMaximum()
     {
         var max = 1f;
-        playerStatsUnderTests.Update(inputs, 1f);
+        playerStatsUnderTests.Update(false, 1f);
         Assert.AreEqual(playerStatsUnderTests.Health, max);
         Assert.AreEqual(playerStatsUnderTests.Stamina, max);
     }
@@ -49,8 +46,7 @@ public class PlayerStatsTests
     [Test]
     public void Update_ShouldConsumeStats_GivenInputs()
     {
-        inputs["IsRunning"] = true;
-        playerStatsUnderTests.Update(inputs, 0.5f);
+        playerStatsUnderTests.Update(true, 0.5f);
         Assert.That(playerStatsUnderTests.Stamina < 1f);
     }
 
@@ -58,8 +54,7 @@ public class PlayerStatsTests
     public void Update_ShouldNotConsumeStats_GivenInputsButPaused()
     {
         PauseMenu.IsOn = true;
-        inputs["IsRunning"] = true;
-        playerStatsUnderTests.Update(inputs, 0.5f);
+        playerStatsUnderTests.Update(true, 0.5f);
         Assert.That(playerStatsUnderTests.Stamina == 1f);
     }
 

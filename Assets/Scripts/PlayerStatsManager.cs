@@ -18,10 +18,8 @@ public class PlayerStatsManager : MonoBehaviour, IPlayerStatsManager
 
     private void Update()
     {
-        var inputInfo = new Dictionary<string, bool>();
-        inputInfo["IsJumping"] = Input.GetButton("Jump");
-        inputInfo["IsRunning"] = Input.GetKey(KeyCode.LeftShift);
-        PlayerStats.Update(inputInfo, Time.deltaTime);
+        var _isRunning = OVRInput.Get(OVRInput.Button.PrimaryTouchpad);
+        PlayerStats.Update(_isRunning, Time.deltaTime);
     }
 
     public void Die()
