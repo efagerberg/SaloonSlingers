@@ -88,13 +88,7 @@ public class CardThrower : MonoBehaviour
             Vector3 linearVelocity = trackingSpace.orientation * transform.forward * m_controllerSpeed;
             Vector3 angularVelocity = trackingSpace.orientation * OVRInput.GetLocalControllerAngularVelocity(m_controller);
 
-            Rigidbody rb = m_grabbedObj.GetComponent<Rigidbody>();
-            rb.isKinematic = false;
-            rb.velocity = linearVelocity;
-            rb.angularVelocity = angularVelocity;
-
-            Destroy(m_grabbedObj, 2f);
-            m_grabbedObj.transform.parent = null;
+            m_grabbedObj.GetComponent<CardComponent>().Throw(linearVelocity, angularVelocity);
             m_grabbedObj = null;
 
             m_isThrowing = false;
