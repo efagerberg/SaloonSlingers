@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 
+public enum ThrowMode { Straight, Curve }
+
 /// <summary>
 /// Throw cards
 /// </summary>
 public class CardThrower : MonoBehaviour
 {
-
     // Should be OVRInput.Controller.LTrackedRemote or OVRInput.Controller.RTrackedRemote.
     [SerializeField]
     protected OVRInput.Controller m_controller;
@@ -23,12 +24,19 @@ public class CardThrower : MonoBehaviour
     protected Vector3 m_anchorOffsetPosition;
 
     // Temporary velocity until OVRPlugin includes Gear VR Controller velocity
-    private float m_controllerSpeed;
-    Vector3 m_lastPosition = Vector3.zero;
+    private Vector3 m_controllerVelocity = Vector3.zero;
+    private Vector3 m_lastPosition = Vector3.zero;
+
+    // Temporary velocity until OVRPlugin includes Gear VR Controller angular velocity
+    private Vector3 m_controllerAngularVelocity = Vector3.zero;
+    private Vector3 m_lastRotation = Vector3.zero;
 
     // Used to check input on the update frame but apply physics on the fixed update frame
     private bool m_isThrowing = false;
     private bool m_isDrawing = false;
+
+    [SerializeField]
+    private ThrowMode m_throwMode = ThrowMode.Straight;
 
     private void Start()
     {
@@ -62,10 +70,15 @@ public class CardThrower : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Calculate controller speed
+        // Calculate controller velocity
         Vector3 _deltaDist = transform.position - m_lastPosition;
-        m_controllerSpeed = (_deltaDist / Time.fixedDeltaTime).magnitude;
+        m_controllerVelocity = (_deltaDist / Time.fixedDeltaTime);
         m_lastPosition = transform.position;
+
+        // Calculate controller angular velocity
+        Vector3 _deltaRotDist = transform.rotation.eulerAngles - m_lastRotation;
+        m_controllerAngularVelocity = (_deltaRotDist / Time.fixedDeltaTime);
+        m_lastRotation = transform.rotation.eulerAngles;
 
         // Check inputs
         if (m_isDrawing)
@@ -78,15 +91,19 @@ public class CardThrower : MonoBehaviour
     {
         if (m_grabbedObj != null)
         {
-            OVRPose localPose = new OVRPose { position = OVRInput.GetLocalControllerPosition(m_controller), orientation = OVRInput.GetLocalControllerRotation(m_controller) };
+            OVRPose localPose = new OVRPose { position = OVRInput.GetLocalControllerPosition(m_controller),
+                                              orientation = OVRInput.GetLocalControllerRotation(m_controller) };
             OVRPose offsetPose = new OVRPose { position = m_anchorOffsetPosition, orientation = m_anchorOffsetRotation };
             localPose = localPose * offsetPose;
 
             OVRPose trackingSpace = transform.ToOVRPose() * localPose.Inverse();
             // Vector3 linearVelocity = trackingSpace.orientation * OVRInput.GetLocalControllerVelocity(m_controller);
             // Temporary velocity until OVRPlugin includes Gear VR Controller velocity
-            Vector3 linearVelocity = trackingSpace.orientation * transform.forward * m_controllerSpeed;
-            Vector3 angularVelocity = trackingSpace.orientation * OVRInput.GetLocalControllerAngularVelocity(m_controller);
+            Vector3 linearVelocity = trackingSpace.orientation * transform.forward * m_controllerVelocity.magnitude;
+            // Vector3 angularVelocity = trackingSpace.orientation * OVRInput.GetLocalControllerAngularVelocity(m_controller);
+            // Temporary angular velocity until OVRPlugin includes Gear VR Controller angular velocity
+            Vector3 angularVelocity = trackingSpace.orientation * m_controllerAngularVelocity;
+ 
 
             m_grabbedObj.GetComponent<CardComponent>().Throw(linearVelocity, angularVelocity);
             m_grabbedObj = null;
@@ -99,10 +116,8 @@ public class CardThrower : MonoBehaviour
     {
         m_grabbedObj = m_deck.SpawnCard();
         m_grabbedObj.transform.SetParent(m_parentTransform);
-        Rigidbody rb = m_grabbedObj.GetComponent<Rigidbody>();
-        rb.isKinematic = true;
-        m_grabbedObj.transform.localPosition = Vector3.zero;
-        m_grabbedObj.transform.localRotation = Quaternion.Euler(0f, 90f, 90f);
+        m_grabbedObj.transform.localPosition = new Vector3(0, 0.05f, 0f);
+        m_grabbedObj.transform.localRotation = Quaternion.Euler(0f, 90f, 45f);
 
         m_isDrawing = false;
     }

@@ -24,9 +24,10 @@ public class PlayerMotor : MonoBehaviour, IPlayerMotor
             return;
         }
 
-        bool running = OVRInput.Get(OVRInput.Button.PrimaryTouchpad);
-        Vector2 touchPosition = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
-        PlayerController.HandleMovement(transform, touchPosition, running);
+        //bool running = OVRInput.Get(OVRInput.Button.PrimaryTouchpad);
+        //Vector2 touchPosition = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
+        //PlayerController.HandleMovement(transform, touchPosition, running);
+        PlayerController.HandleMovement(transform, Vector3.zero, false);
     }
 
     private void FixedUpdate()

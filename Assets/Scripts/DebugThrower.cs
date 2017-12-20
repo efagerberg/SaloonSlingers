@@ -7,7 +7,9 @@ public class DebugThrower : MonoBehaviour
     [SerializeField]
     private DeckComponent m_deck;
     [SerializeField]
-    private float m_throw_speed = 2f;
+    private float m_throwSpeed = 10f;
+    [SerializeField]
+    private float m_spinSpeed = 10f;
     private GameObject m_grabbedObj;
 
     private bool isThrowing = false;
@@ -23,14 +25,7 @@ public class DebugThrower : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            isThrowing = true;
-        }
-    }
-
-    private void FixedUpdate()
-    {
+        isThrowing = Input.GetKeyDown(KeyCode.Space);
         if (isThrowing)
         {
             DrawCard();
@@ -39,30 +34,25 @@ public class DebugThrower : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+    }
+
     protected void DrawCard()
     {
         m_grabbedObj = m_deck.SpawnCard();
         m_grabbedObj.transform.SetParent(transform);
-        Rigidbody rb = m_grabbedObj.GetComponent<Rigidbody>();
-        rb.isKinematic = true;
-        m_grabbedObj.transform.localPosition = Vector3.zero;
-        m_grabbedObj.transform.localRotation = Quaternion.Euler(0f, 90f, 90f);
+        m_grabbedObj.transform.localPosition = new Vector3(0.2f, -0.1f, 0f);
+        m_grabbedObj.transform.localRotation = Quaternion.Euler(0f, 90f, 45f);
     }
 
     protected void ThrowCard()
     {
         if (m_grabbedObj != null)
         {
-            Vector3 linearVelocity = transform.forward * m_throw_speed;
-            Vector3 angularVelocity = (transform.right + transform.up) * m_throw_speed * 50f;
-
-            Rigidbody rb = m_grabbedObj.GetComponent<Rigidbody>();
-            rb.isKinematic = false;
-            rb.AddForce(linearVelocity, ForceMode.Impulse);
-            rb.AddTorque(angularVelocity);
-
-            Destroy(m_grabbedObj, 2f);
-            m_grabbedObj.transform.parent = null;
+            Vector3 linearVelocity = transform.forward * m_throwSpeed;
+            Vector3 angularVelocity = (transform.right) * m_spinSpeed;
+            m_grabbedObj.GetComponent<CardComponent>().Throw(linearVelocity, angularVelocity);
             m_grabbedObj = null;
         }
     }
