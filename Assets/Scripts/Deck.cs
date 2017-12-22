@@ -6,15 +6,18 @@ public class Deck : Queue<Card>, IDeck
 {
     private Random random;
 
-    public Deck()
+    public Deck(int numOfDecks = 1)
     {
-        var vals = Enum.GetValues(typeof(Values)).Cast<Values>();
-        var suits = Enum.GetValues(typeof(Suits)).Cast<Suits>();
-        foreach (var suit in suits)
+        for (int i = 0; i < numOfDecks; i++)
         {
-            foreach (var val in vals)
+            var vals = Enum.GetValues(typeof(Values)).Cast<Values>();
+            var suits = Enum.GetValues(typeof(Suits)).Cast<Suits>();
+            foreach (var suit in suits)
             {
-                Enqueue(new Card(suit, val));
+                foreach (var val in vals)
+                {
+                    Enqueue(new Card(suit, val));
+                }
             }
         }
     }

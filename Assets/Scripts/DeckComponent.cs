@@ -7,7 +7,7 @@ public class DeckComponent : MonoBehaviour {
     private Deck deck;
 
 	void Start () {
-        deck = new Deck().Shuffle();
+        deck = new Deck(numOfDecks: 3).Shuffle();
 	}
 
     public GameObject SpawnCard()
