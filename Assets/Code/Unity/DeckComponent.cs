@@ -7,19 +7,28 @@ namespace GambitSimulator.Unity
     public class DeckComponent : MonoBehaviour
     {
         private Deck deck;
+        [SerializeField]
+        private GameObject cardPrefab;
+        private int spawnCount = 0;
+
         void Start()
         {
             deck = new Deck(3).Shuffle();
-            if (deck.Count > 0)
+        }
+
+        private void Update()
+        {
+            while (spawnCount < 52)
             {
-                SpawnCard();
+                SpawnCard(spawnCount);
+                spawnCount += 1;
             }
         }
 
-        public GameObject SpawnCard()
+        public GameObject SpawnCard(int index)
         {
             Card card = deck.RemoveFromTop();
-            var go = (GameObject)Instantiate(Resources.Load("Prefabs/Card"));
+            var go = Instantiate(cardPrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z * 0.02f * index), Quaternion.identity, transform);
             go.GetComponent<CardComponent>().SetCard(card);
             return go;
         }

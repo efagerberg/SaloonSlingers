@@ -2,7 +2,9 @@
     "name": "GambitSimulator.Unity",
     "rootNamespace": "GambitSimulator.Unity",
     "references": [
-        "GUID:15b54c79343b4614195c3259778ba043"
+        "GUID:15b54c79343b4614195c3259778ba043",
+        "GUID:fe685ec1767f73d42b749ea8045bfe43",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,51 +1,37 @@
+using System.Collections;
+using System.Collections.Generic;
+
 using UnityEngine;
 
 using GambitSimulator.Core;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace GambitSimulator.Unity
 {
-    public class CardComponent : MonoBehaviour
+    [RequireComponent(typeof(TrailRenderer))]
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(ParticleSystem))]
+    public class CardComponent : XRGrabInteractable
     {
         [SerializeField]
         private Card card;
         [SerializeField]
         private Renderer faceRenderer;
         [SerializeField]
-        private float maxSpinSpeed = 50;
+        private float lifeTime = 2f;
         [SerializeField]
-        private bool shouldAddTracer = true;
-        [SerializeField]
-        private GameObject destroyEffectPrefab;
-        [SerializeField]
-        private float effectLifetime = 2f;
-        [SerializeField]
-        private float curveFactor = 0.01f;
+        private List<Renderer> cardRenderers;
+        private Rigidbody rigidBody;
+        private ParticleSystem destroyEffect;
+        private TrailRenderer trailRenderer;
 
-        private Rigidbody m_rb;
-
-        private void Start()
+        public void Start()
         {
-            m_rb = GetComponent<Rigidbody>();
-        }
-
-        private void Update()
-        {
-            name = card.ToString();
-            UpdateGraphic();
-        }
-
-        private void FixedUpdate()
-        {
-            AddCurveForce();
-        }
-
-        private void AddCurveForce()
-        {
-            var curveForce = new Vector3(m_rb.angularVelocity.normalized.y,
-                                         m_rb.angularVelocity.normalized.x,
-                                         0) * curveFactor;
-
-            m_rb.AddForce(curveForce);
+            rigidBody = gameObject.GetComponent<Rigidbody>();
+            rigidBody.isKinematic = true;
+            destroyEffect = gameObject.GetComponent<ParticleSystem>();
+            trailRenderer = gameObject.GetComponent<TrailRenderer>();
+            trailRenderer.enabled = false;
         }
 
         public Card GetCard()
@@ -56,63 +42,42 @@ namespace GambitSimulator.Unity
         public void SetCard(Card inCard)
         {
             card = inCard;
+            name = card.ToString();
+            SetGraphics();
         }
 
-        public void UpdateGraphic()
+        public void SetGraphics()
         {
-            if (card.Equals(null)) return;
             faceRenderer.material.mainTexture = Resources.Load<Texture>(GetTexturePath(card));
         }
 
-        public void Throw(Vector3 linearVelocity)
+        protected override void Detach()
         {
-            m_rb = GetComponent<Rigidbody>();
-            m_rb.maxAngularVelocity = maxSpinSpeed;
-            m_rb.isKinematic = false;
-            m_rb.AddForce(linearVelocity);
-
-            // Spin card in direction of velocity
-            m_rb.AddRelativeTorque(linearVelocity);
-
-            Destroy(gameObject, 2f);
-            transform.parent = null;
-
-            if (shouldAddTracer)
-                AddTracer();
+            base.Detach();
+            rigidBody.isKinematic = false;
+            trailRenderer.enabled = true;
+            StartCoroutine(Burn());
         }
 
-        private void AddTracer()
+        public IEnumerator Burn()
         {
-            TrailRenderer tr = gameObject.AddComponent<TrailRenderer>();
-            tr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            tr.time = 0.2f;
-            var keyframes = new Keyframe[] {
-            new Keyframe(0f, 0.1f),
-            new Keyframe(0.2f, 0.05f),
-            new Keyframe(0.8f, 0.003f),
-            new Keyframe(1f, 0f)
-        };
-            tr.widthCurve = new AnimationCurve(keyframes);
-            tr.material = Resources.Load<Material>("Materials/TracerMaterial");
-        }
-
-        public void Burn()
-        {
-            if (destroyEffectPrefab)
-            {
-                var _go = Instantiate(destroyEffectPrefab, transform.position, Quaternion.identity);
-                Destroy(_go, effectLifetime);
-            }
+            yield return new WaitForSeconds(lifeTime);
+            var childRenderers = transform.GetComponentsInChildren<Renderer>();
+            foreach (var r in cardRenderers)
+                r.enabled = false;
+            rigidBody.isKinematic = true;
+            destroyEffect.Play();
+            yield return new WaitForSeconds(destroyEffect.main.duration);
+            destroyEffect.Stop();
+            foreach (var r in cardRenderers)
+                r.enabled = true;
+            trailRenderer.enabled = false;
+            gameObject.SetActive(false);
         }
 
         private string GetTexturePath(Card card)
         {
             return string.Format("Textures/{0}", card.ToString());
-        }
-
-        private string GetSpritePath(Card card)
-        {
-            return string.Format("Sprites/{0}", card.ToString());
         }
     }
 }
