@@ -1,0 +1,16 @@
+{
+    "name": "GambitSimulator.Unity",
+    "rootNamespace": "GambitSimulator.Unity",
+    "references": [
+        "GUID:15b54c79343b4614195c3259778ba043"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

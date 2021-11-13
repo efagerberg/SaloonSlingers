@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CoverageReport scope="Summary">
+  <Summary>
+    <Generatedon>11/12/2021 - 8:45:15 PM</Generatedon>
+    <Parser>OpenCoverParser</Parser>
+    <Assemblies>3</Assemblies>
+    <Classes>6</Classes>
+    <Files>6</Files>
+    <Coveredlines>168</Coveredlines>
+    <Uncoveredlines>81</Uncoveredlines>
+    <Coverablelines>249</Coverablelines>
+    <Totallines>460</Totallines>
+    <Linecoverage>67.4</Linecoverage>
+    <Coveredbranches>0</Coveredbranches>
+    <Totalbranches>0</Totalbranches>
+  </Summary>
+  <Coverage>
+    <Assembly name="GambitSimulator.Core" classes="2" coverage="91.3" coveredlines="74" coverablelines="81" totallines="137" branchcoverage="" coveredbranches="0" totalbranches="0">
+      <Class name="GambitSimulator.Core.Card" coverage="75.8" coveredlines="22" coverablelines="29" totallines="60" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="GambitSimulator.Core.Deck" coverage="100" coveredlines="52" coverablelines="52" totallines="77" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    </Assembly>
+    <Assembly name="GambitSimulator.Core.Tests" classes="2" coverage="100" coveredlines="94" coverablelines="94" totallines="177" branchcoverage="" coveredbranches="0" totalbranches="0">
+      <Class name="GambitSimulator.Core.Tests.CardTests" coverage="100" coveredlines="52" coverablelines="52" totallines="98" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="GambitSimulator.Core.Tests.DeckTests" coverage="100" coveredlines="42" coverablelines="42" totallines="79" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    </Assembly>
+    <Assembly name="GambitSimulator.Unity" classes="2" coverage="0" coveredlines="0" coverablelines="74" totallines="146" branchcoverage="" coveredbranches="0" totalbranches="0">
+      <Class name="GambitSimulator.Unity.CardComponent" coverage="0" coveredlines="0" coverablelines="61" totallines="119" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="GambitSimulator.Unity.DeckComponent" coverage="0" coveredlines="0" coverablelines="13" totallines="27" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    </Assembly>
+  </Coverage>
+</CoverageReport>

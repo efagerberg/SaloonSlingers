@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2021-11-12_20-45-14" tag="">
+  <assembly name="GambitSimulator.Core">
+    <class name="GambitSimulator.Core.Card" coveredlines="22" coverablelines="29" totallines="60" coveredbranches="0" totalbranches="0" />
+    <class name="GambitSimulator.Core.Deck" coveredlines="52" coverablelines="52" totallines="77" coveredbranches="0" totalbranches="0" />
+  </assembly>
+  <assembly name="GambitSimulator.Core.Tests">
+    <class name="GambitSimulator.Core.Tests.CardTests" coveredlines="52" coverablelines="52" totallines="98" coveredbranches="0" totalbranches="0" />
+    <class name="GambitSimulator.Core.Tests.DeckTests" coveredlines="42" coverablelines="42" totallines="79" coveredbranches="0" totalbranches="0" />
+  </assembly>
+  <assembly name="GambitSimulator.Unity">
+    <class name="GambitSimulator.Unity.CardComponent" coveredlines="0" coverablelines="61" totallines="119" coveredbranches="0" totalbranches="0" />
+    <class name="GambitSimulator.Unity.DeckComponent" coveredlines="0" coverablelines="13" totallines="27" coveredbranches="0" totalbranches="0" />
+  </assembly>
+</coverage>
