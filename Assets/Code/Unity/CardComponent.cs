@@ -18,9 +18,14 @@ namespace GambitSimulator.Unity
         [SerializeField]
         private Renderer faceRenderer;
         [SerializeField]
-        private float lifeTime = 2f;
+        private float lifeTime = 1f;
         [SerializeField]
         private List<Renderer> cardRenderers;
+        [SerializeField]
+        private int maxAngularVelocity = 1_000;
+        [SerializeField]
+        private int spinFactor = 100;
+
         private Rigidbody rigidBody;
         private ParticleSystem destroyEffect;
         private TrailRenderer trailRenderer;
@@ -28,6 +33,7 @@ namespace GambitSimulator.Unity
         public void Start()
         {
             rigidBody = gameObject.GetComponent<Rigidbody>();
+            rigidBody.maxAngularVelocity = maxAngularVelocity;
             rigidBody.isKinematic = true;
             destroyEffect = gameObject.GetComponent<ParticleSystem>();
             trailRenderer = gameObject.GetComponent<TrailRenderer>();
@@ -46,7 +52,7 @@ namespace GambitSimulator.Unity
             SetGraphics();
         }
 
-        public void SetGraphics()
+        private void SetGraphics()
         {
             faceRenderer.material.mainTexture = Resources.Load<Texture>(GetTexturePath(card));
         }
@@ -54,25 +60,33 @@ namespace GambitSimulator.Unity
         protected override void Detach()
         {
             base.Detach();
-            rigidBody.isKinematic = false;
-            trailRenderer.enabled = true;
-            StartCoroutine(Burn());
+            StartCoroutine(ThrowEffect());
         }
 
-        public IEnumerator Burn()
+        public IEnumerator ThrowEffect()
         {
+            rigidBody.isKinematic = false;
+            rigidBody.AddTorque(transform.forward * rigidBody.velocity.normalized.magnitude * spinFactor);
+            trailRenderer.enabled = true;
             yield return new WaitForSeconds(lifeTime);
-            var childRenderers = transform.GetComponentsInChildren<Renderer>();
-            foreach (var r in cardRenderers)
-                r.enabled = false;
+            HideCard();
             rigidBody.isKinematic = true;
+            trailRenderer.enabled = false;
             destroyEffect.Play();
             yield return new WaitForSeconds(destroyEffect.main.duration);
             destroyEffect.Stop();
+        }
+
+        public void HideCard()
+        {
+            foreach (var r in cardRenderers)
+                r.enabled = false;
+        }
+
+        public void ShowCard()
+        {
             foreach (var r in cardRenderers)
                 r.enabled = true;
-            trailRenderer.enabled = false;
-            gameObject.SetActive(false);
         }
 
         private string GetTexturePath(Card card)

@@ -10,15 +10,17 @@ namespace GambitSimulator.Unity
         [SerializeField]
         private GameObject cardPrefab;
         private int spawnCount = 0;
+        private float spawnZOffset;
 
         void Start()
         {
             deck = new Deck(3).Shuffle();
+            spawnZOffset = cardPrefab.GetComponent<BoxCollider>().size.z;
         }
 
         private void Update()
         {
-            while (spawnCount < 52)
+            while (spawnCount < 15)
             {
                 SpawnCard(spawnCount);
                 spawnCount += 1;
@@ -28,7 +30,8 @@ namespace GambitSimulator.Unity
         public GameObject SpawnCard(int index)
         {
             Card card = deck.RemoveFromTop();
-            var go = Instantiate(cardPrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z * 0.02f * index), Quaternion.identity, transform);
+            var spawnPosition = new Vector3(transform.position.x, transform.position.y, transform.forward.z * spawnZOffset * index);
+            var go = Instantiate(cardPrefab, spawnPosition, Quaternion.identity, transform);
             go.GetComponent<CardComponent>().SetCard(card);
             return go;
         }
