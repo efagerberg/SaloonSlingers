@@ -25,6 +25,8 @@ namespace GambitSimulator.Unity
         private int maxAngularVelocity = 1_000;
         [SerializeField]
         private int spinFactor = 100;
+        [SerializeField]
+        private float sizeMultiplier = 2f;
 
         private Rigidbody rigidBody;
         private ParticleSystem destroyEffect;
@@ -38,6 +40,7 @@ namespace GambitSimulator.Unity
             destroyEffect = gameObject.GetComponent<ParticleSystem>();
             trailRenderer = gameObject.GetComponent<TrailRenderer>();
             trailRenderer.enabled = false;
+            transform.localScale = sizeMultiplier * new Vector3(transform.localScale.x, transform.localScale.y, 1);
         }
 
         public Card GetCard()
