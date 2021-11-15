@@ -22,9 +22,9 @@ namespace GambitSimulator.Unity
         [SerializeField]
         private List<Renderer> cardRenderers;
         [SerializeField]
-        private int maxAngularVelocity = 1_000;
+        private int maxAngularVelocity = 100;
         [SerializeField]
-        private int spinFactor = 100;
+        private int spinFactor = 25;
         [SerializeField]
         private float sizeMultiplier = 2f;
 
@@ -69,7 +69,7 @@ namespace GambitSimulator.Unity
         public IEnumerator ThrowEffect()
         {
             rigidBody.isKinematic = false;
-            rigidBody.AddTorque(transform.forward * rigidBody.velocity.normalized.magnitude * spinFactor);
+            rigidBody.AddTorque(transform.forward * rigidBody.velocity.magnitude * spinFactor);
             trailRenderer.enabled = true;
             yield return new WaitForSeconds(lifeTime);
             HideCard();
