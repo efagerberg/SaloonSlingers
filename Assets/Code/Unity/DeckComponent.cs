@@ -34,7 +34,6 @@ namespace GambitSimulator.Unity
         {
             Card card = deck.RemoveFromTop();
             var spawnPosition = new Vector3(transform.position.x, transform.position.y, spawnZOffset * index);
-            Debug.Log(transform.forward);
             var go = Instantiate(cardPrefab, spawnPosition, Quaternion.identity, transform);
             go.GetComponent<CardComponent>().SetCard(card);
             return go;

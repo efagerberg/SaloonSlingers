@@ -8,7 +8,6 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace GambitSimulator.Unity
 {
-    [RequireComponent(typeof(TrailRenderer))]
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(ParticleSystem))]
     public class CardComponent : XRGrabInteractable
@@ -27,10 +26,11 @@ namespace GambitSimulator.Unity
         private int spinFactor = 25;
         [SerializeField]
         private float sizeMultiplier = 2f;
+        [SerializeField]
+        private TrailRenderer trailRenderer;
 
         private Rigidbody rigidBody;
         private ParticleSystem destroyEffect;
-        private TrailRenderer trailRenderer;
 
         public void Start()
         {
@@ -38,7 +38,6 @@ namespace GambitSimulator.Unity
             rigidBody.maxAngularVelocity = maxAngularVelocity;
             rigidBody.isKinematic = true;
             destroyEffect = gameObject.GetComponent<ParticleSystem>();
-            trailRenderer = gameObject.GetComponent<TrailRenderer>();
             trailRenderer.enabled = false;
             transform.localScale = sizeMultiplier * new Vector3(transform.localScale.x, transform.localScale.y, 1);
         }
