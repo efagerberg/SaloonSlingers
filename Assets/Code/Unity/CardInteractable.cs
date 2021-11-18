@@ -15,8 +15,6 @@ namespace GambitSimulator.Unity
         [SerializeField]
         private Renderer faceRenderer;
         [SerializeField]
-        private List<Renderer> cardRenderers;
-        [SerializeField]
         private int maxAngularVelocity = 100;
         [SerializeField]
         private int spinFactor = 25;

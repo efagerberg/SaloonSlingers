@@ -8,9 +8,9 @@ namespace GambitSimulator.Core
     {
         private Random random;
 
-        public Deck(int amountOfDecks = 1)
+        public Deck(int numberOfDecks = 1)
         {
-            for (int i = 0; i < amountOfDecks; i++)
+            for (int i = 0; i < numberOfDecks; i++)
             {
                 var vals = Enum.GetValues(typeof(Values)).Cast<Values>();
                 var suits = Enum.GetValues(typeof(Suits)).Cast<Suits>();

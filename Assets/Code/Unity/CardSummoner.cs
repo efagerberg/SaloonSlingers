@@ -1,10 +1,8 @@
 using UnityEngine;
-
-using GambitSimulator.Core;
-
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.InputSystem;
-using System;
+
+using GambitSimulator.Core;
 
 namespace GambitSimulator.Unity
 {
@@ -16,10 +14,14 @@ namespace GambitSimulator.Unity
         private GameObject cardPrefab;
         [SerializeField]
         private XRInteractionManager interactionManager;
+        [SerializeField]
+        private PlayerAttributes playerAttributes;
 
         private XRDirectInteractor interactor;
-        private Deck deck = new Deck(3).Shuffle();
+        private Deck deck;
         private ActionBasedController controller;
+
+        private void Start() => deck = playerAttributes.Deck;
 
         private void OnEnable()
         {
@@ -35,6 +37,7 @@ namespace GambitSimulator.Unity
 
         private void SpawnCard(InputAction.CallbackContext obj)
         {
+            if (deck.Count == 0) return;
             Card card = deck.RemoveFromTop();
             var go = Instantiate(cardPrefab);
             var cardComponent = go.GetComponent<CardInteractable>();
