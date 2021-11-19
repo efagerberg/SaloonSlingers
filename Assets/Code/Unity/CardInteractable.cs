@@ -2,9 +2,12 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
 using GambitSimulator.Core;
+using System;
 
 namespace GambitSimulator.Unity
 {
+    public delegate void CardDeactivatedEventHandler(CardInteractable sender, EventArgs e);
+
     public class CardInteractable : XRGrabInteractable
     {
         [SerializeField]
@@ -18,15 +21,21 @@ namespace GambitSimulator.Unity
         [SerializeField]
         private float sizeMultiplier = 2f;
         [SerializeField]
+        private float maxLifetime = 2f;
+        [SerializeField]
         private TrailRenderer trailRenderer;
 
         private Rigidbody rigidBody;
+        private float timeToLive;
+
+        public static event CardDeactivatedEventHandler OnCardDeactivated;
 
         public void Start()
         {
             rigidBody = gameObject.GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
             rigidBody.isKinematic = true;
+            timeToLive = maxLifetime;
             trailRenderer.enabled = false;
             transform.localScale = sizeMultiplier * new Vector3(transform.localScale.x, transform.localScale.y, 1);
         }
@@ -63,8 +72,21 @@ namespace GambitSimulator.Unity
 
         private void FixedUpdate()
         {
-            if (!isSelected && rigidBody.velocity.magnitude == 0)
-                Destroy(gameObject);
+            if (!isSelected)
+            {
+                if (rigidBody.velocity.magnitude == 0 || timeToLive <= 0)
+                    DeactivateCard();
+                else timeToLive -= Time.deltaTime;
+            }
+        }
+
+        private void DeactivateCard()
+        {
+            timeToLive = maxLifetime;
+            trailRenderer.enabled = false;
+            rigidBody.isKinematic = true;
+            gameObject.SetActive(false);
+            OnCardDeactivated?.Invoke(this, EventArgs.Empty);
         }
     }
 }
