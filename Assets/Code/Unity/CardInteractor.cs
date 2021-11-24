@@ -14,8 +14,8 @@ namespace GambitSimulator.Unity
         public override void GetValidTargets(List<XRBaseInteractable> targets)
         {
             base.GetValidTargets(targets);
-            if (isSelectActive && targets.Count == 0 && cardSpawner.TrySpawnCard(transform.position, out CardInteractable interactable))
-                targets.Add(interactable);
+            if (isSelectActive && targets.Count == 0)
+                targets.Add(cardSpawner.Pool.Get());
         }
     }
 }

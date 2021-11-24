@@ -10,6 +10,8 @@ namespace GambitSimulator.Unity
 
     public class CardInteractable : XRGrabInteractable
     {
+        public static event CardDeactivatedEventHandler OnCardDeactivated;
+
         [SerializeField]
         private Card card;
         [SerializeField]
@@ -28,8 +30,6 @@ namespace GambitSimulator.Unity
         private Rigidbody rigidBody;
         private float timeToLive;
 
-        public static event CardDeactivatedEventHandler OnCardDeactivated;
-
         public void Start()
         {
             rigidBody = gameObject.GetComponent<Rigidbody>();
@@ -40,20 +40,12 @@ namespace GambitSimulator.Unity
             transform.localScale = sizeMultiplier * new Vector3(transform.localScale.x, transform.localScale.y, 1);
         }
 
-        public Card GetCard()
-        {
-            return card;
-        }
+        public Card GetCard() => card;
 
         public void SetCard(Card inCard)
         {
             card = inCard;
             name = card.ToString();
-            SetGraphics();
-        }
-
-        private void SetGraphics()
-        {
             faceRenderer.material.mainTexture = Resources.Load<Texture>(GetTexturePath(card));
         }
 
@@ -61,14 +53,11 @@ namespace GambitSimulator.Unity
         {
             base.Detach();
             rigidBody.isKinematic = false;
-            rigidBody.AddTorque(transform.forward * rigidBody.velocity.magnitude * spinFactor);
+            rigidBody.AddTorque(rigidBody.velocity.magnitude * spinFactor * transform.forward);
             trailRenderer.enabled = true;
         }
 
-        private string GetTexturePath(Card card)
-        {
-            return string.Format("Textures/{0}", card.ToString());
-        }
+        private string GetTexturePath(Card card) => string.Format("Textures/{0}", card.ToString());
 
         private void FixedUpdate()
         {
@@ -86,6 +75,7 @@ namespace GambitSimulator.Unity
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             gameObject.SetActive(false);
+            transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             OnCardDeactivated?.Invoke(this, EventArgs.Empty);
         }
     }

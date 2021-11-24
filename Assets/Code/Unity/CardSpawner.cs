@@ -1,7 +1,10 @@
-using UnityEngine;
+using System.Collections.Generic;
 
 using GambitSimulator.Core;
-using System.Collections.Generic;
+
+using UnityEngine;
+using UnityEngine.Pool;
+
 
 namespace GambitSimulator.Unity
 {
@@ -14,33 +17,27 @@ namespace GambitSimulator.Unity
         [SerializeField]
         private int poolSize = 10;
 
-        private Queue<CardInteractable> pool;
+        public IObjectPool<CardInteractable> Pool;
 
         private void Start()
         {
-            pool = new Queue<CardInteractable>();
-            for (int i = 0; i < poolSize; i++)
-            {
-                var go = Instantiate(cardPrefab, transform);
-                var cardInteractable = go.GetComponent<CardInteractable>();
-                go.SetActive(false);
-                pool.Enqueue(cardInteractable);
-            }
-            CardInteractable.OnCardDeactivated += (sender, _) => pool.Enqueue(sender);
+            Pool = new ObjectPool<CardInteractable>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
+            CardInteractable.OnCardDeactivated += (sender, _) => Pool.Release(sender);
         }
 
-        public bool TrySpawnCard(Vector3 spawnPosition, out CardInteractable cardInteractable)
+        private CardInteractable CreateInstance()
         {
-            cardInteractable = null;
-            if (pool.Count == 0 || playerAttributes.Deck.Count == 0) return false;
+            var go = Instantiate(cardPrefab, transform);
+            var cardInteractable = go.GetComponent<CardInteractable>();
+            go.SetActive(false);
+            return cardInteractable;
+        }
 
+        private void GetFromPool(CardInteractable cardInteractable)
+        {
             Card card = playerAttributes.Deck.RemoveFromTop();
-            var cardInteractableFromPool = pool.Dequeue();
-            cardInteractableFromPool.gameObject.SetActive(true);
-            cardInteractableFromPool.transform.position = spawnPosition;
-            cardInteractableFromPool.SetCard(card);
-            cardInteractable = cardInteractableFromPool;
-            return true;
+            cardInteractable.gameObject.SetActive(true);
+            cardInteractable.SetCard(card);
         }
     }
 }
