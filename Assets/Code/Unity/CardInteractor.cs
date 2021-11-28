@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -15,7 +14,7 @@ namespace GambitSimulator.Unity
         {
             base.GetValidTargets(targets);
             if (isSelectActive && targets.Count == 0)
-                targets.Add(cardSpawner.Pool.Get());
+                targets.Add(cardSpawner.Spawn(transform.position, Quaternion.identity));
         }
     }
 }

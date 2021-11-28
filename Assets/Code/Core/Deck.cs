@@ -6,19 +6,22 @@ namespace GambitSimulator.Core
 {
     public class Deck : Queue<Card>
     {
+        public const int NUMBER_OF_CARDS_IN_STANDARD_DECK = 52;
         private Random random;
 
-        public Deck(int numberOfDecks = 1)
+        public Deck(int numberOfCards = NUMBER_OF_CARDS_IN_STANDARD_DECK)
         {
-            for (int i = 0; i < numberOfDecks; i++)
+            var vals = Enum.GetValues(typeof(Values)).Cast<Values>();
+            var suits = Enum.GetValues(typeof(Suits)).Cast<Suits>();
+            while (numberOfCards > 0)
             {
-                var vals = Enum.GetValues(typeof(Values)).Cast<Values>();
-                var suits = Enum.GetValues(typeof(Suits)).Cast<Suits>();
                 foreach (var suit in suits)
                 {
                     foreach (var val in vals)
                     {
+                        if (numberOfCards <= 0) return;
                         Enqueue(new Card(suit, val));
+                        numberOfCards -= 1;
                     }
                 }
             }
@@ -38,9 +41,7 @@ namespace GambitSimulator.Core
 
             Clear();
             foreach (var card in queueAsList)
-            {
                 Enqueue(card);
-            }
 
             return this;
         }
@@ -50,27 +51,21 @@ namespace GambitSimulator.Core
             return Dequeue();
         }
 
-        public void RemoveFromTop(int _amount, IList<Card> _cards)
+        public IEnumerable<Card> RemoveFromTop(int _amount)
         {
             for (var i = 0; i < _amount; i++)
-            {
-                _cards.Add(RemoveFromTop());
-            }
+                yield return RemoveFromTop();
         }
 
         public void ReturnCard(Card _card)
         {
             Enqueue(_card);
-            Shuffle();
         }
 
         public void ReturnCards(IEnumerable<Card> _cards)
         {
             foreach (var card in _cards)
-            {
                 Enqueue(card);
-            }
-            Shuffle();
         }
     }
 

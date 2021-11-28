@@ -15,7 +15,7 @@ namespace GambitSimulator.Core.Tests
         }
 
         [Test]
-        public void Constructor_Params_CreatesExpectedCard()
+        public void Constructor_WithSuitAndValue_CreatesExpectedCard()
         {
             var cardUnderTest = new Card(Suits.HEARTS, Values.JACK);
 
@@ -24,33 +24,19 @@ namespace GambitSimulator.Core.Tests
         }
 
         [Test]
-        public void Equals_ForSameValuedCard_ReturnsTrue()
+        public void Constructor_WithCard_CreatesExpectedCard()
         {
-            Card cardUnderTest, cardToCompare;
-            cardUnderTest = cardToCompare = new Card();
-            Assert.IsTrue(cardUnderTest.Equals(cardToCompare));
-        }
+            var cardParam = new Card(Suits.HEARTS, Values.JACK);
+            var cardUnderTest = new Card(cardParam);
 
-        [Test]
-        public void Equals_ForDifferentCards_ReturnsFalse()
-        {
-            Card cardUnderTest, cardToCompare;
-            cardUnderTest = new Card();
-            cardToCompare = new Card(Suits.HEARTS, Values.JACK);
-            Assert.IsFalse(cardUnderTest.Equals(cardToCompare));
-        }
-
-        [Test]
-        public void Equals_ForNull_ReturnsFalse()
-        {
-            var cardUnderTest = new Card();
-            Assert.IsFalse(cardUnderTest.Equals(null));
+            Assert.AreEqual(cardUnderTest.Suit, Suits.HEARTS);
+            Assert.AreEqual(cardUnderTest.Value, Values.JACK);
         }
 
         [Test]
         public void IsFaceCard_ForNonFaceCard_ReturnsTrue()
         {
-            var cardUnderTest = new Card();
+            var cardUnderTest = new Card(Suits.DIAMONDS, Values.EIGHT);
             Assert.IsFalse(cardUnderTest.IsFaceCard());
 
             cardUnderTest.Value = Values.ACE;
@@ -73,25 +59,40 @@ namespace GambitSimulator.Core.Tests
         [Test]
         public void ToString_AceCard_ReturnsExpectedString()
         {
-            var cardUnderTest = new Card();
+            var cardUnderTest = new Card(Suits.CLUBS, Values.ACE);
             Assert.AreEqual(cardUnderTest.ToString(), "ace_of_clubs");
         }
 
         [Test]
         public void ToString_NumberCard_ReturnsExpectedString()
         {
-            var cardUnderTest = new Card();
-            cardUnderTest.Value = Values.EIGHT;
+            var cardUnderTest = new Card(Suits.CLUBS, Values.EIGHT);
             Assert.AreEqual(cardUnderTest.ToString(), "8_of_clubs");
         }
 
         [Test]
         public void ToString_FaceCard_ReturnsExpectedString()
         {
-            var cardUnderTest = new Card();
-            cardUnderTest.Value = Values.JACK;
-            cardUnderTest.Suit = Suits.DIAMONDS;
+            var cardUnderTest = new Card(Suits.DIAMONDS, Values.JACK);
             Assert.AreEqual(cardUnderTest.ToString(), "jack_of_diamonds2");
+        }
+
+        [Test]
+        public void GetHashCode_ReturnsSameValue_ForSameCard()
+        {
+            var card1 = new Card(Suits.DIAMONDS, Values.ACE);
+            var card2 = new Card(Suits.DIAMONDS, Values.ACE);
+
+            Assert.AreEqual(card1.GetHashCode(), card2.GetHashCode());
+        }
+
+        [Test]
+        public void GetHashCode_ReturnsDifferentValue_ForDifferentCard()
+        {
+            var card1 = new Card(Suits.DIAMONDS, Values.ACE);
+            var card2 = new Card(Suits.DIAMONDS, Values.TWO);
+
+            Assert.AreNotEqual(card1.GetHashCode(), card2.GetHashCode());
         }
     }
 

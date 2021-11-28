@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using NUnit.Framework;
@@ -24,9 +23,9 @@ namespace GambitSimulator.Core.Tests
         }
 
         [Test]
-        public void Constructor_ReturnsExpectedDeck()
+        public void Default_Constructor_ReturnsExpectedDeck()
         {
-            Assert.AreEqual(deckUnderTest.Count, 52);
+            Assert.AreEqual(deckUnderTest.Count, Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK);
 
             var expectedValues = Enum.GetValues(typeof(Values)).Cast<Values>();
             var expectedSuits = Enum.GetValues(typeof(Suits)).Cast<Suits>();
@@ -35,44 +34,61 @@ namespace GambitSimulator.Core.Tests
             {
                 foreach (var val in expectedValues)
                 {
-                    var cards = deckUnderTest.Where(x => x.Suit == suit &&
-                                                          x.Value == val).Select(x => x);
+                    var cards = deckUnderTest.Where(x => x.Suit == suit && x.Value == val);
                     Assert.AreEqual(cards.Count(), 1);
                 }
             }
         }
 
-        [Test]
-        public void RemoveFromTop_DefaultParam_ReturnsExpectedCard()
+        [TestCase(1)]
+        [TestCase(20)]
+        [TestCase(-1)]
+        [TestCase(Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK * 3)]
+        public void Constructor_WithNumberOfCards_ReturnsExpectedDeck(int numberOfCards)
         {
-            deckUnderTest.RemoveFromTop();
-            Assert.AreEqual(deckUnderTest.Count, 52 - 1);
+            var deck = new Deck(numberOfCards);
+
+            Assert.AreEqual(deck.Count, Math.Max(0, numberOfCards));
         }
 
         [Test]
-        public void RemoveFromTop_Cards_ReturnExpectedCards()
+        public void RemoveFromTop_NoParam_ReturnsExpectedCard()
         {
-            var cards = new List<Card>();
-            deckUnderTest.RemoveFromTop(7, cards);
-            Assert.AreEqual(deckUnderTest.Count, 52 - 7);
-            Assert.AreEqual(cards.Count, 7);
+            var expectedCount = deckUnderTest.Count - 1;
+            deckUnderTest.RemoveFromTop();
+
+            Assert.AreEqual(deckUnderTest.Count, expectedCount);
+        }
+
+        [Test]
+        public void RemoveFromTop_WithAmount_ReturnExpectedCards()
+        {
+            var amountToTake = 7;
+            var expectedCount = deckUnderTest.Count - amountToTake;
+            var cards = deckUnderTest.RemoveFromTop(amountToTake).ToList();
+
+            Assert.AreEqual(deckUnderTest.Count, expectedCount);
+            Assert.AreEqual(cards.ToList().Count, amountToTake);
         }
 
         [Test]
         public void ReturnCard_ReturnsCardToDeck()
         {
+            var expectedCount = deckUnderTest.Count;
             var card = deckUnderTest.RemoveFromTop();
             deckUnderTest.ReturnCard(card);
-            Assert.AreEqual(deckUnderTest.Count, 52);
+
+            Assert.AreEqual(deckUnderTest.Count, expectedCount);
         }
 
         [Test]
         public void ReturnCards_ReturnsCardsToDeck()
         {
-            var cards = new List<Card>();
-            deckUnderTest.RemoveFromTop(7, cards);
+            var expectedCount = deckUnderTest.Count;
+            var cards = deckUnderTest.RemoveFromTop(7);
             deckUnderTest.ReturnCards(cards);
-            Assert.AreEqual(deckUnderTest.Count, 52);
+
+            Assert.AreEqual(deckUnderTest.Count, expectedCount);
         }
     }
 

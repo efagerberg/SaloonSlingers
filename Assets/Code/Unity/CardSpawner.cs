@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using GambitSimulator.Core;
 
 using UnityEngine;
@@ -13,16 +11,26 @@ namespace GambitSimulator.Unity
         [SerializeField]
         private GameObject cardPrefab;
         [SerializeField]
-        private PlayerAttributes playerAttributes;
-        [SerializeField]
         private int poolSize = 10;
 
-        public IObjectPool<CardInteractable> Pool;
+        private IObjectPool<CardInteractable> pool;
+        private Player player;
+
+        public CardInteractable Spawn() => pool.Get();
+        public CardInteractable Spawn(Vector3 position, Quaternion rotation)
+        {
+            var c = Spawn();
+            c.transform.SetPositionAndRotation(position, rotation);
+            return c;
+        }
+        public void Despawn(CardInteractable c) => pool.Release(c);
 
         private void Start()
         {
-            Pool = new ObjectPool<CardInteractable>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
-            CardInteractable.OnCardDeactivated += (sender, _) => Pool.Release(sender);
+            var playerGO = GameObject.FindGameObjectWithTag("Player");
+            player = playerGO.GetComponent<Player>();
+            pool = new ObjectPool<CardInteractable>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
+            CardInteractable.OnCardDeactivated += (sender, _) => Despawn(sender);
         }
 
         private CardInteractable CreateInstance()
@@ -35,7 +43,7 @@ namespace GambitSimulator.Unity
 
         private void GetFromPool(CardInteractable cardInteractable)
         {
-            Card card = playerAttributes.Deck.RemoveFromTop();
+            Card card = player.Attributes.Deck.RemoveFromTop();
             cardInteractable.gameObject.SetActive(true);
             cardInteractable.SetCard(card);
         }
