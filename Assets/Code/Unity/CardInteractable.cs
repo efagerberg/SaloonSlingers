@@ -3,9 +3,9 @@ using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-using GambitSimulator.Core;
+using SaloonSlingers.Core;
 
-namespace GambitSimulator.Unity
+namespace SaloonSlingers.Unity
 {
     public delegate void CardDeactivatedEventHandler(CardInteractable sender, EventArgs e);
 

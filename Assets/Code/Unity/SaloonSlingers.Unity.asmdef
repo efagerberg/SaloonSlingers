@@ -1,6 +1,6 @@
 {
-    "name": "GambitSimulator.Unity",
-    "rootNamespace": "GambitSimulator.Unity",
+    "name": "SaloonSlingers.Unity",
+    "rootNamespace": "SaloonSlingers.Unity",
     "references": [
         "GUID:15b54c79343b4614195c3259778ba043",
         "GUID:fe685ec1767f73d42b749ea8045bfe43",

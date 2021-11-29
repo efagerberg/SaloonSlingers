@@ -1,10 +1,10 @@
-using GambitSimulator.Core;
+using SaloonSlingers.Core;
 
 using UnityEngine;
 using UnityEngine.Pool;
 
 
-namespace GambitSimulator.Unity
+namespace SaloonSlingers.Unity
 {
     public class CardSpawner : MonoBehaviour
     {

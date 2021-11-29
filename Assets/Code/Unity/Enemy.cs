@@ -1,9 +1,9 @@
 using UnityEngine;
 
-using GambitSimulator.Core;
+using SaloonSlingers.Core;
 using System;
 
-namespace GambitSimulator.Unity
+namespace SaloonSlingers.Unity
 {
     public class Enemy : MonoBehaviour
     {

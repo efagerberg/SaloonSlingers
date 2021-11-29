@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace GambitSimulator.Core
+namespace SaloonSlingers.Core
 {
     public enum Values { ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING }
     public enum Suits { CLUBS, DIAMONDS, HEARTS, SPADES }

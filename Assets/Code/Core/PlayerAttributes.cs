@@ -1,4 +1,4 @@
-namespace GambitSimulator.Core
+namespace SaloonSlingers.Core
 {
     public class PlayerAttributes
     {

@@ -1,6 +1,6 @@
 {
-    "name": "GambitSimulator.Core",
-    "rootNamespace": "GambitSimulator.Core",
+    "name": "SaloonSlingers.Core",
+    "rootNamespace": "SaloonSlingers.Core",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

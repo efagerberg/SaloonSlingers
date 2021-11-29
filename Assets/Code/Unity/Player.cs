@@ -1,8 +1,8 @@
 using UnityEngine;
 
-using GambitSimulator.Core;
+using SaloonSlingers.Core;
 
-namespace GambitSimulator.Unity
+namespace SaloonSlingers.Unity
 {
     public class Player : MonoBehaviour
     {

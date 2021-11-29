@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 
 
-namespace GambitSimulator.Core.Tests
+namespace SaloonSlingers.Core.Tests
 {
     public class CardTests
     {

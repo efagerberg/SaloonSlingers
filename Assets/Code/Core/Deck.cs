@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GambitSimulator.Core
+namespace SaloonSlingers.Core
 {
     public class Deck : Queue<Card>
     {

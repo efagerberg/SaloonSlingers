@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-using GambitSimulator.Core;
+using SaloonSlingers.Core;
 
-namespace GambitSimulator.Unity
+namespace SaloonSlingers.Unity
 {
     public class EnemySpawner : MonoBehaviour
     {

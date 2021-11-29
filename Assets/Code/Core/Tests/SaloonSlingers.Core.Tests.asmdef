@@ -1,8 +1,8 @@
 {
-    "name": "GambitSimulator.Core.Tests",
-    "rootNamespace": "GambitSimulator.Core.Tests",
+    "name": "SaloonSlingers.Core.Tests",
+    "rootNamespace": "SaloonSlingers,Core.Tests",
     "references": [
-        "GambitSimulator.Core"
+        "SaloonSlingers.Core"
     ],
     "includePlatforms": [
         "Editor"
