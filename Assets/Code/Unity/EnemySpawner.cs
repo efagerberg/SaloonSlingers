@@ -41,7 +41,7 @@ namespace SaloonSlingers.Unity
             deckCards = new Stack<GameObject>();
             enemyPool = new ObjectPool<Enemy>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
             SpawnDeck();
-            InvokeRepeating("SpawnEnemy", 3f, 10f);
+            InvokeRepeating("SpawnEnemy", 3f, 8f);
         }
 
         private void SpawnDeck()

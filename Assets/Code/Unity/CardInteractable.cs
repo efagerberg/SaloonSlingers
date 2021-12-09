@@ -64,7 +64,7 @@ namespace SaloonSlingers.Unity
             else timeToLive -= Time.deltaTime;
         }
 
-        private void DeactivateCard()
+        public void DeactivateCard()
         {
             timeToLive = maxLifetime;
             trailRenderer.enabled = false;

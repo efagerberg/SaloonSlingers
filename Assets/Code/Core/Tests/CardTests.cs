@@ -6,15 +6,6 @@ namespace SaloonSlingers.Core.Tests
     public class CardTests
     {
         [Test]
-        public void Constructor_Default_CreatesExpectedCard()
-        {
-            var cardUnderTest = new Card();
-
-            Assert.AreEqual(cardUnderTest.Suit, Suits.CLUBS);
-            Assert.AreEqual(cardUnderTest.Value, Values.ACE);
-        }
-
-        [Test]
         public void Constructor_WithSuitAndValue_CreatesExpectedCard()
         {
             var cardUnderTest = new Card(Suits.HEARTS, Values.JACK);
@@ -74,7 +65,7 @@ namespace SaloonSlingers.Core.Tests
         public void ToString_FaceCard_ReturnsExpectedString()
         {
             var cardUnderTest = new Card(Suits.DIAMONDS, Values.JACK);
-            Assert.AreEqual(cardUnderTest.ToString(), "jack_of_diamonds2");
+            Assert.AreEqual(cardUnderTest.ToString(), "jack_of_diamonds");
         }
 
         [Test]
