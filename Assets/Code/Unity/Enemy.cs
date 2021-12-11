@@ -1,7 +1,6 @@
 using UnityEngine;
 
 using SaloonSlingers.Core;
-using System;
 
 namespace SaloonSlingers.Unity
 {

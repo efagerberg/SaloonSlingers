@@ -13,7 +13,7 @@ namespace SaloonSlingers.Unity
         public override void GetValidTargets(List<XRBaseInteractable> targets)
         {
             base.GetValidTargets(targets);
-            if (isSelectActive && targets.Count == 0)
+            if (isSelectActive && targets.Count == 0 && cardSpawner.HasCardsLeft())
                 targets.Add(cardSpawner.Spawn(transform.position, Quaternion.identity));
         }
     }

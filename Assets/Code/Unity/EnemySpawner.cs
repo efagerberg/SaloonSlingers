@@ -41,7 +41,9 @@ namespace SaloonSlingers.Unity
             deckCards = new Stack<GameObject>();
             enemyPool = new ObjectPool<Enemy>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
             SpawnDeck();
-            InvokeRepeating("SpawnEnemy", 3f, 8f);
+            InvokeRepeating(nameof(SpawnEnemy), 3f, 8f);
+            deck.OnDeckEmpty += (_, __) => CancelInvoke(nameof(SpawnEnemy));
+            deck.OnDeckRefilled += (_, __) => InvokeRepeating(nameof(SpawnEnemy), 3f, 8f);
         }
 
         private void SpawnDeck()
@@ -63,7 +65,7 @@ namespace SaloonSlingers.Unity
         {
             var cardGO = deckCards.Pop();
             Destroy(cardGO);
-            var randomSpawnpointIndex = Random.Range(0, spawnPoints.Count - 1);
+            var randomSpawnpointIndex = UnityEngine.Random.Range(0, spawnPoints.Count - 1);
             var spawnPoint = spawnPoints[randomSpawnpointIndex];
             Spawn(
                 new Vector3(spawnPoint.position.x, 1, spawnPoint.position.z),

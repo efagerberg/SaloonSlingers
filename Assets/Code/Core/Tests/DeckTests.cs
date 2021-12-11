@@ -61,6 +61,28 @@ namespace SaloonSlingers.Core.Tests
         }
 
         [Test]
+        public void RemoveFromTop_EmitsEmptyEvent_WhenDeckBecomesEmpty()
+        {
+            var singleCardDeck = new Deck(1);
+            bool eventTriggered = false;
+            singleCardDeck.OnDeckEmpty += (_, __) => eventTriggered = true;
+            singleCardDeck.RemoveFromTop();
+
+            Assert.That(eventTriggered);
+        }
+
+        [Test]
+        public void RemoveFromTop_DoesNotEmitEmptyEvent_WhenDeckDoesNotBecomeEmpty()
+        {
+            var twoCardDeck = new Deck(2);
+            bool eventTriggered = false;
+            twoCardDeck.OnDeckEmpty += (_, __) => eventTriggered = true;
+            twoCardDeck.RemoveFromTop();
+
+            Assert.IsFalse(eventTriggered);
+        }
+
+        [Test]
         public void RemoveFromTop_WithAmount_ReturnExpectedCards()
         {
             var amountToTake = 7;
@@ -79,6 +101,28 @@ namespace SaloonSlingers.Core.Tests
             deckUnderTest.ReturnCard(card);
 
             Assert.AreEqual(deckUnderTest.Count, expectedCount);
+        }
+
+        [Test]
+        public void ReturnCard_EmitsRefillEvent_WhenSizeIncreasesFrom0()
+        {
+            bool eventTriggered = false;
+            var emptyDeck = new Deck(0);
+            emptyDeck.OnDeckRefilled += (sender, __) => eventTriggered = true;
+            emptyDeck.ReturnCard(new Card(Suits.CLUBS, Values.ACE));
+
+            Assert.That(eventTriggered);
+        }
+
+        [Test]
+        public void ReturnCard_DoesNotEmitsRefillEvent_WhenSizeAbove0()
+        {
+            bool eventTriggered = false;
+            var singleCardDeck = new Deck(1);
+            singleCardDeck.OnDeckRefilled += (sender, __) => eventTriggered = true;
+            singleCardDeck.ReturnCard(new Card(Suits.CLUBS, Values.ACE));
+
+            Assert.IsFalse(eventTriggered);
         }
 
         [Test]

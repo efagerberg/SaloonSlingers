@@ -66,6 +66,7 @@ namespace SaloonSlingers.Unity
 
         public void DeactivateCard()
         {
+            if (!gameObject.activeSelf) return;
             timeToLive = maxLifetime;
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
