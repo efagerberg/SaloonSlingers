@@ -10,7 +10,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private int numberOfCards = Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK;
         [SerializeField]
-        private int health = 5;
+        private int startingHealth = 5;
 
         public void TakeDamage(int amount)
         {
@@ -21,7 +21,7 @@ namespace SaloonSlingers.Unity
 
         private void Start()
         {
-            Attributes = new PlayerAttributes(numberOfCards, health);
+            Attributes = new PlayerAttributes(numberOfCards, startingHealth);
         }
     }
 }
