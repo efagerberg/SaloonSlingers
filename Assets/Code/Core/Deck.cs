@@ -4,10 +4,15 @@ using System.Linq;
 
 namespace SaloonSlingers.Core
 {
+    public delegate void DeckEmptyHandler(Deck sender, EventArgs e);
+    public delegate void DeckRefilledHandler(Deck sender, EventArgs e);
+
     public class Deck : Queue<Card>
     {
         public const int NUMBER_OF_CARDS_IN_STANDARD_DECK = 52;
         private Random random;
+        public event DeckEmptyHandler OnDeckEmpty;
+        public event DeckRefilledHandler OnDeckRefilled;
 
         public Deck(int numberOfCards = NUMBER_OF_CARDS_IN_STANDARD_DECK)
         {
@@ -48,7 +53,9 @@ namespace SaloonSlingers.Core
 
         public Card RemoveFromTop()
         {
-            return Dequeue();
+            Card c = Dequeue();
+            if (Count == 0) OnDeckEmpty?.Invoke(this, EventArgs.Empty);
+            return c;
         }
 
         public IEnumerable<Card> RemoveFromTop(int _amount)
@@ -59,6 +66,7 @@ namespace SaloonSlingers.Core
 
         public void ReturnCard(Card _card)
         {
+            if (Count == 0) OnDeckRefilled?.Invoke(this, EventArgs.Empty);
             Enqueue(_card);
         }
 

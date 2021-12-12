@@ -25,6 +25,10 @@ namespace SaloonSlingers.Unity
         private float maxLifetime = 2f;
         [SerializeField]
         private TrailRenderer trailRenderer;
+        [SerializeField]
+        private Transform leftAttachTransform;
+        [SerializeField]
+        private Transform rightAttachTransform;
 
         private Rigidbody rigidBody;
         private float timeToLive;
@@ -64,14 +68,26 @@ namespace SaloonSlingers.Unity
             else timeToLive -= Time.deltaTime;
         }
 
-        private void DeactivateCard()
+        public void DeactivateCard()
         {
+            if (!gameObject.activeSelf) return;
             timeToLive = maxLifetime;
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             gameObject.SetActive(false);
             OnCardDeactivated?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected override void OnSelectEntering(SelectEnterEventArgs args)
+        {
+            base.OnSelectEntering(args);
+
+            bool isRightHandInteractor = args.interactor.name.Contains("right", StringComparison.OrdinalIgnoreCase);
+            if (isRightHandInteractor) attachTransform = rightAttachTransform;
+
+            bool isLeftHandInteractor = args.interactor.name.Contains("left", StringComparison.OrdinalIgnoreCase);
+            if (isLeftHandInteractor) attachTransform = leftAttachTransform;
         }
     }
 }

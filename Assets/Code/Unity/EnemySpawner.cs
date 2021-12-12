@@ -21,6 +21,10 @@ namespace SaloonSlingers.Unity
         private List<Transform> spawnPoints;
         [SerializeField]
         private GameObject enemyPrefab;
+        [SerializeField]
+        private float spawnPerSecond = 4f;
+        [SerializeField]
+        private float spawnInitialWaitSeconds = 3f;
 
         private Deck deck;
         private Stack<GameObject> deckCards;
@@ -41,7 +45,9 @@ namespace SaloonSlingers.Unity
             deckCards = new Stack<GameObject>();
             enemyPool = new ObjectPool<Enemy>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
             SpawnDeck();
-            InvokeRepeating("SpawnEnemy", 3f, 10f);
+            InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
+            deck.OnDeckEmpty += (_, __) => CancelInvoke(nameof(SpawnEnemy));
+            deck.OnDeckRefilled += (_, __) => InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
         }
 
         private void SpawnDeck()
@@ -63,7 +69,7 @@ namespace SaloonSlingers.Unity
         {
             var cardGO = deckCards.Pop();
             Destroy(cardGO);
-            var randomSpawnpointIndex = Random.Range(0, spawnPoints.Count - 1);
+            var randomSpawnpointIndex = UnityEngine.Random.Range(0, spawnPoints.Count - 1);
             var spawnPoint = spawnPoints[randomSpawnpointIndex];
             Spawn(
                 new Vector3(spawnPoint.position.x, 1, spawnPoint.position.z),

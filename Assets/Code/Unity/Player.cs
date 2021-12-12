@@ -9,10 +9,19 @@ namespace SaloonSlingers.Unity
         public PlayerAttributes Attributes;
         [SerializeField]
         private int numberOfCards = Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK;
+        [SerializeField]
+        private int startingHealth = 5;
 
-        private void Start()
+        public void TakeDamage(int amount)
         {
-            Attributes = new PlayerAttributes(numberOfCards);
+            Attributes.Health -= Mathf.Max(amount, 0);
+            if (Attributes.Health == 0)
+                Debug.Log("Player died");
+        }
+
+        private void Awake()
+        {
+            Attributes = new PlayerAttributes(numberOfCards, startingHealth);
         }
     }
 }
