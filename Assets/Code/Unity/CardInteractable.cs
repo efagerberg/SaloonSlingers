@@ -33,15 +33,6 @@ namespace SaloonSlingers.Unity
         private Rigidbody rigidBody;
         private float timeToLive;
 
-        public void Start()
-        {
-            rigidBody = gameObject.GetComponent<Rigidbody>();
-            rigidBody.maxAngularVelocity = maxAngularVelocity;
-            rigidBody.isKinematic = true;
-            timeToLive = maxLifetime;
-            trailRenderer.enabled = false;
-        }
-
         public Card GetCard() => card;
 
         public void SetCard(Card inCard)
@@ -51,12 +42,42 @@ namespace SaloonSlingers.Unity
             CardGraphicsHelper.SetFaceTexture(card, faceRenderer);
         }
 
-        protected override void Detach()
+        protected override void Awake()
         {
-            base.Detach();
-            rigidBody.isKinematic = false;
-            rigidBody.AddTorque(rigidBody.velocity.magnitude * spinFactor * transform.forward);
-            trailRenderer.enabled = true;
+            base.Awake();
+            rigidBody = gameObject.GetComponent<Rigidbody>();
+            rigidBody.maxAngularVelocity = maxAngularVelocity;
+        }
+
+        public void DeactivateCard()
+        {
+            if (!gameObject.activeSelf) return;
+            timeToLive = maxLifetime;
+            SetUnthrownState();
+            transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            gameObject.SetActive(false);
+            OnCardDeactivated?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected override void OnSelectEntering(SelectEnterEventArgs args)
+        {
+            base.OnSelectEntering(args);
+            attachTransform = GetAttachTransformForInteractor(args.interactorObject);
+            SetUnthrownState();
+        }
+
+        protected override void OnSelectExiting(SelectExitEventArgs args)
+        {
+            base.OnSelectExiting(args);
+            SetThrownState();
+            rigidBody.AddTorque(spinFactor * transform.forward);
+            NegateCharacterControllerVelocity(args.interactorObject);
+        }
+
+        private void NegateCharacterControllerVelocity(IXRInteractor interactorObject)
+        {
+            var c = interactorObject.transform.GetComponentInParent<CharacterController>();
+            rigidBody.AddForce(-c.velocity);
         }
 
         private void FixedUpdate()
@@ -68,26 +89,28 @@ namespace SaloonSlingers.Unity
             else timeToLive -= Time.deltaTime;
         }
 
-        public void DeactivateCard()
+        private Transform GetAttachTransformForInteractor(IXRInteractor interactor)
         {
-            if (!gameObject.activeSelf) return;
-            timeToLive = maxLifetime;
-            trailRenderer.enabled = false;
-            rigidBody.isKinematic = true;
-            transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-            gameObject.SetActive(false);
-            OnCardDeactivated?.Invoke(this, EventArgs.Empty);
+            bool isRightHandInteractor = interactor.transform.name.Contains("right", StringComparison.OrdinalIgnoreCase);
+            if (isRightHandInteractor) return rightAttachTransform;
+
+            bool isLeftHandInteractor = interactor.transform.name.Contains("left", StringComparison.OrdinalIgnoreCase);
+            if (isLeftHandInteractor) return leftAttachTransform;
+
+            return rightAttachTransform;
         }
 
-        protected override void OnSelectEntering(SelectEnterEventArgs args)
+        private void SetThrownState()
         {
-            base.OnSelectEntering(args);
+            trailRenderer.enabled = true;
+            rigidBody.isKinematic = false;
+        }
 
-            bool isRightHandInteractor = args.interactor.name.Contains("right", StringComparison.OrdinalIgnoreCase);
-            if (isRightHandInteractor) attachTransform = rightAttachTransform;
-
-            bool isLeftHandInteractor = args.interactor.name.Contains("left", StringComparison.OrdinalIgnoreCase);
-            if (isLeftHandInteractor) attachTransform = leftAttachTransform;
+        private void SetUnthrownState()
+        {
+            trailRenderer.enabled = false;
+            rigidBody.isKinematic = true;
+            timeToLive = maxLifetime;
         }
     }
 }
