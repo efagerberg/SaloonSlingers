@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -39,15 +40,25 @@ namespace SaloonSlingers.Unity
         }
         public void Despawn(Enemy e) => enemyPool.Release(e);
 
-        private void Start()
+        private void Awake()
         {
             deck = new Deck(numberOfCards).Shuffle();
             deckCards = new Stack<GameObject>();
             enemyPool = new ObjectPool<Enemy>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
             SpawnDeck();
+        }
+
+        private void OnEnable()
+        {
+            deck.OnDeckEmpty += DeckEmptyHandler;
+            deck.OnDeckRefilled += DeckRefilledHandler;
             InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
-            deck.OnDeckEmpty += (_, __) => CancelInvoke(nameof(SpawnEnemy));
-            deck.OnDeckRefilled += (_, __) => InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
+        }
+
+        private void OnDisable()
+        {
+            deck.OnDeckEmpty -= DeckEmptyHandler;
+            deck.OnDeckRefilled -= DeckRefilledHandler;
         }
 
         private void SpawnDeck()
@@ -90,5 +101,8 @@ namespace SaloonSlingers.Unity
             enemy.SetCard(card);
             enemy.gameObject.SetActive(true);
         }
+
+        private void DeckEmptyHandler(Deck _, EventArgs __) => CancelInvoke(nameof(SpawnEnemy));
+        private void DeckRefilledHandler(Deck _, EventArgs __) => InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
     }
 }

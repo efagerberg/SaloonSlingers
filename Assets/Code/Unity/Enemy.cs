@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.XR.CoreUtils;
 
 using SaloonSlingers.Core;
 
@@ -14,7 +15,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private Renderer faceRenderer;
 
-        private GameObject player;
+        private Transform playerCameraTransform;
         private CharacterController controller;
 
         public Card GetCard() => card;
@@ -26,14 +27,14 @@ namespace SaloonSlingers.Unity
 
         private void Start()
         {
-            player = GameObject.FindGameObjectWithTag("Player");
+            playerCameraTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<XROrigin>().Camera.transform;
             controller = GetComponent<CharacterController>();
         }
 
         private void Update()
         {
-            if (transform.position == player.transform.position) gameObject.SetActive(false);
-            transform.LookAt(new Vector3(player.transform.position.x, 1, player.transform.position.z));
+            if (transform.position == playerCameraTransform.transform.position) gameObject.SetActive(false);
+            transform.LookAt(new Vector3(playerCameraTransform.position.x, 1, playerCameraTransform.position.z));
             controller.Move(moveSpeed * Time.deltaTime * transform.forward);
         }
 

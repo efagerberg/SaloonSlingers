@@ -1,8 +1,9 @@
-using SaloonSlingers.Core;
+using System;
 
 using UnityEngine;
 using UnityEngine.Pool;
 
+using SaloonSlingers.Core;
 
 namespace SaloonSlingers.Unity
 {
@@ -27,15 +28,26 @@ namespace SaloonSlingers.Unity
         public void Despawn(CardInteractable c) => pool.Release(c);
         public bool HasCardsLeft() => hasCardsLeft;
 
-        private void Start()
+        private void Awake()
         {
             var playerGO = GameObject.FindGameObjectWithTag("Player");
             player = playerGO.GetComponent<Player>();
             hasCardsLeft = player.Attributes.Deck.Count > 0;
             pool = new ObjectPool<CardInteractable>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
-            CardInteractable.OnCardDeactivated += (sender, _) => Despawn(sender);
-            player.Attributes.Deck.OnDeckEmpty += (_, __) => hasCardsLeft = false;
-            player.Attributes.Deck.OnDeckRefilled += (_, __) => hasCardsLeft = true;
+        }
+
+        private void OnEnable()
+        {
+            CardInteractable.OnCardDeactivated += cardDeactivatedHandler;
+            player.Attributes.Deck.OnDeckEmpty += deckEmptyHandler;
+            player.Attributes.Deck.OnDeckRefilled += deckRefilledHandler;
+        }
+
+        private void OnDisable()
+        {
+            CardInteractable.OnCardDeactivated -= cardDeactivatedHandler;
+            player.Attributes.Deck.OnDeckEmpty -= deckEmptyHandler;
+            player.Attributes.Deck.OnDeckRefilled -= deckRefilledHandler;
         }
 
         private CardInteractable CreateInstance()
@@ -52,5 +64,9 @@ namespace SaloonSlingers.Unity
             cardInteractable.gameObject.SetActive(true);
             cardInteractable.SetCard(card);
         }
+
+        private void cardDeactivatedHandler(CardInteractable sender, EventArgs _) => Despawn(sender);
+        private void deckEmptyHandler(Deck sender, EventArgs _) => hasCardsLeft = false;
+        private void deckRefilledHandler(Deck sender, EventArgs _) => hasCardsLeft = true;
     }
 }
