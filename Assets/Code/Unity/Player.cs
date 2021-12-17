@@ -23,5 +23,12 @@ namespace SaloonSlingers.Unity
         {
             Attributes = new PlayerAttributes(numberOfCards, startingHealth);
         }
+
+        private void OnTriggerEnter(Collider hit)
+        {
+            if (!hit.CompareTag("Enemy")) return;
+            TakeDamage(1);
+            Destroy(hit.gameObject);
+        }
     }
 }

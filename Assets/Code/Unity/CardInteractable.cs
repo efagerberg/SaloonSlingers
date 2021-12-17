@@ -112,5 +112,21 @@ namespace SaloonSlingers.Unity
             rigidBody.isKinematic = true;
             timeToLive = maxLifetime;
         }
+
+        private void OnTriggerEnter(Collider hit)
+        {
+            if (!hit.gameObject.CompareTag("Enemy")) return;
+
+            var enemy = hit.GetComponent<Enemy>();
+            Card inCard = enemy.GetCard();
+            int remainingValue = Mathf.Max(inCard.Value - card.Value, 0);
+            if (remainingValue == 0) Destroy(hit.gameObject);
+            else
+            {
+                Card newCard = new Card(card.Suit, (Values)remainingValue);
+                enemy.SetCard(newCard);
+            }
+            DeactivateCard();
+        }
     }
 }
