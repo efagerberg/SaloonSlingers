@@ -17,6 +17,7 @@ namespace SaloonSlingers.Unity
         private IObjectPool<CardInteractable> pool;
         private Player player;
         private bool hasCardsLeft;
+        private bool hasRegisteredDeckEvents = false;
 
         public CardInteractable Spawn() => pool.Get();
         public CardInteractable Spawn(Vector3 position, Quaternion rotation)
@@ -30,24 +31,27 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
+            pool = new ObjectPool<CardInteractable>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
+        }
+
+        private void Start()
+        {
             var playerGO = GameObject.FindGameObjectWithTag("Player");
             player = playerGO.GetComponent<Player>();
+            RegisterDeckEvents();
             hasCardsLeft = player.Attributes.Deck.Count > 0;
-            pool = new ObjectPool<CardInteractable>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
         }
 
         private void OnEnable()
         {
-            CardInteractable.OnCardDeactivated += cardDeactivatedHandler;
-            player.Attributes.Deck.OnDeckEmpty += deckEmptyHandler;
-            player.Attributes.Deck.OnDeckRefilled += deckRefilledHandler;
+            CardInteractable.OnCardDeactivated += CardDeactivatedHandler;
+            RegisterDeckEvents();
         }
 
         private void OnDisable()
         {
-            CardInteractable.OnCardDeactivated -= cardDeactivatedHandler;
-            player.Attributes.Deck.OnDeckEmpty -= deckEmptyHandler;
-            player.Attributes.Deck.OnDeckRefilled -= deckRefilledHandler;
+            CardInteractable.OnCardDeactivated += CardDeactivatedHandler;
+            UnregisterDeckEvents();
         }
 
         private CardInteractable CreateInstance()
@@ -65,8 +69,22 @@ namespace SaloonSlingers.Unity
             cardInteractable.SetCard(card);
         }
 
-        private void cardDeactivatedHandler(CardInteractable sender, EventArgs _) => Despawn(sender);
-        private void deckEmptyHandler(Deck sender, EventArgs _) => hasCardsLeft = false;
-        private void deckRefilledHandler(Deck sender, EventArgs _) => hasCardsLeft = true;
+        private void CardDeactivatedHandler(CardInteractable sender, EventArgs _) => Despawn(sender);
+        private void DeckEmptyHandler(Deck sender, EventArgs _) => hasCardsLeft = false;
+        private void DeckRefilledHandler(Deck sender, EventArgs _) => hasCardsLeft = true;
+        private void RegisterDeckEvents()
+        {
+            if (hasRegisteredDeckEvents || player == null) return;
+            player.Attributes.Deck.OnDeckEmpty += DeckEmptyHandler;
+            player.Attributes.Deck.OnDeckRefilled += DeckRefilledHandler;
+            hasRegisteredDeckEvents = true;
+        }
+        private void UnregisterDeckEvents()
+        {
+            if (!hasRegisteredDeckEvents || player == null) return;
+            player.Attributes.Deck.OnDeckEmpty -= DeckEmptyHandler;
+            player.Attributes.Deck.OnDeckRefilled -= DeckRefilledHandler;
+            hasRegisteredDeckEvents = false;
+        }
     }
 }
