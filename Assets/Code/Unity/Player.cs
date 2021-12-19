@@ -1,4 +1,9 @@
+using System.Collections;
+using System.Collections.Generic;
+
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit.Inputs;
 
 using SaloonSlingers.Core;
 
@@ -11,6 +16,12 @@ namespace SaloonSlingers.Unity
         private int numberOfCards = Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK;
         [SerializeField]
         private int startingHealth = 5;
+        [SerializeField]
+        private float startingDashSpeed = 6f;
+        [SerializeField]
+        private int startingDashes = 3;
+        [SerializeField]
+        private float startingDashCooldown = 3;
 
         public void TakeDamage(int amount)
         {
@@ -21,7 +32,14 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
-            Attributes = new PlayerAttributes(numberOfCards, startingHealth);
+            Attributes = new PlayerAttributes
+            {
+                Deck = new Deck(numberOfCards),
+                Health = startingHealth,
+                Dashes = startingDashes,
+                DashSpeed = startingDashSpeed,
+                DashCooldown = startingDashCooldown
+            };
         }
 
         private void OnTriggerEnter(Collider hit)

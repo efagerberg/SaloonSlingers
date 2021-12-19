@@ -2,15 +2,12 @@ using System;
 
 namespace SaloonSlingers.Core
 {
-    public class PlayerAttributes
+    public struct PlayerAttributes
     {
-        public Deck Deck { get; private set; }
+        public Deck Deck { get; set; }
         public int Health { get; set; }
-
-        public PlayerAttributes(int numberOfCards, int health)
-        {
-            Deck = new Deck(numberOfCards).Shuffle();
-            Health = health;
-        }
+        public int Dashes { get; set; }
+        public float DashSpeed { get; set; }
+        public float DashCooldown { get; set; }
     }
 }
