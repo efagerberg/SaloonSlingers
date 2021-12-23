@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+
 namespace SaloonSlingers.Core
 {
     public interface IHandEvaluator
     {
-        public float Evaluate(Card[] hand);
-        public float GetMaxHandValue();
-        public float GetMinHandValue();
+        public int Evaluate(IEnumerable<Card> hand);
+        public int GetMaxHandValue();
+        public int GetMinHandValue();
     }
 }

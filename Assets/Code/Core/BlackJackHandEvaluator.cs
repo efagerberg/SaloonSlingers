@@ -1,4 +1,6 @@
-﻿namespace SaloonSlingers.Core
+﻿using System.Collections.Generic;
+
+namespace SaloonSlingers.Core
 {
     public class BlackJackHandEvaluator : IHandEvaluator
     {
@@ -7,15 +9,16 @@
         private const int FACE_VALUE = 10;
         private const int BUST_THRESHOLD = 21;
 
-        public float GetMaxHandValue() => BUST_THRESHOLD + 1;
-        public float GetMinHandValue() => -1;
+        public int GetMaxHandValue() => BUST_THRESHOLD + 1;
+        public int GetMinHandValue() => -1;
 
-        public float Evaluate(Card[] hand)
+        public int Evaluate(IEnumerable<Card> hand)
         {
             int sum = 0;
             int numAces = 0;
             int numFaceCards = 0;
-            foreach (var card in hand)
+            int handLength = 0;
+            foreach (Card card in hand)
             {
                 if (card.Value == Values.ACE)
                 {
@@ -29,8 +32,9 @@
                 }
                 else
                     sum += (int)card.Value;
+                handLength += 1;
 
-                if (IsBlackJack(hand, numAces, numFaceCards)) return GetMaxHandValue();
+                if (IsBlackJack(numAces, numFaceCards, handLength)) return GetMaxHandValue();
             }
 
             while (sum > BUST_THRESHOLD)
@@ -42,9 +46,9 @@
             return sum;
         }
 
-        private static bool IsBlackJack(Card[] hand, int numAces, int numFaceCards)
+        private static bool IsBlackJack(int numAces, int numFaceCards, int length)
         {
-            return hand.Length == 2 && numAces == 1 && numFaceCards == 1;
+            return length == 2 && numAces == 1 && numFaceCards == 1;
         }
     }
 };
