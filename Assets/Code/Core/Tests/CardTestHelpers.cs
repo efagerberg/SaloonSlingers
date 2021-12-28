@@ -2,7 +2,7 @@
 
 namespace SaloonSlingers.Core.Tests
 {
-    public class HandEvaluatorTestBase
+    public static class CardTestHelpers
     {
         public static IEnumerable<Card> MakeHandFromString(string handString)
         {

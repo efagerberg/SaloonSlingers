@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace SaloonSlingers.Core.Tests
 {
-    public class BlackJackHandEvaluatorTests : HandEvaluatorTestBase
+    public class BlackJackHandEvaluatorTests
     {
         public class EvaluateTests
         {
@@ -26,7 +26,7 @@ namespace SaloonSlingers.Core.Tests
             [TestCaseSource(nameof(EvaluateTestCases))]
             public void ReturnsExpectedResult(string handString, float expectedHandValue)
             {
-                Assert.AreEqual(expectedHandValue, subject.Evaluate(MakeHandFromString(handString)));
+                Assert.AreEqual(expectedHandValue, subject.Evaluate(CardTestHelpers.MakeHandFromString(handString)));
             }
         }
     }

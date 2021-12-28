@@ -25,7 +25,7 @@ namespace SaloonSlingers.Core
                     foreach (var val in vals)
                     {
                         if (numberOfCards <= 0) return;
-                        Enqueue(new Card(suit, val));
+                        Enqueue(new Card(val, suit));
                         numberOfCards -= 1;
                     }
                 }
