@@ -13,15 +13,16 @@ namespace SaloonSlingers.Core
     [Serializable]
     public struct Card
     {
-        private static Dictionary<char, Values> CharToValue = Enum.GetValues(typeof(Values))
+        public Suits Suit;
+        public Values Value;
+
+        private static readonly Dictionary<char, Values> CharToValue = Enum.GetValues(typeof(Values))
                                                           .Cast<Values>()
                                                           .ToDictionary(x => (int)x >= FACE_VALUE_THRESHOLD || x == Values.ACE ? x.ToString()[0] : ((int)x).ToString()[0], y => y);
-        private static Dictionary<char, Suits> CharToSuit = Enum.GetValues(typeof(Suits))
+        private static readonly Dictionary<char, Suits> CharToSuit = Enum.GetValues(typeof(Suits))
                                                                  .Cast<Suits>()
                                                                  .ToDictionary(x => x.ToString()[0], y => y);
         private const int FACE_VALUE_THRESHOLD = 10;
-        public Suits Suit;
-        public Values Value;
 
         public Card(Values inValue = Values.ACE, Suits inSuit = Suits.CLUBS)
         {
@@ -49,8 +50,8 @@ namespace SaloonSlingers.Core
 
         public override string ToString()
         {
-            var value_as_int = (int)Value;
-            var template = "{0}_of_{1}";
+            int value_as_int = (int)Value;
+            string template = "{0}_of_{1}";
 
             if (IsFaceCard() || Value == Values.ACE)
                 return string.Format(template, Value.ToString().ToLower(), Suit.ToString().ToLower());
@@ -58,28 +59,29 @@ namespace SaloonSlingers.Core
             return string.Format(template, (value_as_int), Suit.ToString().ToLower());
         }
 
-        public override int GetHashCode()
-        {
-            return Encode(this);
-        }
+        public override int GetHashCode() => Encode(this);
 
         /// <summary>
         /// Encodes a Card object into a byte
         /// Scheme: vvvvcdhs
-        ///     v = value of card (ace=1,deuce=2,trey=3,four=4,five=5,...,king=13)
+        ///     v = value of card (ace=1,two=2,three=3,four=4,five=5,...,king=13)
         ///     cdhs = suit of card (bit turned on based on suit of card)
         /// </summary>
         public static byte Encode(Card card)
         {
-            byte suitByte = (byte)Math.Pow(2, 3 - ((int)card.Suit));
-            return (byte)((byte)card.Value << 4 | suitByte);
+            return (byte)(GetValueMask(card) | GetSuitMask(card));
         }
 
         public static Card Decode(byte encodedCard)
         {
-            Values value = (Values)(encodedCard >> 4);
-            Suits suit = (Suits)(-Math.Log(encodedCard & 0b_0000_1111, 2) + 3);
+            Values value = (Values)(GetValueMask(encodedCard));
+            Suits suit = (Suits)(-Math.Log(GetSuitMask(encodedCard), 2) + 3);
             return new Card(value, suit);
         }
+
+        public static byte GetSuitMask(byte encodedCard) => (byte)(encodedCard & 0x0F);
+        public static byte GetSuitMask(Card card) => (byte)Math.Pow(2, 3 - ((int)card.Suit));
+        public static byte GetValueMask(byte encodedCard) => (byte)(encodedCard >> 4);
+        public static byte GetValueMask(Card card) => (byte)((byte)card.Value << 4);
     }
 }

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using NUnit.Framework;
 
 namespace SaloonSlingers.Core.Tests
@@ -9,24 +7,28 @@ namespace SaloonSlingers.Core.Tests
         public class EvaluateTests
         {
             private static readonly BlackJackHandEvaluator subject = new();
-            private static readonly object[] EvaluateTestCases = {
-                new object[] { "", 0 },
-                new object[] { "8C", 8 },
-                new object[] { "9H", 9 },
-                new object[] { "7H JD", 17 },
-                new object[] { "8C 8H", 16 },
-                new object[] { "AC 8H", 19 },
-                new object[] { "JC JH", 20 },
-                new object[] { "JH KS TD", subject.GetMinHandValue() },
-                new object[] { "JC AH", subject.GetMaxHandValue() },
-                new object[] { "AD AH AS", 13 },
-                new object[] { "AD 8H 5H", 14 }
+            private static readonly object[][] EvaluateTestCases = {
+                new object[] { "", "", "AreEqual" },
+                new object[] { "2H", "", "Greater" },
+                new object[] { "2H", "2D", "AreEqual" },
+                new object[] { "AD", "KS", "Greater"},
+                new object[] { "JC QD TH", "", "Less" },
+                new object[] { "AH AD JS", "AD KS", "Less" },
+                new object[] { "AH AC AS", "AH", "Greater" }
             };
 
-            [TestCaseSource(nameof(EvaluateTestCases))]
-            public void ReturnsExpectedResult(string handString, float expectedHandValue)
+            private static int EvaluateHandString(string x)
             {
-                Assert.AreEqual(expectedHandValue, subject.Evaluate(CardTestHelpers.MakeHandFromString(handString)));
+                return subject.Evaluate(TestHelpers.MakeHandFromString(x));
+            }
+
+            [TestCaseSource(nameof(EvaluateTestCases))]
+            public void ReturnsExpectedResult(string firstHand, string secondHand, string assertionMethod)
+            {
+                TestHelpers.GetAssertionFromMethodString(assertionMethod)(
+                    EvaluateHandString(firstHand),
+                    EvaluateHandString(secondHand)
+                );
             }
         }
     }

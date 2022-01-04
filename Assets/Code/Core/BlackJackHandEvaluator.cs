@@ -9,9 +9,6 @@ namespace SaloonSlingers.Core
         private const int FACE_VALUE = 10;
         private const int BUST_THRESHOLD = 21;
 
-        public int GetMaxHandValue() => BUST_THRESHOLD + 1;
-        public int GetMinHandValue() => -1;
-
         public int Evaluate(IEnumerable<Card> hand)
         {
             int sum = 0;
@@ -50,5 +47,8 @@ namespace SaloonSlingers.Core
         {
             return length == 2 && numAces == 1 && numFaceCards == 1;
         }
+
+        private int GetMaxHandValue() => BUST_THRESHOLD + 1;
+        private int GetMinHandValue() => -1;
     }
 };
