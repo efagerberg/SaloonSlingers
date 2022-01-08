@@ -16,7 +16,7 @@ namespace SaloonSlingers.Core
         public int Evaluate(IEnumerable<Card> hand)
         {
             ulong handBits = HandBits.Create(hand);
-            if (handBits == 0) return 0;
+            if (handBits == 0) return (int)HandTypes.HIGH_CARD - 1;
             return CalculateScore(HandTypes.HIGH_CARD, handBits);
         }
 
