@@ -19,9 +19,9 @@ namespace SaloonSlingers.Core.Tests
             return Convert.ToString(x, 2).PadLeft(padding, '0');
         }
 
-        public static Action<int, int> GetAssertionFromMethodString(string assertionMethod)
+        public static Action<uint, uint> GetAssertionFromMethodString(string assertionMethod)
         {
-            static void areEqual(int x, int y) => Assert.AreEqual(x, y);
+            static void areEqual(uint x, uint y) => Assert.AreEqual(x, y);
             return assertionMethod switch
             {
                 "AreEqual" => areEqual,

@@ -4,6 +4,6 @@ namespace SaloonSlingers.Core
 {
     public interface IHandEvaluator
     {
-        public int Evaluate(IEnumerable<Card> hand);
+        public uint Evaluate(IEnumerable<Card> hand);
     }
 }

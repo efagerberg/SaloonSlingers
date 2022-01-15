@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SaloonSlingers.Core
 {
     public class PokerHandEvaluator : IHandEvaluator
     {
         /// <summary>
-        /// Evaluates a hand for poker.
+        /// Evaluates a 5-7 card hand for poker.
         /// Score is represented as a number composed up to 32 bits.
         /// h|t_1|...|t_n where
         /// h = the hand rank in decimal as binary.
@@ -13,19 +15,27 @@ namespace SaloonSlingers.Core
         /// The hand given does not need to be at it's max length for the flavor of poker.
         /// This allows for evaluation at various steps in a poker game.
         /// </summary>
-        public int Evaluate(IEnumerable<Card> hand)
+        public uint Evaluate(IEnumerable<Card> hand)
         {
-            ulong handBits = HandBits.Create(hand);
-            if (handBits == 0) return (int)HandTypes.HIGH_CARD - 1;
-            return CalculateScore(HandTypes.HIGH_CARD, handBits);
+            var handList = hand.ToList();
+            if (handList.Count() == 0) return (int)HandTypes.HIGH_CARD - 1;
+            HandTypes handType = HandTypeDetector.Detect(handList);
+            return CalculateScore(handType, handList);
         }
 
-        private static int CalculateScore(HandTypes handType, ulong handBits)
+        private static uint CalculateScore(HandTypes handType, List<Card> hand)
         {
-            int handTypeBits = HandBits.CalculateHandTypeScoreBits(handType);
-            int tieBreakerBits = TieBreakerBits.Create(handBits, true);
+            uint handTypeBits = HandTypeScoreAsBits(handType);
+            uint tieBreakerBits = TieBreakerBits.Create(hand, handType);
             return handTypeBits | tieBreakerBits;
         }
+
+        private static uint HandTypeScoreAsBits(HandTypes handType)
+        {
+            return (uint)handType << NibbleHelpers.GetLeftNibbleOffset(NUMBER_OF_BITS_IN_SCORE, 0);
+        }
+
+        private const int NUMBER_OF_BITS_IN_SCORE = 32;
 
         private enum HandTypes
         {
@@ -41,31 +51,68 @@ namespace SaloonSlingers.Core
             ROYAL_FLUSH
         }
 
-        /// <summary>
-        /// Representation of hand as bits
-        /// 
-        /// Each card is a nybble in the format: cdhs
-        /// So a hand with a King of Hearts and Queen of Clubs would be:
-        /// 0010|1000|0000|....
-        /// This allows you to encode the count of each type of card and their values is set positionally.
-        /// so that you can easily use bitwise shifts to see if they are consecutive.
-        /// </summary>
-        private static class HandBits
+        private static class HandTypeDetector
         {
-            public static ulong Create(IEnumerable<Card> hand)
+            public static HandTypes Detect(IEnumerable<Card> hand)
             {
-                ulong x = 0;
-                foreach (Card card in hand)
-                    x |= (ulong)Card.GetSuitMask(card) << (4 * (int)card.Value) - 4;
-                return x;
+                int numCardsInStraight = 5;
+                int numCardsInFlush = 5;
+                var handList = hand.ToList();
+                var (nPairs, nTrips, nQuads, numInSequence) = GetFrequencyStats(handList);
+                var suitPairs = handList.GroupBy(x => x.Suit).OrderByDescending(x => x.Count());
+                var groupWithMostFrequentSuit = suitPairs.First();
+                bool isFlush = groupWithMostFrequentSuit.Count() == numCardsInFlush;
+                bool isStraight = numInSequence == numCardsInStraight;
+                bool isRoyalFlush = (
+                    groupWithMostFrequentSuit.Select(x => x.Value).Contains(Values.ACE) &&
+                    isStraight && isFlush
+                );
+
+                if (isRoyalFlush) return HandTypes.ROYAL_FLUSH;
+                if (isStraight && isFlush) return HandTypes.STRAIGHT_FLUSH;
+                if (nQuads > 0) return HandTypes.FOUR_OF_A_KIND;
+                if (nPairs == 1 && nTrips == 1) return HandTypes.FULL_HOUSE;
+                if (isFlush) return HandTypes.FLUSH;
+                if (isStraight) return HandTypes.STRAIGHT;
+                if (nTrips > 0) return HandTypes.THREE_OF_A_KIND;
+                if (nPairs == 1) return HandTypes.PAIR;
+                if (nPairs == 2) return HandTypes.TWO_PAIR;
+                return HandTypes.HIGH_CARD;
             }
 
-            public static int CalculateHandTypeScoreBits(HandTypes handType)
+            private static (int nPairs, int nTrips, int nQuads, int numInSequence) GetFrequencyStats(IEnumerable<Card> hand)
             {
-                return (int)handType << NibbleHelpers.ConvertLeftNibbleIndexToOffset(NUMBER_OF_BITS_IN_SCORE, 0);
-            }
+                var pairs = hand.GroupBy(x => (byte)x.Value).OrderByDescending(x => x.Key);
+                var initialPairAcc = (nPairs: 0, nTrips: 0, nQuads: 0, maxValue: (byte)0, lastValue: (byte)0, numInSequence: 1);
+                var stats = pairs.Aggregate(initialPairAcc, (acc, pair) =>
+                {
+                    if (acc.lastValue != 0 && acc.maxValue != 0)
+                    {
+                        bool isInSequence = (
+                            acc.lastValue - pair.Key == 1 ||
+                            acc.maxValue - pair.Key == (int)Values.KING - (int)Values.ACE
+                        );
+                        if (isInSequence) acc.numInSequence += 1;
+                    }
 
-            private const int NUMBER_OF_BITS_IN_SCORE = 32;
+                    switch (pair.Count())
+                    {
+                        case 2:
+                            acc.nPairs += 1;
+                            break;
+                        case 3:
+                            acc.nTrips += 1;
+                            break;
+                        case 4:
+                            acc.nQuads += 1;
+                            break;
+                    }
+                    acc.lastValue = pair.Key;
+                    if (acc.maxValue == 0) acc.maxValue = pair.Key;
+                    return acc;
+                });
+                return (stats.nPairs, stats.nTrips, stats.nQuads, stats.numInSequence);
+            }
         }
 
         /// <summary>
@@ -78,43 +125,56 @@ namespace SaloonSlingers.Core
         /// </summary>
         private static class TieBreakerBits
         {
-            public static int Create(ulong handBits, bool acesHigh)
+            public static uint Create(IEnumerable<Card> hand, HandTypes handType)
             {
                 int tieBreakerIndex = 0;
-                int tieBreakers = 0;
-                for (byte cardValue = (byte)Values.KING; cardValue >= (byte)Values.ACE; cardValue -= 1)
+                uint tieBreakers = 0;
+                var valuesOrdered = GetValuesOrdered(hand, handType);
+                foreach (byte cardValue in valuesOrdered)
                 {
-                    if (CardValueNotInHandBits(cardValue, handBits)) continue;
-
-                    if (acesHigh && cardValue == (byte)Values.ACE)
-                        tieBreakers = AddHighAceTieBreaker(tieBreakers);
-                    else tieBreakers |= CalculateTieBreaker(cardValue, tieBreakerIndex);
+                    tieBreakers |= CalculateTieBreaker(cardValue, tieBreakerIndex);
                     tieBreakerIndex += 1;
                 }
 
                 return tieBreakers;
             }
 
-            private static int AddHighAceTieBreaker(int tieBreakers)
+            private static IEnumerable<byte> GetValuesOrdered(IEnumerable<Card> hand, HandTypes handType)
             {
-                byte highAceValue = (byte)Values.KING + 1;
-                tieBreakers >>= NibbleHelpers.BITS_PER_NIBBLE;
-                tieBreakers |= highAceValue << NibbleHelpers.ConvertLeftNibbleIndexToOffset(NUMBER_OF_BITS_IN_TIEBREAKER, 0);
-                return tieBreakers;
+                static byte withAcesHigh(Card x)
+                {
+                    return x.Value == Values.ACE ? (byte)(Values.KING + 1) : (byte)x.Value;
+                }
+
+                return handType switch
+                {
+                    HandTypes.FLUSH or HandTypes.STRAIGHT_FLUSH =>
+                        hand.GroupBy(x => x.Suit)
+                            .OrderByDescending(xs => xs.Count())
+                            .Select(xs => xs.OrderByDescending(x => x.Value))
+                            .SelectMany((xs, i) =>
+                            {
+                                var values = xs.Select(x => i > 0 ? withAcesHigh(x) : (byte)x.Value);
+                                return values.OrderByDescending(x => x);
+                            }),
+                    HandTypes.ROYAL_FLUSH =>
+                        hand.GroupBy(x => x.Suit)
+                            .OrderByDescending(xs => xs.Count())
+                            .Select(xs => xs.OrderByDescending(x => x.Value))
+                            .SelectMany(xs => xs.Select(withAcesHigh).OrderByDescending(x => x)),
+                    _ => hand.Select(withAcesHigh)
+                             .GroupBy(x => x)
+                             .OrderByDescending(xs => xs.Count())
+                             .ThenByDescending(xs => xs.Key)
+                             .Select(xs => xs.Key),
+                };
             }
 
-            internal static int CalculateTieBreaker(byte cardValue, int tieBreakerIndex)
+            internal static uint CalculateTieBreaker(byte cardValue, int tieBreakerIndex)
             {
-                return cardValue << NibbleHelpers.ConvertLeftNibbleIndexToOffset(
+                return (uint)(cardValue << NibbleHelpers.GetLeftNibbleOffset(
                     NUMBER_OF_BITS_IN_TIEBREAKER, tieBreakerIndex
-                );
-            }
-
-            private static bool CardValueNotInHandBits(byte cardValue, ulong handBits)
-            {
-                ulong cardOffset = (ulong)0xF << NibbleHelpers.ConvertRightNibbleIndexToOffset(cardValue);
-                ulong segment = handBits & cardOffset;
-                return segment == 0;
+                ));
             }
 
             private const int NUMBER_OF_BITS_IN_TIEBREAKER = 28;
@@ -122,12 +182,12 @@ namespace SaloonSlingers.Core
 
         private static class NibbleHelpers
         {
-            public static int ConvertRightNibbleIndexToOffset(int pos)
+            public static int GetRightNibbleOffset(int pos)
             {
                 return pos * BITS_PER_NIBBLE - BITS_PER_NIBBLE;
             }
 
-            public static int ConvertLeftNibbleIndexToOffset(int totalBitSize, int pos)
+            public static int GetLeftNibbleOffset(int totalBitSize, int pos)
             {
                 return totalBitSize - pos * BITS_PER_NIBBLE - BITS_PER_NIBBLE;
             }

@@ -17,7 +17,7 @@ namespace SaloonSlingers.Core.Tests
                 new object[] { "AH AC AS", "AH", "Greater" }
             };
 
-            private static int EvaluateHandString(string x)
+            private static uint EvaluateHandString(string x)
             {
                 return subject.Evaluate(TestHelpers.MakeHandFromString(x));
             }

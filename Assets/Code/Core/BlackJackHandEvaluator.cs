@@ -4,14 +4,18 @@ namespace SaloonSlingers.Core
 {
     public class BlackJackHandEvaluator : IHandEvaluator
     {
-        private const int HIGH_ACE_VALUE = 11;
-        private const int LOW_ACE_VALUE = 1;
-        private const int FACE_VALUE = 10;
-        private const int BUST_THRESHOLD = 21;
+        // Note we are offsetting values by 2, since we can't have negative scores.
+        // 0 means you busted
+        // 1 means no hand
+        // >2 everything else
+        private const int HIGH_ACE_VALUE = 11 + 2;
+        private const int LOW_ACE_VALUE = 1 + 2;
+        private const int FACE_VALUE = 10 + 2;
+        private const int BUST_THRESHOLD = 21 + 2;
 
-        public int Evaluate(IEnumerable<Card> hand)
+        public uint Evaluate(IEnumerable<Card> hand)
         {
-            int sum = 0;
+            uint sum = 1;
             int numAces = 0;
             int numFaceCards = 0;
             int handLength = 0;
@@ -28,7 +32,7 @@ namespace SaloonSlingers.Core
                     numFaceCards += 1;
                 }
                 else
-                    sum += (int)card.Value;
+                    sum += (uint)card.Value + 2;
                 handLength += 1;
 
                 if (IsBlackJack(numAces, numFaceCards, handLength)) return GetMaxHandValue();
@@ -48,7 +52,7 @@ namespace SaloonSlingers.Core
             return length == 2 && numAces == 1 && numFaceCards == 1;
         }
 
-        private int GetMaxHandValue() => BUST_THRESHOLD + 1;
-        private int GetMinHandValue() => -1;
+        private uint GetMaxHandValue() => BUST_THRESHOLD + 1;
+        private uint GetMinHandValue() => 0;
     }
 };
