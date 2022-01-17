@@ -55,16 +55,13 @@ namespace SaloonSlingers.Core
 
         private static class HandTypeDetector
         {
-            private const int NUMBER_OF_CARDS_IN_STRAIGHT = 5;
-
             public static (HandTypes, bool) Detect(IEnumerable<Card> hand)
             {
-                int numCardsInFlush = 5;
                 var handList = hand.ToList();
                 var (nPairs, nTrips, nQuads, isStraight, hasAcesHigh) = GetFrequencyStats(handList);
                 var suitPairs = handList.GroupBy(x => x.Suit).OrderByDescending(x => x.Count());
                 var groupWithMostFrequentSuit = suitPairs.First();
-                bool isFlush = groupWithMostFrequentSuit.Count() == numCardsInFlush;
+                bool isFlush = groupWithMostFrequentSuit.Count() == NUMBER_OF_CARDS_IN_FLUSH;
                 bool isRoyalFlush = (
                     groupWithMostFrequentSuit.Select(x => x.Value).Contains(Values.ACE) &&
                     isStraight && isFlush
@@ -138,6 +135,8 @@ namespace SaloonSlingers.Core
                     !isStraight || stats.hasHighAceInSequence
                 );
             }
+            private const int NUMBER_OF_CARDS_IN_STRAIGHT = 5;
+            private const int NUMBER_OF_CARDS_IN_FLUSH = 5;
         }
 
         /// <summary>
@@ -151,6 +150,10 @@ namespace SaloonSlingers.Core
         /// </summary>
         private static class TieBreakerBits
         {
+            public const int NUMBER_OF_BITS_IN_TIEBREAKER = (
+                MAX_NUMBER_OF_TIEBREAKERS * NibbleHelpers.BITS_PER_NIBBLE
+            );
+
             public static uint Create(IEnumerable<Card> hand, HandTypes handType, bool hasAcesHigh)
             {
                 int tieBreakerIndex = 0;
@@ -167,44 +170,45 @@ namespace SaloonSlingers.Core
 
             private static IEnumerable<byte> GetValuesToConsider(IEnumerable<Card> hand, HandTypes handType, bool hasAcesHigh)
             {
-                static byte byteValues(bool hasAcesHigh, Card x)
-                {
-                    if (hasAcesHigh && x.Value == Values.ACE)
-                        return (byte)(Values.KING + 1);
-                    return (byte)x.Value;
-                }
-
                 int numberOfValuesToConsider = handType switch
                 {
                     HandTypes.PAIR => MAX_NUMBER_OF_TIEBREAKERS - 1,
                     HandTypes.TWO_PAIR => MAX_NUMBER_OF_TIEBREAKERS - 2,
                     HandTypes.THREE_OF_A_KIND => MAX_NUMBER_OF_TIEBREAKERS - 2,
                     HandTypes.FOUR_OF_A_KIND => MAX_NUMBER_OF_TIEBREAKERS - 3,
-                    HandTypes.FULL_HOUSE => MAX_NUMBER_OF_TIEBREAKERS - 3,
                     HandTypes.STRAIGHT or HandTypes.STRAIGHT_FLUSH => MAX_NUMBER_OF_TIEBREAKERS - 4,
+                    HandTypes.FULL_HOUSE => MAX_NUMBER_OF_TIEBREAKERS - 3,
                     HandTypes.ROYAL_FLUSH => 0,
                     _ => MAX_NUMBER_OF_TIEBREAKERS
                 };
 
-                var values = handType switch
+                IEnumerable<byte> values = handType switch
                 {
                     HandTypes.STRAIGHT =>
-                        hand.Select(x => byteValues(hasAcesHigh, x))
+                        hand.Select(x => GetByteValues(hasAcesHigh, x))
                             .GroupBy(x => x)
                             .First().OrderByDescending(x => x),
                     HandTypes.FLUSH or HandTypes.STRAIGHT_FLUSH =>
                         hand.GroupBy(x => x.Suit)
                             .OrderByDescending(xs => xs.Count())
                             .First()
-                            .Select(x => byteValues(hasAcesHigh, x))
+                            .Select(x => GetByteValues(hasAcesHigh, x))
                             .OrderByDescending(x => x),
-                    _ => hand.Select(x => byteValues(hasAcesHigh, x))
+                    _ => hand.Select(x => GetByteValues(hasAcesHigh, x))
                              .GroupBy(x => x)
                              .OrderByDescending(xs => xs.Count())
                              .ThenByDescending(xs => xs.Key)
                              .Select(xs => xs.Key),
                 };
+
                 return values.Take(numberOfValuesToConsider);
+            }
+
+            private static byte GetByteValues(bool hasAcesHigh, Card x)
+            {
+                if (hasAcesHigh && x.Value == Values.ACE)
+                    return (byte)(Values.KING + 1);
+                return (byte)x.Value;
             }
 
             private static uint CalculateTieBreaker(byte cardValue, int tieBreakerIndex)
@@ -215,9 +219,6 @@ namespace SaloonSlingers.Core
             }
 
             private const int MAX_NUMBER_OF_TIEBREAKERS = 5;
-            public const int NUMBER_OF_BITS_IN_TIEBREAKER = (
-                MAX_NUMBER_OF_TIEBREAKERS * NibbleHelpers.BITS_PER_NIBBLE
-            );
         }
 
         private static class NibbleHelpers
