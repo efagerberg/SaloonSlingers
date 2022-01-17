@@ -1,90 +1,154 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 
+using NUnit.Framework;
 
 namespace SaloonSlingers.Core.Tests
 {
     public class CardTests
     {
-        [Test]
-        public void Constructor_WithSuitAndValue_CreatesExpectedCard()
+        class TestConstructor
         {
-            var cardUnderTest = new Card(Suits.HEARTS, Values.JACK);
+            [Test]
+            public void WithSuitAndValue_CreatesExpectedCard()
+            {
+                Card cardUnderTest = new(Values.JACK, Suits.HEARTS);
 
-            Assert.AreEqual(cardUnderTest.Suit, Suits.HEARTS);
-            Assert.AreEqual(cardUnderTest.Value, Values.JACK);
+                Assert.AreEqual(cardUnderTest.Suit, Suits.HEARTS);
+                Assert.AreEqual(cardUnderTest.Value, Values.JACK);
+            }
+
+            [Test]
+            public void WithCard_CreatesExpectedCard()
+            {
+                Card cardParam = new(Values.JACK, Suits.HEARTS);
+                Card cardUnderTest = new(cardParam);
+
+                Assert.AreEqual(cardUnderTest.Suit, Suits.HEARTS);
+                Assert.AreEqual(cardUnderTest.Value, Values.JACK);
+            }
+
+            [Test]
+            public void WithString_CreatesExpectedCard()
+            {
+                Card cardUnderTest = new("AD");
+
+                Assert.AreEqual(Suits.DIAMONDS, cardUnderTest.Suit);
+                Assert.AreEqual(Values.ACE, cardUnderTest.Value);
+            }
         }
 
-        [Test]
-        public void Constructor_WithCard_CreatesExpectedCard()
+        class TestIsFace
         {
-            var cardParam = new Card(Suits.HEARTS, Values.JACK);
-            var cardUnderTest = new Card(cardParam);
+            [Test]
+            public void ForNonFaceCard_ReturnsTrue()
+            {
+                Card cardUnderTest = new(Values.EIGHT, Suits.DIAMONDS);
+                Assert.IsFalse(cardUnderTest.IsFaceCard());
 
-            Assert.AreEqual(cardUnderTest.Suit, Suits.HEARTS);
-            Assert.AreEqual(cardUnderTest.Value, Values.JACK);
+                cardUnderTest.Value = Values.ACE;
+                Assert.IsFalse(cardUnderTest.IsFaceCard());
+            }
+
+            [Test]
+            public void ForFaceCards_ReturnsTrue()
+            {
+                Card cardUnderTest = new(Values.QUEEN, Suits.CLUBS);
+                Assert.IsTrue(cardUnderTest.IsFaceCard());
+
+                cardUnderTest.Value = Values.KING;
+                Assert.IsTrue(cardUnderTest.IsFaceCard());
+
+                cardUnderTest.Value = Values.JACK;
+                Assert.IsTrue(cardUnderTest.IsFaceCard());
+            }
         }
 
-        [Test]
-        public void IsFaceCard_ForNonFaceCard_ReturnsTrue()
+        class TestToString
         {
-            var cardUnderTest = new Card(Suits.DIAMONDS, Values.EIGHT);
-            Assert.IsFalse(cardUnderTest.IsFaceCard());
+            [Test]
+            public void ToString_AceCard_ReturnsExpectedString()
+            {
+                Card cardUnderTest = new(Values.ACE, Suits.CLUBS);
+                Assert.AreEqual(cardUnderTest.ToString(), "ace_of_clubs");
+            }
 
-            cardUnderTest.Value = Values.ACE;
-            Assert.IsFalse(cardUnderTest.IsFaceCard());
+            [Test]
+            public void ToString_NumberCard_ReturnsExpectedString()
+            {
+                Card cardUnderTest = new(Values.EIGHT, Suits.CLUBS);
+                Assert.AreEqual(cardUnderTest.ToString(), "8_of_clubs");
+            }
+
+            [Test]
+            public void ToString_FaceCard_ReturnsExpectedString()
+            {
+                Card cardUnderTest = new(Values.JACK, Suits.DIAMONDS);
+                Assert.AreEqual(cardUnderTest.ToString(), "jack_of_diamonds");
+            }
         }
 
-        [Test]
-        public void IsFaceCard_ForFaceCards_ReturnsTrue()
+        class TestGetHashCode
         {
-            var cardUnderTest = new Card(Suits.CLUBS, Values.QUEEN);
-            Assert.IsTrue(cardUnderTest.IsFaceCard());
+            [Test]
+            public void ForSameCard_ReturnsSameValue()
+            {
+                Card card1 = new(Values.ACE, Suits.DIAMONDS);
+                Card card2 = new(Values.ACE, Suits.DIAMONDS);
 
-            cardUnderTest.Value = Values.KING;
-            Assert.IsTrue(cardUnderTest.IsFaceCard());
+                Assert.AreEqual(card1.GetHashCode(), card2.GetHashCode());
+            }
 
-            cardUnderTest.Value = Values.JACK;
-            Assert.IsTrue(cardUnderTest.IsFaceCard());
+            [Test]
+            public void ForDifferentCard_ReturnsDifferentValue()
+            {
+                Card card1 = new(Values.ACE, Suits.DIAMONDS);
+                Card card2 = new(Values.TWO, Suits.DIAMONDS);
+
+                Assert.AreNotEqual(card1.GetHashCode(), card2.GetHashCode());
+            }
         }
 
-        [Test]
-        public void ToString_AceCard_ReturnsExpectedString()
+        class TestEncode
         {
-            var cardUnderTest = new Card(Suits.CLUBS, Values.ACE);
-            Assert.AreEqual(cardUnderTest.ToString(), "ace_of_clubs");
+            public static readonly object[][] EncodeTestCases = {
+                new object[] { "KD", "11010100" },
+                new object[] { "QC", "11001000" },
+                new object[] { "2H", "00100010" },
+                new object[] { "AD", "00010100" },
+                new object[] { "5S", "01010001" },
+                new object[] { "TH", "10100010" }
+            };
+
+            [TestCaseSource(nameof(EncodeTestCases))]
+            public void ReturnsExpectedByte_WhenEncoded(string cardString, string expected)
+            {
+                Card subject = new(cardString);
+                byte actual = Card.Encode(subject);
+
+                Assert.Greater(Marshal.SizeOf(subject), Marshal.SizeOf(actual));
+                Assert.AreEqual(expected, TestHelpers.ConvertToBinaryString(actual, 8));
+            }
         }
 
-        [Test]
-        public void ToString_NumberCard_ReturnsExpectedString()
+        class TestDecode
         {
-            var cardUnderTest = new Card(Suits.CLUBS, Values.EIGHT);
-            Assert.AreEqual(cardUnderTest.ToString(), "8_of_clubs");
-        }
+            private static readonly IEnumerable<object[]> DecodeTestCases = TestEncode.EncodeTestCases.Select(
+                x => new object[] { x[1], x[0] }
+            );
 
-        [Test]
-        public void ToString_FaceCard_ReturnsExpectedString()
-        {
-            var cardUnderTest = new Card(Suits.DIAMONDS, Values.JACK);
-            Assert.AreEqual(cardUnderTest.ToString(), "jack_of_diamonds");
-        }
+            [TestCaseSource(nameof(DecodeTestCases))]
+            public void ReturnsExpectedCard_WhenDecoded(string cardBinaryString, string expectedCardString)
+            {
+                Card expected = new(expectedCardString);
+                byte binaryCard = Convert.ToByte(cardBinaryString, 2);
+                Card actual = Card.Decode(binaryCard);
 
-        [Test]
-        public void GetHashCode_ReturnsSameValue_ForSameCard()
-        {
-            var card1 = new Card(Suits.DIAMONDS, Values.ACE);
-            var card2 = new Card(Suits.DIAMONDS, Values.ACE);
-
-            Assert.AreEqual(card1.GetHashCode(), card2.GetHashCode());
-        }
-
-        [Test]
-        public void GetHashCode_ReturnsDifferentValue_ForDifferentCard()
-        {
-            var card1 = new Card(Suits.DIAMONDS, Values.ACE);
-            var card2 = new Card(Suits.DIAMONDS, Values.TWO);
-
-            Assert.AreNotEqual(card1.GetHashCode(), card2.GetHashCode());
+                Assert.Greater(Marshal.SizeOf(actual), Marshal.SizeOf(binaryCard));
+                Assert.AreEqual(expected, actual);
+            }
         }
     }
-
 }

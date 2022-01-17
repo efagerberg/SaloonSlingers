@@ -109,7 +109,7 @@ namespace SaloonSlingers.Core.Tests
             bool eventTriggered = false;
             var emptyDeck = new Deck(0);
             emptyDeck.OnDeckRefilled += (sender, __) => eventTriggered = true;
-            emptyDeck.ReturnCard(new Card(Suits.CLUBS, Values.ACE));
+            emptyDeck.ReturnCard(new Card(Values.ACE, Suits.CLUBS));
 
             Assert.That(eventTriggered);
         }
@@ -120,7 +120,7 @@ namespace SaloonSlingers.Core.Tests
             bool eventTriggered = false;
             var singleCardDeck = new Deck(1);
             singleCardDeck.OnDeckRefilled += (sender, __) => eventTriggered = true;
-            singleCardDeck.ReturnCard(new Card(Suits.CLUBS, Values.ACE));
+            singleCardDeck.ReturnCard(new Card(Values.ACE, Suits.CLUBS));
 
             Assert.IsFalse(eventTriggered);
         }

@@ -123,7 +123,7 @@ namespace SaloonSlingers.Unity
             if (remainingValue == 0) Destroy(hit.gameObject);
             else
             {
-                Card newCard = new Card(card.Suit, (Values)remainingValue);
+                Card newCard = new Card((Values)remainingValue, card.Suit);
                 enemy.SetCard(newCard);
             }
             DeactivateCard();

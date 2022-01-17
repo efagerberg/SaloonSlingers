@@ -1,41 +1,57 @@
 ﻿using System;
-
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SaloonSlingers.Core
 {
-    public enum Values { ACE = 1, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING }
     public enum Suits { CLUBS, DIAMONDS, HEARTS, SPADES }
+    public enum Values
+    {
+        ACE = 1, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING
+    }
 
     [Serializable]
     public struct Card
     {
-        private const int FACE_VALUE_THRESHOLD = 10;
         public Suits Suit;
         public Values Value;
 
+        private static readonly Dictionary<char, Values> CharToValue = Enum.GetValues(typeof(Values))
+                                                          .Cast<Values>()
+                                                          .ToDictionary(x => (int)x >= FACE_VALUE_THRESHOLD || x == Values.ACE ? x.ToString()[0] : ((int)x).ToString()[0], y => y);
+        private static readonly Dictionary<char, Suits> CharToSuit = Enum.GetValues(typeof(Suits))
+                                                                 .Cast<Suits>()
+                                                                 .ToDictionary(x => x.ToString()[0], y => y);
+        private const int FACE_VALUE_THRESHOLD = 10;
 
-        public Card(Suits inSuit = Suits.CLUBS, Values inValue = Values.ACE)
+        public Card(Values inValue = Values.ACE, Suits inSuit = Suits.CLUBS)
         {
-            Suit = inSuit;
             Value = inValue;
+            Suit = inSuit;
         }
 
         public Card(Card inCard)
         {
-            Suit = inCard.Suit;
             Value = inCard.Value;
+            Suit = inCard.Suit;
+        }
+
+        public Card(string cardString)
+        {
+            Value = CharToValue[cardString[0]];
+            Suit = CharToSuit[cardString[1]];
         }
 
         public bool IsFaceCard()
         {
             int valAsInt = (int)Value;
-            return valAsInt > FACE_VALUE_THRESHOLD;
+            return valAsInt > FACE_VALUE_THRESHOLD && Value != Values.ACE;
         }
 
         public override string ToString()
         {
-            var value_as_int = (int)Value;
-            var template = "{0}_of_{1}";
+            int value_as_int = (int)Value;
+            string template = "{0}_of_{1}";
 
             if (IsFaceCard() || Value == Values.ACE)
                 return string.Format(template, Value.ToString().ToLower(), Suit.ToString().ToLower());
@@ -43,9 +59,29 @@ namespace SaloonSlingers.Core
             return string.Format(template, (value_as_int), Suit.ToString().ToLower());
         }
 
-        public override int GetHashCode()
+        public override int GetHashCode() => Encode(this);
+
+        /// <summary>
+        /// Encodes a Card object into a byte
+        /// Scheme: vvvvcdhs
+        ///     v = value of card (ace=1,two=2,three=3,four=4,five=5,...,king=13)
+        ///     cdhs = suit of card (bit turned on based on suit of card)
+        /// </summary>
+        public static byte Encode(Card card)
         {
-            return (int)Suit ^ (int)Value;
+            return (byte)(GetValueMask(card) | GetSuitMask(card));
         }
+
+        public static Card Decode(byte encodedCard)
+        {
+            Values value = (Values)(GetValueMask(encodedCard));
+            Suits suit = (Suits)(-Math.Log(GetSuitMask(encodedCard), 2) + 3);
+            return new Card(value, suit);
+        }
+
+        public static byte GetSuitMask(byte encodedCard) => (byte)(encodedCard & 0x0F);
+        public static byte GetSuitMask(Card card) => (byte)Math.Pow(2, 3 - ((int)card.Suit));
+        public static byte GetValueMask(byte encodedCard) => (byte)(encodedCard >> 4);
+        public static byte GetValueMask(Card card) => (byte)((byte)card.Value << 4);
     }
 }
