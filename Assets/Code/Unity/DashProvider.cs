@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
 
-using SaloonSlingers.Core;
+using SaloonSlingers.Core.SlingerAttributes;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity
@@ -26,7 +26,7 @@ namespace SaloonSlingers.Unity
         private void Start()
         {
             controller = system.xrOrigin.GetComponent<CharacterController>();
-            attributes = system.xrOrigin.GetComponent<Player>().Attributes;
+            attributes = (PlayerAttributes)system.xrOrigin.GetComponent<Player>().Attributes;
         }
 
         private void OnEnable()

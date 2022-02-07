@@ -1,9 +1,11 @@
 using System;
+using System.Linq;
 
 using UnityEngine;
 using UnityEngine.Pool;
 
 using SaloonSlingers.Core;
+using SaloonSlingers.Core.SlingerAttributes;
 
 namespace SaloonSlingers.Unity
 {
@@ -15,7 +17,7 @@ namespace SaloonSlingers.Unity
         private int poolSize = 10;
 
         private IObjectPool<CardInteractable> pool;
-        private Player player;
+        private PlayerAttributes Attributes;
         private bool hasCardsLeft;
         private bool hasRegisteredDeckEvents = false;
 
@@ -37,9 +39,10 @@ namespace SaloonSlingers.Unity
         private void Start()
         {
             var playerGO = GameObject.FindGameObjectWithTag("Player");
-            player = playerGO.GetComponent<Player>();
+            Player player = playerGO.GetComponent<Player>();
+            Attributes = (PlayerAttributes)player.Attributes;
             RegisterDeckEvents();
-            hasCardsLeft = player.Attributes.Deck.Count > 0;
+            hasCardsLeft = Attributes.Deck.Count > 0;
         }
 
         private void OnEnable()
@@ -64,9 +67,10 @@ namespace SaloonSlingers.Unity
 
         private void GetFromPool(CardInteractable cardInteractable)
         {
-            Card card = player.Attributes.Deck.RemoveFromTop();
+            Card card = Attributes.Deck.RemoveFromTop();
             cardInteractable.gameObject.SetActive(true);
             cardInteractable.SetCard(card);
+            Attributes.Hand.Add(card);
         }
 
         private void CardDeactivatedHandler(CardInteractable sender, EventArgs _) => Despawn(sender);
@@ -74,16 +78,16 @@ namespace SaloonSlingers.Unity
         private void DeckRefilledHandler(Deck sender, EventArgs _) => hasCardsLeft = true;
         private void RegisterDeckEvents()
         {
-            if (hasRegisteredDeckEvents || player == null) return;
-            player.Attributes.Deck.OnDeckEmpty += DeckEmptyHandler;
-            player.Attributes.Deck.OnDeckRefilled += DeckRefilledHandler;
+            if (hasRegisteredDeckEvents || Attributes.Deck == null) return;
+            Attributes.Deck.OnDeckEmpty += DeckEmptyHandler;
+            Attributes.Deck.OnDeckRefilled += DeckRefilledHandler;
             hasRegisteredDeckEvents = true;
         }
         private void UnregisterDeckEvents()
         {
-            if (!hasRegisteredDeckEvents || player == null) return;
-            player.Attributes.Deck.OnDeckEmpty -= DeckEmptyHandler;
-            player.Attributes.Deck.OnDeckRefilled -= DeckRefilledHandler;
+            if (!hasRegisteredDeckEvents || Attributes.Deck == null) return;
+            Attributes.Deck.OnDeckEmpty -= DeckEmptyHandler;
+            Attributes.Deck.OnDeckRefilled -= DeckRefilledHandler;
             hasRegisteredDeckEvents = false;
         }
     }

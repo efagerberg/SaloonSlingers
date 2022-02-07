@@ -7,6 +7,7 @@ namespace SaloonSlingers.Core
     public delegate void DeckEmptyHandler(Deck sender, EventArgs e);
     public delegate void DeckRefilledHandler(Deck sender, EventArgs e);
 
+    [Serializable]
     public class Deck : Queue<Card>
     {
         public const int NUMBER_OF_CARDS_IN_STANDARD_DECK = 52;

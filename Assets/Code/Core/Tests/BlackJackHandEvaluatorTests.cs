@@ -1,34 +1,33 @@
 using NUnit.Framework;
 
+using SaloonSlingers.Core.HandEvaluators;
+
 namespace SaloonSlingers.Core.Tests
 {
     public class BlackJackHandEvaluatorTests
     {
         public class EvaluateTests
         {
-            private static readonly BlackJackHandEvaluator subject = new();
-            private static readonly object[][] EvaluateTestCases = {
-                new object[] { "", "", "AreEqual" },
-                new object[] { "2H", "", "Greater" },
-                new object[] { "2H", "2D", "AreEqual" },
-                new object[] { "AD", "KS", "Greater"},
-                new object[] { "JC QD TH", "", "Less" },
-                new object[] { "AH AD JS", "AD KS", "Less" },
-                new object[] { "AH AC AS", "AH", "Greater" }
-            };
-
-            private static uint EvaluateHandString(string x)
-            {
-                return subject.Evaluate(TestHelpers.MakeHandFromString(x));
-            }
-
-            [TestCaseSource(nameof(EvaluateTestCases))]
+            [TestCase("", "", "AreEqual")]
+            [TestCase("2H", "", "Greater")]
+            [TestCase("2H", "2D", "AreEqual")]
+            [TestCase("AD", "KS", "Greater")]
+            [TestCase("JC QD TH", "", "Less")]
+            [TestCase("AH AD JS", "AD KS", "Less")]
+            [TestCase("AH AC AS", "AH", "Greater")]
             public void ReturnsExpectedResult(string firstHand, string secondHand, string assertionMethod)
             {
                 TestHelpers.GetAssertionFromMethodString(assertionMethod)(
                     EvaluateHandString(firstHand),
                     EvaluateHandString(secondHand)
                 );
+            }
+
+            private static readonly BlackJackHandEvaluator subject = new();
+
+            private static uint EvaluateHandString(string x)
+            {
+                return subject.Evaluate(TestHelpers.MakeHandFromString(x)).Score;
             }
         }
     }

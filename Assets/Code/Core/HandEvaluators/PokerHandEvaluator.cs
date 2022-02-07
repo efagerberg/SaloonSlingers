@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 
-namespace SaloonSlingers.Core
+namespace SaloonSlingers.Core.HandEvaluators
 {
     public class PokerHandEvaluator : IHandEvaluator
     {
@@ -15,49 +17,54 @@ namespace SaloonSlingers.Core
         /// The hand given does not need to be at it's max length for the flavor of poker.
         /// This allows for evaluation at various steps in a poker game.
         /// </summary>
-        public uint Evaluate(IEnumerable<Card> hand)
+        public HandType Evaluate(IEnumerable<Card> hand)
         {
             var handList = hand.ToList();
-            if (handList.Count() == 0) return (int)HandTypes.HIGH_CARD - 1;
-            (HandTypes handType, bool hasAcesHigh) = HandTypeDetector.Detect(handList);
-            return CalculateScore(handType, hasAcesHigh, handList);
+            (HandNames handName, bool hasAcesHigh) = HandTypeDetector.Detect(handList);
+            return CreateHandType(
+                CalculateScore(handName, hasAcesHigh, handList),
+                handName
+            );
         }
 
-        private static uint CalculateScore(HandTypes handType, bool hasAcesHigh, List<Card> hand)
+        private static uint CalculateScore(HandNames handName, bool hasAcesHigh, List<Card> hand)
         {
-            uint handTypeBits = HandTypeScoreAsBits(handType);
-            uint tieBreakerBits = TieBreakerBits.Create(hand, handType, hasAcesHigh);
+            uint ranking = HandNameToRank[handName];
+            uint handTypeBits = RankScoreAsBits(ranking);
+            uint tieBreakerBits = TieBreakerBits.Create(hand, handName, hasAcesHigh);
             return handTypeBits | tieBreakerBits;
         }
 
-        private static uint HandTypeScoreAsBits(HandTypes handType)
+        private static uint RankScoreAsBits(uint ranking)
         {
-            return (uint)handType << NibbleHelpers.GetLeftNibbleOffset(NUMBER_OF_BITS_IN_SCORE, 0);
+            return ranking << NibbleHelpers.GetLeftNibbleOffset(NUMBER_OF_BITS_IN_SCORE, 0);
         }
 
         private const int NUMBER_OF_BITS_IN_SCORE = (
             NibbleHelpers.BITS_PER_NIBBLE + TieBreakerBits.NUMBER_OF_BITS_IN_TIEBREAKER
         );
 
-        private enum HandTypes
-        {
-            HIGH_CARD = 1,
-            PAIR,
-            TWO_PAIR,
-            THREE_OF_A_KIND,
-            STRAIGHT,
-            FLUSH,
-            FULL_HOUSE,
-            FOUR_OF_A_KIND,
-            STRAIGHT_FLUSH,
-            ROYAL_FLUSH
-        }
+        private static IReadOnlyDictionary<HandNames, uint> HandNameToRank = new Dictionary<HandNames, uint>() {
+            { HandNames.EMPTY, 0 },
+            { HandNames.HIGH_CARD, 1 },
+            { HandNames.PAIR, 2 },
+            { HandNames.TWO_PAIR, 3 },
+            { HandNames.THREE_OF_A_KIND, 4 },
+            { HandNames.STRAIGHT, 5 },
+            { HandNames.FLUSH, 6 },
+            { HandNames.FULL_HOUSE, 7 },
+            { HandNames.FOUR_OF_A_KIND, 8 },
+            { HandNames.STRAIGHT_FLUSH, 9 },
+            { HandNames.ROYAL_FLUSH, 10 }
+        };
 
         private static class HandTypeDetector
         {
-            public static (HandTypes, bool) Detect(IEnumerable<Card> hand)
+            public static (HandNames, bool) Detect(IEnumerable<Card> hand)
             {
                 var handList = hand.ToList();
+                if (handList.Count() == 0) return (HandNames.EMPTY, false);
+
                 var (nPairs, nTrips, nQuads, isStraight, hasAcesHigh) = GetFrequencyStats(handList);
                 var suitPairs = handList.GroupBy(x => x.Suit).OrderByDescending(x => x.Count());
                 var groupWithMostFrequentSuit = suitPairs.First();
@@ -67,16 +74,16 @@ namespace SaloonSlingers.Core
                     isStraight && isFlush
                 );
 
-                if (isRoyalFlush) return (HandTypes.ROYAL_FLUSH, hasAcesHigh);
-                if (isStraight && isFlush) return (HandTypes.STRAIGHT_FLUSH, hasAcesHigh);
-                if (nQuads > 0) return (HandTypes.FOUR_OF_A_KIND, hasAcesHigh);
-                if (nPairs == 1 && nTrips == 1) return (HandTypes.FULL_HOUSE, hasAcesHigh);
-                if (isFlush) return (HandTypes.FLUSH, hasAcesHigh);
-                if (isStraight) return (HandTypes.STRAIGHT, hasAcesHigh);
-                if (nTrips > 0) return (HandTypes.THREE_OF_A_KIND, hasAcesHigh);
-                if (nPairs == 1) return (HandTypes.PAIR, hasAcesHigh);
-                if (nPairs == 2) return (HandTypes.TWO_PAIR, hasAcesHigh);
-                return (HandTypes.HIGH_CARD, hasAcesHigh);
+                if (isRoyalFlush) return (HandNames.ROYAL_FLUSH, hasAcesHigh);
+                if (isStraight && isFlush) return (HandNames.STRAIGHT_FLUSH, hasAcesHigh);
+                if (nQuads > 0) return (HandNames.FOUR_OF_A_KIND, hasAcesHigh);
+                if (nPairs == 1 && nTrips == 1) return (HandNames.FULL_HOUSE, hasAcesHigh);
+                if (isFlush) return (HandNames.FLUSH, hasAcesHigh);
+                if (isStraight) return (HandNames.STRAIGHT, hasAcesHigh);
+                if (nTrips > 0) return (HandNames.THREE_OF_A_KIND, hasAcesHigh);
+                if (nPairs == 1) return (HandNames.PAIR, hasAcesHigh);
+                if (nPairs == 2) return (HandNames.TWO_PAIR, hasAcesHigh);
+                return (HandNames.HIGH_CARD, hasAcesHigh);
             }
 
             private static (int nPairs, int nTrips, int nQuads, bool isStraight, bool hasAcesHigh) GetFrequencyStats(IEnumerable<Card> hand)
@@ -154,11 +161,11 @@ namespace SaloonSlingers.Core
                 MAX_NUMBER_OF_TIEBREAKERS * NibbleHelpers.BITS_PER_NIBBLE
             );
 
-            public static uint Create(IEnumerable<Card> hand, HandTypes handType, bool hasAcesHigh)
+            public static uint Create(IEnumerable<Card> hand, HandNames handName, bool hasAcesHigh)
             {
                 int tieBreakerIndex = 0;
                 uint tieBreakers = 0;
-                var valuesOrdered = GetValuesToConsider(hand, handType, hasAcesHigh);
+                var valuesOrdered = GetValuesToConsider(hand, handName, hasAcesHigh);
                 foreach (byte cardValue in valuesOrdered)
                 {
                     tieBreakers |= CalculateTieBreaker(cardValue, tieBreakerIndex);
@@ -168,27 +175,27 @@ namespace SaloonSlingers.Core
                 return tieBreakers;
             }
 
-            private static IEnumerable<byte> GetValuesToConsider(IEnumerable<Card> hand, HandTypes handType, bool hasAcesHigh)
+            private static IEnumerable<byte> GetValuesToConsider(IEnumerable<Card> hand, HandNames handName, bool hasAcesHigh)
             {
-                int numberOfValuesToConsider = handType switch
+                int numberOfValuesToConsider = handName switch
                 {
-                    HandTypes.PAIR => MAX_NUMBER_OF_TIEBREAKERS - 1,
-                    HandTypes.TWO_PAIR => MAX_NUMBER_OF_TIEBREAKERS - 2,
-                    HandTypes.THREE_OF_A_KIND => MAX_NUMBER_OF_TIEBREAKERS - 2,
-                    HandTypes.FOUR_OF_A_KIND => MAX_NUMBER_OF_TIEBREAKERS - 3,
-                    HandTypes.STRAIGHT or HandTypes.STRAIGHT_FLUSH => MAX_NUMBER_OF_TIEBREAKERS - 4,
-                    HandTypes.FULL_HOUSE => MAX_NUMBER_OF_TIEBREAKERS - 3,
-                    HandTypes.ROYAL_FLUSH => 0,
+                    HandNames.PAIR => MAX_NUMBER_OF_TIEBREAKERS - 1,
+                    HandNames.TWO_PAIR => MAX_NUMBER_OF_TIEBREAKERS - 2,
+                    HandNames.THREE_OF_A_KIND => MAX_NUMBER_OF_TIEBREAKERS - 2,
+                    HandNames.FOUR_OF_A_KIND => MAX_NUMBER_OF_TIEBREAKERS - 3,
+                    HandNames.STRAIGHT or HandNames.STRAIGHT_FLUSH => MAX_NUMBER_OF_TIEBREAKERS - 4,
+                    HandNames.FULL_HOUSE => MAX_NUMBER_OF_TIEBREAKERS - 3,
+                    HandNames.ROYAL_FLUSH => 0,
                     _ => MAX_NUMBER_OF_TIEBREAKERS
                 };
 
-                IEnumerable<byte> values = handType switch
+                IEnumerable<byte> values = handName switch
                 {
-                    HandTypes.STRAIGHT =>
+                    HandNames.STRAIGHT =>
                         hand.Select(x => GetByteValues(hasAcesHigh, x))
                             .GroupBy(x => x)
                             .First().OrderByDescending(x => x),
-                    HandTypes.FLUSH or HandTypes.STRAIGHT_FLUSH =>
+                    HandNames.FLUSH or HandNames.STRAIGHT_FLUSH =>
                         hand.GroupBy(x => x.Suit)
                             .OrderByDescending(xs => xs.Count())
                             .First()
@@ -229,6 +236,13 @@ namespace SaloonSlingers.Core
             }
 
             public const int BITS_PER_NIBBLE = 4;
+        }
+
+        private HandType CreateHandType(uint score, HandNames handName)
+        {
+            string enumName = Enum.GetName(typeof(HandNames), handName);
+            TextInfo textInfo = Thread.CurrentThread.CurrentCulture.TextInfo;
+            return new HandType(handName, score);
         }
     }
 }

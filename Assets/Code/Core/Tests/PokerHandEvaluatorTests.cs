@@ -1,5 +1,7 @@
 using NUnit.Framework;
 
+using SaloonSlingers.Core.HandEvaluators;
+
 namespace SaloonSlingers.Core.Tests
 {
     public class PokerHandEvaluatorTests
@@ -105,7 +107,7 @@ namespace SaloonSlingers.Core.Tests
 
             private static uint EvaluateHandString(string x)
             {
-                return subject.Evaluate(TestHelpers.MakeHandFromString(x));
+                return subject.Evaluate(TestHelpers.MakeHandFromString(x)).Score;
             }
         }
     }

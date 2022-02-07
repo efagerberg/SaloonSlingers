@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 
 using SaloonSlingers.Core;
+using SaloonSlingers.Core.SlingerAttributes;
 
 namespace SaloonSlingers.Unity
 {
@@ -26,6 +27,8 @@ namespace SaloonSlingers.Unity
         private float spawnPerSecond = 4f;
         [SerializeField]
         private float spawnInitialWaitSeconds = 3f;
+        [SerializeField]
+        private GameRulesManager gameRulesManager;
 
         private Deck deck;
         private Stack<GameObject> deckCards;
@@ -35,24 +38,35 @@ namespace SaloonSlingers.Unity
         public Enemy Spawn(Vector3 position, Quaternion rotation)
         {
             var e = Spawn();
+            gameRulesManager.OnGameRulesChanged += e.GameRulesChangedHandler;
             e.transform.SetPositionAndRotation(position, rotation);
             return e;
         }
-        public void Despawn(Enemy e) => enemyPool.Release(e);
+        public void Despawn(Enemy e)
+        {
+            enemyPool.Release(e);
+            gameRulesManager.OnGameRulesChanged -= e.GameRulesChangedHandler;
+        }
 
         private void Awake()
         {
             deck = new Deck(numberOfCards).Shuffle();
+        }
+
+        private void Start()
+        {
             deckCards = new Stack<GameObject>();
             enemyPool = new ObjectPool<Enemy>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
             SpawnDeck();
+            var gameRulesManagerGO = GameObject.FindGameObjectWithTag("GameRulesManager");
+            gameRulesManager = gameRulesManagerGO.GetComponent<GameRulesManager>();
+            InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
         }
 
         private void OnEnable()
         {
             deck.OnDeckEmpty += DeckEmptyHandler;
             deck.OnDeckRefilled += DeckRefilledHandler;
-            InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
         }
 
         private void OnDisable()
@@ -100,6 +114,11 @@ namespace SaloonSlingers.Unity
             Card card = deck.RemoveFromTop();
             enemy.SetCard(card);
             enemy.gameObject.SetActive(true);
+            enemy.Attributes = new EnemyAttributes
+            {
+                Hand = new Hand(gameRulesManager.GameRules.HandEvaluator),
+            };
+            enemy.Attributes.Hand.Add(card);
         }
 
         private void DeckEmptyHandler(Deck _, EventArgs __) => CancelInvoke(nameof(SpawnEnemy));

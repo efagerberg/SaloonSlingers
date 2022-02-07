@@ -42,28 +42,21 @@ namespace SaloonSlingers.Core.Tests
 
         class TestIsFace
         {
-            [Test]
-            public void ForNonFaceCard_ReturnsTrue()
+            [TestCaseSource(nameof(IsFaceCardTestCases))]
+            public void ForNonFaceCard_ReturnsTrue(Card card, bool expected)
             {
-                Card cardUnderTest = new(Values.EIGHT, Suits.DIAMONDS);
-                Assert.IsFalse(cardUnderTest.IsFaceCard());
-
-                cardUnderTest.Value = Values.ACE;
-                Assert.IsFalse(cardUnderTest.IsFaceCard());
+                Assert.That(card.IsFaceCard() == expected);
             }
 
-            [Test]
-            public void ForFaceCards_ReturnsTrue()
+            private static readonly object[][] IsFaceCardTestCases =
             {
-                Card cardUnderTest = new(Values.QUEEN, Suits.CLUBS);
-                Assert.IsTrue(cardUnderTest.IsFaceCard());
-
-                cardUnderTest.Value = Values.KING;
-                Assert.IsTrue(cardUnderTest.IsFaceCard());
-
-                cardUnderTest.Value = Values.JACK;
-                Assert.IsTrue(cardUnderTest.IsFaceCard());
-            }
+                new object[] { new Card("AH"), false },
+                new object[] { new Card("8D"), false },
+                new object[] { new Card("TC"), false },
+                new object[] { new Card("JS"), true },
+                new object[] { new Card("QH"), true },
+                new object[] { new Card("KD"), true },
+            };
         }
 
         class TestToString

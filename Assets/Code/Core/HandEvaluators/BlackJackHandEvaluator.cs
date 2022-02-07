@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SaloonSlingers.Core
+namespace SaloonSlingers.Core.HandEvaluators
 {
     public class BlackJackHandEvaluator : IHandEvaluator
     {
@@ -13,7 +13,7 @@ namespace SaloonSlingers.Core
         private const int FACE_VALUE = 10 + 2;
         private const int BUST_THRESHOLD = 21 + 2;
 
-        public uint Evaluate(IEnumerable<Card> hand)
+        public HandType Evaluate(IEnumerable<Card> hand)
         {
             uint sum = 1;
             int numAces = 0;
@@ -35,16 +35,16 @@ namespace SaloonSlingers.Core
                     sum += (uint)card.Value + 2;
                 handLength += 1;
 
-                if (IsBlackJack(numAces, numFaceCards, handLength)) return GetMaxHandValue();
+                if (IsBlackJack(numAces, numFaceCards, handLength)) return new HandType(HandNames.BLACK_JACK, GetMaxHandValue());
             }
 
             while (sum > BUST_THRESHOLD)
             {
-                if (numAces == 0) return GetMinHandValue();
+                if (numAces == 0) return new HandType(HandNames.BUST, GetMinHandValue());
                 numAces -= 1;
                 sum -= (HIGH_ACE_VALUE - LOW_ACE_VALUE);
             }
-            return sum;
+            return new HandType(HandNames.EMPTY, sum);
         }
 
         private static bool IsBlackJack(int numAces, int numFaceCards, int length)

@@ -1,0 +1,5 @@
+{
+  "Name": "Poker",
+  "MaxHandSize": 5,
+  "HandEvaluator": "Poker"
+}

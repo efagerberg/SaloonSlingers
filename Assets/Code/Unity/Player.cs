@@ -1,17 +1,16 @@
-using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit.Inputs;
 
 using SaloonSlingers.Core;
+using SaloonSlingers.Core.SlingerAttributes;
+using System;
 
 namespace SaloonSlingers.Unity
 {
-    public class Player : MonoBehaviour
+    public class Player : MonoBehaviour, ISlinger
     {
-        public PlayerAttributes Attributes;
+        public ISlingerAttributes Attributes { get; private set; }
         [SerializeField]
         private int numberOfCards = Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK;
         [SerializeField]
@@ -22,6 +21,8 @@ namespace SaloonSlingers.Unity
         private int startingDashes = 3;
         [SerializeField]
         private float startingDashCooldown = 3;
+        [SerializeField]
+        private GameRulesManager gameRulesManager;
 
         public void TakeDamage(int amount)
         {
@@ -30,16 +31,30 @@ namespace SaloonSlingers.Unity
                 Debug.Log("Player died");
         }
 
-        private void Awake()
+        public void GameRulesChangedHandler(GameRules rules, EventArgs _)
         {
+            Attributes.Hand.HandEvaluator = rules.HandEvaluator;
+        }
+
+        private void Start()
+        {
+            var gameRulesManagerGO = GameObject.FindGameObjectWithTag("GameRulesManager");
+            gameRulesManager = gameRulesManagerGO.GetComponent<GameRulesManager>();
             Attributes = new PlayerAttributes
             {
                 Deck = new Deck(numberOfCards),
+                Hand = new Hand(gameRulesManager.GameRules.HandEvaluator),
                 Health = startingHealth,
                 Dashes = startingDashes,
                 DashSpeed = startingDashSpeed,
                 DashCooldown = startingDashCooldown
             };
+            gameRulesManager.OnGameRulesChanged += GameRulesChangedHandler;
+        }
+
+        private void OnDisable()
+        {
+            gameRulesManager.OnGameRulesChanged -= GameRulesChangedHandler;
         }
 
         private void OnTriggerEnter(Collider hit)
