@@ -591,6 +591,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Commit Hand Toggle",
+                    "type": "Button",
+                    "id": "747fa79b-93b5-4051-b4f9-bf57cb1b27a7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -921,6 +930,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f3dd4a12-d1b6-4eb8-9b53-f3ceebd6fc04",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Commit Hand Toggle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

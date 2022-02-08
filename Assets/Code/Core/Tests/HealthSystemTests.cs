@@ -19,7 +19,7 @@ namespace SaloonSlingers.Core.Tests
                 targets, List<int> expectedTargetHealths
             )
             {
-                HealthSystem.DoDamage(source, targets);
+                HealthSystem.DoDamage(new TestHandEvaluator(), source, targets);
                 var actualTargetHealths = targets.Select(x => x.Health).ToList();
 
                 Assert.AreEqual(expectedTargetHealths, actualTargetHealths);
@@ -79,19 +79,17 @@ namespace SaloonSlingers.Core.Tests
 
             private class TestSlingerAttributes : ISlingerAttributes
             {
-                public Hand Hand { get; set; }
-                public int MaxHandSize { get; set; }
+                public IList<Card> Hand { get; set; }
+                public Deck Deck { get; set; }
                 public int Health { get; set; }
+                public int Level { get; set; }
             }
 
             private static TestSlingerAttributes CreateAttributes(string handString, int health = 3)
             {
                 return new TestSlingerAttributes
                 {
-                    Hand = new Hand(
-                        new TestHandEvaluator(),
-                        TestHelpers.MakeHandFromString(handString)
-                    ),
+                    Hand = TestHelpers.MakeHandFromString(handString).ToList(),
                     Health = health
                 };
             }
