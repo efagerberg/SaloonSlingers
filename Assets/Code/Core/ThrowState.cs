@@ -1,4 +1,4 @@
-namespace SaloonSlingers.Unity.HandInteractable
+namespace SaloonSlingers.Core
 {
     public class ThrowState
     {
@@ -15,19 +15,25 @@ namespace SaloonSlingers.Unity.HandInteractable
             shouldDespawn = false;
         }
 
-        public void SetThrown() => isThrown = true;
+        public ThrowState Throw()
+        {
+            isThrown = true;
+            return this;
+        }
 
-        public void SetUnthrown()
+        public ThrowState Reset()
         {
             timeToLive = maxLifetime;
             isThrown = false;
+            return this;
         }
 
-        public void Update(float velocityMagnitude, float deltaTime)
+        public ThrowState Update(float velocityMagnitude, float deltaTime)
         {
-            if (!isThrown || shouldDespawn) return;
+            if (!isThrown || shouldDespawn) return this;
+            timeToLive -= deltaTime;
             if (velocityMagnitude == 0 || timeToLive <= 0) shouldDespawn = true;
-            else timeToLive -= deltaTime;
+            return this;
         }
     }
 }

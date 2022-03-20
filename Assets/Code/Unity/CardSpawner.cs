@@ -12,20 +12,20 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private int poolSize = 32;
 
-        private IObjectPool<TangibleCard> pool;
+        private IObjectPool<ITangibleCard> pool;
 
-        public TangibleCard Spawn() => pool.Get();
-        public TangibleCard Spawn(Card card)
+        public ITangibleCard Spawn() => pool.Get();
+        public ITangibleCard Spawn(Card card)
         {
             var c = Spawn();
             c.Card = card;
             return c;
         }
-        public void Despawn(TangibleCard c) => pool.Release(c);
+        public void Despawn(ITangibleCard c) => pool.Release(c);
 
         private void Awake()
         {
-            pool = new ObjectPool<TangibleCard>(CreateInstance, GetFromPool, ReturnToPool, defaultCapacity: poolSize);
+            pool = new ObjectPool<ITangibleCard>(CreateInstance, GetFromPool, ReturnToPool, defaultCapacity: poolSize);
         }
 
         private TangibleCard CreateInstance()
@@ -36,12 +36,12 @@ namespace SaloonSlingers.Unity
             return cardInteractable;
         }
 
-        private void GetFromPool(TangibleCard tangibleCard)
+        private void GetFromPool(ITangibleCard tangibleCard)
         {
             tangibleCard.gameObject.SetActive(true);
         }
 
-        private void ReturnToPool(TangibleCard tangibleCard)
+        private void ReturnToPool(ITangibleCard tangibleCard)
         {
             tangibleCard.gameObject.SetActive(true);
             tangibleCard.transform.position = Vector3.zero;

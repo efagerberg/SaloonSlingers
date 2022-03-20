@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
+using SaloonSlingers.Core.SlingerAttributes;
+using System;
+using SaloonSlingers.Core;
 
 namespace SaloonSlingers.Unity.HandInteractable
 {
@@ -18,7 +21,9 @@ namespace SaloonSlingers.Unity.HandInteractable
         [SerializeField]
         private GameRulesManager gameRulesManager;
         [SerializeField]
-        private GameObject handPanel;
+        private RectTransform handPanelRectTransform;
+        [SerializeField]
+        private RectTransform handCanvasRectTransform;
         [SerializeField]
         private float totalCardDegrees = 30f;
         [SerializeField]
@@ -28,19 +33,14 @@ namespace SaloonSlingers.Unity.HandInteractable
         private Rigidbody rigidBody;
         private ThrowState throwState;
         private HandLayoutMediator handLayoutMediator;
+        private ISlingerAttributes slingerAttributes;
+        private Func<int, IEnumerable<float>> rotationCalculator;
 
         protected override void OnEnable()
         {
             base.OnEnable();
+            rotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
             throwState = new(maxLifetime);
-            if (handLayoutMediator == null) return;
-            commitHandActionProperties.ForEach(prop => prop.action.started += handLayoutMediator.ToggleCommitHand);
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            commitHandActionProperties.ForEach(prop => prop.action.started -= handLayoutMediator.ToggleCommitHand);
         }
 
         protected override void OnSelectEntering(SelectEnterEventArgs args)
@@ -48,7 +48,8 @@ namespace SaloonSlingers.Unity.HandInteractable
             base.OnSelectEntering(args);
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
-            throwState.SetUnthrown();
+            commitHandActionProperties.ForEach(prop => prop.action.started += CommitHand);
+            throwState = throwState.Reset();
         }
 
         protected override void OnSelectExiting(SelectExitEventArgs args)
@@ -56,23 +57,32 @@ namespace SaloonSlingers.Unity.HandInteractable
             base.OnSelectExiting(args);
             trailRenderer.enabled = true;
             rigidBody.isKinematic = false;
-            throwState.SetThrown();
+            commitHandActionProperties.ForEach(prop => prop.action.started -= CommitHand);
+            throwState = throwState.Throw();
             NegateCharacterControllerVelocity(args.interactorObject);
+        }
+
+        private void CommitHand(InputAction.CallbackContext ctx)
+        {
+            Vector2 newCanvasSizeDelta = handLayoutMediator.ToggleCommitHand(rotationCalculator, ctx).canvasSizeDelta;
+            handPanelRectTransform.parent.GetComponent<RectTransform>().sizeDelta = newCanvasSizeDelta;
         }
 
         protected override void OnActivated(ActivateEventArgs args)
         {
             base.OnActivated(args);
-            handLayoutMediator.AddCardToHand(gameRulesManager);
+            handLayoutMediator.AddCardToHand(gameRulesManager.GameRules.MaxHandSize, slingerAttributes, cardSpawner.Spawn, rotationCalculator);
         }
 
         private void Start()
         {
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
-            handLayoutMediator = new(slingerGO, handPanel, cardSpawner, totalCardDegrees);
-            handLayoutMediator.AddCardToHand(gameRulesManager);
-            commitHandActionProperties.ForEach(prop => prop.action.started += handLayoutMediator.ToggleCommitHand);
+            slingerAttributes = slingerGO.GetComponent<ISlinger>().Attributes;
+            if (handCanvasRectTransform == null) handCanvasRectTransform = handPanelRectTransform.parent.GetComponent<RectTransform>();
+
+            handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
+            handLayoutMediator.AddCardToHand(gameRulesManager.GameRules.MaxHandSize, slingerAttributes, cardSpawner.Spawn, rotationCalculator);
         }
 
         private void NegateCharacterControllerVelocity(IXRInteractor interactorObject)
@@ -83,10 +93,10 @@ namespace SaloonSlingers.Unity.HandInteractable
 
         private void FixedUpdate()
         {
-            throwState.Update(rigidBody.velocity.magnitude, Time.deltaTime);
+            throwState = throwState.Update(rigidBody.velocity.magnitude, Time.deltaTime);
             if (!throwState.IsAlive)
             {
-                handLayoutMediator.Dispose();
+                handLayoutMediator.Dispose(cardSpawner.Despawn, slingerAttributes.Hand);
                 Destroy(gameObject);
             }
         }

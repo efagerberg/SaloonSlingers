@@ -4,7 +4,9 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "SaloonSlingers.Unity"
+        "SaloonSlingers.Unity",
+        "SaloonSlingers.Core",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"

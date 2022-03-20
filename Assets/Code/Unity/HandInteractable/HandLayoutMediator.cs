@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
@@ -12,99 +13,95 @@ namespace SaloonSlingers.Unity.HandInteractable
     public class HandLayoutMediator
     {
         private const float zOffset = -0.001f;
-        private float totalCardDegrees;
-        private GameObject handPanel;
-        private CardSpawner cardSpawner;
-        private float handCanvasUncommittedSize;
+        private readonly RectTransform handPanelRectTransform;
+        private readonly RectTransform handCanvasRectTransform;
+        private readonly float handCanvasUncommittedSize;
         private float handCanvasCommittedSize;
-        private List<TangibleCard> tangibleCards;
+        private readonly List<ITangibleCard> tangibleCards;
         private bool handCommitted;
-        private ISlingerAttributes slingerAttributes;
 
-        public HandLayoutMediator(GameObject slingerGameObject, GameObject handPanel, CardSpawner cardSpawner, float totalCardDegrees)
+        public HandLayoutMediator(RectTransform handPanelRectTransform, RectTransform handCanvasRectTransform)
         {
-            tangibleCards = new List<TangibleCard>();
-            var slinger = slingerGameObject.GetComponent<ISlinger>();
-            slingerAttributes = slinger.Attributes;
-            RectTransform canvasTransform = handPanel.transform.parent.GetComponent<RectTransform>();
-            handCanvasUncommittedSize = canvasTransform.rect.width;
-            this.totalCardDegrees = totalCardDegrees;
-            this.cardSpawner = cardSpawner;
-            this.handPanel = handPanel;
+            tangibleCards = new List<ITangibleCard>();
+            this.handPanelRectTransform = handPanelRectTransform;
+            this.handCanvasRectTransform = handCanvasRectTransform;
+            handCanvasUncommittedSize = handCanvasRectTransform.rect.width;
         }
 
-        public void ApplyLayoutRotation()
-        {
-            tangibleCards.Zip(
-                HandRotationCalculator.CalculateRotations(tangibleCards.Count, totalCardDegrees),
-                (first, second) => (first, second)
-            ).Select(r => ApplyLayoutRotationToCard(r.second, r.first)).ToList();
-        }
-
-        public void ToggleCommitHand(InputAction.CallbackContext _)
+        public (Vector2 canvasSizeDelta, IList<ITangibleCard> tangibleCards) ToggleCommitHand(Func<int, IEnumerable<float>> rotationCalculator, InputAction.CallbackContext _)
         {
             handCommitted = !handCommitted;
-            var canvasTransform = handPanel.transform.parent.GetComponent<RectTransform>();
             float newCanvasWidth;
 
             if (handCommitted)
             {
                 newCanvasWidth = handCanvasCommittedSize;
-                tangibleCards.ForEach(RevertLayoutRotationOfCard);
+                tangibleCards.ForEach((t) => t.transform.localRotation = GetRevertedLocalRotation(t.transform));
             }
             else
             {
                 newCanvasWidth = handCanvasUncommittedSize;
-                ApplyLayoutRotation();
+                ApplyLayoutRotation(rotationCalculator);
             }
-            canvasTransform.sizeDelta = new Vector2(newCanvasWidth, canvasTransform.sizeDelta.y);
+            return (
+                new Vector2(newCanvasWidth, handCanvasRectTransform.sizeDelta.y),
+                tangibleCards
+            );
         }
 
-        public void AddCardToHand(GameRulesManager gameRulesManager)
+        public IList<ITangibleCard> AddCardToHand(int maxHandSize, ISlingerAttributes slingerAttributes, Func<Card, ITangibleCard> cardSpawner, Func<int, IEnumerable<float>> rotationCalculator)
         {
-            if (handCommitted || slingerAttributes.Hand.Count() >= gameRulesManager.GameRules.MaxHandSize)
-                return;
+            if (handCommitted || slingerAttributes.Hand.Count() >= maxHandSize)
+                return tangibleCards;
 
             Card card = slingerAttributes.Deck.Dequeue();
             slingerAttributes.Hand.Add(card);
-            TangibleCard tangibleCard = cardSpawner.Spawn(card);
+            ITangibleCard tangibleCard = cardSpawner(card);
             if (handCanvasCommittedSize == 0)
                 handCanvasCommittedSize = tangibleCard.GetComponent<RectTransform>().rect.width;
             tangibleCard.transform.position = new Vector3(0, 0, (tangibleCards.Count() - 1) * zOffset);
-            tangibleCard.transform.SetParent(handPanel.transform, false);
+            tangibleCard.transform.SetParent(handPanelRectTransform, false);
             tangibleCards.Add(tangibleCard);
-            ApplyLayoutRotation();
+            return ApplyLayoutRotation(rotationCalculator);
         }
 
-        public void Dispose()
+        public IList<ITangibleCard> Dispose(Action<ITangibleCard> cardDespawner, IList<Card> hand)
         {
-            for (int i = 0; i < tangibleCards.Count(); i++)
+            for (int i = tangibleCards.Count() - 1; i >= 0; i--)
             {
-                TangibleCard tangibleCard = tangibleCards[i];
-                cardSpawner.Despawn(tangibleCard);
+                ITangibleCard tangibleCard = tangibleCards[i];
+                cardDespawner(tangibleCard);
                 tangibleCards.RemoveAt(i);
-                slingerAttributes.Hand.RemoveAt(i);
+                hand.RemoveAt(i);
             }
+            return tangibleCards;
         }
 
-        private static TangibleCard ApplyLayoutRotationToCard(float degrees, TangibleCard tangibleCard)
+        private static ITangibleCard ApplyLayoutRotationToCard(float degrees, ITangibleCard tangibleCard)
         {
-            RevertLayoutRotationOfCard(tangibleCard);
+            tangibleCard.transform.localRotation = GetRevertedLocalRotation(tangibleCard.transform);
             Vector3[] corners = new Vector3[4];
             tangibleCard.GetComponent<RectTransform>().GetLocalCorners(corners);
             tangibleCard.transform.RotateAround(corners[3], tangibleCard.transform.forward, degrees);
             return tangibleCard;
         }
 
-        private static void RevertLayoutRotationOfCard(TangibleCard current)
+        private static Quaternion GetRevertedLocalRotation(Transform currentTransform)
         {
-            Transform currentTransform = current.transform;
-            currentTransform.localRotation = Quaternion.Euler(new Vector3(
+            return Quaternion.Euler(new Vector3(
                 currentTransform.localEulerAngles.x,
                 currentTransform.localEulerAngles.y,
                 // Reset z rotation to what it was before
                 currentTransform.parent.localEulerAngles.z
             ));
+        }
+
+        private IList<ITangibleCard> ApplyLayoutRotation(Func<int, IEnumerable<float>> rotationCalculator)
+        {
+            return tangibleCards.Zip(
+                rotationCalculator(tangibleCards.Count),
+                (first, second) => (first, second)
+            ).Select(r => ApplyLayoutRotationToCard(r.second, r.first)).ToList();
         }
     }
 }

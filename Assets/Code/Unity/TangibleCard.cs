@@ -4,7 +4,7 @@ using SaloonSlingers.Core;
 
 namespace SaloonSlingers.Unity
 {
-    public class TangibleCard : MonoBehaviour
+    public class TangibleCard : MonoBehaviour, ITangibleCard
     {
         [SerializeField]
         private Card card;
@@ -18,6 +18,7 @@ namespace SaloonSlingers.Unity
             {
                 card = value;
                 name = card.ToString();
+                if (faceRenderer == null) faceRenderer = GetComponent<Renderer>();
                 CardGraphicsHelper.SetFaceTexture(card, faceRenderer);
             }
         }
