@@ -14,12 +14,14 @@ namespace SaloonSlingers.Core.Tests
         {
             [TestCaseSource(nameof(DoDamageTestCases))]
             public void TestDoesDamageExpectedly(
-                ISlingerAttributes source,
-                List<ISlingerAttributes>
-                targets, List<int> expectedTargetHealths
+                (string, int) rawSource,
+                List<(string, int)> rawTargets,
+                List<int> expectedTargetHealths
             )
             {
-                HealthSystem.DoDamage(source, targets);
+                TestSlingerAttributes source = CreateAttributes(rawSource.Item1, rawSource.Item2);
+                List<TestSlingerAttributes> targets = rawTargets.Select(t => CreateAttributes(t.Item1, t.Item2)).ToList();
+                HealthSystem.DoDamage(new TestHandEvaluator(), source, targets);
                 var actualTargetHealths = targets.Select(x => x.Health).ToList();
 
                 Assert.AreEqual(expectedTargetHealths, actualTargetHealths);
@@ -35,63 +37,61 @@ namespace SaloonSlingers.Core.Tests
 
             private static readonly object[][] DoDamageTestCases = {
                 new object[] {
-                    CreateAttributes("AH", 3),
-                    new List<ISlingerAttributes>(),
+                    ("AH", 3),
+                    new List<(string, int)>(),
                     new List<int>()
                 },
                 new object[] {
-                    CreateAttributes("AH", 3),
-                    new List<ISlingerAttributes>() { CreateAttributes("AH", 3) },
+                    ("AH", 3),
+                    new List<(string, int)>() { ("AH", 3) },
                     new List<int> { 3 }
                 },
                 new object[] {
-                    CreateAttributes("AH", 3),
-                    new List<ISlingerAttributes>() { CreateAttributes("AH 2C", 3) },
+                    ("AH", 3),
+                    new List<(string, int)>() { ("AH 2C", 3) },
                     new List<int> { 3 }
                 },
                 new object[] {
-                    CreateAttributes("AH 2C 3D", 3),
-                    new List<ISlingerAttributes>() { CreateAttributes("AH", 3) },
+                    ("AH 2C 3D", 3),
+                    new List<(string, int)>() { ("AH", 3) },
                     new List<int> { 2 }
                 },
                 new object[] {
-                    CreateAttributes("AH 2C 3D", 3),
-                    new List<ISlingerAttributes>() {
-                        CreateAttributes("AH", 3),
-                        CreateAttributes("AH", 2)
+                    ("AH 2C 3D", 3),
+                    new List<(string, int)>() {
+                        ("AH", 3),
+                        ("AH", 2)
                     },
                     new List<int> { 2, 1 }
                 },
                 new object[] {
-                    CreateAttributes("AH 2C 3D", 3),
-                    new List<ISlingerAttributes>() {
-                        CreateAttributes("AH 2C 3D", 3),
-                        CreateAttributes("AH", 2)
+                    ("AH 2C 3D", 3),
+                    new List<(string, int)>() {
+                        ("AH 2C 3D", 3),
+                        ("AH", 2)
                     },
                     new List<int> { 3, 1 }
                 },
                 new object[] {
-                    CreateAttributes("AH 2C 3D", 3),
-                    new List<ISlingerAttributes>() { CreateAttributes("AH 2C", 0) },
+                    ("AH 2C 3D", 3),
+                    new List<(string, int)>() { ("AH 2C", 0) },
                     new List<int> { 0 }
                 }
             };
 
             private class TestSlingerAttributes : ISlingerAttributes
             {
-                public Hand Hand { get; set; }
-                public int MaxHandSize { get; set; }
+                public IList<Card> Hand { get; set; }
+                public Deck Deck { get; set; }
                 public int Health { get; set; }
+                public int Level { get; set; }
             }
 
             private static TestSlingerAttributes CreateAttributes(string handString, int health = 3)
             {
-                return new TestSlingerAttributes
+                return new TestSlingerAttributes()
                 {
-                    Hand = new Hand(
-                        new TestHandEvaluator(),
-                        TestHelpers.MakeHandFromString(handString)
-                    ),
+                    Hand = TestHelpers.MakeHandFromString(handString).ToList(),
                     Health = health
                 };
             }

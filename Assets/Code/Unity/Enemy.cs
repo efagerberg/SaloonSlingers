@@ -1,5 +1,3 @@
-using System;
-
 using UnityEngine;
 using Unity.XR.CoreUtils;
 
@@ -11,24 +9,23 @@ namespace SaloonSlingers.Unity
     public class Enemy : MonoBehaviour, ISlinger
     {
         public ISlingerAttributes Attributes { get; set; }
+        public Card Card
+        {
+            get => card;
+            set
+            {
+                card = value;
+                CardGraphicsHelper.SetFaceTexture(card, faceRenderer);
+            }
+        }
+
         [SerializeField]
         private float moveSpeed = 1;
         [SerializeField]
         private Card card;
         [SerializeField]
         private Renderer faceRenderer;
-
         private Transform playerCameraTransform;
-        public Card GetCard() => card;
-        public void SetCard(Card inCard)
-        {
-            card = inCard;
-            CardGraphicsHelper.SetFaceTexture(card, faceRenderer);
-        }
-        public void GameRulesChangedHandler(GameRules rules, EventArgs _)
-        {
-            Attributes.Hand.HandEvaluator = rules.HandEvaluator;
-        }
 
         private void Start()
         {

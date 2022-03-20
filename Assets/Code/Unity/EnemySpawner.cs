@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 using UnityEngine.Pool;
@@ -38,14 +39,12 @@ namespace SaloonSlingers.Unity
         public Enemy Spawn(Vector3 position, Quaternion rotation)
         {
             var e = Spawn();
-            gameRulesManager.OnGameRulesChanged += e.GameRulesChangedHandler;
             e.transform.SetPositionAndRotation(position, rotation);
             return e;
         }
         public void Despawn(Enemy e)
         {
             enemyPool.Release(e);
-            gameRulesManager.OnGameRulesChanged -= e.GameRulesChangedHandler;
         }
 
         private void Awake()
@@ -112,13 +111,16 @@ namespace SaloonSlingers.Unity
         private void GetFromPool(Enemy enemy)
         {
             Card card = deck.RemoveFromTop();
-            enemy.SetCard(card);
+            enemy.Card = card;
             enemy.gameObject.SetActive(true);
             enemy.Attributes = new EnemyAttributes
             {
-                Hand = new Hand(gameRulesManager.GameRules.HandEvaluator),
+                Hand = new List<Card>(),
+                Deck = new Deck().Shuffle(),
+                Health = 1,
+                Level = card.Value == Values.ACE ? (int)Values.KING + 1 : (int)card.Value
             };
-            enemy.Attributes.Hand.Add(card);
+            enemy.Attributes.Hand.Append(card);
         }
 
         private void DeckEmptyHandler(Deck _, EventArgs __) => CancelInvoke(nameof(SpawnEnemy));
