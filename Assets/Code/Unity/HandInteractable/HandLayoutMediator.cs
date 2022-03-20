@@ -17,18 +17,18 @@ namespace SaloonSlingers.Unity.HandInteractable
         private readonly RectTransform handCanvasRectTransform;
         private readonly float handCanvasUncommittedSize;
         private float handCanvasCommittedSize;
-        private readonly List<ITangibleCard> tangibleCards;
+        private readonly IList<ITangibleCard> tangibleCards;
         private bool handCommitted;
 
-        public HandLayoutMediator(RectTransform handPanelRectTransform, RectTransform handCanvasRectTransform)
+        public HandLayoutMediator(RectTransform handPanelRectTransform, RectTransform handCanvasRectTransform, IList<ITangibleCard> tangibleCards)
         {
-            tangibleCards = new List<ITangibleCard>();
+            this.tangibleCards = tangibleCards;
             this.handPanelRectTransform = handPanelRectTransform;
             this.handCanvasRectTransform = handCanvasRectTransform;
             handCanvasUncommittedSize = handCanvasRectTransform.rect.width;
         }
 
-        public (Vector2 canvasSizeDelta, IList<ITangibleCard> tangibleCards) ToggleCommitHand(Func<int, IEnumerable<float>> rotationCalculator, InputAction.CallbackContext _)
+        public void ToggleCommitHand(Func<int, IEnumerable<float>> rotationCalculator, InputAction.CallbackContext _)
         {
             handCommitted = !handCommitted;
             float newCanvasWidth;
@@ -36,23 +36,21 @@ namespace SaloonSlingers.Unity.HandInteractable
             if (handCommitted)
             {
                 newCanvasWidth = handCanvasCommittedSize;
-                tangibleCards.ForEach((t) => t.transform.localRotation = GetRevertedLocalRotation(t.transform));
+                foreach (ITangibleCard t in tangibleCards)
+                    t.transform.localRotation = GetRevertedLocalRotation(t.transform);
             }
             else
             {
                 newCanvasWidth = handCanvasUncommittedSize;
                 ApplyLayoutRotation(rotationCalculator);
             }
-            return (
-                new Vector2(newCanvasWidth, handCanvasRectTransform.sizeDelta.y),
-                tangibleCards
-            );
+            handCanvasRectTransform.sizeDelta = new Vector2(newCanvasWidth, handCanvasRectTransform.sizeDelta.y);
         }
 
-        public IList<ITangibleCard> AddCardToHand(int maxHandSize, ISlingerAttributes slingerAttributes, Func<Card, ITangibleCard> cardSpawner, Func<int, IEnumerable<float>> rotationCalculator)
+        public void AddCardToHand(int maxHandSize, ISlingerAttributes slingerAttributes, Func<Card, ITangibleCard> cardSpawner, Func<int, IEnumerable<float>> rotationCalculator)
         {
             if (handCommitted || slingerAttributes.Hand.Count() >= maxHandSize)
-                return tangibleCards;
+                return;
 
             Card card = slingerAttributes.Deck.Dequeue();
             slingerAttributes.Hand.Add(card);
@@ -62,10 +60,10 @@ namespace SaloonSlingers.Unity.HandInteractable
             tangibleCard.transform.position = new Vector3(0, 0, (tangibleCards.Count() - 1) * zOffset);
             tangibleCard.transform.SetParent(handPanelRectTransform, false);
             tangibleCards.Add(tangibleCard);
-            return ApplyLayoutRotation(rotationCalculator);
+            ApplyLayoutRotation(rotationCalculator);
         }
 
-        public IList<ITangibleCard> Dispose(Action<ITangibleCard> cardDespawner, IList<Card> hand)
+        public void Dispose(Action<ITangibleCard> cardDespawner, IList<Card> hand)
         {
             for (int i = tangibleCards.Count() - 1; i >= 0; i--)
             {
@@ -74,16 +72,14 @@ namespace SaloonSlingers.Unity.HandInteractable
                 tangibleCards.RemoveAt(i);
                 hand.RemoveAt(i);
             }
-            return tangibleCards;
         }
 
-        private static ITangibleCard ApplyLayoutRotationToCard(float degrees, ITangibleCard tangibleCard)
+        private static void ApplyLayoutRotationToCard(float degrees, ITangibleCard tangibleCard)
         {
             tangibleCard.transform.localRotation = GetRevertedLocalRotation(tangibleCard.transform);
             Vector3[] corners = new Vector3[4];
             tangibleCard.GetComponent<RectTransform>().GetLocalCorners(corners);
             tangibleCard.transform.RotateAround(corners[3], tangibleCard.transform.forward, degrees);
-            return tangibleCard;
         }
 
         private static Quaternion GetRevertedLocalRotation(Transform currentTransform)
@@ -96,12 +92,12 @@ namespace SaloonSlingers.Unity.HandInteractable
             ));
         }
 
-        private IList<ITangibleCard> ApplyLayoutRotation(Func<int, IEnumerable<float>> rotationCalculator)
+        private void ApplyLayoutRotation(Func<int, IEnumerable<float>> rotationCalculator)
         {
-            return tangibleCards.Zip(
+            tangibleCards.Zip(
                 rotationCalculator(tangibleCards.Count),
                 (first, second) => (first, second)
-            ).Select(r => ApplyLayoutRotationToCard(r.second, r.first)).ToList();
+            ).ToList().ForEach(r => ApplyLayoutRotationToCard(r.second, r.first));
         }
     }
 }

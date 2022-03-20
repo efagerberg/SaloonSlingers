@@ -64,8 +64,7 @@ namespace SaloonSlingers.Unity.HandInteractable
 
         private void CommitHand(InputAction.CallbackContext ctx)
         {
-            Vector2 newCanvasSizeDelta = handLayoutMediator.ToggleCommitHand(rotationCalculator, ctx).canvasSizeDelta;
-            handPanelRectTransform.parent.GetComponent<RectTransform>().sizeDelta = newCanvasSizeDelta;
+            handLayoutMediator.ToggleCommitHand(rotationCalculator, ctx);
         }
 
         protected override void OnActivated(ActivateEventArgs args)
@@ -81,7 +80,7 @@ namespace SaloonSlingers.Unity.HandInteractable
             slingerAttributes = slingerGO.GetComponent<ISlinger>().Attributes;
             if (handCanvasRectTransform == null) handCanvasRectTransform = handPanelRectTransform.parent.GetComponent<RectTransform>();
 
-            handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
+            handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform, new List<ITangibleCard>());
             handLayoutMediator.AddCardToHand(gameRulesManager.GameRules.MaxHandSize, slingerAttributes, cardSpawner.Spawn, rotationCalculator);
         }
 

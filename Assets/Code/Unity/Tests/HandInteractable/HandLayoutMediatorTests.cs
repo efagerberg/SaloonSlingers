@@ -19,7 +19,10 @@ namespace SaloonSlingers.Unity.Tests
             [Test]
             public void Test_DespawnsTangibleCards_AndRemovesCardsFromSlingerAttributes()
             {
-                HandLayoutMediator subject = CreateLayoutMediator();
+                RectTransform handPanelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
+                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
+                HandLayoutMediator subject = new(handPanelTransform, canvasTransform, tangibleCards);
                 PlayerAttributes testAttributes = new()
                 {
                     Deck = new Deck(),
@@ -37,9 +40,9 @@ namespace SaloonSlingers.Unity.Tests
                 }
                 subject.AddCardToHand(10, testAttributes, spawner, noRotationCalculator);
                 subject.AddCardToHand(10, testAttributes, spawner, noRotationCalculator);
-                var actual = subject.Dispose(cardDespawner, testAttributes.Hand);
+                subject.Dispose(cardDespawner, testAttributes.Hand);
 
-                Assert.AreEqual(0, actual.Count());
+                Assert.AreEqual(0, tangibleCards.Count());
                 CollectionAssert.AreEquivalent(expectedDespawned, actualDespawned);
             }
         }
@@ -54,7 +57,8 @@ namespace SaloonSlingers.Unity.Tests
             {
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
+                HandLayoutMediator subject = new(panelTransform, canvasTransform, tangibleCards);
                 PlayerAttributes testAttributes = new()
                 {
                     Deck = new Deck(),
@@ -63,16 +67,16 @@ namespace SaloonSlingers.Unity.Tests
                 (Func<Card, ITangibleCard> spawner,
                  IList<ITangibleCard> expectedTangibles) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15f);
-                IList<ITangibleCard> actual = Enumerable.Range(0, n).Select(
+                Enumerable.Range(0, n).ToList().ForEach(
                     _ => subject.AddCardToHand(maxSize, testAttributes, spawner, rotationCalculator)
-                ).ToList().Last();
+                );
 
                 AssertExpectedTangibleCards(
                     panelTransform,
                     expectedTangibles,
                     rotationCalculator,
                     testAttributes.Hand,
-                    actual
+                    tangibleCards
                 );
             }
 
@@ -81,7 +85,8 @@ namespace SaloonSlingers.Unity.Tests
             {
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
+                HandLayoutMediator subject = new(panelTransform, canvasTransform, tangibleCards);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15f);
                 PlayerAttributes testAttributes = new()
                 {
@@ -92,15 +97,15 @@ namespace SaloonSlingers.Unity.Tests
                  IList<ITangibleCard> expectedTangibles) = GetSpawnerWithExpectedSpawned();
                 subject.AddCardToHand(100, testAttributes, spawner, rotationCalculator);
                 subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
-                IList<ITangibleCard> actual = subject.AddCardToHand(100, testAttributes, spawner, rotationCalculator);
+                subject.AddCardToHand(100, testAttributes, spawner, rotationCalculator);
 
-                Assert.AreEqual(actual.Count(), 1);
+                Assert.AreEqual(tangibleCards.Count(), 1);
                 AssertExpectedTangibleCards(
                     panelTransform,
                     expectedTangibles,
                     rotationCalculator,
                     testAttributes.Hand,
-                    actual
+                    tangibleCards
                 );
             }
 
@@ -135,11 +140,12 @@ namespace SaloonSlingers.Unity.Tests
             {
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
+                HandLayoutMediator subject = new(panelTransform, canvasTransform, tangibleCards);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(-10f);
-                (Vector2 canvasSizeDelta, IList<ITangibleCard> cards) = subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
+                subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
 
-                AssertExpectedCommittedResult(canvasSizeDelta.x, cards, 0, 0);
+                AssertExpectedCommittedResult(canvasTransform.sizeDelta.x, tangibleCards, 0, 0);
             }
 
             [TestCase(1)]
@@ -149,7 +155,8 @@ namespace SaloonSlingers.Unity.Tests
             {
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
+                HandLayoutMediator subject = new(panelTransform, canvasTransform, tangibleCards);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 PlayerAttributes testAttributes = new()
                 {
@@ -157,14 +164,13 @@ namespace SaloonSlingers.Unity.Tests
                     Hand = new List<Card>()
                 };
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
-                Enumerable.Range(0, n).Select(_ =>
+                Enumerable.Range(0, n).ToList().ForEach(_ =>
                 {
-                    return subject.AddCardToHand(n, testAttributes, spawner, rotationCalculator);
-                }).ToList();
-                (Vector2 canvasSizeDelta,
-                 IList<ITangibleCard> cards) = subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
+                    subject.AddCardToHand(n, testAttributes, spawner, rotationCalculator);
+                });
+                subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
 
-                AssertExpectedCommittedResult(canvasSizeDelta.x, cards, cards.First().GetComponent<RectTransform>().rect.width, n);
+                AssertExpectedCommittedResult(canvasTransform.sizeDelta.x, tangibleCards, tangibleCards.First().GetComponent<RectTransform>().rect.width, n);
             }
 
             [TestCase(1)]
@@ -174,7 +180,8 @@ namespace SaloonSlingers.Unity.Tests
             {
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
+                HandLayoutMediator subject = new(panelTransform, canvasTransform, tangibleCards);
                 PlayerAttributes testAttributes = new()
                 {
                     Deck = new Deck(),
@@ -182,15 +189,14 @@ namespace SaloonSlingers.Unity.Tests
                 };
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
-                Enumerable.Range(0, n).Select(_ =>
+                Enumerable.Range(0, n).ToList().ForEach(_ =>
                 {
-                    return subject.AddCardToHand(n, testAttributes, spawner, rotationCalculator);
-                }).ToList();
+                    subject.AddCardToHand(n, testAttributes, spawner, rotationCalculator);
+                });
                 subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
-                (Vector2 canvasSizeDelta,
-                 IList<ITangibleCard> cards) = subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
+                subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
 
-                AssertExpectedResult(canvasSizeDelta.x, cards, canvasTransform.rect.width, n, rotationCalculator(n));
+                AssertExpectedResult(canvasTransform.sizeDelta.x, tangibleCards, canvasTransform.rect.width, n, rotationCalculator(n));
             }
 
             private static void AssertExpectedResult(float actualWidthDelta, IList<ITangibleCard> cards, float expectedWidthDelta, int expectedCount, IEnumerable<float> expectedRotations)
@@ -234,14 +240,6 @@ namespace SaloonSlingers.Unity.Tests
         {
             private Card card;
             public Card Card { get => card; set => card = value; }
-        }
-
-        private static HandLayoutMediator CreateLayoutMediator()
-        {
-            RectTransform handPanelTransform = CreateComponent<RectTransform>("HandPanel");
-            RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-            HandLayoutMediator subject = new(handPanelTransform, canvasTransform);
-            return subject;
         }
 
         private static (Func<Card, ITangibleCard> spawner, IList<ITangibleCard> spawned) GetSpawnerWithExpectedSpawned()
