@@ -12,39 +12,40 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private int poolSize = 32;
 
-        private IObjectPool<ITangibleCard> pool;
+        private IObjectPool<ICardGraphic> pool;
 
-        public ITangibleCard Spawn() => pool.Get();
-        public ITangibleCard Spawn(Card card)
+        public ICardGraphic Spawn() => pool.Get();
+        public ICardGraphic Spawn(Card card)
         {
             var c = Spawn();
             c.Card = card;
             return c;
         }
-        public void Despawn(ITangibleCard c) => pool.Release(c);
+        public void Despawn(ICardGraphic c) => pool.Release(c);
 
         private void Awake()
         {
-            pool = new ObjectPool<ITangibleCard>(CreateInstance, GetFromPool, ReturnToPool, defaultCapacity: poolSize);
+            pool = new ObjectPool<ICardGraphic>(CreateInstance, GetFromPool, ReturnToPool, defaultCapacity: poolSize);
         }
 
-        private ITangibleCard CreateInstance()
+        private ICardGraphic CreateInstance()
         {
             var go = Instantiate(cardPrefab, transform);
-            var cardInteractable = go.GetComponent<ITangibleCard>();
+            var cardInteractable = go.GetComponent<ICardGraphic>();
             go.SetActive(false);
             return cardInteractable;
         }
 
-        private void GetFromPool(ITangibleCard tangibleCard)
+        private void GetFromPool(ICardGraphic cardGraphic)
         {
-            tangibleCard.gameObject.SetActive(true);
+            cardGraphic.gameObject.SetActive(true);
         }
 
-        private void ReturnToPool(ITangibleCard tangibleCard)
+        private void ReturnToPool(ICardGraphic cardGraphic)
         {
-            tangibleCard.gameObject.SetActive(true);
-            tangibleCard.transform.position = Vector3.zero;
+            cardGraphic.gameObject.SetActive(true);
+            cardGraphic.transform.position = Vector3.zero;
+            cardGraphic.transform.SetParent(transform);
         }
     }
 }

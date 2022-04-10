@@ -4,7 +4,6 @@ using System.Linq;
 
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
@@ -16,135 +15,92 @@ namespace SaloonSlingers.Unity.Interactables.Tests
         public class TestDispose
         {
             [Test]
-            public void Test_DespawnsTangibleCards_AndRemovesCardsFromSlingerAttributes()
+            public void Test_DespawnsCardGraphics_LeavingHandPanelEmpty()
             {
-                RectTransform handPanelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
-                HandLayoutMediator subject = new(handPanelTransform, canvasTransform, tangibleCards);
-                PlayerAttributes testAttributes = new()
-                {
-                    Deck = new Deck(),
-                    Hand = new List<Card>()
-                };
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
 
-                (Func<Card, ITangibleCard> spawner,
-                 IList<ITangibleCard> expectedDespawned) = GetSpawnerWithExpectedSpawned();
+                (Func<Card, ICardGraphic> spawner,
+                 IList<ICardGraphic> expectedDespawned) = GetSpawnerWithExpectedSpawned();
 
-                List<ITangibleCard> actualDespawned = new();
-                void cardDespawner(ITangibleCard t)
+                List<ICardGraphic> actualDespawned = new();
+                void cardDespawner(ICardGraphic t)
                 {
                     actualDespawned.Add(t);
                     return;
                 }
-                subject.AddCardToHand(10, testAttributes, spawner, noRotationCalculator);
-                subject.AddCardToHand(10, testAttributes, spawner, noRotationCalculator);
-                subject.Dispose(cardDespawner, testAttributes.Hand);
+                subject.AddCardToLayout(spawner(new Card("AC")), noRotationCalculator);
+                subject.AddCardToLayout(spawner(new Card("TC")), noRotationCalculator);
+                subject.Dispose(cardDespawner);
 
-                Assert.AreEqual(0, tangibleCards.Count());
+                AssertDespawned(panelTransform, expectedDespawned, actualDespawned);
+            }
+
+            private static void AssertDespawned(RectTransform panelTransform, IList<ICardGraphic> expectedDespawned, List<ICardGraphic> actualDespawned)
+            {
                 CollectionAssert.AreEquivalent(expectedDespawned, actualDespawned);
+                ICardGraphic[] cardsInPanel = panelTransform.GetComponentsInChildren<ICardGraphic>();
+                CollectionAssert.IsEmpty(cardsInPanel);
             }
         }
 
-        public class TestAddCardToHand
+        public class TestAddCardToLayout
         {
-            [TestCase(1, 1)]
-            [TestCase(2, 5)]
-            [TestCase(1, 10)]
-            [TestCase(10, 5)]
-            public void Test_WhenCardsCanBeAdded_ReturnsExpectedTangibleCards(int n, int maxSize)
+            [TestCase(1)]
+            [TestCase(2)]
+            [TestCase(10)]
+            public void Test_SpawnsExpectedIntoLayout(int n)
             {
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
-                HandLayoutMediator subject = new(panelTransform, canvasTransform, tangibleCards);
-                PlayerAttributes testAttributes = new()
-                {
-                    Deck = new Deck(),
-                    Hand = new List<Card>()
-                };
-                (Func<Card, ITangibleCard> spawner,
-                 IList<ITangibleCard> expectedTangibles) = GetSpawnerWithExpectedSpawned();
+                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                (Func<Card, ICardGraphic> spawner,
+                 IList<ICardGraphic> expectedGraphics) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15f);
-                Enumerable.Range(0, n).ToList().ForEach(
-                    _ => subject.AddCardToHand(maxSize, testAttributes, spawner, rotationCalculator)
-                );
+                Enumerable.Range(0, n).ToList().ForEach(_ => subject.AddCardToLayout(spawner(new Card("AH")), rotationCalculator));
+                ICardGraphic[] actualSpawned = panelTransform.GetComponentsInChildren<ICardGraphic>();
 
-                AssertExpectedTangibleCards(
+                AssertExpectedCardGraphics(
                     panelTransform,
-                    expectedTangibles,
+                    expectedGraphics,
                     rotationCalculator,
-                    testAttributes.Hand,
-                    tangibleCards
+                    actualSpawned
                 );
             }
 
-            [Test]
-            public void Test_WhenCommitted_ReturnsEmpty()
-            {
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
-                HandLayoutMediator subject = new(panelTransform, canvasTransform, tangibleCards);
-                Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15f);
-                PlayerAttributes testAttributes = new()
-                {
-                    Deck = new Deck(),
-                    Hand = new List<Card>()
-                };
-                (Func<Card, ITangibleCard> spawner,
-                 IList<ITangibleCard> expectedTangibles) = GetSpawnerWithExpectedSpawned();
-                subject.AddCardToHand(100, testAttributes, spawner, rotationCalculator);
-                subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
-                subject.AddCardToHand(100, testAttributes, spawner, rotationCalculator);
-
-                Assert.AreEqual(tangibleCards.Count(), 1);
-                AssertExpectedTangibleCards(
-                    panelTransform,
-                    expectedTangibles,
-                    rotationCalculator,
-                    testAttributes.Hand,
-                    tangibleCards
-                );
-            }
-
-            private static void AssertExpectedTangibleCards(
+            private static void AssertExpectedCardGraphics(
                 RectTransform expectedParent,
-                IList<ITangibleCard> expectedTangibles,
+                IList<ICardGraphic> expectedGraphics,
                 Func<int, IEnumerable<float>> rotationCalculator,
-                IList<Card> actualHand,
-                IList<ITangibleCard> actualTangibles
+                IList<ICardGraphic> actualTangibles
             )
             {
-                CollectionAssert.AreEquivalent(expectedTangibles, actualTangibles);
+                CollectionAssert.AreEquivalent(expectedGraphics, actualTangibles);
                 CollectionAssert.AreEquivalent(
                     new List<Transform> { expectedParent },
                     actualTangibles.Select(x => x.transform.parent).Distinct()
                 );
-                CollectionAssert.AreEquivalent(
-                    actualHand,
-                    actualTangibles.Select(x => x.Card)
-                );
                 Assert.That(
-                    rotationCalculator(expectedTangibles.Count()),
+                    rotationCalculator(expectedGraphics.Count()),
                     Is.EqualTo(actualTangibles.Select(x => x.transform.localEulerAngles.z)).Within(0.001f)
                 );
             }
         }
 
-        public class TestToggleCommitHand
+        public class TestApplyLayout
         {
             [Test]
             public void Test_WhenNoCardAddedAndCommitted_Returns0WidthCanvasSizeDelta_AndEmptyList()
             {
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
-                HandLayoutMediator subject = new(panelTransform, canvasTransform, tangibleCards);
+                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(-10f);
-                subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
+                subject.ApplyLayout(true, rotationCalculator);
 
-                AssertExpectedCommittedResult(canvasTransform.sizeDelta.x, tangibleCards, 0, 0);
+                ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
+                AssertExpectedCommittedResult(canvasTransform.sizeDelta.x, cardGraphics, 0, 0);
             }
 
             [TestCase(1)]
@@ -152,10 +108,9 @@ namespace SaloonSlingers.Unity.Interactables.Tests
             [TestCase(5)]
             public void Test_WhenCardsAdded_ThenHandCommitted_ReturnsCardWidthCanvasSizeDelta_AndListWithNoRotation(int n)
             {
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
-                HandLayoutMediator subject = new(panelTransform, canvasTransform, tangibleCards);
+                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 PlayerAttributes testAttributes = new()
                 {
@@ -165,11 +120,12 @@ namespace SaloonSlingers.Unity.Interactables.Tests
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Enumerable.Range(0, n).ToList().ForEach(_ =>
                 {
-                    subject.AddCardToHand(n, testAttributes, spawner, rotationCalculator);
+                    subject.AddCardToLayout(spawner(new Card("3D")), rotationCalculator);
                 });
-                subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
+                subject.ApplyLayout(true, rotationCalculator);
 
-                AssertExpectedCommittedResult(canvasTransform.sizeDelta.x, tangibleCards, tangibleCards.First().GetComponent<RectTransform>().rect.width, n);
+                ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
+                AssertExpectedCommittedResult(canvasTransform.sizeDelta.x, cardGraphics, cardGraphics.First().GetComponent<RectTransform>().rect.width, n);
             }
 
             [TestCase(1)]
@@ -177,10 +133,9 @@ namespace SaloonSlingers.Unity.Interactables.Tests
             [TestCase(5)]
             public void Test_WhenCardsAdded_ThenHandCommitted_AndUncommitted_ReturnsOriginalWidthCanvasSizeDelta_AndListWithRotation(int n)
             {
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                IList<ITangibleCard> tangibleCards = new List<ITangibleCard>();
-                HandLayoutMediator subject = new(panelTransform, canvasTransform, tangibleCards);
+                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
                 PlayerAttributes testAttributes = new()
                 {
                     Deck = new Deck(),
@@ -190,15 +145,16 @@ namespace SaloonSlingers.Unity.Interactables.Tests
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 Enumerable.Range(0, n).ToList().ForEach(_ =>
                 {
-                    subject.AddCardToHand(n, testAttributes, spawner, rotationCalculator);
+                    subject.AddCardToLayout(spawner(new Card("AD")), rotationCalculator);
                 });
-                subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
-                subject.ToggleCommitHand(rotationCalculator, new InputAction.CallbackContext());
+                subject.ApplyLayout(true, rotationCalculator);
+                subject.ApplyLayout(false, rotationCalculator);
 
-                AssertExpectedResult(canvasTransform.sizeDelta.x, tangibleCards, canvasTransform.rect.width, n, rotationCalculator(n));
+                ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
+                AssertExpectedResult(canvasTransform.sizeDelta.x, cardGraphics, canvasTransform.rect.width, n, rotationCalculator(n));
             }
 
-            private static void AssertExpectedResult(float actualWidthDelta, IList<ITangibleCard> cards, float expectedWidthDelta, int expectedCount, IEnumerable<float> expectedRotations)
+            private static void AssertExpectedResult(float actualWidthDelta, IList<ICardGraphic> cards, float expectedWidthDelta, int expectedCount, IEnumerable<float> expectedRotations)
             {
                 Assert.AreEqual(actualWidthDelta, expectedWidthDelta);
                 Assert.AreEqual(cards.Count(), expectedCount);
@@ -208,7 +164,7 @@ namespace SaloonSlingers.Unity.Interactables.Tests
                 );
             }
 
-            private static void AssertExpectedCommittedResult(float actualWidthDelta, IList<ITangibleCard> cards, float expectedWidthDelta, int expectedCount)
+            private static void AssertExpectedCommittedResult(float actualWidthDelta, IList<ICardGraphic> cards, float expectedWidthDelta, int expectedCount)
             {
                 AssertExpectedResult(
                     actualWidthDelta,
@@ -235,18 +191,19 @@ namespace SaloonSlingers.Unity.Interactables.Tests
             return (n) => Enumerable.Range(0, n).Select((x, i) => i * step);
         }
 
-        private class TestTangibleCard : MonoBehaviour, ITangibleCard
+        private class TestCardGraphic : MonoBehaviour, ICardGraphic
         {
             private Card card;
             public Card Card { get => card; set => card = value; }
+            public void SetGraphics(Card card) { }
         }
 
-        private static (Func<Card, ITangibleCard> spawner, IList<ITangibleCard> spawned) GetSpawnerWithExpectedSpawned()
+        private static (Func<Card, ICardGraphic> spawner, IList<ICardGraphic> spawned) GetSpawnerWithExpectedSpawned()
         {
-            List<ITangibleCard> spawned = new();
-            ITangibleCard cardSpawner(Card c)
+            List<ICardGraphic> spawned = new();
+            ICardGraphic cardSpawner(Card c)
             {
-                ITangibleCard t = CreateComponent<TestTangibleCard>();
+                ICardGraphic t = CreateComponent<TestCardGraphic>();
                 t.gameObject.AddComponent<RectTransform>();
                 t.Card = c;
                 spawned.Add(t);
