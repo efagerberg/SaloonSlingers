@@ -14,8 +14,8 @@ namespace SaloonSlingers.Core.Tests
                 Assert.True(x.Update(shouldDespawn).IsAlive);
             }
 
-            [TestCase(false, false)]
-            [TestCase(true, true)]
+            [TestCase(false, true)]
+            [TestCase(true, false)]
             public void Test_WhenThrown_IsAlive_ReturnsExpectedValue(bool shouldDespawn, bool expected)
             {
                 ThrowState x = new();

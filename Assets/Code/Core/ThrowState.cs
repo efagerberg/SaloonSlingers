@@ -25,7 +25,7 @@ namespace SaloonSlingers.Core
 
         public ThrowState Update(bool shouldDespawn)
         {
-            if (!isThrown || shouldDespawn) return this;
+            if (!isThrown || !shouldDespawn) return this;
             this.shouldDespawn = shouldDespawn;
             return this;
         }
