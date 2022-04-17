@@ -61,29 +61,23 @@ namespace SaloonSlingers.Unity.Interactables.Tests
                 Enumerable.Range(0, n).ToList().ForEach(_ => subject.AddCardToLayout(spawner(new Card("AH")), rotationCalculator));
                 ICardGraphic[] actualSpawned = panelTransform.GetComponentsInChildren<ICardGraphic>();
 
-                AssertExpectedCardGraphics(
+                AssertHasExpectedSpawnedCardGraphics(
                     panelTransform,
                     expectedGraphics,
-                    rotationCalculator,
                     actualSpawned
                 );
             }
 
-            private static void AssertExpectedCardGraphics(
+            private static void AssertHasExpectedSpawnedCardGraphics(
                 RectTransform expectedParent,
                 IList<ICardGraphic> expectedGraphics,
-                Func<int, IEnumerable<float>> rotationCalculator,
-                IList<ICardGraphic> actualTangibles
+                IList<ICardGraphic> actualGraphics
             )
             {
-                CollectionAssert.AreEquivalent(expectedGraphics, actualTangibles);
+                CollectionAssert.AreEquivalent(expectedGraphics, actualGraphics);
                 CollectionAssert.AreEquivalent(
                     new List<Transform> { expectedParent },
-                    actualTangibles.Select(x => x.transform.parent).Distinct()
-                );
-                Assert.That(
-                    rotationCalculator(expectedGraphics.Count()),
-                    Is.EqualTo(actualTangibles.Select(x => x.transform.localEulerAngles.z)).Within(0.001f)
+                    actualGraphics.Select(x => x.transform.parent).Distinct()
                 );
             }
         }
@@ -100,7 +94,7 @@ namespace SaloonSlingers.Unity.Interactables.Tests
                 subject.ApplyLayout(true, rotationCalculator);
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                AssertExpectedCommittedResult(canvasTransform.sizeDelta.x, cardGraphics, 0, 0);
+                AssertExpectedCommittedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, 0, 0);
             }
 
             [TestCase(1)]
@@ -125,7 +119,7 @@ namespace SaloonSlingers.Unity.Interactables.Tests
                 subject.ApplyLayout(true, rotationCalculator);
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                AssertExpectedCommittedResult(canvasTransform.sizeDelta.x, cardGraphics, cardGraphics.First().GetComponent<RectTransform>().rect.width, n);
+                AssertExpectedCommittedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, cardGraphics.First().GetComponent<RectTransform>().rect.width, n);
             }
 
             [TestCase(1)]
@@ -151,28 +145,24 @@ namespace SaloonSlingers.Unity.Interactables.Tests
                 subject.ApplyLayout(false, rotationCalculator);
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                AssertExpectedResult(canvasTransform.sizeDelta.x, cardGraphics, canvasTransform.rect.width, n, rotationCalculator(n));
+                AssertExpectedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, canvasTransform.rect.width, n);
             }
 
-            private static void AssertExpectedResult(float actualWidthDelta, IList<ICardGraphic> cards, float expectedWidthDelta, int expectedCount, IEnumerable<float> expectedRotations)
+            private static void AssertExpectedLayoutResult(float actualWidthDelta, IList<ICardGraphic> cards, float expectedWidthDelta, int expectedCount)
             {
                 Assert.AreEqual(actualWidthDelta, expectedWidthDelta);
                 Assert.AreEqual(cards.Count(), expectedCount);
-                Assert.That(
-                    cards.Select(x => x.transform.localEulerAngles.z),
-                    Is.EqualTo(expectedRotations).Within(0.001f)
-                );
             }
 
-            private static void AssertExpectedCommittedResult(float actualWidthDelta, IList<ICardGraphic> cards, float expectedWidthDelta, int expectedCount)
+            private static void AssertExpectedCommittedLayoutResult(float actualWidthDelta, IList<ICardGraphic> cards, float expectedWidthDelta, int expectedCount)
             {
-                AssertExpectedResult(
+                AssertExpectedLayoutResult(
                     actualWidthDelta,
                     cards,
                     expectedWidthDelta,
-                    expectedCount,
-                    Enumerable.Range(0, expectedCount).Select(_ => 0f)
+                    expectedCount
                 );
+                Assert.That(cards.Select(x => x.transform.localEulerAngles), Is.EqualTo(Enumerable.Repeat(Vector3.zero, expectedCount)));
             }
         }
 

@@ -57,7 +57,7 @@ namespace SaloonSlingers.Unity.Interactables
             {
                 ICardGraphic cardGraphic = cardGraphics[i];
                 cardGraphic.transform.localRotation = GetRevertedLocalRotation(cardGraphic.transform);
-                cardGraphic.transform.parent = null;
+                cardGraphic.transform.SetParent(null, false);
                 cardDespawner(cardGraphic);
                 cardGraphics.RemoveAt(i);
             }
@@ -68,7 +68,8 @@ namespace SaloonSlingers.Unity.Interactables
             cardGraphic.transform.localRotation = GetRevertedLocalRotation(cardGraphic.transform);
             Vector3[] corners = new Vector3[4];
             cardGraphic.GetComponent<RectTransform>().GetLocalCorners(corners);
-            cardGraphic.transform.RotateAround(corners[3], cardGraphic.transform.forward, degrees);
+            cardGraphic.transform.RotateAround(corners[3], -cardGraphic.transform.forward, degrees);
+
         }
 
         private static Quaternion GetRevertedLocalRotation(Transform currentTransform)

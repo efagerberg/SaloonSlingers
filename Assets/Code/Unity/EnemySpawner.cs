@@ -15,7 +15,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private GameObject cardPrefab;
         [SerializeField]
-        private int numberOfCards = Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK;
+        private int numberOfCards = Core.Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK;
         [SerializeField]
         private int poolSize = 10;
         [SerializeField]
@@ -31,7 +31,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private GameRulesManager gameRulesManager;
 
-        private Deck deck;
+        private Core.Deck deck;
         private Stack<GameObject> deckCards;
         private IObjectPool<Enemy> enemyPool;
 
@@ -49,7 +49,7 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
-            deck = new Deck(numberOfCards).Shuffle();
+            deck = new Core.Deck(numberOfCards).Shuffle();
         }
 
         private void Start()
@@ -116,14 +116,14 @@ namespace SaloonSlingers.Unity
             enemy.Attributes = new EnemyAttributes
             {
                 Hand = new List<Card>(),
-                Deck = new Deck().Shuffle(),
+                Deck = new Core.Deck().Shuffle(),
                 Health = 1,
                 Level = card.Value == Values.ACE ? (int)Values.KING + 1 : (int)card.Value
             };
             enemy.Attributes.Hand.Append(card);
         }
 
-        private void DeckEmptyHandler(Deck _, EventArgs __) => CancelInvoke(nameof(SpawnEnemy));
-        private void DeckRefilledHandler(Deck _, EventArgs __) => InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
+        private void DeckEmptyHandler(Core.Deck _, EventArgs __) => CancelInvoke(nameof(SpawnEnemy));
+        private void DeckRefilledHandler(Core.Deck _, EventArgs __) => InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
     }
 }
