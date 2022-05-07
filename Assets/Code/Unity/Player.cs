@@ -21,7 +21,7 @@ namespace SaloonSlingers.Unity
         private int startingDashes = 3;
         [SerializeField]
         private float startingDashCooldown = 3;
-
+        [SerializeField]
         private Handedness defaultHandedness = Handedness.RIGHT;
 
         private void Awake()

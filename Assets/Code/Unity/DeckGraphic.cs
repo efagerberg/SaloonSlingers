@@ -19,16 +19,16 @@ namespace SaloonSlingers.Unity
         public void Return(ICardGraphic cardGraphic)
         {
             cardGraphic.transform.SetParent(transform);
-            cardGraphic.transform.position = GetPositionOfCard(cardGraphics.Count);
+            cardGraphic.transform.position = GetLocalPositionOfCard(cardGraphics.Count);
             cardGraphics.Push(cardGraphic);
         }
 
-        private Vector3 GetPositionOfCard(int i)
+        private Vector3 GetLocalPositionOfCard(int i)
         {
             return new(
-                transform.position.x,
-                transform.position.y,
-                transform.position.z + zOffset * i
+                transform.localPosition.x,
+                transform.localPosition.y,
+                transform.localPosition.z + zOffset * i
             );
         }
 
@@ -45,7 +45,7 @@ namespace SaloonSlingers.Unity
             {
                 ICardGraphic cardGraphic = cardSpawner.Spawn();
                 cardGraphic.transform.SetParent(transform, false);
-                cardGraphic.transform.position = GetPositionOfCard(i);
+                cardGraphic.transform.localPosition = GetLocalPositionOfCard(i);
                 cardGraphics.Push(cardGraphic);
             }
         }
