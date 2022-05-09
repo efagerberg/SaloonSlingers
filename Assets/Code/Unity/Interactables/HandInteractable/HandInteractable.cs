@@ -10,14 +10,13 @@ using SaloonSlingers.Core.SlingerAttributes;
 
 namespace SaloonSlingers.Unity.Interactables
 {
+    public delegate void HandInteractableHeld(HandInteractable sender, EventArgs e);
+    public delegate void HandInteractableReadyToRespawn(HandInteractable sender, EventArgs e);
+
     public class HandInteractable : XRGrabInteractable
     {
-        [SerializeField]
-        private GameObject slingerGO;
-        [SerializeField]
-        private CardSpawner cardSpawner;
-        [SerializeField]
-        private GameRulesManager gameRulesManager;
+        public event HandInteractableHeld OnHandInteractableHeld;
+        public event HandInteractableReadyToRespawn OnHandInterableReadyToRespawn;
         [SerializeField]
         private RectTransform handPanelRectTransform;
         [SerializeField]
@@ -31,15 +30,33 @@ namespace SaloonSlingers.Unity.Interactables
         private Rigidbody rigidBody;
         private ThrowState throwState;
         private HandLayoutMediator handLayoutMediator;
-        private ISlingerAttributes slingerAttributes;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private bool isHandCommitted = false;
+        private ISlingerAttributes slingerAttributes;
+        private ICardSpawner cardSpawner;
+        private GameRulesManager gameRulesManager;
+
+        public void AssociateWithSlinger(ISlingerAttributes attributes, ICardSpawner slingerCardSpawner)
+        {
+            slingerAttributes = attributes;
+            cardSpawner = slingerCardSpawner;
+        }
 
         protected override void OnEnable()
         {
             base.OnEnable();
             cardRotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
             throwState = new();
+        }
+
+        private void Start()
+        {
+            gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
+            trailRenderer = GetComponent<TrailRenderer>();
+            rigidBody = GetComponent<Rigidbody>();
+            if (handCanvasRectTransform == null) handCanvasRectTransform = handPanelRectTransform.parent.GetComponent<RectTransform>();
+
+            handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
         }
 
         protected override void OnSelectEntering(SelectEnterEventArgs args)
@@ -49,6 +66,8 @@ namespace SaloonSlingers.Unity.Interactables
             rigidBody.isKinematic = true;
             commitHandActionProperties.ForEach(prop => prop.action.started += ToggleCommitHand);
             throwState = throwState.Reset();
+            if (slingerAttributes.Hand.Count == 0) TryAddCard();
+            OnHandInteractableHeld?.Invoke(this, EventArgs.Empty);
         }
 
         protected override void OnSelectExiting(SelectExitEventArgs args)
@@ -58,6 +77,7 @@ namespace SaloonSlingers.Unity.Interactables
             rigidBody.isKinematic = false;
             commitHandActionProperties.ForEach(prop => prop.action.started -= ToggleCommitHand);
             throwState = throwState.Throw();
+            slingerAttributes.Hand.Clear();
             NegateCharacterControllerVelocity(args.interactorObject);
         }
 
@@ -75,7 +95,7 @@ namespace SaloonSlingers.Unity.Interactables
 
         private void TryAddCard()
         {
-            if (isHandCommitted || slingerAttributes.Hand.Count >= gameRulesManager.GameRules.MaxHandSize) return;
+            if (!CanDraw) return;
 
             Card card = slingerAttributes.Deck.Dequeue();
             slingerAttributes.Hand.Add(card);
@@ -83,20 +103,17 @@ namespace SaloonSlingers.Unity.Interactables
             handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
         }
 
-        private void Start()
+        private bool CanDraw
         {
-            trailRenderer = GetComponent<TrailRenderer>();
-            rigidBody = GetComponent<Rigidbody>();
-            slingerAttributes = slingerGO.GetComponent<ISlinger>().Attributes;
-            if (handCanvasRectTransform == null) handCanvasRectTransform = handPanelRectTransform.parent.GetComponent<RectTransform>();
-
-            handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
-            TryAddCard();
+            get
+            {
+                return !isHandCommitted && slingerAttributes.Hand.Count < gameRulesManager.GameRules.MaxHandSize && slingerAttributes.Deck.Count > 0;
+            }
         }
 
         private void NegateCharacterControllerVelocity(IXRInteractor interactorObject)
         {
-            var c = interactorObject.transform.GetComponentInParent<CharacterController>();
+            CharacterController c = interactorObject.transform.GetComponentInParent<CharacterController>();
             rigidBody.AddForce(-c.velocity);
         }
 
@@ -106,8 +123,11 @@ namespace SaloonSlingers.Unity.Interactables
             if (throwState.IsAlive) return;
 
             handLayoutMediator.Dispose(cardSpawner.Despawn);
-            slingerAttributes.Hand.Clear();
-            Destroy(gameObject);
+            trailRenderer.enabled = false;
+            rigidBody.isKinematic = true;
+            throwState = throwState.Reset();
+            if (isHandCommitted) ToggleCommitHand(new InputAction.CallbackContext());
+            OnHandInterableReadyToRespawn?.Invoke(this, EventArgs.Empty);
         }
     }
 }

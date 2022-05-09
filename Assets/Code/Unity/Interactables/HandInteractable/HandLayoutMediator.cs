@@ -45,8 +45,8 @@ namespace SaloonSlingers.Unity.Interactables
         {
             if (handCanvasCommittedSize == 0)
                 handCanvasCommittedSize = cardGraphic.GetComponent<RectTransform>().rect.width;
-            cardGraphic.transform.position = new Vector3(0, 0, (cardGraphics.Count() - 1) * zOffset);
             cardGraphic.transform.SetParent(handPanelRectTransform, false);
+            cardGraphic.transform.localPosition = new Vector3(0, 0, (cardGraphics.Count() - 1) * zOffset);
             cardGraphics.Add(cardGraphic);
             ApplyLayoutRotation(rotationCalculator);
         }

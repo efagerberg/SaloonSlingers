@@ -20,6 +20,7 @@ namespace SaloonSlingers.Core
         public ThrowState Reset()
         {
             isThrown = false;
+            shouldDespawn = false;
             return this;
         }
 
