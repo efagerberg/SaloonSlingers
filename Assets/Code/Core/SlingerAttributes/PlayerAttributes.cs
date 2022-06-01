@@ -11,5 +11,6 @@ namespace SaloonSlingers.Core.SlingerAttributes
         public int Dashes { get; set; }
         public float DashSpeed { get; set; }
         public float DashCooldown { get; set; }
+        public Handedness Handedness { get; set; }
     }
 }

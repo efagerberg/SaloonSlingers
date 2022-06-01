@@ -85,6 +85,7 @@ namespace SaloonSlingers.Core.Tests
                 public Deck Deck { get; set; }
                 public int Health { get; set; }
                 public int Level { get; set; }
+                public Handedness Handedness { get; set; }
             }
 
             private static TestSlingerAttributes CreateAttributes(string handString, int health = 3)

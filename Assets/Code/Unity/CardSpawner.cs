@@ -5,7 +5,7 @@ using SaloonSlingers.Core;
 
 namespace SaloonSlingers.Unity
 {
-    public class CardSpawner : MonoBehaviour
+    public class CardSpawner : MonoBehaviour, ICardSpawner
     {
         [SerializeField]
         private GameObject cardPrefab;
@@ -43,7 +43,7 @@ namespace SaloonSlingers.Unity
 
         private void ReturnToPool(ICardGraphic cardGraphic)
         {
-            cardGraphic.gameObject.SetActive(true);
+            cardGraphic.gameObject.SetActive(false);
             cardGraphic.transform.position = Vector3.zero;
             cardGraphic.transform.SetParent(transform);
         }

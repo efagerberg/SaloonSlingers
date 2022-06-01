@@ -10,14 +10,13 @@ using SaloonSlingers.Core.SlingerAttributes;
 
 namespace SaloonSlingers.Unity.Interactables
 {
+    public delegate void HandInteractableHeld(HandInteractable sender, EventArgs e);
+    public delegate void HandInteractableReadyToRespawn(HandInteractable sender, EventArgs e);
+
     public class HandInteractable : XRGrabInteractable
     {
-        [SerializeField]
-        private GameObject slingerGO;
-        [SerializeField]
-        private CardSpawner cardSpawner;
-        [SerializeField]
-        private GameRulesManager gameRulesManager;
+        public event HandInteractableHeld OnHandInteractableHeld;
+        public event HandInteractableReadyToRespawn OnHandInterableReadyToRespawn;
         [SerializeField]
         private RectTransform handPanelRectTransform;
         [SerializeField]
@@ -29,17 +28,41 @@ namespace SaloonSlingers.Unity.Interactables
 
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
-        private ThrowState throwState;
+        private HandInteractableState state;
         private HandLayoutMediator handLayoutMediator;
-        private ISlingerAttributes slingerAttributes;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
-        private bool isHandCommitted = false;
+        private ISlingerAttributes slingerAttributes;
+        private ICardSpawner cardSpawner;
+        private GameRulesManager gameRulesManager;
+        [SerializeField]
+        private float lifespanInSeconds = 1f;
+        private float originlLifespanInSeconds;
+
+        public void AssociateWithSlinger(ISlingerAttributes attributes, ICardSpawner slingerCardSpawner)
+        {
+            slingerAttributes = attributes;
+            cardSpawner = slingerCardSpawner;
+        }
 
         protected override void OnEnable()
         {
             base.OnEnable();
             cardRotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
-            throwState = new();
+            state = new(
+                () => lifespanInSeconds > 0 && rigidBody.velocity.magnitude != 0,
+                () => slingerAttributes.Hand.Count < gameRulesManager.GameRules.MaxHandSize && slingerAttributes.Deck.Count > 0
+            );
+        }
+
+        private void Start()
+        {
+            gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
+            trailRenderer = GetComponent<TrailRenderer>();
+            rigidBody = GetComponent<Rigidbody>();
+            if (handCanvasRectTransform == null) handCanvasRectTransform = handPanelRectTransform.parent.GetComponent<RectTransform>();
+
+            handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
+            originlLifespanInSeconds = lifespanInSeconds;
         }
 
         protected override void OnSelectEntering(SelectEnterEventArgs args)
@@ -48,7 +71,9 @@ namespace SaloonSlingers.Unity.Interactables
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             commitHandActionProperties.ForEach(prop => prop.action.started += ToggleCommitHand);
-            throwState = throwState.Reset();
+            state = state.Reset();
+            if (slingerAttributes.Hand.Count == 0) TryAddCard();
+            OnHandInteractableHeld?.Invoke(this, EventArgs.Empty);
         }
 
         protected override void OnSelectExiting(SelectExitEventArgs args)
@@ -57,14 +82,15 @@ namespace SaloonSlingers.Unity.Interactables
             trailRenderer.enabled = true;
             rigidBody.isKinematic = false;
             commitHandActionProperties.ForEach(prop => prop.action.started -= ToggleCommitHand);
-            throwState = throwState.Throw();
+            state = state.Throw();
+            slingerAttributes.Hand.Clear();
             NegateCharacterControllerVelocity(args.interactorObject);
         }
 
         private void ToggleCommitHand(InputAction.CallbackContext _)
         {
-            isHandCommitted = !isHandCommitted;
-            handLayoutMediator.ApplyLayout(isHandCommitted, cardRotationCalculator);
+            state = state.ToggleCommit();
+            handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
         }
 
         protected override void OnActivated(ActivateEventArgs args)
@@ -75,7 +101,7 @@ namespace SaloonSlingers.Unity.Interactables
 
         private void TryAddCard()
         {
-            if (isHandCommitted || slingerAttributes.Hand.Count >= gameRulesManager.GameRules.MaxHandSize) return;
+            if (!state.CanDraw) return;
 
             Card card = slingerAttributes.Deck.Dequeue();
             slingerAttributes.Hand.Add(card);
@@ -83,31 +109,25 @@ namespace SaloonSlingers.Unity.Interactables
             handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
         }
 
-        private void Start()
-        {
-            trailRenderer = GetComponent<TrailRenderer>();
-            rigidBody = GetComponent<Rigidbody>();
-            slingerAttributes = slingerGO.GetComponent<ISlinger>().Attributes;
-            if (handCanvasRectTransform == null) handCanvasRectTransform = handPanelRectTransform.parent.GetComponent<RectTransform>();
-
-            handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
-            TryAddCard();
-        }
-
         private void NegateCharacterControllerVelocity(IXRInteractor interactorObject)
         {
-            var c = interactorObject.transform.GetComponentInParent<CharacterController>();
+            CharacterController c = interactorObject.transform.GetComponentInParent<CharacterController>();
+            if (c == null) return;
             rigidBody.AddForce(-c.velocity);
         }
 
         private void FixedUpdate()
         {
-            throwState = throwState.Update(rigidBody.velocity.magnitude == 0);
-            if (throwState.IsAlive) return;
+            if (state.IsThrown) lifespanInSeconds -= Time.fixedDeltaTime;
+            if (state.IsAlive) return;
 
+            trailRenderer.enabled = false;
+            rigidBody.isKinematic = true;
+            state = state.Reset();
+            handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
             handLayoutMediator.Dispose(cardSpawner.Despawn);
-            slingerAttributes.Hand.Clear();
-            Destroy(gameObject);
+            lifespanInSeconds = originlLifespanInSeconds;
+            OnHandInterableReadyToRespawn?.Invoke(this, EventArgs.Empty);
         }
     }
 }
