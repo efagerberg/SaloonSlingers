@@ -13,8 +13,6 @@ namespace SaloonSlingers.Unity
     public class DashProvider : LocomotionProvider
     {
         [SerializeField]
-        private InputActionManager inputManager;
-        [SerializeField]
         private float dashDuration = 0.25f;
         [SerializeField]
         private List<InputActionProperty> dashInputProperties;
@@ -49,7 +47,6 @@ namespace SaloonSlingers.Unity
 
         private IEnumerator Dash()
         {
-            inputManager.DisableInput();
             canDash = false;
             attributes.Dashes -= 1;
             var originalDashTime = dashDuration;
@@ -62,7 +59,6 @@ namespace SaloonSlingers.Unity
             dashDuration = originalDashTime;
 
             if (attributes.Dashes > 0) canDash = true;
-            inputManager.EnableInput();
 
             yield return new WaitForSeconds(attributes.DashCooldown);
             attributes.Dashes += 1;
