@@ -16,7 +16,7 @@ namespace SaloonSlingers.Unity
         private ICardSpawner baseCardSpawner;
         private const float zOffset = 0.001f;
         private readonly Stack<ICardGraphic> cardGraphics = new();
-        private Queue<HandInteractable> interactables = new(2);
+        private Queue<CardHand> interactables = new(2);
         private ISlingerAttributes slingerAttributes;
 
         public ICardGraphic Spawn() => cardGraphics.Pop();
@@ -45,7 +45,7 @@ namespace SaloonSlingers.Unity
             if (interactables.Count == 0) return;
             if (cardGraphics.Count == 0) return;
             ICardGraphic topCardGraphic = cardGraphics.Peek();
-            HandInteractable interactable = interactables.Peek();
+            CardHand interactable = interactables.Peek();
             interactable.transform.SetPositionAndRotation(topCardGraphic.transform.position, topCardGraphic.transform.rotation);
             interactable.transform.SetParent(transform);
         }
@@ -67,7 +67,7 @@ namespace SaloonSlingers.Unity
                 cardGraphics.Push(cardGraphic);
             }
             GameObject primaryInteractableGO = Instantiate(handInteractablePrefab);
-            HandInteractable primaryInteractable = primaryInteractableGO.GetComponent<HandInteractable>();
+            CardHand primaryInteractable = primaryInteractableGO.GetComponent<CardHand>();
             primaryInteractable.AssociateWithSlinger(slingerAttributes, this);
             primaryInteractable.OnHandInteractableHeld += HandInteractableHeldHandler;
             primaryInteractable.OnHandInterableReadyToRespawn += HandInteractableReadyToRespawn;
@@ -75,22 +75,22 @@ namespace SaloonSlingers.Unity
             TryPlaceNextInteractableOnTop();
 
             GameObject secondardyInteractableGO = Instantiate(handInteractablePrefab);
-            HandInteractable secondardyInteractable = secondardyInteractableGO.GetComponent<HandInteractable>();
+            CardHand secondardyInteractable = secondardyInteractableGO.GetComponent<CardHand>();
             secondardyInteractable.AssociateWithSlinger(slingerAttributes, this);
             secondardyInteractable.OnHandInteractableHeld += HandInteractableHeldHandler;
             secondardyInteractable.OnHandInterableReadyToRespawn += HandInteractableReadyToRespawn;
             interactables.Enqueue(secondardyInteractable);
         }
 
-        private void HandInteractableHeldHandler(HandInteractable _, EventArgs __)
+        private void HandInteractableHeldHandler(CardHand _, EventArgs __)
         {
             if (interactables.Count == 0) return;
-            HandInteractable interactable = interactables.Dequeue();
+            CardHand interactable = interactables.Dequeue();
             interactable.transform.SetParent(null);
             TryPlaceNextInteractableOnTop();
         }
 
-        private void HandInteractableReadyToRespawn(HandInteractable sender, EventArgs _)
+        private void HandInteractableReadyToRespawn(CardHand sender, EventArgs _)
         {
             interactables.Enqueue(sender);
             TryPlaceNextInteractableOnTop();
