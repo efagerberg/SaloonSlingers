@@ -3,12 +3,11 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit.Inputs;
 
 using SaloonSlingers.Core.SlingerAttributes;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Slingers
 {
     public class DashProvider : LocomotionProvider
     {

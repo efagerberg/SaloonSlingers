@@ -1,13 +1,13 @@
+using System;
 using System.Collections.Generic;
 
 using UnityEngine;
 
 using SaloonSlingers.Core;
-using SaloonSlingers.Unity.Interactables;
 using SaloonSlingers.Core.SlingerAttributes;
-using System;
+using SaloonSlingers.Unity.Slingers;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.CardEntities
 {
     public class DeckGraphic : MonoBehaviour, ICardSpawner
     {

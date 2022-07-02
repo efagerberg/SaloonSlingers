@@ -3,7 +3,7 @@ using UnityEngine.Pool;
 
 using SaloonSlingers.Core;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.CardEntities
 {
     public class CardSpawner : MonoBehaviour, ICardSpawner
     {

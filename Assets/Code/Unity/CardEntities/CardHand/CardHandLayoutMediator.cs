@@ -4,9 +4,9 @@ using System.Linq;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity.Interactables
+namespace SaloonSlingers.Unity.CardEntities
 {
-    public class HandLayoutMediator
+    public class CardHandLayoutMediator
     {
         private const float zOffset = -0.001f;
         private readonly RectTransform handPanelRectTransform;
@@ -15,7 +15,7 @@ namespace SaloonSlingers.Unity.Interactables
         private float handCanvasCommittedSize;
         private readonly IList<ICardGraphic> cardGraphics;
 
-        public HandLayoutMediator(RectTransform handPanelRectTransform, RectTransform handCanvasRectTransform)
+        public CardHandLayoutMediator(RectTransform handPanelRectTransform, RectTransform handCanvasRectTransform)
         {
             cardGraphics = new List<ICardGraphic>();
             this.handPanelRectTransform = handPanelRectTransform;

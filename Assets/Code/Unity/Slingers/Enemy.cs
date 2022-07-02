@@ -3,7 +3,9 @@ using Unity.XR.CoreUtils;
 
 using SaloonSlingers.Core.SlingerAttributes;
 
-namespace SaloonSlingers.Unity
+using SaloonSlingers.Unity.CardEntities;
+
+namespace SaloonSlingers.Unity.Slingers
 {
     public class Enemy : CardGraphic, ISlinger
     {

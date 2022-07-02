@@ -8,7 +8,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
 
-namespace SaloonSlingers.Unity.Interactables
+namespace SaloonSlingers.Unity.CardEntities
 {
     public delegate void HandInteractableHeld(CardHand sender, EventArgs e);
     public delegate void HandInteractableReadyToRespawn(CardHand sender, EventArgs e);
@@ -32,7 +32,7 @@ namespace SaloonSlingers.Unity.Interactables
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
         private HandInteractableState state;
-        private HandLayoutMediator handLayoutMediator;
+        private CardHandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private ISlingerAttributes slingerAttributes;
         private ICardSpawner cardSpawner;

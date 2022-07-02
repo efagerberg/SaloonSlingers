@@ -8,7 +8,7 @@ using UnityEngine;
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
 
-namespace SaloonSlingers.Unity.Interactables.Tests
+namespace SaloonSlingers.Unity.CardEntities.Tests
 {
     public class HandLayoutMediatorTests
     {
@@ -19,7 +19,7 @@ namespace SaloonSlingers.Unity.Interactables.Tests
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
 
                 (Func<Card, ICardGraphic> spawner,
                  IList<ICardGraphic> expectedDespawned) = GetSpawnerWithExpectedSpawned();
@@ -54,7 +54,7 @@ namespace SaloonSlingers.Unity.Interactables.Tests
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
                 (Func<Card, ICardGraphic> spawner,
                  IList<ICardGraphic> expectedGraphics) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15f);
@@ -89,7 +89,7 @@ namespace SaloonSlingers.Unity.Interactables.Tests
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(-10f);
                 subject.ApplyLayout(true, rotationCalculator);
 
@@ -104,7 +104,7 @@ namespace SaloonSlingers.Unity.Interactables.Tests
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 PlayerAttributes testAttributes = new()
                 {
@@ -129,7 +129,7 @@ namespace SaloonSlingers.Unity.Interactables.Tests
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
                 PlayerAttributes testAttributes = new()
                 {
                     Deck = new Deck(),

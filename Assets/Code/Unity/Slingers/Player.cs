@@ -6,7 +6,7 @@ using UnityEngine.XR;
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Slingers
 {
     public class Player : MonoBehaviour, ISlinger
     {

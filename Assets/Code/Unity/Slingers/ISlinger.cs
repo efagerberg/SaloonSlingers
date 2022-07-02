@@ -1,6 +1,6 @@
 ﻿using SaloonSlingers.Core.SlingerAttributes;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Slingers
 {
     public interface ISlinger
     {
