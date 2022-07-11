@@ -9,8 +9,8 @@ namespace SaloonSlingers.Unity.Aerodynamics
 
         public BiVector3(Vector3 force, Vector3 torque)
         {
-            this.p = force;
-            this.q = torque;
+            p = force;
+            q = torque;
         }
 
         public static BiVector3 operator +(BiVector3 a, BiVector3 b)
