@@ -15,7 +15,7 @@ namespace SaloonSlingers.Unity.Aerodynamics
 
         public BiVector3 CalculateForces(Vector3 worldAirVelocity, float airDensity, Vector3 relativePosition)
         {
-            BiVector3 forceAndTorque = new BiVector3();
+            BiVector3 forceAndTorque = new();
             if (!gameObject.activeInHierarchy || config == null) return forceAndTorque;
 
             // Accounting for aspect ratio effect on lift coefficient.
@@ -57,9 +57,9 @@ namespace SaloonSlingers.Unity.Aerodynamics
                                                                     stallAngleHigh,
                                                                     stallAngleLow);
 
-            Vector3 lift = liftDirection * aerodynamicCoefficients.x * dynamicPressure * area;
-            Vector3 drag = dragDirection * aerodynamicCoefficients.y * dynamicPressure * area;
-            Vector3 torque = -transform.forward * aerodynamicCoefficients.z * dynamicPressure * area * config.chord;
+            Vector3 lift = aerodynamicCoefficients.x * area * dynamicPressure * liftDirection;
+            Vector3 drag = aerodynamicCoefficients.y * area * dynamicPressure * dragDirection;
+            Vector3 torque = aerodynamicCoefficients.z * area * config.chord * dynamicPressure * -transform.forward;
 
             forceAndTorque.p += lift + drag;
             forceAndTorque.q += Vector3.Cross(relativePosition, forceAndTorque.p);
