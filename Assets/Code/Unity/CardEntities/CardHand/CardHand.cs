@@ -7,6 +7,8 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
+using SaloonSlingers.Unity.Slingers;
+using System.Linq;
 
 namespace SaloonSlingers.Unity.CardEntities
 {
@@ -33,7 +35,7 @@ namespace SaloonSlingers.Unity.CardEntities
 
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
-        private HandInteractableState state;
+        private CardHandState state;
         private CardHandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private ISlingerAttributes slingerAttributes;
@@ -53,6 +55,7 @@ namespace SaloonSlingers.Unity.CardEntities
             rigidBody.isKinematic = true;
             commitHandActionProperties.ForEach(prop => prop.action.started += ToggleCommitHand);
             state = state.Reset();
+            lifespanInSeconds = originlLifespanInSeconds;
             if (slingerAttributes.Hand.Count == 0) DrawCard();
             OnHandInteractableHeld?.Invoke(this, EventArgs.Empty);
         }
@@ -73,8 +76,27 @@ namespace SaloonSlingers.Unity.CardEntities
             rigidBody.isKinematic = false;
             commitHandActionProperties.ForEach(prop => prop.action.started -= ToggleCommitHand);
             state = state.Throw();
-            slingerAttributes.Hand.Clear();
+            lifespanInSeconds = originlLifespanInSeconds;
             NegateCharacterControllerVelocity(characterControllerRb);
+        }
+
+        public void OnSelectEnter(SelectEnterEventArgs args)
+        {
+            SwapHand(args.interactorObject.transform);
+            Pickup();
+        }
+
+        private void SwapHand(Transform slingerTransform)
+        {
+            ISlingerAttributes newAttributes = slingerTransform.GetComponentInParent<ISlinger>().Attributes;
+            ICardSpawner spawner = slingerTransform.GetComponentInParent<ICardSpawner>();
+            if (newAttributes != slingerAttributes)
+            {
+                IList<Card> tmpHand = slingerAttributes.Hand.ToList();
+                slingerAttributes.Hand.Clear();
+                AssociateWithSlinger(newAttributes, spawner);
+                slingerAttributes.Hand = tmpHand;
+            }
         }
 
         public void OnSelectExit(SelectExitEventArgs args)
@@ -124,6 +146,7 @@ namespace SaloonSlingers.Unity.CardEntities
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             state = state.Reset();
+            slingerAttributes.Hand.Clear();
             handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
             handLayoutMediator.Dispose(cardSpawner.Despawn);
             lifespanInSeconds = originlLifespanInSeconds;

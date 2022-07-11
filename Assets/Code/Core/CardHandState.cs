@@ -2,7 +2,7 @@ using System;
 
 namespace SaloonSlingers.Core
 {
-    public class HandInteractableState
+    public class CardHandState
     {
         public bool IsAlive {
             get => !IsThrown || checkAlive();
@@ -14,7 +14,7 @@ namespace SaloonSlingers.Core
         private readonly Func<bool> checkAlive;
         private readonly Func<bool> checkCanDraw;
 
-        public HandInteractableState(Func<bool> checkAlive, Func<bool> checkCanDraw)
+        public CardHandState(Func<bool> checkAlive, Func<bool> checkCanDraw)
         {
             IsThrown = false;
             IsCommitted = false;
@@ -22,19 +22,19 @@ namespace SaloonSlingers.Core
             this.checkCanDraw = checkCanDraw;
         }
 
-        public HandInteractableState Throw()
+        public CardHandState Throw()
         {
             IsThrown = true;
             return this;
         }
 
-        public HandInteractableState ToggleCommit()
+        public CardHandState ToggleCommit()
         {
             IsCommitted = !IsCommitted;
             return this;
         }
 
-        public HandInteractableState Reset()
+        public CardHandState Reset()
         {
             IsThrown = false;
             IsCommitted = false;
