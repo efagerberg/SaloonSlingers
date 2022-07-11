@@ -6,13 +6,6 @@ namespace SaloonSlingers.Unity.Aerodynamics
     {
         [SerializeField] AeroSurfaceConfig config = null;
 
-        private float flapAngle;
-
-        public void SetFlapAngle(float angle)
-        {
-            flapAngle = Mathf.Clamp(angle, -Mathf.Deg2Rad * 50, Mathf.Deg2Rad * 50);
-        }
-
         public BiVector3 CalculateForces(Vector3 worldAirVelocity, float airDensity, Vector3 relativePosition)
         {
             BiVector3 forceAndTorque = new();
@@ -22,23 +15,7 @@ namespace SaloonSlingers.Unity.Aerodynamics
             float correctedLiftSlope = config.liftSlope * config.aspectRatio /
                (config.aspectRatio + 2 * (config.aspectRatio + 4) / (config.aspectRatio + 2));
 
-            // Calculating flap deflection influence on zero lift angle of attack
-            // and angles at which stall happens.
-            float theta = Mathf.Acos(2 * config.flapFraction - 1);
-            float flapEffectivness = 1 - (theta - Mathf.Sin(theta)) / Mathf.PI;
-            float deltaLift = correctedLiftSlope * flapEffectivness * FlapEffectivnessCorrection(flapAngle) * flapAngle;
-
-            float zeroLiftAoaBase = config.zeroLiftAoA * Mathf.Deg2Rad;
-            float zeroLiftAoA = zeroLiftAoaBase - deltaLift / correctedLiftSlope;
-
-            float stallAngleHighBase = config.stallAngleHigh * Mathf.Deg2Rad;
-            float stallAngleLowBase = config.stallAngleLow * Mathf.Deg2Rad;
-
-            float clMaxHigh = correctedLiftSlope * (stallAngleHighBase - zeroLiftAoaBase) + deltaLift * LiftCoefficientMaxFraction(config.flapFraction);
-            float clMaxLow = correctedLiftSlope * (stallAngleLowBase - zeroLiftAoaBase) + deltaLift * LiftCoefficientMaxFraction(config.flapFraction);
-
-            float stallAngleHigh = zeroLiftAoA + clMaxHigh / correctedLiftSlope;
-            float stallAngleLow = zeroLiftAoA + clMaxLow / correctedLiftSlope;
+            float zeroLiftAoA = config.zeroLiftAoA * Mathf.Deg2Rad;
 
             // Calculating air velocity relative to the surface's coordinate system.
             // Z component of the velocity is discarded. 
@@ -54,8 +31,8 @@ namespace SaloonSlingers.Unity.Aerodynamics
             Vector3 aerodynamicCoefficients = CalculateCoefficients(angleOfAttack,
                                                                     correctedLiftSlope,
                                                                     zeroLiftAoA,
-                                                                    stallAngleHigh,
-                                                                    stallAngleLow);
+                                                                    zeroLiftAoA,
+                                                                    zeroLiftAoA);
 
             Vector3 lift = aerodynamicCoefficients.x * area * dynamicPressure * liftDirection;
             Vector3 drag = aerodynamicCoefficients.y * area * dynamicPressure * dragDirection;
@@ -77,8 +54,8 @@ namespace SaloonSlingers.Unity.Aerodynamics
             Vector3 aerodynamicCoefficients;
 
             // Low angles of attack mode and stall mode curves are stitched together by a line segment. 
-            float paddingAngleHigh = Mathf.Deg2Rad * Mathf.Lerp(15, 5, (Mathf.Rad2Deg * flapAngle + 50) / 100);
-            float paddingAngleLow = Mathf.Deg2Rad * Mathf.Lerp(15, 5, (-Mathf.Rad2Deg * flapAngle + 50) / 100);
+            float paddingAngleHigh = Mathf.Deg2Rad * Mathf.Lerp(15, 5, 1 / 2);
+            float paddingAngleLow = Mathf.Deg2Rad * Mathf.Lerp(15, 5, - 1 / 2);
             float paddedStallAngleHigh = stallAngleHigh + paddingAngleHigh;
             float paddedStallAngleLow = stallAngleLow - paddingAngleLow;
 
@@ -171,14 +148,11 @@ namespace SaloonSlingers.Unity.Aerodynamics
             inducedAngle = Mathf.Lerp(0, inducedAngle, lerpParam);
             float effectiveAngle = angleOfAttack - zeroLiftAoA - inducedAngle;
 
-            float normalCoefficient = FrictionAt90Degrees(flapAngle) * Mathf.Sin(effectiveAngle) *
-                (1 / (0.56f + 0.44f * Mathf.Abs(Mathf.Sin(effectiveAngle))) -
-                0.41f * (1 - Mathf.Exp(-17 / config.aspectRatio)));
             float tangentialCoefficient = 0.5f * config.skinFriction * Mathf.Cos(effectiveAngle);
 
-            float liftCoefficient = normalCoefficient * Mathf.Cos(effectiveAngle) - tangentialCoefficient * Mathf.Sin(effectiveAngle);
-            float dragCoefficient = normalCoefficient * Mathf.Sin(effectiveAngle) + tangentialCoefficient * Mathf.Cos(effectiveAngle);
-            float torqueCoefficient = -normalCoefficient * TorqCoefficientProportion(effectiveAngle);
+            float liftCoefficient =  Mathf.Cos(effectiveAngle) - tangentialCoefficient * Mathf.Sin(effectiveAngle);
+            float dragCoefficient =  Mathf.Sin(effectiveAngle) + tangentialCoefficient * Mathf.Cos(effectiveAngle);
+            float torqueCoefficient = -TorqCoefficientProportion(effectiveAngle);
 
             return new Vector3(liftCoefficient, dragCoefficient, torqueCoefficient);
         }
@@ -188,19 +162,9 @@ namespace SaloonSlingers.Unity.Aerodynamics
             return 0.25f - 0.175f * (1 - 2 * Mathf.Abs(effectiveAngle) / Mathf.PI);
         }
 
-        private float FrictionAt90Degrees(float flapAngle)
+        private float LiftCoefficientMax()
         {
-            return 1.98f - 4.26e-2f * flapAngle * flapAngle + 2.1e-1f * flapAngle;
-        }
-
-        private float FlapEffectivnessCorrection(float flapAngle)
-        {
-            return Mathf.Lerp(0.8f, 0.4f, (Mathf.Abs(flapAngle) * Mathf.Rad2Deg - 10) / 50);
-        }
-
-        private float LiftCoefficientMaxFraction(float flapFraction)
-        {
-            return Mathf.Clamp01(1 - 0.5f * (flapFraction - 0.1f) / 0.3f);
+            return Mathf.Clamp01(1 - 0.5f * -0.1f / 0.3f);
         }
     }
 }

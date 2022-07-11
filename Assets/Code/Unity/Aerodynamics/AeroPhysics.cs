@@ -65,7 +65,7 @@ namespace SaloonSlingers.Unity.Aerodynamics
             if (rb.inertiaTensor.y > 0)
                 angularVelocityChangeInDiagonalSpace.y = torqueInDiagonalSpace.y / rb.inertiaTensor.y;
             if (rb.inertiaTensor.z > 0)
-            angularVelocityChangeInDiagonalSpace.z = torqueInDiagonalSpace.z / rb.inertiaTensor.z;
+                angularVelocityChangeInDiagonalSpace.z = torqueInDiagonalSpace.z / rb.inertiaTensor.z;
 
             return rb.angularVelocity + Time.fixedDeltaTime * PREDICTION_TIMESTEP_FRACTION
                 * (inertiaTensorWorldRotation * angularVelocityChangeInDiagonalSpace);
