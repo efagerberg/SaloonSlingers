@@ -7,8 +7,9 @@ using UnityEngine;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
+using SaloonSlingers.Unity.CardEntities;
 
-namespace SaloonSlingers.Unity.CardEntities.Tests
+namespace SaloonSlingers.Unity.Tests.CardEntities
 {
     public class HandLayoutMediatorTests
     {

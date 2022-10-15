@@ -10,7 +10,7 @@ namespace SaloonSlingers.Core.Tests
             [TestCase(true)]
             public void Test_WhenNotThrown_IsAlive(bool shouldDespawn)
             {
-                HandInteractableState x = new(() => true, () => false);
+                CardHandState x = new(() => true, () => false);
                 Assert.IsTrue(x.IsAlive);
             }
 
@@ -18,7 +18,7 @@ namespace SaloonSlingers.Core.Tests
             [TestCase(true, false)]
             public void Test_WhenThrown_IsAlive_ReturnsExpectedValue(bool shouldDespawn, bool expected)
             {
-                HandInteractableState x = new(() => !shouldDespawn, () => false);
+                CardHandState x = new(() => !shouldDespawn, () => false);
                 Assert.That(
                     x.Throw().IsAlive,
                     Is.EqualTo(expected)
@@ -30,14 +30,14 @@ namespace SaloonSlingers.Core.Tests
             [Test]
             public void Test_WhenNotCommitted_IsCommitted()
             {
-                HandInteractableState x = new(() => true, () => true);
+                CardHandState x = new(() => true, () => true);
                 Assert.IsTrue(x.ToggleCommit().IsCommitted);
             }
 
             [Test]
             public void Test_WhenCommitted_IsUncommitted()
             {
-                HandInteractableState x = new(() => true, () => true);
+                CardHandState x = new(() => true, () => true);
                 Assert.IsFalse(x.ToggleCommit().ToggleCommit().IsCommitted);
             }
         }
@@ -48,7 +48,7 @@ namespace SaloonSlingers.Core.Tests
             [TestCase(true)]
             public void Test_WhenNotCommitte_ReturnsCheckCanDraw(bool shouldBeAbleToDraw)
             {
-                HandInteractableState x = new(() => true, () => shouldBeAbleToDraw);
+                CardHandState x = new(() => true, () => shouldBeAbleToDraw);
                 Assert.AreEqual(x.CanDraw, shouldBeAbleToDraw);
             }
 
@@ -56,7 +56,7 @@ namespace SaloonSlingers.Core.Tests
             [TestCase(true)]
             public void Test_WhenCommitted_ReturnsFalse(bool shouldBeAbleToDraw)
             {
-                HandInteractableState x = new(() => true, () => shouldBeAbleToDraw);
+                CardHandState x = new(() => true, () => shouldBeAbleToDraw);
                 Assert.IsFalse(x.ToggleCommit().CanDraw);
             }
         }
@@ -66,14 +66,14 @@ namespace SaloonSlingers.Core.Tests
             [Test]
             public void Test_WhenUnthrownStateWithCheckAliveTrue_IsAliveAfterResetting()
             {
-                HandInteractableState x = new(() => true, () => false);
+                CardHandState x = new(() => true, () => false);
                 Assert.IsTrue(x.Reset().IsAlive);
             }
 
             [Test]
             public void Test_WhenThrownStateWithCheckAliveFalse_IsAliveAfterResetting()
             {
-                HandInteractableState x = new HandInteractableState(() => false, () => false).Throw();
+                CardHandState x = new CardHandState(() => false, () => false).Throw();
                 Assert.IsFalse(x.IsAlive);
                 Assert.IsTrue(x.Reset().IsAlive);
             }

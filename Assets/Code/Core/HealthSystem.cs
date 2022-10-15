@@ -8,9 +8,9 @@ namespace SaloonSlingers.Core
 {
     public static class HealthSystem
     {
-        public static void DoDamage(IHandEvaluator handEvaluator, ISlingerAttributes source, IEnumerable<ISlingerAttributes> targets)
+        public static void DoDamage(IHandEvaluator handEvaluator, IList<Card> sources, IEnumerable<ISlingerAttributes> targets)
         {
-            uint sourceScore = handEvaluator.Evaluate(source.Hand).Score;
+            uint sourceScore = handEvaluator.Evaluate(sources).Score;
             bool targetFilter(ISlingerAttributes target)
             {
                 return target.Health > 0 && sourceScore > handEvaluator.Evaluate(target.Hand).Score;

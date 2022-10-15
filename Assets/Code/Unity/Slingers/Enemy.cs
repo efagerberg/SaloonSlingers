@@ -4,6 +4,7 @@ using Unity.XR.CoreUtils;
 using SaloonSlingers.Core.SlingerAttributes;
 
 using SaloonSlingers.Unity.CardEntities;
+using UnityEngine.AI;
 
 namespace SaloonSlingers.Unity.Slingers
 {
@@ -12,22 +13,38 @@ namespace SaloonSlingers.Unity.Slingers
         public ISlingerAttributes Attributes { get; set; }
 
         [SerializeField]
-        private float moveSpeed = 1;
-        private Transform playerCameraTransform;
+        private float lookRadius = 10f;
+        [SerializeField]
+        private float stoppingDistance = 0.1f;
+
+        private Transform target;
+        private NavMeshAgent agent;
 
         private void Start()
         {
-            playerCameraTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<XROrigin>().Camera.transform;
+            target = GameObject.FindGameObjectWithTag("Player").GetComponent<XROrigin>().Camera.transform;
+            agent = GetComponent<NavMeshAgent>();
+            agent.stoppingDistance = stoppingDistance;
         }
 
         private void Update()
         {
-            if (transform.position == playerCameraTransform.transform.position)
-                gameObject.SetActive(false);
-            transform.LookAt(
-                new Vector3(playerCameraTransform.position.x, 1, playerCameraTransform.position.z)
-            );
-            transform.position += moveSpeed * Time.deltaTime * transform.forward;
+            FaceTarget();
+            float distance = Vector3.Distance(target.position, transform.position);
+            if (distance <= lookRadius) agent.SetDestination(target.position);
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, lookRadius);
+        }
+
+        private void FaceTarget()
+        {
+            Vector3 direction = (target.position - transform.position).normalized;
+            Quaternion lookRotations = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotations, Time.deltaTime * 5);
         }
     }
 }

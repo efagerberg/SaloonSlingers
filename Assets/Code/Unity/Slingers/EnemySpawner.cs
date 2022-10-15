@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using UnityEngine;
 using UnityEngine.Pool;
@@ -13,13 +11,7 @@ namespace SaloonSlingers.Unity.Slingers
     public class EnemySpawner : MonoBehaviour
     {
         [SerializeField]
-        private GameObject cardPrefab;
-        [SerializeField]
-        private int numberOfCards = Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK;
-        [SerializeField]
         private int poolSize = 10;
-        [SerializeField]
-        private GameObject deckPosition;
         [SerializeField]
         private List<Transform> spawnPoints;
         [SerializeField]
@@ -27,102 +19,63 @@ namespace SaloonSlingers.Unity.Slingers
         [SerializeField]
         private float spawnPerSecond = 4f;
         [SerializeField]
-        private float spawnInitialWaitSeconds = 3f;
+        private int maxActiveEnemies = 3;
 
-        private GameRulesManager gameRulesManager;
-        private Deck deck;
-        private Stack<GameObject> deckCards;
         private IObjectPool<Enemy> enemyPool;
+        private int activeEnemies = 0;
 
         public Enemy Spawn() => enemyPool.Get();
         public Enemy Spawn(Vector3 position, Quaternion rotation)
         {
-            var e = Spawn();
+            Enemy e = Spawn();
             e.transform.SetPositionAndRotation(position, rotation);
+            activeEnemies += 1;
             return e;
         }
         public void Despawn(Enemy e)
         {
             enemyPool.Release(e);
-        }
-
-        private void Awake()
-        {
-            deck = new Deck(numberOfCards).Shuffle();
+            activeEnemies -= 1;
         }
 
         private void Start()
         {
-            deckCards = new Stack<GameObject>();
-            enemyPool = new ObjectPool<Enemy>(CreateInstance, GetFromPool, defaultCapacity: poolSize);
-            SpawnDeck();
-            var gameRulesManagerGO = GameObject.FindGameObjectWithTag("GameRulesManager");
-            gameRulesManager = gameRulesManagerGO.GetComponent<GameRulesManager>();
-            InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
-        }
-
-        private void OnEnable()
-        {
-            deck.OnDeckEmpty += DeckEmptyHandler;
-            deck.OnDeckRefilled += DeckRefilledHandler;
-        }
-
-        private void OnDisable()
-        {
-            deck.OnDeckEmpty -= DeckEmptyHandler;
-            deck.OnDeckRefilled -= DeckRefilledHandler;
-        }
-
-        private void SpawnDeck()
-        {
-            float yOffset = cardPrefab.GetComponent<BoxCollider>().size.z * cardPrefab.transform.localScale.z;
-            for (int i = 0; i < deck.Count; i++)
-            {
-                var instantiatePosition = new Vector3(
-                    deckPosition.transform.position.x,
-                    deckPosition.transform.position.y + yOffset * i,
-                    deckPosition.transform.position.z
-                );
-                var go = Instantiate(cardPrefab, instantiatePosition, deckPosition.transform.rotation, deckPosition.transform);
-                deckCards.Push(go);
-            }
-        }
-
-        private void SpawnEnemy()
-        {
-            var cardGO = deckCards.Pop();
-            Destroy(cardGO);
-            var randomSpawnpointIndex = UnityEngine.Random.Range(0, spawnPoints.Count - 1);
-            var spawnPoint = spawnPoints[randomSpawnpointIndex];
-            Spawn(
-                new Vector3(spawnPoint.position.x, 1, spawnPoint.position.z),
-                Quaternion.identity
-            );
+            enemyPool = new ObjectPool<Enemy>(CreateInstance, OnGet, OnRelease, defaultCapacity: poolSize);
+            InvokeRepeating(nameof(SpawnEnemy), 1, spawnPerSecond);
         }
 
         private Enemy CreateInstance()
         {
-            var go = Instantiate(enemyPrefab, transform);
+            GameObject go = Instantiate(enemyPrefab, transform);
             go.SetActive(false);
             return go.GetComponent<Enemy>();
         }
 
-        private void GetFromPool(Enemy enemy)
+        private void OnGet(Enemy enemy)
         {
-            Card card = deck.RemoveFromTop();
-            enemy.Card = card;
-            enemy.gameObject.SetActive(true);
             enemy.Attributes = new EnemyAttributes
             {
                 Hand = new List<Card>(),
                 Deck = new Deck().Shuffle(),
                 Health = 1,
-                Level = card.Value == Values.ACE ? (int)Values.KING + 1 : (int)card.Value
+                Level = 1
             };
-            enemy.Attributes.Hand.Append(card);
+        }
+        private void OnRelease(Enemy enemy)
+        {
+            enemy.gameObject.SetActive(false);
         }
 
-        private void DeckEmptyHandler(Deck _, EventArgs __) => CancelInvoke(nameof(SpawnEnemy));
-        private void DeckRefilledHandler(Deck _, EventArgs __) => InvokeRepeating(nameof(SpawnEnemy), spawnInitialWaitSeconds, spawnPerSecond);
+        private void SpawnEnemy()
+        {
+            if (activeEnemies >= maxActiveEnemies) return;
+            int randomSpawnpointIndex = Random.Range(0, spawnPoints.Count - 1);
+            Transform spawnPoint = spawnPoints[randomSpawnpointIndex];
+            Enemy enemy = Spawn(
+                new Vector3(spawnPoint.position.x, 1, spawnPoint.position.z),
+                Quaternion.identity
+            );
+            enemy.gameObject.SetActive(true);
+        }
     }
 }

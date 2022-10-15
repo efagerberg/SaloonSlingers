@@ -14,14 +14,14 @@ namespace SaloonSlingers.Core.Tests
         {
             [TestCaseSource(nameof(DoDamageTestCases))]
             public void TestDoesDamageExpectedly(
-                (string, int) rawSource,
+                string rawSourceHand,
                 List<(string, int)> rawTargets,
                 List<int> expectedTargetHealths
             )
             {
-                TestSlingerAttributes source = CreateAttributes(rawSource.Item1, rawSource.Item2);
+                IList<Card> sourceHand = TestHelpers.MakeHandFromString(rawSourceHand).ToList();
                 List<TestSlingerAttributes> targets = rawTargets.Select(t => CreateAttributes(t.Item1, t.Item2)).ToList();
-                HealthSystem.DoDamage(new TestHandEvaluator(), source, targets);
+                HealthSystem.DoDamage(new TestHandEvaluator(), sourceHand, targets);
                 var actualTargetHealths = targets.Select(x => x.Health).ToList();
 
                 Assert.AreEqual(expectedTargetHealths, actualTargetHealths);
@@ -37,27 +37,27 @@ namespace SaloonSlingers.Core.Tests
 
             private static readonly object[][] DoDamageTestCases = {
                 new object[] {
-                    ("AH", 3),
+                    "AH",
                     new List<(string, int)>(),
                     new List<int>()
                 },
                 new object[] {
-                    ("AH", 3),
+                    "AH",
                     new List<(string, int)>() { ("AH", 3) },
                     new List<int> { 3 }
                 },
                 new object[] {
-                    ("AH", 3),
+                    "AH",
                     new List<(string, int)>() { ("AH 2C", 3) },
                     new List<int> { 3 }
                 },
                 new object[] {
-                    ("AH 2C 3D", 3),
+                    "AH 2C 3D",
                     new List<(string, int)>() { ("AH", 3) },
                     new List<int> { 2 }
                 },
                 new object[] {
-                    ("AH 2C 3D", 3),
+                    "AH 2C 3D",
                     new List<(string, int)>() {
                         ("AH", 3),
                         ("AH", 2)
@@ -65,7 +65,7 @@ namespace SaloonSlingers.Core.Tests
                     new List<int> { 2, 1 }
                 },
                 new object[] {
-                    ("AH 2C 3D", 3),
+                    "AH 2C 3D",
                     new List<(string, int)>() {
                         ("AH 2C 3D", 3),
                         ("AH", 2)
@@ -73,7 +73,7 @@ namespace SaloonSlingers.Core.Tests
                     new List<int> { 3, 1 }
                 },
                 new object[] {
-                    ("AH 2C 3D", 3),
+                    "AH 2C 3D",
                     new List<(string, int)>() { ("AH 2C", 0) },
                     new List<int> { 0 }
                 }

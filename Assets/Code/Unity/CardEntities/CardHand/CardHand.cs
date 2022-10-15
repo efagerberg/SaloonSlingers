@@ -7,6 +7,8 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
+using SaloonSlingers.Unity.Slingers;
+using System.Linq;
 
 namespace SaloonSlingers.Unity.CardEntities
 {
@@ -28,10 +30,18 @@ namespace SaloonSlingers.Unity.CardEntities
         private List<InputActionProperty> commitHandActionProperties;
         [SerializeField]
         private float lifespanInSeconds = 1f;
+        [SerializeField]
+        private int maxAngularVelocity = 100;
+        [SerializeField]
+        private AudioSource audioSource;
+        [SerializeField]
+        private AudioClip drawSFX;
+        [SerializeField]
+        private AudioClip throwSFX;
 
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
-        private HandInteractableState state;
+        private CardHandState state;
         private CardHandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private ISlingerAttributes slingerAttributes;
@@ -51,6 +61,7 @@ namespace SaloonSlingers.Unity.CardEntities
             rigidBody.isKinematic = true;
             commitHandActionProperties.ForEach(prop => prop.action.started += ToggleCommitHand);
             state = state.Reset();
+            lifespanInSeconds = originlLifespanInSeconds;
             if (slingerAttributes.Hand.Count == 0) DrawCard();
             OnHandInteractableHeld?.Invoke(this, EventArgs.Empty);
         }
@@ -61,18 +72,47 @@ namespace SaloonSlingers.Unity.CardEntities
 
             Card card = slingerAttributes.Deck.Dequeue();
             slingerAttributes.Hand.Add(card);
+            audioSource.clip = drawSFX;
+            audioSource.Play();
             ICardGraphic cardGraphic = cardSpawner.Spawn(card);
             handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
         }
 
-        public void Throw(SelectExitEventArgs args)
+        public void Throw(Rigidbody characterControllerRb)
         {
             trailRenderer.enabled = true;
             rigidBody.isKinematic = false;
             commitHandActionProperties.ForEach(prop => prop.action.started -= ToggleCommitHand);
             state = state.Throw();
-            slingerAttributes.Hand.Clear();
-            NegateCharacterControllerVelocity(args.interactorObject);
+            audioSource.clip = throwSFX;
+            audioSource.Play();
+            lifespanInSeconds = originlLifespanInSeconds;
+            NegateCharacterControllerVelocity(characterControllerRb);
+        }
+
+        public void OnSelectEnter(SelectEnterEventArgs args)
+        {
+            SwapHand(args.interactorObject.transform);
+            Pickup();
+        }
+
+        private void SwapHand(Transform slingerTransform)
+        {
+            ISlingerAttributes newAttributes = slingerTransform.GetComponentInParent<ISlinger>().Attributes;
+            ICardSpawner spawner = slingerTransform.GetComponentInParent<ICardSpawner>();
+            if (newAttributes != slingerAttributes)
+            {
+                IList<Card> tmpHand = slingerAttributes.Hand.ToList();
+                slingerAttributes.Hand.Clear();
+                AssociateWithSlinger(newAttributes, spawner);
+                slingerAttributes.Hand = tmpHand;
+            }
+        }
+
+        public void OnSelectExit(SelectExitEventArgs args)
+        {
+            Rigidbody characterControllerRb = args.interactorObject.transform.GetComponentInParent<Rigidbody>();
+            Throw(characterControllerRb);
         }
 
         private void OnEnable()
@@ -89,6 +129,7 @@ namespace SaloonSlingers.Unity.CardEntities
             gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
+            rigidBody.maxAngularVelocity = maxAngularVelocity;
             if (handCanvasRectTransform == null) handCanvasRectTransform = handPanelRectTransform.parent.GetComponent<RectTransform>();
 
             handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
@@ -101,11 +142,10 @@ namespace SaloonSlingers.Unity.CardEntities
             handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
         }
 
-        private void NegateCharacterControllerVelocity(IXRInteractor interactorObject)
+        private void NegateCharacterControllerVelocity(Rigidbody characterControllerRb)
         {
-            CharacterController c = interactorObject.transform.GetComponentInParent<CharacterController>();
-            if (c == null) return;
-            rigidBody.AddForce(-c.velocity);
+            if (characterControllerRb == null) return;
+            rigidBody.AddForce(-characterControllerRb.velocity);
         }
 
         private void FixedUpdate()
@@ -116,6 +156,7 @@ namespace SaloonSlingers.Unity.CardEntities
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             state = state.Reset();
+            slingerAttributes.Hand.Clear();
             handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
             handLayoutMediator.Dispose(cardSpawner.Despawn);
             lifespanInSeconds = originlLifespanInSeconds;
