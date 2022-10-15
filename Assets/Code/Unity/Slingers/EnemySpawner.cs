@@ -69,12 +69,10 @@ namespace SaloonSlingers.Unity.Slingers
         private void SpawnEnemy()
         {
             if (activeEnemies >= maxActiveEnemies) return;
+
             int randomSpawnpointIndex = Random.Range(0, spawnPoints.Count - 1);
             Transform spawnPoint = spawnPoints[randomSpawnpointIndex];
-            Enemy enemy = Spawn(
-                new Vector3(spawnPoint.position.x, 1, spawnPoint.position.z),
-                Quaternion.identity
-            );
+            Enemy enemy = Spawn(spawnPoint.position, Quaternion.identity);
             enemy.gameObject.SetActive(true);
         }
     }
