@@ -38,6 +38,8 @@ namespace SaloonSlingers.Unity.CardEntities
         private AudioClip drawSFX;
         [SerializeField]
         private AudioClip throwSFX;
+        [SerializeField]
+        private float maxDeckDistance = 0.08f;
 
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
@@ -48,6 +50,7 @@ namespace SaloonSlingers.Unity.CardEntities
         private ICardSpawner cardSpawner;
         private GameRulesManager gameRulesManager;
         private float originlLifespanInSeconds;
+        private Transform deckGraphicTransform;
 
         public void AssociateWithSlinger(ISlingerAttributes attributes, ICardSpawner slingerCardSpawner)
         {
@@ -62,11 +65,11 @@ namespace SaloonSlingers.Unity.CardEntities
             commitHandActionProperties.ForEach(prop => prop.action.started += ToggleCommitHand);
             state = state.Reset();
             lifespanInSeconds = originlLifespanInSeconds;
-            if (slingerAttributes.Hand.Count == 0) DrawCard();
+            if (slingerAttributes.Hand.Count == 0) TryDrawCard();
             OnHandInteractableHeld?.Invoke(this, EventArgs.Empty);
         }
 
-        public void DrawCard()
+        public void TryDrawCard()
         {
             if (!state.CanDraw) return;
 
@@ -120,13 +123,22 @@ namespace SaloonSlingers.Unity.CardEntities
             cardRotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
             state = new(
                 () => lifespanInSeconds > 0 && rigidBody.velocity.magnitude != 0,
-                () => slingerAttributes.Hand.Count < gameRulesManager.GameRules.MaxHandSize && slingerAttributes.Deck.Count > 0
+                () => slingerAttributes.Hand.Count < gameRulesManager.GameRules.MaxHandSize &&
+                      slingerAttributes.Deck.Count > 0 &&
+                      IsTouchingDeck()
             );
+        }
+
+        private bool IsTouchingDeck()
+        {
+            float dist = Mathf.Abs(Vector3.Distance(transform.position, deckGraphicTransform.transform.position));
+            return dist <= maxDeckDistance;
         }
 
         private void Start()
         {
             gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
+            deckGraphicTransform = GameObject.FindGameObjectWithTag("DeckGraphic").transform;
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
