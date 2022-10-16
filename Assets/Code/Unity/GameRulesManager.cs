@@ -20,8 +20,8 @@ namespace SaloonSlingers.Unity
         public void LoadRules(string configPath)
         {
             ConfigPath = configPath;
-            using FileStream s = new(ConfigPath, FileMode.Open, FileAccess.Read);
-            GameRules = GameRules.Load(s);
+            TextAsset rulesTextAsset = Resources.Load<TextAsset>(ConfigPath);
+            GameRules = GameRules.Load(rulesTextAsset.text);
             OnGameRulesChanged?.Invoke(GameRules, EventArgs.Empty);
         }
 

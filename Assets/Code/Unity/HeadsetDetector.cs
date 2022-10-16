@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation;
@@ -13,6 +14,16 @@ namespace SaloonSlingers.Unity
         {
             simulator = GetComponent<XRDeviceSimulator>();
             simulator.enabled = true;
+
+            CheckAlreadyConnectedHeadset();
+        }
+
+        private void CheckAlreadyConnectedHeadset()
+        {
+            List<InputDevice> inputDevices = new List<InputDevice>();
+            InputDevices.GetDevicesWithCharacteristics(headsetCharacteristic, inputDevices);
+            foreach (InputDevice device in inputDevices)
+                SetSimulatorEnabledIfHMD(device, false);
         }
 
         private void OnEnable()

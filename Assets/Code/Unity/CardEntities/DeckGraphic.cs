@@ -66,6 +66,7 @@ namespace SaloonSlingers.Unity.CardEntities
                 cardGraphic.transform.localPosition = GetLocalPositionOfCard(i);
                 cardGraphics.Push(cardGraphic);
             }
+
             GameObject primaryInteractableGO = Instantiate(handInteractablePrefab);
             CardHand primaryInteractable = primaryInteractableGO.GetComponent<CardHand>();
             primaryInteractable.AssociateWithSlinger(slingerAttributes, this);

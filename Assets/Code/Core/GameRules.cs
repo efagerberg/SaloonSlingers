@@ -15,11 +15,9 @@ namespace SaloonSlingers.Core
         public int MaxHandSize { get; set; }
         public IHandEvaluator HandEvaluator { get; set; }
 
-        public static GameRules Load(Stream stream)
+        public static GameRules Load(string raw)
         {
             IReadOnlyDictionary<string, object> rawConfig;
-            using StreamReader r = new(stream);
-            string raw = r.ReadToEnd();
             rawConfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(raw);
 
             return new GameRules
