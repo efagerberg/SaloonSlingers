@@ -1,11 +1,11 @@
 using System;
-using System.Collections.Generic;
 
 using UnityEngine;
 
 using SaloonSlingers.Core.SlingerAttributes;
 using SaloonSlingers.Unity.CardEntities;
 using SaloonSlingers.Unity.Slingers;
+using UnityEngine.Pool;
 
 namespace SaloonSlingers.Unity
 {
@@ -13,58 +13,54 @@ namespace SaloonSlingers.Unity
     {
         [SerializeField]
         private GameObject handInteractablePrefab;
+        [SerializeField]
+        private int poolSize = 5;
 
-        private Queue<CardHand> interactables = new(2);
-        private ISlingerAttributes slingerAttributes;
-        private ICardSpawner cardSpawner;
+        private IObjectPool<GameObject> handInteractablePool;
         private DeckGraphic deckGraphic;
 
         private void Start()
         {
-            slingerAttributes = GetComponentInParent<ISlinger>().Attributes;
+            handInteractablePool = new ObjectPool<GameObject>(
+                () => {
+                    GameObject go = Instantiate(handInteractablePrefab);
+                    CardHand cardHand = go.GetComponent<CardHand>();
+                    cardHand.OnHandInteractableHeld += HandInteractableHeldHandler;
+                    cardHand.OnHandInterableReadyToRespawn += HandInteractableReadyToRespawn;
+                    go.SetActive(false);
+                    return go;
+                },
+                (GameObject go) => go.SetActive(true),
+                (GameObject go) => go.SetActive(false),
+                (GameObject go) => {
+                    CardHand cardHand = go.GetComponent<CardHand>();
+                    cardHand.OnHandInteractableHeld -= HandInteractableHeldHandler;
+                    cardHand.OnHandInterableReadyToRespawn -= HandInteractableReadyToRespawn;
+                },
+                defaultCapacity: poolSize
+            );
             deckGraphic = GetComponent<DeckGraphic>();
-            cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<ICardSpawner>();
-            InitializeInteractables();
+            GameObject first = handInteractablePool.Get();
+            PlaceOnTop(deckGraphic.TopCardTransform, first);
         }
 
-        private void PlaceOnTop(Transform topCardTransform)
+        private void PlaceOnTop(Transform topCardTransform, GameObject cardHandGO)
         {
-            if (interactables.Count == 0) return;
-            CardHand interactable = interactables.Peek();
-            interactable.transform.SetPositionAndRotation(topCardTransform.position, topCardTransform.rotation);
-            interactable.transform.SetParent(transform);
+            cardHandGO.transform.SetPositionAndRotation(
+                topCardTransform.position, topCardTransform.rotation
+            );
+            cardHandGO.transform.SetParent(transform);
         }
 
-        private void HandInteractableHeldHandler(CardHand _, EventArgs __)
+        private void HandInteractableHeldHandler(CardHand sender, EventArgs _)
         {
-            if (interactables.Count == 0) return;
-            CardHand interactable = interactables.Dequeue();
-            interactable.transform.SetParent(null);
-            PlaceOnTop(deckGraphic.TopCardTransform);
+            sender.transform.SetParent(null);
+            PlaceOnTop(deckGraphic.TopCardTransform, handInteractablePool.Get());
         }
 
         private void HandInteractableReadyToRespawn(CardHand sender, EventArgs _)
         {
-            interactables.Enqueue(sender);
-            PlaceOnTop(deckGraphic.TopCardTransform);
-        }
-
-        private void InitializeInteractables()
-        {
-            GameObject primaryInteractableGO = Instantiate(handInteractablePrefab);
-            CardHand primaryInteractable = primaryInteractableGO.GetComponent<CardHand>();
-            primaryInteractable.AssociateWithSlinger(slingerAttributes, cardSpawner);
-            primaryInteractable.OnHandInteractableHeld += HandInteractableHeldHandler;
-            primaryInteractable.OnHandInterableReadyToRespawn += HandInteractableReadyToRespawn;
-            interactables.Enqueue(primaryInteractable);
-            PlaceOnTop(deckGraphic.TopCardTransform);
-
-            GameObject secondardyInteractableGO = Instantiate(handInteractablePrefab);
-            CardHand secondardyInteractable = secondardyInteractableGO.GetComponent<CardHand>();
-            secondardyInteractable.AssociateWithSlinger(slingerAttributes, cardSpawner);
-            secondardyInteractable.OnHandInteractableHeld += HandInteractableHeldHandler;
-            secondardyInteractable.OnHandInterableReadyToRespawn += HandInteractableReadyToRespawn;
-            interactables.Enqueue(secondardyInteractable);
+            handInteractablePool.Release(sender.gameObject);
         }
     }
 }

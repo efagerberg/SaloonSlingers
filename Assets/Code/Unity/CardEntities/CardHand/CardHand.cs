@@ -52,10 +52,9 @@ namespace SaloonSlingers.Unity.CardEntities
         private float originlLifespanInSeconds;
         private Transform deckGraphicTransform;
 
-        public void AssociateWithSlinger(ISlingerAttributes attributes, ICardSpawner slingerCardSpawner)
+        public void AssociateWithSlinger(ISlingerAttributes attributes)
         {
             slingerAttributes = attributes;
-            cardSpawner = slingerCardSpawner;
         }
 
         public void Pickup()
@@ -95,19 +94,24 @@ namespace SaloonSlingers.Unity.CardEntities
 
         public void OnSelectEnter(SelectEnterEventArgs args)
         {
-            SwapHand(args.interactorObject.transform);
+            SwapHandIfDifferentSlinger(args.interactorObject.transform);
             Pickup();
         }
 
-        private void SwapHand(Transform slingerTransform)
+        private void SwapHandIfDifferentSlinger(Transform slingerTransform)
         {
             ISlingerAttributes newAttributes = slingerTransform.GetComponentInParent<ISlinger>().Attributes;
-            ICardSpawner spawner = slingerTransform.GetComponentInParent<ICardSpawner>();
+            if (slingerAttributes == null)
+            {
+                AssociateWithSlinger(newAttributes);
+                return;
+            }
+    
             if (newAttributes != slingerAttributes)
             {
                 IList<Card> tmpHand = slingerAttributes.Hand.ToList();
                 slingerAttributes.Hand.Clear();
-                AssociateWithSlinger(newAttributes, spawner);
+                AssociateWithSlinger(newAttributes);
                 slingerAttributes.Hand = tmpHand;
             }
         }
@@ -139,6 +143,7 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
             deckGraphicTransform = GameObject.FindGameObjectWithTag("DeckGraphic").transform;
+            cardSpawner = GameObject.FindGameObjectWithTag("DeckGraphic").GetComponent<DeckGraphic>();
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
