@@ -77,7 +77,8 @@ namespace SaloonSlingers.Unity.CardEntities
             slingerAttributes.Hand.Add(card);
             audioSource.clip = drawSFX;
             audioSource.Play();
-            ICardGraphic cardGraphic = cardSpawner.Spawn(card);
+            ICardGraphic cardGraphic = cardSpawner.Spawn();
+            cardGraphic.Card = card;
             handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
         }
 
@@ -146,7 +147,7 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
             deckGraphicTransform = GameObject.FindGameObjectWithTag("DeckGraphic").transform;
-            cardSpawner = GameObject.FindGameObjectWithTag("DeckGraphic").GetComponent<DeckGraphic>();
+            cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<ICardSpawner>();
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
