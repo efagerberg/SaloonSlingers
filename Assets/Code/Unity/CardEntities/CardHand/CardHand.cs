@@ -51,6 +51,7 @@ namespace SaloonSlingers.Unity.CardEntities
         private GameRulesManager gameRulesManager;
         private float originlLifespanInSeconds;
         private Transform deckGraphicTransform;
+        private IList<Card> cards;
 
         public void AssociateWithSlinger(ISlingerAttributes attributes)
         {
@@ -90,6 +91,8 @@ namespace SaloonSlingers.Unity.CardEntities
             audioSource.Play();
             lifespanInSeconds = originlLifespanInSeconds;
             NegateCharacterControllerVelocity(characterControllerRb);
+            cards = slingerAttributes.Hand;
+            slingerAttributes.Hand.Clear();
         }
 
         public void OnSelectEnter(SelectEnterEventArgs args)
@@ -174,6 +177,7 @@ namespace SaloonSlingers.Unity.CardEntities
             rigidBody.isKinematic = true;
             state = state.Reset();
             slingerAttributes.Hand.Clear();
+            cards.Clear();
             handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
             handLayoutMediator.Dispose(cardSpawner.Despawn);
             lifespanInSeconds = originlLifespanInSeconds;
