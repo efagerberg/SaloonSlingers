@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
@@ -27,8 +24,6 @@ namespace SaloonSlingers.Unity.CardEntities
         [SerializeField]
         private float totalCardDegrees = 30f;
         [SerializeField]
-        private List<InputActionProperty> commitHandActionProperties;
-        [SerializeField]
         private float lifespanInSeconds = 1f;
         [SerializeField]
         private int maxAngularVelocity = 100;
@@ -38,8 +33,6 @@ namespace SaloonSlingers.Unity.CardEntities
         private AudioClip drawSFX;
         [SerializeField]
         private AudioClip throwSFX;
-        [SerializeField]
-        private float maxDeckDistance = 0.08f;
 
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
@@ -50,19 +43,12 @@ namespace SaloonSlingers.Unity.CardEntities
         private ICardSpawner cardSpawner;
         private GameRulesManager gameRulesManager;
         private float originlLifespanInSeconds;
-        private Transform deckGraphicTransform;
         private IList<Card> cards = new List<Card>();
-
-        public void AssociateWithSlinger(ISlingerAttributes attributes)
-        {
-            slingerAttributes = attributes;
-        }
 
         public void Pickup()
         {
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
-            commitHandActionProperties.ForEach(prop => prop.action.started += ToggleCommitHand);
             state = state.Reset();
             lifespanInSeconds = originlLifespanInSeconds;
             if (cards.Count == 0) TryDrawCard();
@@ -86,7 +72,6 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             trailRenderer.enabled = true;
             rigidBody.isKinematic = false;
-            commitHandActionProperties.ForEach(prop => prop.action.started -= ToggleCommitHand);
             state = state.Throw();
             audioSource.clip = throwSFX;
             audioSource.Play();
@@ -94,13 +79,7 @@ namespace SaloonSlingers.Unity.CardEntities
             NegateCharacterControllerVelocity(characterControllerRb);
         }
 
-        public void OnSelectEnter(SelectEnterEventArgs args)
-        {
-            SwapHandIfDifferentSlinger(args.interactorObject.transform);
-            Pickup();
-        }
-
-        private void SwapHandIfDifferentSlinger(Transform slingerTransform)
+        public void SwapHandIfDifferentSlinger(Transform slingerTransform)
         {
             ISlingerAttributes newAttributes = slingerTransform.GetComponentInParent<ISlinger>().Attributes;
             if (slingerAttributes == null)
@@ -110,10 +89,15 @@ namespace SaloonSlingers.Unity.CardEntities
             }
         }
 
-        public void OnSelectExit(SelectExitEventArgs args)
+        public void ToggleCommitHand()
         {
-            Rigidbody characterControllerRb = args.interactorObject.transform.GetComponentInParent<Rigidbody>();
-            Throw(characterControllerRb);
+            state = state.ToggleCommit();
+            handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
+        }
+
+        private void AssociateWithSlinger(ISlingerAttributes attributes)
+        {
+            slingerAttributes = attributes;
         }
 
         private void OnEnable()
@@ -122,21 +106,13 @@ namespace SaloonSlingers.Unity.CardEntities
             state = new(
                 () => lifespanInSeconds > 0 && rigidBody.velocity.magnitude != 0,
                 () => cards.Count < gameRulesManager.GameRules.MaxHandSize &&
-                      slingerAttributes.Deck.Count > 0 &&
-                      IsTouchingDeck()
+                      slingerAttributes.Deck.Count > 0
             );
-        }
-
-        private bool IsTouchingDeck()
-        {
-            float dist = Mathf.Abs(Vector3.Distance(transform.position, deckGraphicTransform.transform.position));
-            return dist <= maxDeckDistance;
         }
 
         private void Start()
         {
             gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
-            deckGraphicTransform = GameObject.FindGameObjectWithTag("DeckGraphic").transform;
             cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<ICardSpawner>();
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
@@ -145,12 +121,6 @@ namespace SaloonSlingers.Unity.CardEntities
 
             handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
             originlLifespanInSeconds = lifespanInSeconds;
-        }
-
-        private void ToggleCommitHand(InputAction.CallbackContext _)
-        {
-            state = state.ToggleCommit();
-            handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
         }
 
         private void NegateCharacterControllerVelocity(Rigidbody characterControllerRb)
