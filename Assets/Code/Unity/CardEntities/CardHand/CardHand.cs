@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,7 +9,6 @@ using UnityEngine.XR.Interaction.Toolkit;
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
 using SaloonSlingers.Unity.Slingers;
-using System.Linq;
 
 namespace SaloonSlingers.Unity.CardEntities
 {
@@ -51,7 +51,7 @@ namespace SaloonSlingers.Unity.CardEntities
         private GameRulesManager gameRulesManager;
         private float originlLifespanInSeconds;
         private Transform deckGraphicTransform;
-        private IList<Card> cards;
+        private IList<Card> cards = new List<Card>();
 
         public void AssociateWithSlinger(ISlingerAttributes attributes)
         {
@@ -65,7 +65,7 @@ namespace SaloonSlingers.Unity.CardEntities
             commitHandActionProperties.ForEach(prop => prop.action.started += ToggleCommitHand);
             state = state.Reset();
             lifespanInSeconds = originlLifespanInSeconds;
-            if (slingerAttributes.Hand.Count == 0) TryDrawCard();
+            if (cards.Count == 0) TryDrawCard();
             OnHandInteractableHeld?.Invoke(this, EventArgs.Empty);
         }
 
@@ -74,7 +74,7 @@ namespace SaloonSlingers.Unity.CardEntities
             if (!state.CanDraw) return;
 
             Card card = slingerAttributes.Deck.Dequeue();
-            slingerAttributes.Hand.Add(card);
+            cards.Add(card);
             audioSource.clip = drawSFX;
             audioSource.Play();
             ICardGraphic cardGraphic = cardSpawner.Spawn();
@@ -92,8 +92,6 @@ namespace SaloonSlingers.Unity.CardEntities
             audioSource.Play();
             lifespanInSeconds = originlLifespanInSeconds;
             NegateCharacterControllerVelocity(characterControllerRb);
-            cards = slingerAttributes.Hand;
-            slingerAttributes.Hand.Clear();
         }
 
         public void OnSelectEnter(SelectEnterEventArgs args)
@@ -110,14 +108,6 @@ namespace SaloonSlingers.Unity.CardEntities
                 AssociateWithSlinger(newAttributes);
                 return;
             }
-    
-            if (newAttributes != slingerAttributes)
-            {
-                IList<Card> tmpHand = slingerAttributes.Hand.ToList();
-                slingerAttributes.Hand.Clear();
-                AssociateWithSlinger(newAttributes);
-                slingerAttributes.Hand = tmpHand;
-            }
         }
 
         public void OnSelectExit(SelectExitEventArgs args)
@@ -131,7 +121,7 @@ namespace SaloonSlingers.Unity.CardEntities
             cardRotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
             state = new(
                 () => lifespanInSeconds > 0 && rigidBody.velocity.magnitude != 0,
-                () => slingerAttributes.Hand.Count < gameRulesManager.GameRules.MaxHandSize &&
+                () => cards.Count < gameRulesManager.GameRules.MaxHandSize &&
                       slingerAttributes.Deck.Count > 0 &&
                       IsTouchingDeck()
             );
@@ -177,7 +167,6 @@ namespace SaloonSlingers.Unity.CardEntities
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             state = state.Reset();
-            slingerAttributes.Hand.Clear();
             cards.Clear();
             handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
             handLayoutMediator.Dispose(cardSpawner.Despawn);

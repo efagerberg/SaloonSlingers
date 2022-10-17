@@ -1,11 +1,9 @@
 using System;
 
 using UnityEngine;
-
-using SaloonSlingers.Core.SlingerAttributes;
-using SaloonSlingers.Unity.CardEntities;
-using SaloonSlingers.Unity.Slingers;
 using UnityEngine.Pool;
+
+using SaloonSlingers.Unity.CardEntities;
 
 namespace SaloonSlingers.Unity
 {

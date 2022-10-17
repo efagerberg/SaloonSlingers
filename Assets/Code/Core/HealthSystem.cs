@@ -8,15 +8,15 @@ namespace SaloonSlingers.Core
 {
     public static class HealthSystem
     {
-        public static void DoDamage(IHandEvaluator handEvaluator, IList<Card> sources, IEnumerable<ISlingerAttributes> targets)
+        public static void DoDamage(IHandEvaluator handEvaluator, IList<Card> source, IEnumerable<(ISlingerAttributes, IList<Card>)> targets)
         {
-            uint sourceScore = handEvaluator.Evaluate(sources).Score;
-            bool targetFilter(ISlingerAttributes target)
+            uint sourceScore = handEvaluator.Evaluate(source).Score;
+            bool targetFilter((ISlingerAttributes, IList<Card>) target)
             {
-                return target.Health > 0 && sourceScore > handEvaluator.Evaluate(target.Hand).Score;
+                return target.Item1.Health > 0 && sourceScore > handEvaluator.Evaluate(target.Item2).Score;
             }
 
-            targets.Where(targetFilter).ToList().ForEach(target => target.Health -= 1);
+            targets.Where(targetFilter).ToList().ForEach(target => target.Item1.Health -= 1);
         }
     }
 }
