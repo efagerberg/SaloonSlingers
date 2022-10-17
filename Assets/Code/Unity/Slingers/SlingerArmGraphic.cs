@@ -4,7 +4,7 @@ using SaloonSlingers.Core.SlingerAttributes;
 
 namespace SaloonSlingers.Unity.Slingers
 {
-    public class Hand : MonoBehaviour
+    public class SlingerArmGraphic : MonoBehaviour
     {
         [SerializeField]
         private Transform LeftDeckAttachTransform;
