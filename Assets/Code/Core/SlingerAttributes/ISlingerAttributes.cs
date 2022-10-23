@@ -9,6 +9,6 @@
     {
         public Deck Deck { get; }
         public Handedness Handedness { get; set; }
-        public Health Health { get; }
+        public Points HealthPoints { get; }
     }
 }

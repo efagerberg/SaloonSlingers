@@ -30,7 +30,7 @@ namespace SaloonSlingers.Unity.Slingers
         {
             Attributes = new PlayerAttributes(
                 new Deck(numberOfCards).Shuffle(),
-                new Health(startingHitPoints),
+                new Points(startingHitPoints),
                 new Dash(
                     startingDashes,
                     startingDashSpeed,

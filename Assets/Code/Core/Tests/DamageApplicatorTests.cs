@@ -19,14 +19,14 @@ namespace SaloonSlingers.Core.Tests
             )
             {
                 IList<Card> sourceHand = TestHelpers.MakeHandFromString(rawSourceHand).ToList();
-                IList<(Health, IList<Card>)> targets = rawTargets.Select(
+                IList<(Points, IList<Card>)> targets = rawTargets.Select(
                     t => (
-                        new Health(t.Item2),
+                        new Points(t.Item2),
                         (IList<Card>)TestHelpers.MakeHandFromString(t.Item1).ToList()
                     )
                 ).ToList();
                 DamageApplicator.DoDamage(new TestHandEvaluator(), sourceHand, targets);
-                var actualTargetHitPoints = targets.Select(x => x.Item1.HitPoints).ToList();
+                var actualTargetHitPoints = targets.Select(x => x.Item1.Value).ToList();
 
                 CollectionAssert.AreEqual(expectedTargetHitPoints, actualTargetHitPoints);
             }

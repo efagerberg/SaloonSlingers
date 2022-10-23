@@ -47,7 +47,7 @@ namespace SaloonSlingers.Unity.Slingers
         private IEnumerator Dash()
         {
             canDash = false;
-            dash.DashPoints -= 1;
+            dash.DashPoints.Value -= 1;
             float currentDuration = dash.Duration;
             while (currentDuration > 0)
             {
@@ -57,13 +57,13 @@ namespace SaloonSlingers.Unity.Slingers
             }
 
             yield return new WaitForSeconds(dash.CoolDown);
-            canDash = dash.DashPoints > 0;
+            canDash = dash.DashPoints.Value > 0;
 
             // Assumes the cooldown is always smaller than the recovery period
             // Game-wise this makes sense, why would the player be allowed to regen
             // points faster than they can use them.
             yield return new WaitForSeconds(dash.PointRecoveryPeriod - dash.CoolDown);
-            dash.DashPoints += 1;
+            dash.DashPoints.Value += 1;
             canDash = true;
         }
     }
