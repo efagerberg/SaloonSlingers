@@ -136,11 +136,11 @@ namespace SaloonSlingers.Unity.CardEntities
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             state = state.Reset();
-            Cards.Clear();
             handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
             handLayoutMediator.Dispose();
             lifespanInSeconds = originlLifespanInSeconds;
             OnHandInteractableDied?.Invoke(this, EventArgs.Empty);
+            Cards.Clear();
         }
     }
 }
