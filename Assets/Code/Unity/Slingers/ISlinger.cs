@@ -1,4 +1,5 @@
 ﻿using SaloonSlingers.Core.SlingerAttributes;
+using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity.Slingers
 {

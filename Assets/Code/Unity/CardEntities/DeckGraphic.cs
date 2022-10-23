@@ -2,31 +2,31 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
 using SaloonSlingers.Unity.Slingers;
+using System;
+using SaloonSlingers.Core;
 
 namespace SaloonSlingers.Unity.CardEntities
 {
+    public delegate void DeckGraphicEmptyHandler(DeckGraphic sender, EventArgs e);
+
     public class DeckGraphic : MonoBehaviour, ICardSpawner
     {
+        public Transform TopCardTransform { get => cardGraphics.Peek().transform; }
+        public bool CanDraw { get; private set; }
+        public event DeckGraphicEmptyHandler OnDeckGraphicEmpty;
+
         [SerializeField]
         private GameObject handInteractablePrefab;
-        private ICardSpawner baseCardSpawner;
+
+        private ICardSpawner cardSpawner;
         private const float zOffset = 0.001f;
         private readonly Stack<ICardGraphic> cardGraphics = new();
         private ISlingerAttributes slingerAttributes;
 
-        public Transform TopCardTransform { get => cardGraphics.Peek().transform; }
         public ICardGraphic Spawn() => cardGraphics.Pop();
-        public ICardGraphic Spawn(Card c)
-        {
-            ICardGraphic cardGraphic = Spawn();
-            cardGraphic.Card = c;
-            return cardGraphic;
-        }
-
-        public void Despawn(ICardGraphic cardGraphic) => baseCardSpawner.Despawn(cardGraphic);
+        public void Despawn(ICardGraphic cardGraphic) => cardSpawner.Despawn(cardGraphic);
 
         private Vector3 GetLocalPositionOfCard(int i)
         {
@@ -40,19 +40,39 @@ namespace SaloonSlingers.Unity.CardEntities
         private void Start()
         {
             slingerAttributes = GetComponentInParent<ISlinger>().Attributes;
-            baseCardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<ICardSpawner>();
+            slingerAttributes.Deck.OnDeckEmpty += DeckEmptyHandler;
+            cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<ICardSpawner>();
             SpawnDeck();
+        }
+
+        private void OnDisable()
+        {
+            if (slingerAttributes == null) return;
+            slingerAttributes.Deck.OnDeckEmpty -= DeckEmptyHandler;
+        }
+
+        private void OnEnable()
+        {
+            if (slingerAttributes == null) return;
+            slingerAttributes.Deck.OnDeckEmpty += DeckEmptyHandler;
         }
 
         private void SpawnDeck()
         {
             for (int i = 0; i < slingerAttributes.Deck.Count; i++)
             {
-                ICardGraphic cardGraphic = baseCardSpawner.Spawn();
+                CanDraw = true;
+                ICardGraphic cardGraphic = cardSpawner.Spawn();
                 cardGraphic.transform.SetParent(transform, false);
                 cardGraphic.transform.localPosition = GetLocalPositionOfCard(i);
                 cardGraphics.Push(cardGraphic);
             }
+        }
+
+        private void DeckEmptyHandler(Deck _, EventArgs __)
+        {
+            CanDraw = false;
+            OnDeckGraphicEmpty?.Invoke(this, EventArgs.Empty);
         }
     }
 }

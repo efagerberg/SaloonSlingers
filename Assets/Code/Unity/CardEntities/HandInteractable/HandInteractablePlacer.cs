@@ -1,13 +1,9 @@
 using System;
 
 using UnityEngine;
-
-using SaloonSlingers.Core.SlingerAttributes;
-using SaloonSlingers.Unity.CardEntities;
-using SaloonSlingers.Unity.Slingers;
 using UnityEngine.Pool;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.CardEntities
 {
     public class HandInteractablePlacer : MonoBehaviour
     {
@@ -18,6 +14,7 @@ namespace SaloonSlingers.Unity
 
         private IObjectPool<GameObject> handInteractablePool;
         private DeckGraphic deckGraphic;
+        private GameObject onDeckHandInteractable;
 
         private void Start()
         {
@@ -26,7 +23,7 @@ namespace SaloonSlingers.Unity
                     GameObject go = Instantiate(handInteractablePrefab);
                     CardHand cardHand = go.GetComponent<CardHand>();
                     cardHand.OnHandInteractableHeld += HandInteractableHeldHandler;
-                    cardHand.OnHandInterableReadyToRespawn += HandInteractableReadyToRespawn;
+                    cardHand.OnHandInteractableDied += HandInteractableDiedHandler;
                     go.SetActive(false);
                     return go;
                 },
@@ -35,13 +32,30 @@ namespace SaloonSlingers.Unity
                 (GameObject go) => {
                     CardHand cardHand = go.GetComponent<CardHand>();
                     cardHand.OnHandInteractableHeld -= HandInteractableHeldHandler;
-                    cardHand.OnHandInterableReadyToRespawn -= HandInteractableReadyToRespawn;
+                    cardHand.OnHandInteractableDied -= HandInteractableDiedHandler;
                 },
                 defaultCapacity: poolSize
             );
             deckGraphic = GetComponent<DeckGraphic>();
+            deckGraphic.OnDeckGraphicEmpty += DeckGraphicEmptyHandler;
+            if (!deckGraphic.CanDraw) return;
+
             GameObject first = handInteractablePool.Get();
             PlaceOnTop(deckGraphic.TopCardTransform, first);
+        }
+
+        private void OnEnable()
+        {
+            if (deckGraphic == null) return;
+
+            deckGraphic.OnDeckGraphicEmpty += DeckGraphicEmptyHandler;
+        }
+
+        private void OnDisable()
+        {
+            if (deckGraphic == null) return;
+
+            deckGraphic.OnDeckGraphicEmpty -= DeckGraphicEmptyHandler;
         }
 
         private void PlaceOnTop(Transform topCardTransform, GameObject cardHandGO)
@@ -50,16 +64,26 @@ namespace SaloonSlingers.Unity
                 topCardTransform.position, topCardTransform.rotation
             );
             cardHandGO.transform.SetParent(transform);
+            onDeckHandInteractable = cardHandGO;
+        }
+
+        private void DeckGraphicEmptyHandler(DeckGraphic _, EventArgs __)
+        {
+            handInteractablePool.Release(onDeckHandInteractable);
         }
 
         private void HandInteractableHeldHandler(CardHand sender, EventArgs _)
         {
             sender.transform.SetParent(null);
+            if (!deckGraphic.CanDraw) return;
+
             PlaceOnTop(deckGraphic.TopCardTransform, handInteractablePool.Get());
         }
 
-        private void HandInteractableReadyToRespawn(CardHand sender, EventArgs _)
+        private void HandInteractableDiedHandler(CardHand sender, EventArgs _)
         {
+            foreach (ICardGraphic c in sender.Cards)
+                deckGraphic.Despawn(c);
             handInteractablePool.Release(sender.gameObject);
         }
     }

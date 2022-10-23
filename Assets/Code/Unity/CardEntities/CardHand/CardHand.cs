@@ -2,13 +2,10 @@ using System;
 using System.Collections.Generic;
 
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
 using SaloonSlingers.Unity.Slingers;
-using System.Linq;
 
 namespace SaloonSlingers.Unity.CardEntities
 {
@@ -18,7 +15,8 @@ namespace SaloonSlingers.Unity.CardEntities
     public class CardHand : MonoBehaviour
     {
         public event HandInteractableHeld OnHandInteractableHeld;
-        public event HandInteractableReadyToRespawn OnHandInterableReadyToRespawn;
+        public event HandInteractableReadyToRespawn OnHandInteractableDied;
+        public IList<ICardGraphic> Cards { get; private set; }
 
         [SerializeField]
         private RectTransform handPanelRectTransform;
@@ -26,8 +24,6 @@ namespace SaloonSlingers.Unity.CardEntities
         private RectTransform handCanvasRectTransform;
         [SerializeField]
         private float totalCardDegrees = 30f;
-        [SerializeField]
-        private List<InputActionProperty> commitHandActionProperties;
         [SerializeField]
         private float lifespanInSeconds = 1f;
         [SerializeField]
@@ -38,8 +34,6 @@ namespace SaloonSlingers.Unity.CardEntities
         private AudioClip drawSFX;
         [SerializeField]
         private AudioClip throwSFX;
-        [SerializeField]
-        private float maxDeckDistance = 0.08f;
 
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
@@ -47,36 +41,29 @@ namespace SaloonSlingers.Unity.CardEntities
         private CardHandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private ISlingerAttributes slingerAttributes;
-        private ICardSpawner cardSpawner;
         private GameRulesManager gameRulesManager;
         private float originlLifespanInSeconds;
-        private Transform deckGraphicTransform;
 
-        public void AssociateWithSlinger(ISlingerAttributes attributes)
-        {
-            slingerAttributes = attributes;
-        }
-
-        public void Pickup()
+        public void Pickup(Func<ICardGraphic> spawnCard)
         {
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
-            commitHandActionProperties.ForEach(prop => prop.action.started += ToggleCommitHand);
             state = state.Reset();
             lifespanInSeconds = originlLifespanInSeconds;
-            if (slingerAttributes.Hand.Count == 0) TryDrawCard();
+            if (Cards.Count == 0) TryDrawCard(spawnCard);
             OnHandInteractableHeld?.Invoke(this, EventArgs.Empty);
         }
 
-        public void TryDrawCard()
+        public void TryDrawCard(Func<ICardGraphic> spawnCard)
         {
             if (!state.CanDraw) return;
 
-            Card card = slingerAttributes.Deck.Dequeue();
-            slingerAttributes.Hand.Add(card);
+            Card card = slingerAttributes.Deck.RemoveFromTop();
             audioSource.clip = drawSFX;
             audioSource.Play();
-            ICardGraphic cardGraphic = cardSpawner.Spawn(card);
+            ICardGraphic cardGraphic = spawnCard();
+            cardGraphic.Card = card;
+            Cards.Add(cardGraphic);
             handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
         }
 
@@ -84,7 +71,6 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             trailRenderer.enabled = true;
             rigidBody.isKinematic = false;
-            commitHandActionProperties.ForEach(prop => prop.action.started -= ToggleCommitHand);
             state = state.Throw();
             audioSource.clip = throwSFX;
             audioSource.Play();
@@ -92,34 +78,25 @@ namespace SaloonSlingers.Unity.CardEntities
             NegateCharacterControllerVelocity(characterControllerRb);
         }
 
-        public void OnSelectEnter(SelectEnterEventArgs args)
-        {
-            SwapHandIfDifferentSlinger(args.interactorObject.transform);
-            Pickup();
-        }
-
-        private void SwapHandIfDifferentSlinger(Transform slingerTransform)
+        public void SwapHandIfDifferentSlinger(Transform slingerTransform)
         {
             ISlingerAttributes newAttributes = slingerTransform.GetComponentInParent<ISlinger>().Attributes;
-            if (slingerAttributes == null)
+            if (slingerAttributes == null || slingerAttributes != newAttributes)
             {
                 AssociateWithSlinger(newAttributes);
                 return;
             }
-    
-            if (newAttributes != slingerAttributes)
-            {
-                IList<Card> tmpHand = slingerAttributes.Hand.ToList();
-                slingerAttributes.Hand.Clear();
-                AssociateWithSlinger(newAttributes);
-                slingerAttributes.Hand = tmpHand;
-            }
         }
 
-        public void OnSelectExit(SelectExitEventArgs args)
+        public void ToggleCommitHand()
         {
-            Rigidbody characterControllerRb = args.interactorObject.transform.GetComponentInParent<Rigidbody>();
-            Throw(characterControllerRb);
+            state = state.ToggleCommit();
+            handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
+        }
+
+        private void AssociateWithSlinger(ISlingerAttributes attributes)
+        {
+            slingerAttributes = attributes;
         }
 
         private void OnEnable()
@@ -127,23 +104,15 @@ namespace SaloonSlingers.Unity.CardEntities
             cardRotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
             state = new(
                 () => lifespanInSeconds > 0 && rigidBody.velocity.magnitude != 0,
-                () => slingerAttributes.Hand.Count < gameRulesManager.GameRules.MaxHandSize &&
-                      slingerAttributes.Deck.Count > 0 &&
-                      IsTouchingDeck()
+                () => Cards.Count < gameRulesManager.GameRules.MaxHandSize &&
+                      slingerAttributes.Deck.Count > 0
             );
-        }
-
-        private bool IsTouchingDeck()
-        {
-            float dist = Mathf.Abs(Vector3.Distance(transform.position, deckGraphicTransform.transform.position));
-            return dist <= maxDeckDistance;
         }
 
         private void Start()
         {
+            Cards = new List<ICardGraphic>();
             gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
-            deckGraphicTransform = GameObject.FindGameObjectWithTag("DeckGraphic").transform;
-            cardSpawner = GameObject.FindGameObjectWithTag("DeckGraphic").GetComponent<DeckGraphic>();
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
@@ -151,12 +120,6 @@ namespace SaloonSlingers.Unity.CardEntities
 
             handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
             originlLifespanInSeconds = lifespanInSeconds;
-        }
-
-        private void ToggleCommitHand(InputAction.CallbackContext _)
-        {
-            state = state.ToggleCommit();
-            handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
         }
 
         private void NegateCharacterControllerVelocity(Rigidbody characterControllerRb)
@@ -173,11 +136,11 @@ namespace SaloonSlingers.Unity.CardEntities
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             state = state.Reset();
-            slingerAttributes.Hand.Clear();
+            Cards.Clear();
             handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
-            handLayoutMediator.Dispose(cardSpawner.Despawn);
+            handLayoutMediator.Dispose();
             lifespanInSeconds = originlLifespanInSeconds;
-            OnHandInterableReadyToRespawn?.Invoke(this, EventArgs.Empty);
+            OnHandInteractableDied?.Invoke(this, EventArgs.Empty);
         }
     }
 }

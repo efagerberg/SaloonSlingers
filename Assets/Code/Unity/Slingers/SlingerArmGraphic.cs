@@ -1,12 +1,10 @@
 using UnityEngine;
 
 using SaloonSlingers.Core.SlingerAttributes;
-using SaloonSlingers.Unity;
-
 
 namespace SaloonSlingers.Unity.Slingers
 {
-    public class Hand : MonoBehaviour
+    public class SlingerArmGraphic : MonoBehaviour
     {
         [SerializeField]
         private Transform LeftDeckAttachTransform;
@@ -33,7 +31,6 @@ namespace SaloonSlingers.Unity.Slingers
             }
 
             isPrimary = transform.parent.name.Contains(slinger.Attributes.Handedness.ToString(), System.StringComparison.CurrentCultureIgnoreCase);
-
             if (!isPrimary && deckAttachTransform != null) Instantiate(deckGraphicPrefab, deckAttachTransform);
         }
     }

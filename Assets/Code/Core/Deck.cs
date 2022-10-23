@@ -8,12 +8,14 @@ namespace SaloonSlingers.Core
     public delegate void DeckRefilledHandler(Deck sender, EventArgs e);
 
     [Serializable]
-    public class Deck : Queue<Card>
+    public class Deck
     {
         public const int NUMBER_OF_CARDS_IN_STANDARD_DECK = 52;
         private Random random;
         public event DeckEmptyHandler OnDeckEmpty;
         public event DeckRefilledHandler OnDeckRefilled;
+
+        private readonly Queue<Card> cards = new();
 
         public Deck(int numberOfCards = NUMBER_OF_CARDS_IN_STANDARD_DECK)
         {
@@ -21,60 +23,62 @@ namespace SaloonSlingers.Core
             var suits = Enum.GetValues(typeof(Suits)).Cast<Suits>();
             while (numberOfCards > 0)
             {
-                foreach (var suit in suits)
+                foreach (Suits suit in suits)
                 {
-                    foreach (var val in vals)
+                    foreach (Values val in vals)
                     {
                         if (numberOfCards <= 0) return;
-                        Enqueue(new Card(val, suit));
+                        cards.Enqueue(new Card(val, suit));
                         numberOfCards -= 1;
                     }
                 }
             }
         }
 
+        public int Count { get => cards.Count; }
+
         public Deck Shuffle()
         {
-            var queueAsList = this.ToList();
+            var queueAsList = cards.ToList();
             random = new Random((int)(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond));
-            for (var i = 0; i < queueAsList.Count; i++)
+            for (int i = 0; i < queueAsList.Count; i++)
             {
-                var num = random.Next(0, queueAsList.Count - 1);
-                var c = queueAsList[num];
+                int num = random.Next(0, queueAsList.Count - 1);
+                Card c = queueAsList[num];
                 queueAsList[num] = queueAsList[i];
                 queueAsList[i] = c;
             }
 
-            Clear();
-            foreach (var card in queueAsList)
-                Enqueue(card);
+            cards.Clear();
+            foreach (Card card in queueAsList)
+                cards.Enqueue(card);
 
             return this;
         }
 
         public Card RemoveFromTop()
         {
-            Card c = Dequeue();
-            if (Count == 0) OnDeckEmpty?.Invoke(this, EventArgs.Empty);
+            Card c = cards.Dequeue();
+            if (cards.Count == 0) OnDeckEmpty?.Invoke(this, EventArgs.Empty);
             return c;
         }
 
-        public IEnumerable<Card> RemoveFromTop(int _amount)
+        public IEnumerable<Card> RemoveFromTop(int amount)
         {
-            for (var i = 0; i < _amount; i++)
+            for (int i = 0; i < amount; i++)
                 yield return RemoveFromTop();
         }
 
-        public void ReturnCard(Card _card)
+        public void ReturnCard(Card card)
         {
-            if (Count == 0) OnDeckRefilled?.Invoke(this, EventArgs.Empty);
-            Enqueue(_card);
+            if (cards.Count == 0) OnDeckRefilled?.Invoke(this, EventArgs.Empty);
+            cards.Enqueue(card);
         }
 
         public void ReturnCards(IEnumerable<Card> _cards)
         {
-            foreach (var card in _cards)
-                Enqueue(card);
+            foreach (Card card in _cards)
+                cards.Enqueue(card);
         }
     }
 

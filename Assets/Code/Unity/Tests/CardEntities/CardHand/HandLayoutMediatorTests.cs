@@ -16,33 +16,55 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
         public class TestDispose
         {
             [Test]
-            public void Test_DespawnsCardGraphics_LeavingHandPanelEmpty()
+            public void Test_Resets_Transform()
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
 
                 (Func<Card, ICardGraphic> spawner,
-                 IList<ICardGraphic> expectedDespawned) = GetSpawnerWithExpectedSpawned();
+                 IList<ICardGraphic> expectedSpawned) = GetSpawnerWithExpectedSpawned();
 
                 List<ICardGraphic> actualDespawned = new();
-                void cardDespawner(ICardGraphic t)
-                {
-                    actualDespawned.Add(t);
-                    return;
-                }
-                subject.AddCardToLayout(spawner(new Card("AC")), noRotationCalculator);
-                subject.AddCardToLayout(spawner(new Card("TC")), noRotationCalculator);
-                subject.Dispose(cardDespawner);
+                Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15);
+                subject.AddCardToLayout(spawner(new Card("AC")), rotationCalculator);
+                subject.AddCardToLayout(spawner(new Card("TC")), rotationCalculator);
+                subject.Dispose();
 
-                AssertDespawned(panelTransform, expectedDespawned, actualDespawned);
+                AssertCardTransformReset(expectedSpawned);
             }
 
-            private static void AssertDespawned(RectTransform panelTransform, IList<ICardGraphic> expectedDespawned, List<ICardGraphic> actualDespawned)
+            [Test]
+            public void Test_Removes_From_HandPanel()
             {
-                CollectionAssert.AreEquivalent(expectedDespawned, actualDespawned);
-                ICardGraphic[] cardsInPanel = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                CollectionAssert.IsEmpty(cardsInPanel);
+                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
+                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
+
+                (Func<Card, ICardGraphic> spawner,
+                 IList<ICardGraphic> expectedSpawned) = GetSpawnerWithExpectedSpawned();
+
+                List<ICardGraphic> actualDespawned = new();
+                Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15);
+                subject.AddCardToLayout(spawner(new Card("AC")), rotationCalculator);
+                subject.AddCardToLayout(spawner(new Card("TC")), rotationCalculator);
+                subject.Dispose();
+
+                CollectionAssert.IsEmpty(panelTransform.GetComponentsInChildren<ICardGraphic>());
+            }
+
+            private static void AssertCardTransformReset(IList<ICardGraphic> expectedSpawned)
+            {
+                Assert.AreEqual(
+                    expectedSpawned.Select(c => c.transform.localRotation).ToHashSet(),
+                    new HashSet<Quaternion> { Quaternion.identity }
+                );
+                Assert.That(expectedSpawned.Select(c => c.transform.localPosition.z).ToHashSet().Count > 1);
+                CollectionAssert.AreEquivalent(
+                    expectedSpawned.Select(c => c.transform.localPosition),
+                    expectedSpawned.Select(c => c.transform.localPosition).OrderBy(pos => pos.z)
+                );
+                Assert.That(expectedSpawned.Select(c => c.transform.parent).All(p => p == null));
             }
         }
 
@@ -107,11 +129,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
-                PlayerAttributes testAttributes = new()
-                {
-                    Deck = new Deck(),
-                    Hand = new List<Card>()
-                };
+                PlayerAttributes testAttributes = new() { Deck = new Deck() };
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Enumerable.Range(0, n).ToList().ForEach(_ =>
                 {
@@ -131,11 +149,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
-                PlayerAttributes testAttributes = new()
-                {
-                    Deck = new Deck(),
-                    Hand = new List<Card>()
-                };
+                PlayerAttributes testAttributes = new() { Deck = new Deck() };
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 Enumerable.Range(0, n).ToList().ForEach(_ =>

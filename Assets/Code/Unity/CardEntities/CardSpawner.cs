@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-using SaloonSlingers.Core;
-
 namespace SaloonSlingers.Unity.CardEntities
 {
     public class CardSpawner : MonoBehaviour, ICardSpawner
@@ -15,12 +13,6 @@ namespace SaloonSlingers.Unity.CardEntities
         private IObjectPool<ICardGraphic> pool;
 
         public ICardGraphic Spawn() => pool.Get();
-        public ICardGraphic Spawn(Card card)
-        {
-            var c = Spawn();
-            c.Card = card;
-            return c;
-        }
         public void Despawn(ICardGraphic c) => pool.Release(c);
 
         private void Awake()

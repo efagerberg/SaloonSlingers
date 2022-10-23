@@ -29,7 +29,6 @@ namespace SaloonSlingers.Unity.Slingers
             Attributes = new PlayerAttributes
             {
                 Deck = new Deck(numberOfCards).Shuffle(),
-                Hand = new List<Card>(),
                 Level = 1,
                 Health = startingHealth,
                 Dashes = startingDashes,

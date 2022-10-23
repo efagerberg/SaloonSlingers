@@ -20,9 +20,14 @@ namespace SaloonSlingers.Core.Tests
             )
             {
                 IList<Card> sourceHand = TestHelpers.MakeHandFromString(rawSourceHand).ToList();
-                List<TestSlingerAttributes> targets = rawTargets.Select(t => CreateAttributes(t.Item1, t.Item2)).ToList();
+                IList<(ISlingerAttributes, IList<Card>)> targets = rawTargets.Select(
+                    t => (
+                        CreateAttributes(t.Item2),
+                        (IList<Card>)TestHelpers.MakeHandFromString(t.Item1).ToList()
+                    )
+                ).ToList();
                 HealthSystem.DoDamage(new TestHandEvaluator(), sourceHand, targets);
-                var actualTargetHealths = targets.Select(x => x.Health).ToList();
+                var actualTargetHealths = targets.Select(x => x.Item1.Health).ToList();
 
                 Assert.AreEqual(expectedTargetHealths, actualTargetHealths);
             }
@@ -81,18 +86,16 @@ namespace SaloonSlingers.Core.Tests
 
             private class TestSlingerAttributes : ISlingerAttributes
             {
-                public IList<Card> Hand { get; set; }
                 public Deck Deck { get; set; }
                 public int Health { get; set; }
                 public int Level { get; set; }
                 public Handedness Handedness { get; set; }
             }
 
-            private static TestSlingerAttributes CreateAttributes(string handString, int health = 3)
+            private static ISlingerAttributes CreateAttributes(int health = 3)
             {
                 return new TestSlingerAttributes()
                 {
-                    Hand = TestHelpers.MakeHandFromString(handString).ToList(),
                     Health = health
                 };
             }

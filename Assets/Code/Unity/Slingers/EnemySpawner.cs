@@ -55,7 +55,6 @@ namespace SaloonSlingers.Unity.Slingers
         {
             enemy.Attributes = new EnemyAttributes
             {
-                Hand = new List<Card>(),
                 Deck = new Deck().Shuffle(),
                 Health = 1,
                 Level = 1

@@ -30,8 +30,10 @@ namespace SaloonSlingers.Unity.CardEntities
             if (isHandCommitted)
             {
                 newCanvasWidth = handCanvasCommittedSize;
-                foreach (ICardGraphic x in cardGraphics)
+                foreach (ICardGraphic x in cardGraphics) {
                     x.transform.localRotation = GetRevertedLocalRotation(x.transform);
+                    x.transform.localPosition = GetRevertedLocalPosition(x.transform);
+                }
             }
             else
             {
@@ -51,14 +53,14 @@ namespace SaloonSlingers.Unity.CardEntities
             ApplyLayoutRotation(rotationCalculator);
         }
 
-        public void Dispose(Action<ICardGraphic> cardDespawner)
+        public void Dispose()
         {
             for (int i = cardGraphics.Count() - 1; i >= 0; i--)
             {
                 ICardGraphic cardGraphic = cardGraphics[i];
                 cardGraphic.transform.localRotation = GetRevertedLocalRotation(cardGraphic.transform);
+                cardGraphic.transform.localPosition = GetRevertedLocalPosition(cardGraphic.transform);
                 cardGraphic.transform.SetParent(null, false);
-                cardDespawner(cardGraphic);
                 cardGraphics.RemoveAt(i);
             }
         }
@@ -69,7 +71,6 @@ namespace SaloonSlingers.Unity.CardEntities
             Vector3[] corners = new Vector3[4];
             cardGraphic.GetComponent<RectTransform>().GetLocalCorners(corners);
             cardGraphic.transform.RotateAround(corners[3], -cardGraphic.transform.forward, degrees);
-
         }
 
         private static Quaternion GetRevertedLocalRotation(Transform currentTransform)
@@ -80,6 +81,11 @@ namespace SaloonSlingers.Unity.CardEntities
                 // Reset z rotation to what it was before
                 currentTransform.parent.localEulerAngles.z
             ));
+        }
+
+        private static Vector3 GetRevertedLocalPosition(Transform currentTransform)
+        {
+            return new Vector3(0, 0, currentTransform.localPosition.z);
         }
 
         private void ApplyLayoutRotation(Func<int, IEnumerable<float>> rotationCalculator)

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 using NUnit.Framework;
@@ -27,17 +29,18 @@ namespace SaloonSlingers.Core.Tests
         {
             Assert.AreEqual(deckUnderTest.Count, Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK);
 
-            var expectedValues = Enum.GetValues(typeof(Values)).Cast<Values>();
-            var expectedSuits = Enum.GetValues(typeof(Suits)).Cast<Suits>();
+            IEnumerable<Values> expectedValues = Enum.GetValues(typeof(Values)).Cast<Values>();
+            IEnumerable<Suits> expectedSuits = Enum.GetValues(typeof(Suits)).Cast<Suits>();
+            List<Card> cards = new();
 
-            foreach (var suit in expectedSuits)
-            {
-                foreach (var val in expectedValues)
-                {
-                    var cards = deckUnderTest.Where(x => x.Suit == suit && x.Value == val);
-                    Assert.AreEqual(cards.Count(), 1);
-                }
-            }
+            for (int _ = 0; _ < deckUnderTest.Count; _++)
+                cards.Add(deckUnderTest.RemoveFromTop());
+
+            foreach (Suits suit in expectedSuits)
+                foreach (Values val in expectedValues)
+                    cards.Remove(new Card(val, suit));
+
+            Assert.IsEmpty(cards);
         }
 
         [TestCase(1)]
