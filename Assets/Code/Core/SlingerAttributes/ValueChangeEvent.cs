@@ -7,7 +7,7 @@ namespace SaloonSlingers.Core
         public readonly T Before;
         public readonly T After;
 
-        internal ValueChangeEvent(T before, T after)
+        internal ValueChangeEvent(T before, T after): base()
         {
             Before = before;
             After = after;
