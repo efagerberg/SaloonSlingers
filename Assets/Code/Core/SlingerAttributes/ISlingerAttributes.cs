@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SaloonSlingers.Core.SlingerAttributes
+﻿namespace SaloonSlingers.Core.SlingerAttributes
 {
     public enum Handedness
     {
@@ -9,9 +7,8 @@ namespace SaloonSlingers.Core.SlingerAttributes
 
     public interface ISlingerAttributes
     {
-        public Deck Deck { get; set; }
+        public Deck Deck { get; }
         public Handedness Handedness { get; set; }
-        public int Health { get; set; }
-        public int Level { get; set; }
+        public Health Health { get; }
     }
 }

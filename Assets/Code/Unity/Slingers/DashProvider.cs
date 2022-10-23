@@ -6,24 +6,24 @@ using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
 using SaloonSlingers.Core.SlingerAttributes;
+using SaloonSlingers.Core;
 
 namespace SaloonSlingers.Unity.Slingers
 {
     public class DashProvider : LocomotionProvider
     {
         [SerializeField]
-        private float dashDuration = 0.25f;
-        [SerializeField]
         private List<InputActionProperty> dashInputProperties;
 
         private bool canDash = true;
-        private PlayerAttributes attributes;
+        private Dash dash;
         private CharacterController controller;
 
         private void Start()
         {
             controller = system.xrOrigin.GetComponent<CharacterController>();
-            attributes = (PlayerAttributes)system.xrOrigin.GetComponent<Player>().Attributes;
+            PlayerAttributes attributes = (PlayerAttributes)system.xrOrigin.GetComponent<Player>().Attributes;
+            dash = attributes.Dash;
         }
 
         private void OnEnable()
@@ -47,20 +47,23 @@ namespace SaloonSlingers.Unity.Slingers
         private IEnumerator Dash()
         {
             canDash = false;
-            attributes.Dashes -= 1;
-            var originalDashTime = dashDuration;
-            while (dashDuration > 0)
+            dash.DashPoints -= 1;
+            float currentDuration = dash.Duration;
+            while (currentDuration > 0)
             {
-                controller.Move(attributes.DashSpeed * Time.deltaTime * system.xrOrigin.Camera.transform.forward);
-                dashDuration -= Time.deltaTime;
+                controller.Move(dash.Speed * Time.deltaTime * system.xrOrigin.Camera.transform.forward);
+                currentDuration -= Time.deltaTime;
                 yield return new WaitForEndOfFrame();
             }
-            dashDuration = originalDashTime;
 
-            if (attributes.Dashes > 0) canDash = true;
+            yield return new WaitForSeconds(dash.CoolDown);
+            canDash = dash.DashPoints > 0;
 
-            yield return new WaitForSeconds(attributes.DashCooldown);
-            attributes.Dashes += 1;
+            // Assumes the cooldown is always smaller than the recovery period
+            // Game-wise this makes sense, why would the player be allowed to regen
+            // points faster than they can use them.
+            yield return new WaitForSeconds(dash.PointRecoveryPeriod - dash.CoolDown);
+            dash.DashPoints += 1;
             canDash = true;
         }
     }

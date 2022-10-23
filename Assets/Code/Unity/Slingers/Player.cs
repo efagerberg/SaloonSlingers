@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -14,28 +12,34 @@ namespace SaloonSlingers.Unity.Slingers
         [SerializeField]
         private int numberOfCards = Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK;
         [SerializeField]
-        private int startingHealth = 5;
+        private uint startingHitPoints = 5;
         [SerializeField]
         private float startingDashSpeed = 6f;
         [SerializeField]
-        private int startingDashes = 3;
+        private uint startingDashes = 3;
         [SerializeField]
         private float startingDashCooldown = 3;
+        [SerializeField]
+        private float startingDashDuration = 0.25f;
+        [SerializeField]
+        private float startingPointRecoveryPeriod = 1f;
         [SerializeField]
         private Handedness defaultHandedness = Handedness.RIGHT;
 
         private void Awake()
         {
-            Attributes = new PlayerAttributes
-            {
-                Deck = new Deck(numberOfCards).Shuffle(),
-                Level = 1,
-                Health = startingHealth,
-                Dashes = startingDashes,
-                DashSpeed = startingDashSpeed,
-                DashCooldown = startingDashCooldown,
-                Handedness = defaultHandedness
-            };
+            Attributes = new PlayerAttributes(
+                new Deck(numberOfCards).Shuffle(),
+                new Health(startingHitPoints),
+                new Dash(
+                    startingDashes,
+                    startingDashSpeed,
+                    startingDashDuration,
+                    startingDashCooldown,
+                    startingPointRecoveryPeriod
+                ),
+                defaultHandedness
+            );
         }
 
         private void OnEnable() => InputDevices.deviceConnected += SetHandedness;

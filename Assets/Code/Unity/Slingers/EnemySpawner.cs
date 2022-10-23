@@ -53,12 +53,7 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void OnGet(Enemy enemy)
         {
-            enemy.Attributes = new EnemyAttributes
-            {
-                Deck = new Deck().Shuffle(),
-                Health = 1,
-                Level = 1
-            };
+            enemy.Attributes = new EnemyAttributes(new Deck().Shuffle(), new Health(1), Handedness.RIGHT);
         }
         private void OnRelease(Enemy enemy)
         {

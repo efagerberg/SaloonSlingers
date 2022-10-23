@@ -6,7 +6,6 @@ using NUnit.Framework;
 using UnityEngine;
 
 using SaloonSlingers.Core;
-using SaloonSlingers.Core.SlingerAttributes;
 using SaloonSlingers.Unity.CardEntities;
 
 namespace SaloonSlingers.Unity.Tests.CardEntities
@@ -129,7 +128,6 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
-                PlayerAttributes testAttributes = new() { Deck = new Deck() };
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Enumerable.Range(0, n).ToList().ForEach(_ =>
                 {
@@ -149,7 +147,6 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
                 CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
-                PlayerAttributes testAttributes = new() { Deck = new Deck() };
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 Enumerable.Range(0, n).ToList().ForEach(_ =>
@@ -188,8 +185,6 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             if (name != null) comp.name = name;
             return comp;
         }
-
-        private static readonly Func<int, IEnumerable<float>> noRotationCalculator = SimpleRotationCalculatorFactory(0);
 
         private static Func<int, IEnumerable<float>> SimpleRotationCalculatorFactory(float step)
         {
