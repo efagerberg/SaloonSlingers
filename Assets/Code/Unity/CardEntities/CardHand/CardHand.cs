@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 
-using UnityEngine;
-
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
 using SaloonSlingers.Unity.Slingers;
+
+using UnityEngine;
 
 namespace SaloonSlingers.Unity.CardEntities
 {

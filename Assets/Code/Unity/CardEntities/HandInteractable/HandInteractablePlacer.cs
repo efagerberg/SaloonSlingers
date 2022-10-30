@@ -14,12 +14,12 @@ namespace SaloonSlingers.Unity.CardEntities
 
         private IObjectPool<GameObject> handInteractablePool;
         private DeckGraphic deckGraphic;
-        private GameObject onDeckHandInteractable;
 
         private void Start()
         {
             handInteractablePool = new ObjectPool<GameObject>(
-                () => {
+                () =>
+                {
                     GameObject go = Instantiate(handInteractablePrefab);
                     CardHand cardHand = go.GetComponent<CardHand>();
                     cardHand.OnHandInteractableHeld += HandInteractableHeldHandler;
@@ -29,7 +29,8 @@ namespace SaloonSlingers.Unity.CardEntities
                 },
                 (GameObject go) => go.SetActive(true),
                 (GameObject go) => go.SetActive(false),
-                (GameObject go) => {
+                (GameObject go) =>
+                {
                     CardHand cardHand = go.GetComponent<CardHand>();
                     cardHand.OnHandInteractableHeld -= HandInteractableHeldHandler;
                     cardHand.OnHandInteractableDied -= HandInteractableDiedHandler;
@@ -37,26 +38,12 @@ namespace SaloonSlingers.Unity.CardEntities
                 defaultCapacity: poolSize
             );
             deckGraphic = GetComponent<DeckGraphic>();
-            deckGraphic.OnDeckGraphicEmpty += DeckGraphicEmptyHandler;
             if (!deckGraphic.CanDraw) return;
 
             GameObject first = handInteractablePool.Get();
             PlaceOnTop(deckGraphic.TopCardTransform, first);
         }
 
-        private void OnEnable()
-        {
-            if (deckGraphic == null) return;
-
-            deckGraphic.OnDeckGraphicEmpty += DeckGraphicEmptyHandler;
-        }
-
-        private void OnDisable()
-        {
-            if (deckGraphic == null) return;
-
-            deckGraphic.OnDeckGraphicEmpty -= DeckGraphicEmptyHandler;
-        }
 
         private void PlaceOnTop(Transform topCardTransform, GameObject cardHandGO)
         {
@@ -64,12 +51,6 @@ namespace SaloonSlingers.Unity.CardEntities
                 topCardTransform.position, topCardTransform.rotation
             );
             cardHandGO.transform.SetParent(transform);
-            onDeckHandInteractable = cardHandGO;
-        }
-
-        private void DeckGraphicEmptyHandler(DeckGraphic _, EventArgs __)
-        {
-            handInteractablePool.Release(onDeckHandInteractable);
         }
 
         private void HandInteractableHeldHandler(CardHand sender, EventArgs _)

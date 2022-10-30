@@ -1,8 +1,8 @@
-using UnityEngine;
-using UnityEngine.XR;
-
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
+
+using UnityEngine;
+using UnityEngine.XR;
 
 namespace SaloonSlingers.Unity.Slingers
 {
