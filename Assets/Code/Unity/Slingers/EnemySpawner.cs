@@ -53,7 +53,7 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void OnGet(Enemy enemy)
         {
-            enemy.Attributes = new EnemyAttributes(new Deck().Shuffle(), new Points(1));
+            enemy.Attributes = new EnemyAttributes(new Deck().Shuffle());
         }
         private void OnRelease(Enemy enemy)
         {

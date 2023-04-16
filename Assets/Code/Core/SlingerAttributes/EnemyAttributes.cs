@@ -3,12 +3,10 @@
     public struct EnemyAttributes : ISlingerAttributes
     {
         public Deck Deck { get; }
-        public Points HealthPoints { get; }
 
-        public EnemyAttributes(Deck deck, Points health)
+        public EnemyAttributes(Deck deck)
         {
             Deck = deck;
-            HealthPoints = health;
         }
     }
 }
