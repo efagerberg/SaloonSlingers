@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
-    public class Damagable : MonoBehaviour
+    public class HealthComponent : MonoBehaviour
     {
         public Points Health { get; private set; }
 

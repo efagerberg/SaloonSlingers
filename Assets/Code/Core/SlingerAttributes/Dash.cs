@@ -1,5 +1,3 @@
-using System;
-
 namespace SaloonSlingers.Core
 {
     public delegate void DashPointsChangedHandler(DashConfig sender, ValueChangeEvent<uint> e);
@@ -20,7 +18,5 @@ namespace SaloonSlingers.Core
             CoolDown = coolDown;
             PointRecoveryPeriod = pointRecoveryPeriod;
         }
-
-        private uint _dashPoints;
     }
 }
