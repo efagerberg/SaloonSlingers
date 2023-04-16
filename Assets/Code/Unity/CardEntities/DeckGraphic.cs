@@ -17,9 +17,6 @@ namespace SaloonSlingers.Unity.CardEntities
         public bool CanDraw { get; private set; }
         public event DeckGraphicEmptyHandler OnDeckGraphicEmpty;
 
-        [SerializeField]
-        private GameObject handInteractablePrefab;
-
         private ICardSpawner cardSpawner;
         private const float zOffset = 0.001f;
         private readonly Stack<ICardGraphic> cardGraphics = new();
