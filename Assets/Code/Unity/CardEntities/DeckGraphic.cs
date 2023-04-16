@@ -1,11 +1,9 @@
+using System;
 using System.Collections.Generic;
 
-using UnityEngine;
-
-using SaloonSlingers.Core.SlingerAttributes;
-using SaloonSlingers.Unity.Slingers;
-using System;
 using SaloonSlingers.Core;
+
+using UnityEngine;
 
 namespace SaloonSlingers.Unity.CardEntities
 {
@@ -16,14 +14,14 @@ namespace SaloonSlingers.Unity.CardEntities
         public Transform TopCardTransform { get => cardGraphics.Peek().transform; }
         public bool CanDraw { get; private set; }
         public event DeckGraphicEmptyHandler OnDeckGraphicEmpty;
+        public Deck Deck { get; private set; }
 
         [SerializeField]
-        private GameObject handInteractablePrefab;
+        private int numberOfCards = Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK;
 
         private ICardSpawner cardSpawner;
         private const float zOffset = 0.001f;
         private readonly Stack<ICardGraphic> cardGraphics = new();
-        private ISlingerAttributes slingerAttributes;
 
         public ICardGraphic Spawn() => cardGraphics.Pop();
         public void Despawn(ICardGraphic cardGraphic) => cardSpawner.Despawn(cardGraphic);
@@ -37,29 +35,31 @@ namespace SaloonSlingers.Unity.CardEntities
             );
         }
 
-        private void Start()
+        private void Awake()
         {
-            slingerAttributes = GetComponentInParent<ISlinger>().Attributes;
-            slingerAttributes.Deck.OnDeckEmpty += DeckEmptyHandler;
-            cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<ICardSpawner>();
-            SpawnDeck();
+            Deck = new Deck(numberOfCards).Shuffle();
         }
 
         private void OnDisable()
         {
-            if (slingerAttributes == null) return;
-            slingerAttributes.Deck.OnDeckEmpty -= DeckEmptyHandler;
+            Deck.OnDeckEmpty -= DeckEmptyHandler;
         }
 
         private void OnEnable()
         {
-            if (slingerAttributes == null) return;
-            slingerAttributes.Deck.OnDeckEmpty += DeckEmptyHandler;
+            Deck.OnDeckEmpty += DeckEmptyHandler;
+        }
+
+        private void Start()
+        {
+            Deck.OnDeckEmpty += DeckEmptyHandler;
+            cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<ICardSpawner>();
+            SpawnDeck();
         }
 
         private void SpawnDeck()
         {
-            for (int i = 0; i < slingerAttributes.Deck.Count; i++)
+            for (int i = 0; i < Deck.Count; i++)
             {
                 CanDraw = true;
                 ICardGraphic cardGraphic = cardSpawner.Spawn();

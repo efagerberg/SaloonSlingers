@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-using SaloonSlingers.Core;
-using SaloonSlingers.Core.SlingerAttributes;
-
 namespace SaloonSlingers.Unity.Slingers
 {
     public class EnemySpawner : MonoBehaviour
@@ -40,7 +37,7 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void Start()
         {
-            enemyPool = new ObjectPool<Enemy>(CreateInstance, OnGet, OnRelease, defaultCapacity: poolSize);
+            enemyPool = new ObjectPool<Enemy>(CreateInstance, (Enemy e) => { }, OnRelease, defaultCapacity: poolSize);
             InvokeRepeating(nameof(SpawnEnemy), 1, spawnPerSecond);
         }
 
@@ -51,15 +48,6 @@ namespace SaloonSlingers.Unity.Slingers
             return go.GetComponent<Enemy>();
         }
 
-        private void OnGet(Enemy enemy)
-        {
-            enemy.Attributes = new EnemyAttributes
-            {
-                Deck = new Deck().Shuffle(),
-                Health = 1,
-                Level = 1
-            };
-        }
         private void OnRelease(Enemy enemy)
         {
             enemy.gameObject.SetActive(false);
