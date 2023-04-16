@@ -27,11 +27,11 @@ namespace SaloonSlingers.Unity.Slingers
                     break;
             }
 
-            isPrimary = transform.parent.name.Contains(
+            isPrimary = transform.parent.parent.name.Contains(
                 handedness.Current.ToString(),
                 System.StringComparison.CurrentCultureIgnoreCase
             );
-            if (!isPrimary && deckAttachTransform != null)
+            if (!isPrimary)
                 Instantiate(deckGraphicPrefab, deckAttachTransform);
         }
     }

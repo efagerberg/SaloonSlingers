@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 
 using SaloonSlingers.Core;
-using SaloonSlingers.Core.SlingerAttributes;
-using SaloonSlingers.Unity.Slingers;
 
 using UnityEngine;
 
@@ -82,8 +80,7 @@ namespace SaloonSlingers.Unity.CardEntities
         public void AssignNewSlinger(Transform slingerTransform)
         {
             int newId = slingerTransform.GetInstanceID();
-            ISlingerAttributes newAttributes = slingerTransform.GetComponentInParent<ISlinger>().Attributes;
-            Deck newDeck = newAttributes.Deck;
+            Deck newDeck = GameObject.FindGameObjectWithTag("DeckGraphic").GetComponent<DeckGraphic>().Deck;
             if (slingerId == null || slingerId != newId)
                 AssociateWithSlinger(newId, newDeck);
         }

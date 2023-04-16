@@ -70,9 +70,7 @@ namespace SaloonSlingers.Unity.CardEntities
 
         private void DeckGraphicEmptyHandler(DeckGraphic sender, EventArgs e)
         {
-            int childCount = transform.childCount;
-            for (int i = childCount - 1; i > 0; i--)
-                handInteractablePool.Release(transform.GetChild(i).gameObject);
+            handInteractablePool.Clear();
         }
 
         private void OnEnable()

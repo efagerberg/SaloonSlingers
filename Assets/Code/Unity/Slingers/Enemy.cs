@@ -1,16 +1,16 @@
-using UnityEngine;
+using SaloonSlingers.Core;
+using SaloonSlingers.Unity.CardEntities;
+
 using Unity.XR.CoreUtils;
 
-using SaloonSlingers.Core.SlingerAttributes;
-
-using SaloonSlingers.Unity.CardEntities;
+using UnityEngine;
 using UnityEngine.AI;
 
 namespace SaloonSlingers.Unity.Slingers
 {
-    public class Enemy : CardGraphic, ISlinger
+    public class Enemy : CardGraphic
     {
-        public ISlingerAttributes Attributes { get; set; }
+        public Deck Deck { get; private set; }
 
         [SerializeField]
         private float lookRadius = 10f;
@@ -45,6 +45,11 @@ namespace SaloonSlingers.Unity.Slingers
             Vector3 direction = (target.position - transform.position).normalized;
             Quaternion lookRotations = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotations, Time.deltaTime * 5);
+        }
+
+        private void OnEnable()
+        {
+            Deck = new Deck().Shuffle();
         }
     }
 }
