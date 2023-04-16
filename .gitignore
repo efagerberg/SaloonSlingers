@@ -72,3 +72,6 @@ crashlytics-build.properties
 
 # Code Coverage
 CodeCoverage/
+
+# Backups
+*_ButDontShipItWithYourGame/
