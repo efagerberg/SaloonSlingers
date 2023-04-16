@@ -1,7 +1,5 @@
 using UnityEngine;
 
-using SaloonSlingers.Core.SlingerAttributes;
-
 namespace SaloonSlingers.Unity.Slingers
 {
     public class SlingerArmGraphic : MonoBehaviour
@@ -15,12 +13,11 @@ namespace SaloonSlingers.Unity.Slingers
 
         private Transform deckAttachTransform;
         private bool isPrimary = false;
-        private ISlinger slinger;
 
         private void Start()
         {
-            slinger = GetComponentInParent<ISlinger>();
-            switch (slinger.Attributes.Handedness)
+            SlingerHandedness handedness = GetComponentInParent<SlingerHandedness>();
+            switch (handedness.Current)
             {
                 case Handedness.RIGHT:
                     deckAttachTransform = LeftDeckAttachTransform;
@@ -30,8 +27,12 @@ namespace SaloonSlingers.Unity.Slingers
                     break;
             }
 
-            isPrimary = transform.parent.name.Contains(slinger.Attributes.Handedness.ToString(), System.StringComparison.CurrentCultureIgnoreCase);
-            if (!isPrimary && deckAttachTransform != null) Instantiate(deckGraphicPrefab, deckAttachTransform);
+            isPrimary = transform.parent.name.Contains(
+                handedness.Current.ToString(),
+                System.StringComparison.CurrentCultureIgnoreCase
+            );
+            if (!isPrimary && deckAttachTransform != null)
+                Instantiate(deckGraphicPrefab, deckAttachTransform);
         }
     }
 }

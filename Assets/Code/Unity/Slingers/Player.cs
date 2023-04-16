@@ -2,7 +2,6 @@ using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
 
 using UnityEngine;
-using UnityEngine.XR;
 
 namespace SaloonSlingers.Unity.Slingers
 {
@@ -23,8 +22,6 @@ namespace SaloonSlingers.Unity.Slingers
         private float startingDashDuration = 0.25f;
         [SerializeField]
         private float startingPointRecoveryPeriod = 1f;
-        [SerializeField]
-        private Handedness defaultHandedness = Handedness.RIGHT;
 
         private void Awake()
         {
@@ -37,30 +34,8 @@ namespace SaloonSlingers.Unity.Slingers
                     startingDashDuration,
                     startingDashCooldown,
                     startingPointRecoveryPeriod
-                ),
-                defaultHandedness
+                )
             );
-        }
-
-        private void OnEnable() => InputDevices.deviceConnected += SetHandedness;
-
-        private void OnDisable() => InputDevices.deviceConnected -= SetHandedness;
-
-        private void SetHandedness(InputDevice device) => Attributes.Handedness = GetHandedness(device);
-
-        private Handedness GetHandedness(InputDevice device)
-        {
-            if (device.TryGetFeatureValue(CommonUsages.primaryButton, out _))
-            {
-                switch (device.name.ToLower())
-                {
-                    case "left":
-                        return Handedness.LEFT;
-                    case "right":
-                        return Handedness.RIGHT;
-                }
-            }
-            return defaultHandedness;
         }
     }
 }

@@ -40,7 +40,8 @@ namespace SaloonSlingers.Unity.CardEntities
         private CardHandState state;
         private CardHandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
-        private ISlingerAttributes slingerAttributes;
+        private int? slingerId;
+        private Deck deck;
         private GameRulesManager gameRulesManager;
         private float originlLifespanInSeconds;
 
@@ -58,7 +59,7 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             if (!state.CanDraw) return;
 
-            Card card = slingerAttributes.Deck.RemoveFromTop();
+            Card card = deck.RemoveFromTop();
             audioSource.clip = drawSFX;
             audioSource.Play();
             ICardGraphic cardGraphic = spawnCard();
@@ -78,14 +79,13 @@ namespace SaloonSlingers.Unity.CardEntities
             NegateCharacterControllerVelocity(characterControllerRb);
         }
 
-        public void SwapHandIfDifferentSlinger(Transform slingerTransform)
+        public void AssignNewSlinger(Transform slingerTransform)
         {
+            int newId = slingerTransform.GetInstanceID();
             ISlingerAttributes newAttributes = slingerTransform.GetComponentInParent<ISlinger>().Attributes;
-            if (slingerAttributes == null || slingerAttributes != newAttributes)
-            {
-                AssociateWithSlinger(newAttributes);
-                return;
-            }
+            Deck newDeck = newAttributes.Deck;
+            if (slingerId == null || slingerId != newId)
+                AssociateWithSlinger(newId, newDeck);
         }
 
         public void ToggleCommitHand()
@@ -94,9 +94,10 @@ namespace SaloonSlingers.Unity.CardEntities
             handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
         }
 
-        private void AssociateWithSlinger(ISlingerAttributes attributes)
+        private void AssociateWithSlinger(int newId, Deck newDeck)
         {
-            slingerAttributes = attributes;
+            slingerId = newId;
+            deck = newDeck;
         }
 
         private void OnEnable()
@@ -105,7 +106,7 @@ namespace SaloonSlingers.Unity.CardEntities
             state = new(
                 () => lifespanInSeconds > 0 && rigidBody.velocity.magnitude != 0,
                 () => Cards.Count < gameRulesManager.GameRules.MaxHandSize &&
-                      slingerAttributes.Deck.Count > 0
+                      deck.Count > 0
             );
         }
 

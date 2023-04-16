@@ -4,13 +4,11 @@
     {
         public Deck Deck { get; }
         public Points HealthPoints { get; }
-        public Handedness Handedness { get; set; }
 
-        public EnemyAttributes(Deck deck, Points health, Handedness handedness)
+        public EnemyAttributes(Deck deck, Points health)
         {
             Deck = deck;
             HealthPoints = health;
-            Handedness = handedness;
         }
     }
 }

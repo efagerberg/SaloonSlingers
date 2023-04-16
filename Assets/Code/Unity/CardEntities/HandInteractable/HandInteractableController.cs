@@ -6,7 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.CardEntities
 {
-    public class HandInteractableController: MonoBehaviour
+    public class HandInteractableController : MonoBehaviour
     {
         [SerializeField]
         private float maxDeckDistance = 0.08f;
@@ -18,7 +18,7 @@ namespace SaloonSlingers.Unity.CardEntities
 
         public void OnSelectEnter(SelectEnterEventArgs args)
         {
-            cardHand.SwapHandIfDifferentSlinger(args.interactorObject.transform);
+            cardHand.AssignNewSlinger(args.interactorObject.transform);
             cardHand.Pickup(deckGraphic.Spawn);
             commitHandActionProperties.ForEach(prop => prop.action.started += OnToggleCommit);
         }

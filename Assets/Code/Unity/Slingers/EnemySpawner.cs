@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 
-using UnityEngine;
-using UnityEngine.Pool;
-
 using SaloonSlingers.Core;
 using SaloonSlingers.Core.SlingerAttributes;
+
+using UnityEngine;
+using UnityEngine.Pool;
 
 namespace SaloonSlingers.Unity.Slingers
 {
@@ -53,7 +53,7 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void OnGet(Enemy enemy)
         {
-            enemy.Attributes = new EnemyAttributes(new Deck().Shuffle(), new Points(1), Handedness.RIGHT);
+            enemy.Attributes = new EnemyAttributes(new Deck().Shuffle(), new Points(1));
         }
         private void OnRelease(Enemy enemy)
         {
