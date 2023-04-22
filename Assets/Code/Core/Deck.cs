@@ -7,13 +7,6 @@ namespace SaloonSlingers.Core
     public delegate void DeckEmptyHandler(Deck sender, EventArgs e);
     public delegate void DeckRefilledHandler(Deck sender, EventArgs e);
 
-    public class CardDrawnEvent: EventArgs
-    {
-        public readonly Card cardDrawn;
-        internal CardDrawnEvent(Card c) : base() => cardDrawn = c;
-    }
-    public delegate void CardDrawnHandler(Deck sender, CardDrawnEvent e);
-
     [Serializable]
     public class Deck
     {
@@ -21,7 +14,6 @@ namespace SaloonSlingers.Core
         private Random random;
         public event DeckEmptyHandler OnDeckEmpty;
         public event DeckRefilledHandler OnDeckRefilled;
-        public event CardDrawnHandler OnCardDrawn;
 
         private readonly Queue<Card> cards = new();
 
@@ -66,7 +58,6 @@ namespace SaloonSlingers.Core
         {
             Card c = cards.Dequeue();
             if (cards.Count == 0) OnDeckEmpty?.Invoke(this, EventArgs.Empty);
-            OnCardDrawn?.Invoke(this, new CardDrawnEvent(c));
             return c;
         }
 

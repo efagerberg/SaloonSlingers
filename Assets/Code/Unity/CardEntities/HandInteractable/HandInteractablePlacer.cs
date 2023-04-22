@@ -21,7 +21,7 @@ namespace SaloonSlingers.Unity.CardEntities
                 () =>
                 {
                     GameObject go = Instantiate(handInteractablePrefab);
-                    CardHand cardHand = go.GetComponent<CardHand>();
+                    HandProjectile cardHand = go.GetComponent<HandProjectile>();
                     cardHand.OnHandInteractableHeld += HandInteractableHeldHandler;
                     cardHand.OnHandInteractableDied += HandInteractableDiedHandler;
                     go.SetActive(false);
@@ -31,7 +31,7 @@ namespace SaloonSlingers.Unity.CardEntities
                 (GameObject go) => go.SetActive(false),
                 (GameObject go) =>
                 {
-                    CardHand cardHand = go.GetComponent<CardHand>();
+                    HandProjectile cardHand = go.GetComponent<HandProjectile>();
                     cardHand.OnHandInteractableHeld -= HandInteractableHeldHandler;
                     cardHand.OnHandInteractableDied -= HandInteractableDiedHandler;
                 },
@@ -53,7 +53,7 @@ namespace SaloonSlingers.Unity.CardEntities
             cardHandGO.transform.SetParent(transform);
         }
 
-        private void HandInteractableHeldHandler(CardHand sender, EventArgs _)
+        private void HandInteractableHeldHandler(HandProjectile sender, EventArgs _)
         {
             sender.transform.SetParent(null);
             if (!deckGraphic.CanDraw) return;
@@ -61,9 +61,9 @@ namespace SaloonSlingers.Unity.CardEntities
             PlaceOnTop(deckGraphic.TopCardTransform, handInteractablePool.Get());
         }
 
-        private void HandInteractableDiedHandler(CardHand sender, EventArgs _)
+        private void HandInteractableDiedHandler(HandProjectile sender, EventArgs _)
         {
-            foreach (ICardGraphic c in sender.Cards)
+            foreach (ICardGraphic c in sender.CardGraphics)
                 deckGraphic.Despawn(c);
             handInteractablePool.Release(sender.gameObject);
         }

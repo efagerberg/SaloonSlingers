@@ -1,3 +1,5 @@
+using SaloonSlingers.Unity.CardEntities;
+
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -12,6 +14,8 @@ public class SlingerHandedness : MonoBehaviour
     {
         get; private set;
     }
+
+    public DeckGraphic DeckGraphic;
 
     [SerializeField]
     private Handedness defaultHandedness = Handedness.RIGHT;

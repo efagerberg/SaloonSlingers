@@ -19,7 +19,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
 
                 (Func<Card, ICardGraphic> spawner,
                  IList<ICardGraphic> expectedSpawned) = GetSpawnerWithExpectedSpawned();
@@ -38,7 +38,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
 
                 (Func<Card, ICardGraphic> spawner,
                  IList<ICardGraphic> expectedSpawned) = GetSpawnerWithExpectedSpawned();
@@ -76,7 +76,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
                 (Func<Card, ICardGraphic> spawner,
                  IList<ICardGraphic> expectedGraphics) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15f);
@@ -111,7 +111,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(-10f);
                 subject.ApplyLayout(true, rotationCalculator);
 
@@ -126,7 +126,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Enumerable.Range(0, n).ToList().ForEach(_ =>
@@ -146,7 +146,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                CardHandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 Enumerable.Range(0, n).ToList().ForEach(_ =>

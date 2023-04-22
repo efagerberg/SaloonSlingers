@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.CardEntities
 {
-    public class CardHandLayoutMediator
+    public class HandLayoutMediator
     {
         private const float zOffset = -0.001f;
         private readonly RectTransform handPanelRectTransform;
@@ -15,7 +15,7 @@ namespace SaloonSlingers.Unity.CardEntities
         private float handCanvasCommittedSize;
         private readonly IList<ICardGraphic> cardGraphics;
 
-        public CardHandLayoutMediator(RectTransform handPanelRectTransform, RectTransform handCanvasRectTransform)
+        public HandLayoutMediator(RectTransform handPanelRectTransform, RectTransform handCanvasRectTransform)
         {
             cardGraphics = new List<ICardGraphic>();
             this.handPanelRectTransform = handPanelRectTransform;
@@ -30,7 +30,8 @@ namespace SaloonSlingers.Unity.CardEntities
             if (isHandCommitted)
             {
                 newCanvasWidth = handCanvasCommittedSize;
-                foreach (ICardGraphic x in cardGraphics) {
+                foreach (ICardGraphic x in cardGraphics)
+                {
                     x.transform.localRotation = GetRevertedLocalRotation(x.transform);
                     x.transform.localPosition = GetRevertedLocalPosition(x.transform);
                 }

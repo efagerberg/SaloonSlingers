@@ -1,8 +1,10 @@
+using SaloonSlingers.Unity.CardEntities;
+
 using UnityEngine;
 
 namespace SaloonSlingers.Unity.Slingers
 {
-    public class SlingerArmGraphic : MonoBehaviour
+    public class DeckGraphicPlacer : MonoBehaviour
     {
         [SerializeField]
         private Transform LeftDeckAttachTransform;
@@ -32,7 +34,10 @@ namespace SaloonSlingers.Unity.Slingers
                 System.StringComparison.CurrentCultureIgnoreCase
             );
             if (!isPrimary)
-                Instantiate(deckGraphicPrefab, deckAttachTransform);
+            {
+                GameObject clone = Instantiate(deckGraphicPrefab, deckAttachTransform);
+                handedness.DeckGraphic = clone.GetComponent<DeckGraphic>();
+            }
         }
     }
 }

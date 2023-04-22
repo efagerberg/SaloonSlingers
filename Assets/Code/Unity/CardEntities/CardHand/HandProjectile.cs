@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using SaloonSlingers.Core;
 
@@ -7,14 +8,15 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.CardEntities
 {
-    public delegate void HandInteractableHeld(CardHand sender, EventArgs e);
-    public delegate void HandInteractableReadyToRespawn(CardHand sender, EventArgs e);
+    public delegate void HandProjectileHeld(HandProjectile sender, EventArgs e);
+    public delegate void HandProjectileReadyToRespawn(HandProjectile sender, EventArgs e);
 
-    public class CardHand : MonoBehaviour
+    public class HandProjectile : MonoBehaviour
     {
-        public event HandInteractableHeld OnHandInteractableHeld;
-        public event HandInteractableReadyToRespawn OnHandInteractableDied;
-        public IList<ICardGraphic> Cards { get; private set; }
+        public event HandProjectileHeld OnHandInteractableHeld;
+        public event HandProjectileReadyToRespawn OnHandInteractableDied;
+        public IList<ICardGraphic> CardGraphics { get; private set; }
+        public IList<Card> Cards { get => CardGraphics.Select(x => x.Card).ToList(); }
 
         [SerializeField]
         private RectTransform handPanelRectTransform;
@@ -35,21 +37,18 @@ namespace SaloonSlingers.Unity.CardEntities
 
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
-        private CardHandState state;
-        private CardHandLayoutMediator handLayoutMediator;
+        private HandProjectileState state;
+        private HandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
-        private int? slingerId;
         private Deck deck;
         private GameRulesManager gameRulesManager;
-        private float originlLifespanInSeconds;
 
         public void Pickup(Func<ICardGraphic> spawnCard)
         {
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             state = state.Reset();
-            lifespanInSeconds = originlLifespanInSeconds;
-            if (Cards.Count == 0) TryDrawCard(spawnCard);
+            if (CardGraphics.Count == 0) TryDrawCard(spawnCard);
             OnHandInteractableHeld?.Invoke(this, EventArgs.Empty);
         }
 
@@ -62,27 +61,23 @@ namespace SaloonSlingers.Unity.CardEntities
             audioSource.Play();
             ICardGraphic cardGraphic = spawnCard();
             cardGraphic.Card = card;
-            Cards.Add(cardGraphic);
+            CardGraphics.Add(cardGraphic);
             handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
         }
 
-        public void Throw(Rigidbody characterControllerRb)
+        public void Throw()
         {
             trailRenderer.enabled = true;
             rigidBody.isKinematic = false;
             state = state.Throw();
             audioSource.clip = throwSFX;
             audioSource.Play();
-            lifespanInSeconds = originlLifespanInSeconds;
-            NegateCharacterControllerVelocity(characterControllerRb);
         }
 
-        public void AssignNewSlinger(Transform slingerTransform)
+        public void AssignDeck(Deck newDeck)
         {
-            int newId = slingerTransform.GetInstanceID();
-            Deck newDeck = GameObject.FindGameObjectWithTag("DeckGraphic").GetComponent<DeckGraphic>().Deck;
-            if (slingerId == null || slingerId != newId)
-                AssociateWithSlinger(newId, newDeck);
+            if (deck != null || deck != newDeck)
+                deck = newDeck;
         }
 
         public void ToggleCommitHand()
@@ -91,25 +86,25 @@ namespace SaloonSlingers.Unity.CardEntities
             handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
         }
 
-        private void AssociateWithSlinger(int newId, Deck newDeck)
-        {
-            slingerId = newId;
-            deck = newDeck;
-        }
+        public bool IsThrown { get => state.IsThrown; }
 
         private void OnEnable()
         {
             cardRotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
             state = new(
-                () => lifespanInSeconds > 0 && rigidBody.velocity.magnitude != 0,
-                () => Cards.Count < gameRulesManager.GameRules.MaxHandSize &&
+                lifespanInSeconds,
+                () => CardGraphics.Count < gameRulesManager.GameRules.MaxHandSize &&
                       deck.Count > 0
             );
         }
 
+        private void Awake()
+        {
+            CardGraphics = new List<ICardGraphic>();
+        }
+
         private void Start()
         {
-            Cards = new List<ICardGraphic>();
             gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
@@ -117,18 +112,11 @@ namespace SaloonSlingers.Unity.CardEntities
             if (handCanvasRectTransform == null) handCanvasRectTransform = handPanelRectTransform.parent.GetComponent<RectTransform>();
 
             handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
-            originlLifespanInSeconds = lifespanInSeconds;
-        }
-
-        private void NegateCharacterControllerVelocity(Rigidbody characterControllerRb)
-        {
-            if (characterControllerRb == null) return;
-            rigidBody.AddForce(-characterControllerRb.velocity);
         }
 
         private void FixedUpdate()
         {
-            if (state.IsThrown) lifespanInSeconds -= Time.fixedDeltaTime;
+            state.Update(Time.fixedDeltaTime);
             if (state.IsAlive) return;
 
             trailRenderer.enabled = false;
@@ -136,9 +124,8 @@ namespace SaloonSlingers.Unity.CardEntities
             state = state.Reset();
             handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
             handLayoutMediator.Dispose();
-            lifespanInSeconds = originlLifespanInSeconds;
             OnHandInteractableDied?.Invoke(this, EventArgs.Empty);
-            Cards.Clear();
+            CardGraphics.Clear();
         }
     }
 }
