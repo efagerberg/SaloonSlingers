@@ -37,6 +37,7 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             cardGraphic.gameObject.SetActive(false);
             cardGraphic.transform.position = Vector3.zero;
+            cardGraphic.transform.rotation = Quaternion.identity;
             cardGraphic.transform.SetParent(transform);
         }
     }

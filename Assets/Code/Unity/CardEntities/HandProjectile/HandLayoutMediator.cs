@@ -11,8 +11,7 @@ namespace SaloonSlingers.Unity.CardEntities
         private const float zOffset = -0.001f;
         private readonly RectTransform handPanelRectTransform;
         private readonly RectTransform handCanvasRectTransform;
-        private readonly float handCanvasUncommittedSize;
-        private float handCanvasCommittedSize;
+        private readonly float originalCanvasSize;
         private readonly IList<ICardGraphic> cardGraphics;
 
         public HandLayoutMediator(RectTransform handPanelRectTransform, RectTransform handCanvasRectTransform)
@@ -20,7 +19,7 @@ namespace SaloonSlingers.Unity.CardEntities
             cardGraphics = new List<ICardGraphic>();
             this.handPanelRectTransform = handPanelRectTransform;
             this.handCanvasRectTransform = handCanvasRectTransform;
-            handCanvasUncommittedSize = handCanvasRectTransform.rect.width;
+            originalCanvasSize = handCanvasRectTransform.rect.width;
         }
 
         public void ApplyLayout(bool isHandCommitted, Func<int, IEnumerable<float>> rotationCalculator)
@@ -29,7 +28,7 @@ namespace SaloonSlingers.Unity.CardEntities
 
             if (isHandCommitted)
             {
-                newCanvasWidth = handCanvasCommittedSize;
+                newCanvasWidth = 0;
                 foreach (ICardGraphic x in cardGraphics)
                 {
                     x.transform.localRotation = GetRevertedLocalRotation(x.transform);
@@ -38,7 +37,7 @@ namespace SaloonSlingers.Unity.CardEntities
             }
             else
             {
-                newCanvasWidth = handCanvasUncommittedSize;
+                newCanvasWidth = originalCanvasSize;
                 ApplyLayoutRotation(rotationCalculator);
             }
             handCanvasRectTransform.sizeDelta = new Vector2(newCanvasWidth, handCanvasRectTransform.sizeDelta.y);
@@ -46,8 +45,6 @@ namespace SaloonSlingers.Unity.CardEntities
 
         public void AddCardToLayout(ICardGraphic cardGraphic, Func<int, IEnumerable<float>> rotationCalculator)
         {
-            if (handCanvasCommittedSize == 0)
-                handCanvasCommittedSize = cardGraphic.GetComponent<RectTransform>().rect.width;
             cardGraphic.transform.SetParent(handPanelRectTransform, false);
             cardGraphic.transform.localPosition = new Vector3(0, 0, (cardGraphics.Count() - 1) * zOffset);
             cardGraphics.Add(cardGraphic);
