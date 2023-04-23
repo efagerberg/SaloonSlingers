@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 
-using Newtonsoft.Json;
-
 using SaloonSlingers.Core.HandEvaluators;
+
+using Unity.Plastic.Newtonsoft.Json;
+
 
 namespace SaloonSlingers.Core
 {

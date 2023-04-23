@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Newtonsoft.Json;
 using NUnit.Framework;
 
 using SaloonSlingers.Core.HandEvaluators;
+
+using Unity.Plastic.Newtonsoft.Json;
 
 namespace SaloonSlingers.Core.Tests
 {
