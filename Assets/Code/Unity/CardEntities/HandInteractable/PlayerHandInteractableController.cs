@@ -19,15 +19,23 @@ namespace SaloonSlingers.Unity.CardEntities
         private DeckGraphic deckGraphic;
         private Vector3 slingerVelocityAtRelease;
         private Rigidbody rb;
+        private ControllerSwapper swapper;
+        private int? slingerId;
 
         public void OnSelectEnter(SelectEnterEventArgs args)
         {
             XROrigin origin = args.interactorObject.transform.GetComponentInParent<XROrigin>();
-            SlingerHandedness handedness = origin.GetComponent<SlingerHandedness>();
-            deckGraphic = handedness.DeckGraphic;
-            handProjectile.AssignDeck(deckGraphic.Deck);
-            handProjectile.Pickup(deckGraphic.Spawn);
+            int newSlingerId = origin.transform.GetInstanceID();
+            if (slingerId == null || slingerId != newSlingerId)
+            {
+                slingerId = newSlingerId;
+                SlingerHandedness handedness = origin.GetComponent<SlingerHandedness>();
+                deckGraphic = handedness.DeckGraphic;
+                swapper.SetController(ControllerTypes.PLAYER);
+                handProjectile.AssignDeck(deckGraphic.Deck);
+            }
             commitHandActionProperties.ForEach(prop => prop.action.started += OnToggleCommit);
+            handProjectile.Pickup(deckGraphic.Spawn);
         }
 
         public void OnSelectExit(SelectExitEventArgs args)
@@ -50,10 +58,11 @@ namespace SaloonSlingers.Unity.CardEntities
             return dist <= maxDeckDistance;
         }
 
-        private void Start()
+        private void Awake()
         {
             handProjectile = GetComponent<HandProjectile>();
             rb = GetComponent<Rigidbody>();
+            swapper = GetComponent<ControllerSwapper>();
         }
 
         private void FixedUpdate()

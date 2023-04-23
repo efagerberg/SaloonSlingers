@@ -42,22 +42,24 @@ namespace SaloonSlingers.Unity.Slingers
                 () =>
                 {
                     GameObject go = Instantiate(handInteractablePrefab);
-                    HandProjectile cardHand = go.GetComponent<HandProjectile>();
-                    cardHand.OnHandInteractableDied += HandInteractableDiedHandler;
                     go.SetActive(false);
                     return go;
                 },
-                (GameObject go) => go.SetActive(true),
                 (GameObject go) =>
                 {
-                    go.SetActive(false);
-                    go.transform.position = Vector3.zero;
-                    go.transform.rotation = Quaternion.identity;
+                    go.SetActive(true);
+                    HandProjectile cardHand = go.GetComponent<HandProjectile>();
+                    cardHand.OnHandInteractableDied += HandInteractableDiedHandler;
+                    ControllerSwapper swapper = go.GetComponent<ControllerSwapper>();
+                    swapper.SetController(ControllerTypes.ENEMY);
                 },
                 (GameObject go) =>
                 {
+                    go.SetActive(false);
                     HandProjectile cardHand = go.GetComponent<HandProjectile>();
                     cardHand.OnHandInteractableDied -= HandInteractableDiedHandler;
+                    go.transform.position = Vector3.zero;
+                    go.transform.rotation = Quaternion.identity;
                 },
                 defaultCapacity: interactablePoolSize
             );
@@ -119,11 +121,9 @@ namespace SaloonSlingers.Unity.Slingers
         private void Attack()
         {
             if (!agent.hasPath) return;
-
             if (currentHandController.Cards.Count == 4)
             {
                 currentHandController.transform.SetParent(null, true);
-                currentHandController.Commit();
                 currentHandController.Throw(transform.forward);
 
                 GameObject clone = handInteractablePool.Get();
@@ -133,6 +133,7 @@ namespace SaloonSlingers.Unity.Slingers
             }
             currentHandController.Draw(Deck, cardSpawner);
         }
+
 
         private void HandInteractableDiedHandler(HandProjectile sender, EventArgs _)
         {

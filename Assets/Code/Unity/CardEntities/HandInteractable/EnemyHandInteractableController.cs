@@ -27,13 +27,9 @@ namespace SaloonSlingers.Unity
                 handProjectile.TryDrawCard(cardSpawner.Spawn);
         }
 
-        public void Commit()
-        {
-            handProjectile.ToggleCommitHand();
-        }
-
         public void Throw(Vector3 throwDirection)
         {
+            handProjectile.ToggleCommitHand();
             transform.Rotate(-90, 0, 0);
             handProjectile.Throw();
             this.throwDirection = throwDirection;

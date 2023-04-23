@@ -21,16 +21,21 @@ namespace SaloonSlingers.Unity.CardEntities
                 () =>
                 {
                     GameObject go = Instantiate(handInteractablePrefab);
-                    HandProjectile cardHand = go.GetComponent<HandProjectile>();
-                    cardHand.OnHandInteractableHeld += HandInteractableHeldHandler;
-                    cardHand.OnHandInteractableDied += HandInteractableDiedHandler;
                     go.SetActive(false);
                     return go;
                 },
-                (GameObject go) => go.SetActive(true),
-                (GameObject go) => go.SetActive(false),
                 (GameObject go) =>
                 {
+                    go.SetActive(true);
+                    HandProjectile cardHand = go.GetComponent<HandProjectile>();
+                    cardHand.OnHandInteractableHeld += HandInteractableHeldHandler;
+                    cardHand.OnHandInteractableDied += HandInteractableDiedHandler;
+                    ControllerSwapper swapper = go.GetComponent<ControllerSwapper>();
+                    swapper.SetController(ControllerTypes.PLAYER);
+                },
+                (GameObject go) =>
+                {
+                    go.SetActive(false);
                     HandProjectile cardHand = go.GetComponent<HandProjectile>();
                     cardHand.OnHandInteractableHeld -= HandInteractableHeldHandler;
                     cardHand.OnHandInteractableDied -= HandInteractableDiedHandler;

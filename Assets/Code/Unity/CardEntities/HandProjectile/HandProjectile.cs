@@ -47,7 +47,10 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
+            bool wasCommitted = state.IsCommitted;
             state = state.Reset();
+            if (wasCommitted)
+                handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
             if (CardGraphics.Count == 0) TryDrawCard(spawnCard);
             OnHandInteractableHeld?.Invoke(this, EventArgs.Empty);
         }
