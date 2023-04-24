@@ -16,26 +16,36 @@ namespace SaloonSlingers.Unity
 
         private GameRulesManager gameRulesManager;
         private HandProjectile projectile;
+        private bool isPeering = false;
+        private Transform interactorTransform;
 
         public void OnHoverEnter(HoverEnterEventArgs args)
         {
-            Debug.Log("Seen");
-            var value = gameRulesManager.GameRules.HandEvaluator.Evaluate(projectile.Cards);
-            handValueText.text = value.DisplayName();
-            canvas.transform.LookAt(args.interactorObject.transform);
+            isPeering = true;
             canvas.enabled = true;
+            interactorTransform = args.interactorObject.transform;
         }
 
-        public void OnHoverExit(HoverExitEventArgs args)
+        public void OnHoverExit(HoverExitEventArgs _)
         {
-            Debug.Log("Unseen");
             canvas.enabled = false;
+            isPeering = false;
         }
 
         private void Start()
         {
             gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
             projectile = transform.parent.GetComponent<HandProjectile>();
+        }
+
+        private void Update()
+        {
+            if (isPeering && interactorTransform)
+            {
+                var value = gameRulesManager.GameRules.HandEvaluator.Evaluate(projectile.Cards);
+                handValueText.text = value.DisplayName();
+                canvas.transform.LookAt(interactorTransform);
+            }
         }
     }
 }

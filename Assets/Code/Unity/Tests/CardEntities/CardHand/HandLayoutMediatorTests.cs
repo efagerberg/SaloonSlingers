@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 using NUnit.Framework;
-using UnityEngine;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.CardEntities;
+
+using UnityEngine;
 
 namespace SaloonSlingers.Unity.Tests.CardEntities
 {
@@ -122,7 +123,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             [TestCase(1)]
             [TestCase(3)]
             [TestCase(5)]
-            public void Test_WhenCardsAdded_ThenHandCommitted_ReturnsCardWidthCanvasSizeDelta_AndListWithNoRotation(int n)
+            public void Test_WhenCardsAdded_ThenHandCommitted_Returns0WidthAndRotation(int n)
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
@@ -136,7 +137,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                 subject.ApplyLayout(true, rotationCalculator);
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                AssertExpectedCommittedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, cardGraphics.First().GetComponent<RectTransform>().rect.width, n);
+                AssertExpectedCommittedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, 0, n);
             }
 
             [TestCase(1)]
