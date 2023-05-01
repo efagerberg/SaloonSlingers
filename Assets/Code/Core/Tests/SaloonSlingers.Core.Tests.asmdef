@@ -2,17 +2,17 @@
     "name": "SaloonSlingers.Core.Tests",
     "rootNamespace": "SaloonSlingers.Core.Tests",
     "references": [
-        "SaloonSlingers.Core"
+        "GUID:15b54c79343b4614195c3259778ba043"
     ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": true,
+    "overrideReferences": false,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "Unity.Plastic.Newtonsoft.Json.dll"
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

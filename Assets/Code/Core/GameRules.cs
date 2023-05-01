@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-using SaloonSlingers.Core.HandEvaluators;
+using Newtonsoft.Json;
 
-using Unity.Plastic.Newtonsoft.Json;
+using SaloonSlingers.Core.HandEvaluators;
 
 
 namespace SaloonSlingers.Core
