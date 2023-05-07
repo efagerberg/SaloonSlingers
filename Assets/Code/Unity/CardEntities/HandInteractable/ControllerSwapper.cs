@@ -1,5 +1,7 @@
 using SaloonSlingers.Unity.CardEntities;
 
+using Unity.XR.CoreUtils;
+
 using UnityEngine;
 
 
@@ -26,10 +28,12 @@ namespace SaloonSlingers.Unity
                 case ControllerTypes.PLAYER:
                     playerController.enabled = true;
                     enemyController.enabled = false;
+                    gameObject.SetLayerRecursively(LayerMask.NameToLayer("PlayerBody"));
                     break;
                 case ControllerTypes.ENEMY:
                     enemyController.enabled = true;
                     playerController.enabled = false;
+                    gameObject.SetLayerRecursively(LayerMask.NameToLayer("Enemy"));
                     break;
             }
         }
