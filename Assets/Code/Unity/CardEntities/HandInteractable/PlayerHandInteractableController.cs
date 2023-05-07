@@ -17,8 +17,6 @@ namespace SaloonSlingers.Unity.CardEntities
 
         private HandProjectile handProjectile;
         private DeckGraphic deckGraphic;
-        private Vector3 slingerVelocityAtRelease;
-        private Rigidbody rb;
         private ControllerSwapper swapper;
         private int? slingerId;
 
@@ -40,8 +38,6 @@ namespace SaloonSlingers.Unity.CardEntities
 
         public void OnSelectExit(SelectExitEventArgs args)
         {
-            CharacterController characterController = args.interactorObject.transform.root.GetComponentInChildren<CharacterController>();
-            slingerVelocityAtRelease = characterController.velocity;
             handProjectile.Throw();
             commitHandActionProperties.ForEach(prop => prop.action.started -= OnToggleCommit);
         }
@@ -61,14 +57,7 @@ namespace SaloonSlingers.Unity.CardEntities
         private void Awake()
         {
             handProjectile = GetComponent<HandProjectile>();
-            rb = GetComponent<Rigidbody>();
             swapper = GetComponent<ControllerSwapper>();
-        }
-
-        private void FixedUpdate()
-        {
-            if (handProjectile.IsThrown)
-                rb.AddForce(-slingerVelocityAtRelease * Time.fixedDeltaTime, ForceMode.VelocityChange);
         }
 
         private void OnToggleCommit(InputAction.CallbackContext _) => handProjectile.ToggleCommitHand();
