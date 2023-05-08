@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.CardEntities;
@@ -18,6 +19,8 @@ namespace SaloonSlingers.Unity.Slingers
         [SerializeField]
         private float lookDistance = 10f;
         [SerializeField]
+        private float lookSpeed = 5f;
+        [SerializeField]
         private GameObject handInteractablePrefab;
         [SerializeField]
         private int interactablePoolSize = 5;
@@ -25,6 +28,10 @@ namespace SaloonSlingers.Unity.Slingers
         private Transform handAttachTransform;
         [SerializeField]
         private float persueStoppingDistance = 5f;
+        [SerializeField]
+        private float throwSpeed = 5f;
+        [SerializeField]
+        private float releaseControlSeconds = 0.1f;
 
         private Transform target;
         private NavMeshAgent agent;
@@ -58,8 +65,7 @@ namespace SaloonSlingers.Unity.Slingers
                     go.SetActive(false);
                     HandProjectile cardHand = go.GetComponent<HandProjectile>();
                     cardHand.OnHandInteractableDied -= HandInteractableDiedHandler;
-                    go.transform.position = Vector3.zero;
-                    go.transform.rotation = Quaternion.identity;
+                    go.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
                 },
                 defaultCapacity: interactablePoolSize
             );
@@ -103,7 +109,7 @@ namespace SaloonSlingers.Unity.Slingers
         {
             Vector3 direction = (target.position - transform.position).normalized;
             Quaternion lookRotations = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotations, Time.deltaTime * 5);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotations, Time.deltaTime * lookSpeed);
         }
 
         private void OnEnable()
@@ -124,7 +130,9 @@ namespace SaloonSlingers.Unity.Slingers
             if (currentHandController.Cards.Count == 4)
             {
                 currentHandController.transform.SetParent(null, true);
-                currentHandController.Throw(transform.forward);
+                currentHandController.Throw(transform.forward * throwSpeed);
+                var coroutine = ReleaseControl(currentHandController);
+                StartCoroutine(coroutine);
 
                 GameObject clone = handInteractablePool.Get();
                 currentHandController = clone.GetComponent<EnemyHandInteractableController>();
@@ -134,6 +142,12 @@ namespace SaloonSlingers.Unity.Slingers
             currentHandController.Draw(Deck, cardSpawner);
         }
 
+        private IEnumerator ReleaseControl(EnemyHandInteractableController currentHandController)
+        {
+            yield return new WaitForSeconds(releaseControlSeconds);
+            ControllerSwapper swapper = currentHandController.GetComponent<ControllerSwapper>();
+            swapper.SetController(ControllerTypes.PLAYER);
+        }
 
         private void HandInteractableDiedHandler(HandProjectile sender, EventArgs _)
         {

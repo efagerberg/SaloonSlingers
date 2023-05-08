@@ -16,6 +16,7 @@ namespace SaloonSlingers.Unity.CardEntities
         private List<InputActionProperty> commitHandActionProperties;
 
         private HandProjectile handProjectile;
+        private XRBaseInteractable interactable;
         private DeckGraphic deckGraphic;
         private ControllerSwapper swapper;
         private int? slingerId;
@@ -36,13 +37,13 @@ namespace SaloonSlingers.Unity.CardEntities
             handProjectile.Pickup(deckGraphic.Spawn);
         }
 
-        public void OnSelectExit(SelectExitEventArgs args)
+        public void OnSelectExit()
         {
             handProjectile.Throw();
             commitHandActionProperties.ForEach(prop => prop.action.started -= OnToggleCommit);
         }
 
-        public void OnActivate(ActivateEventArgs _)
+        public void OnActivate()
         {
             if (!deckGraphic.CanDraw || !IsTouchingDeck()) return;
             handProjectile.TryDrawCard(deckGraphic.Spawn);
@@ -58,8 +59,22 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             handProjectile = GetComponent<HandProjectile>();
             swapper = GetComponent<ControllerSwapper>();
+            interactable = GetComponent<XRBaseInteractable>();
         }
 
-        private void OnToggleCommit(InputAction.CallbackContext _) => handProjectile.ToggleCommitHand();
+        private void OnEnable()
+        {
+            interactable.enabled = true;
+        }
+
+        private void OnDisable()
+        {
+            interactable.enabled = false;
+        }
+
+        private void OnToggleCommit(InputAction.CallbackContext _)
+        {
+            handProjectile.ToggleCommitHand();
+        }
     }
 }
