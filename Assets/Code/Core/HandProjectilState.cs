@@ -39,7 +39,6 @@ namespace SaloonSlingers.Core
 
         public HandProjectileState Reset()
         {
-            var before = this;
             IsThrown = false;
             IsCommitted = false;
             lifespanInSeconds = originalLifeSpanInSeconds;

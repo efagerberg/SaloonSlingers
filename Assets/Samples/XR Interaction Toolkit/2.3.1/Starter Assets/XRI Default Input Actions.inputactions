@@ -1344,6 +1344,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Peer",
+                    "type": "Button",
+                    "id": "a89ad507-afdf-445f-889b-52a2d6f670be",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1487,6 +1496,17 @@
                     "processors": "",
                     "groups": "Generic XR Controller",
                     "action": "ToggleCommit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "89f69152-e46b-4184-9b5f-02318a13dd10",
+                    "path": "<XRController>{RightHand}/secondaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "Peer",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

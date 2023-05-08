@@ -161,6 +161,28 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                 AssertExpectedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, canvasTransform.rect.width, n);
             }
 
+            [TestCase(1)]
+            [TestCase(3)]
+            [TestCase(5)]
+            public void Test_WhenNotCommitted_Idempotent(int n)
+            {
+                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
+                Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
+                Enumerable.Range(0, n).ToList().ForEach(_ =>
+                {
+                    subject.AddCardToLayout(spawner(new Card("AD")), rotationCalculator);
+                });
+                subject.ApplyLayout(false, rotationCalculator);
+                var afterFirst = panelTransform.GetComponentsInChildren<ICardGraphic>().Select(x => x.transform);
+                subject.ApplyLayout(false, rotationCalculator);
+                var afterSecond = panelTransform.GetComponentsInChildren<ICardGraphic>().Select(x => x.transform);
+
+                Assert.AreEqual(afterFirst, afterSecond);
+            }
+
             private static void AssertExpectedLayoutResult(float actualWidthDelta, IList<ICardGraphic> cards, float expectedWidthDelta, int expectedCount)
             {
                 Assert.AreEqual(actualWidthDelta, expectedWidthDelta);

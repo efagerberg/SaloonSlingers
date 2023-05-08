@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
-    public class Dashable : MonoBehaviour
+    public class Dashable : ActionPerformer
     {
-        public DashConfig DashConfig { get; private set; }
+        public ActionPoints Points { get; private set; }
 
         [SerializeField]
-        private float startingDashSpeed = 6f;
+        private float dashSpeed = 6f;
         [SerializeField]
         private uint startingDashes = 3;
         [SerializeField]
@@ -21,43 +21,28 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private float startingPointRecoveryPeriod = 1f;
 
-        private bool canDash = true;
-
         public void Dash(CharacterController controller, Vector3 forward)
         {
-            if (!canDash) return;
-            IEnumerator coroutine = DoDash(controller, forward);
-            StartCoroutine(coroutine);
-        }
-
-        private IEnumerator DoDash(CharacterController controller, Vector3 forward)
-        {
-            canDash = false;
-            DashConfig.DashPoints.Value -= 1;
-            float currentDuration = DashConfig.Duration;
-            while (currentDuration > 0)
+            IEnumerator onStart()
             {
-                controller.Move(DashConfig.Speed * Time.deltaTime * forward);
-                currentDuration -= Time.deltaTime;
-                yield return new WaitForEndOfFrame();
+                float currentDuration = Points.Duration;
+                while (currentDuration > 0)
+                {
+                    controller.Move(dashSpeed * Time.deltaTime * forward);
+                    currentDuration -= Time.deltaTime;
+                    yield return new WaitForEndOfFrame();
+                }
             }
+            IEnumerator coroutine = GetActionCoroutine(Points, onStart);
+            if (coroutine == null) return;
 
-            yield return new WaitForSeconds(DashConfig.CoolDown);
-            canDash = DashConfig.DashPoints.Value > 0;
-
-            // Assumes the cooldown is always smaller than the recovery period
-            // Game-wise this makes sense, why would the player be allowed to regen
-            // points faster than they can use them.
-            yield return new WaitForSeconds(DashConfig.PointRecoveryPeriod - DashConfig.CoolDown);
-            DashConfig.DashPoints.Value += 1;
-            canDash = true;
+            StartCoroutine(coroutine);
         }
 
         private void Start()
         {
-            DashConfig = new DashConfig(
+            Points = new ActionPoints(
                 startingDashes,
-                startingDashSpeed,
                 startingDashDuration,
                 startingDashCooldown,
                 startingPointRecoveryPeriod

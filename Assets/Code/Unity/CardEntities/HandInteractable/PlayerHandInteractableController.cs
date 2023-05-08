@@ -14,9 +14,12 @@ namespace SaloonSlingers.Unity.CardEntities
         private float maxDeckDistance = 0.08f;
         [SerializeField]
         private List<InputActionProperty> commitHandActionProperties;
+        [SerializeField]
+        private XRBaseInteractable mainInteractable;
+        [SerializeField]
+        private XRBaseInteractable peerInteractable;
 
         private HandProjectile handProjectile;
-        private XRBaseInteractable interactable;
         private DeckGraphic deckGraphic;
         private ControllerSwapper swapper;
         private int? slingerId;
@@ -32,6 +35,7 @@ namespace SaloonSlingers.Unity.CardEntities
                 deckGraphic = handedness.DeckGraphic;
                 swapper.SetController(ControllerTypes.PLAYER);
                 handProjectile.AssignDeck(deckGraphic.Deck);
+                peerInteractable.enabled = true;
             }
             commitHandActionProperties.ForEach(prop => prop.action.started += OnToggleCommit);
             handProjectile.Pickup(deckGraphic.Spawn);
@@ -41,6 +45,7 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             handProjectile.Throw();
             commitHandActionProperties.ForEach(prop => prop.action.started -= OnToggleCommit);
+            peerInteractable.enabled = false;
         }
 
         public void OnActivate()
@@ -59,17 +64,18 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             handProjectile = GetComponent<HandProjectile>();
             swapper = GetComponent<ControllerSwapper>();
-            interactable = GetComponent<XRBaseInteractable>();
         }
 
         private void OnEnable()
         {
-            interactable.enabled = true;
+            mainInteractable.enabled = true;
+            peerInteractable.enabled = false;
         }
 
         private void OnDisable()
         {
-            interactable.enabled = false;
+            mainInteractable.enabled = false;
+            peerInteractable.enabled = false;
         }
 
         private void OnToggleCommit(InputAction.CallbackContext _)

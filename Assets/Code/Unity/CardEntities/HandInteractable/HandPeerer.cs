@@ -17,16 +17,20 @@ namespace SaloonSlingers.Unity
         private GameRulesManager gameRulesManager;
         private HandProjectile projectile;
         private bool isPeering = false;
-        private Transform interactorTransform;
+        private Transform peererTransform;
 
         public void OnHoverEnter(HoverEnterEventArgs args)
         {
-            isPeering = true;
-            canvas.enabled = true;
-            interactorTransform = args.interactorObject.transform;
+            Peer(args.interactorObject.transform);
         }
 
-        public void OnHoverExit(HoverExitEventArgs _)
+        public void Peer(Transform peererTransform)
+        {
+            isPeering = true;
+            this.peererTransform = peererTransform;
+        }
+
+        public void Hide()
         {
             canvas.enabled = false;
             isPeering = false;
@@ -40,11 +44,12 @@ namespace SaloonSlingers.Unity
 
         private void Update()
         {
-            if (isPeering && interactorTransform)
+            if (isPeering && peererTransform && projectile.Cards.Count > 0)
             {
+                canvas.enabled = true;
                 var value = gameRulesManager.GameRules.HandEvaluator.Evaluate(projectile.Cards);
                 handValueText.text = value.DisplayName();
-                canvas.transform.LookAt(interactorTransform);
+                canvas.transform.LookAt(peererTransform);
             }
         }
     }
