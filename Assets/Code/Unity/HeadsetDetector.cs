@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation;
@@ -7,7 +8,7 @@ namespace SaloonSlingers.Unity
 {
     public class HeadsetDetector : MonoBehaviour
     {
-        private InputDeviceCharacteristics headsetCharacteristic = InputDeviceCharacteristics.HeadMounted;
+        private readonly InputDeviceCharacteristics headsetCharacteristic = InputDeviceCharacteristics.HeadMounted;
         private XRDeviceSimulator simulator;
 
         private void Awake()

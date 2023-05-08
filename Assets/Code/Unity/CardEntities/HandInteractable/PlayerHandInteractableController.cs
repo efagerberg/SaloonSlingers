@@ -14,11 +14,13 @@ namespace SaloonSlingers.Unity.CardEntities
         private float maxDeckDistance = 0.08f;
         [SerializeField]
         private List<InputActionProperty> commitHandActionProperties;
+        [SerializeField]
+        private XRBaseInteractable mainInteractable;
+        [SerializeField]
+        private XRBaseInteractable peerInteractable;
 
         private HandProjectile handProjectile;
         private DeckGraphic deckGraphic;
-        private Vector3 slingerVelocityAtRelease;
-        private Rigidbody rb;
         private ControllerSwapper swapper;
         private int? slingerId;
 
@@ -33,20 +35,20 @@ namespace SaloonSlingers.Unity.CardEntities
                 deckGraphic = handedness.DeckGraphic;
                 swapper.SetController(ControllerTypes.PLAYER);
                 handProjectile.AssignDeck(deckGraphic.Deck);
+                peerInteractable.enabled = true;
             }
             commitHandActionProperties.ForEach(prop => prop.action.started += OnToggleCommit);
             handProjectile.Pickup(deckGraphic.Spawn);
         }
 
-        public void OnSelectExit(SelectExitEventArgs args)
+        public void OnSelectExit()
         {
-            CharacterController characterController = args.interactorObject.transform.root.GetComponentInChildren<CharacterController>();
-            slingerVelocityAtRelease = characterController.velocity;
             handProjectile.Throw();
             commitHandActionProperties.ForEach(prop => prop.action.started -= OnToggleCommit);
+            peerInteractable.enabled = false;
         }
 
-        public void OnActivate(ActivateEventArgs _)
+        public void OnActivate()
         {
             if (!deckGraphic.CanDraw || !IsTouchingDeck()) return;
             handProjectile.TryDrawCard(deckGraphic.Spawn);
@@ -61,16 +63,24 @@ namespace SaloonSlingers.Unity.CardEntities
         private void Awake()
         {
             handProjectile = GetComponent<HandProjectile>();
-            rb = GetComponent<Rigidbody>();
             swapper = GetComponent<ControllerSwapper>();
         }
 
-        private void FixedUpdate()
+        private void OnEnable()
         {
-            if (handProjectile.IsThrown)
-                rb.AddForce(-slingerVelocityAtRelease * Time.fixedDeltaTime, ForceMode.VelocityChange);
+            mainInteractable.enabled = true;
+            peerInteractable.enabled = false;
         }
 
-        private void OnToggleCommit(InputAction.CallbackContext _) => handProjectile.ToggleCommitHand();
+        private void OnDisable()
+        {
+            mainInteractable.enabled = false;
+            peerInteractable.enabled = false;
+        }
+
+        private void OnToggleCommit(InputAction.CallbackContext _)
+        {
+            handProjectile.ToggleCommitHand();
+        }
     }
 }

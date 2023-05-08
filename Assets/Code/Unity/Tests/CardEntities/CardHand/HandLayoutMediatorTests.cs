@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 using NUnit.Framework;
-using UnityEngine;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.CardEntities;
+
+using UnityEngine;
 
 namespace SaloonSlingers.Unity.Tests.CardEntities
 {
@@ -122,7 +123,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             [TestCase(1)]
             [TestCase(3)]
             [TestCase(5)]
-            public void Test_WhenCardsAdded_ThenHandCommitted_ReturnsCardWidthCanvasSizeDelta_AndListWithNoRotation(int n)
+            public void Test_WhenCardsAdded_ThenHandCommitted_Returns0WidthAndRotation(int n)
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
                 RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
@@ -136,7 +137,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                 subject.ApplyLayout(true, rotationCalculator);
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                AssertExpectedCommittedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, cardGraphics.First().GetComponent<RectTransform>().rect.width, n);
+                AssertExpectedCommittedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, 0, n);
             }
 
             [TestCase(1)]
@@ -158,6 +159,28 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
                 AssertExpectedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, canvasTransform.rect.width, n);
+            }
+
+            [TestCase(1)]
+            [TestCase(3)]
+            [TestCase(5)]
+            public void Test_WhenNotCommitted_Idempotent(int n)
+            {
+                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
+                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
+                Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
+                Enumerable.Range(0, n).ToList().ForEach(_ =>
+                {
+                    subject.AddCardToLayout(spawner(new Card("AD")), rotationCalculator);
+                });
+                subject.ApplyLayout(false, rotationCalculator);
+                var afterFirst = panelTransform.GetComponentsInChildren<ICardGraphic>().Select(x => x.transform);
+                subject.ApplyLayout(false, rotationCalculator);
+                var afterSecond = panelTransform.GetComponentsInChildren<ICardGraphic>().Select(x => x.transform);
+
+                Assert.AreEqual(afterFirst, afterSecond);
             }
 
             private static void AssertExpectedLayoutResult(float actualWidthDelta, IList<ICardGraphic> cards, float expectedWidthDelta, int expectedCount)

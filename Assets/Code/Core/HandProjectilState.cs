@@ -10,8 +10,8 @@ namespace SaloonSlingers.Core
         }
         public bool IsCommitted { get; private set; }
         public bool CanDraw { get => !IsCommitted && checkCanDraw(); }
-
         public bool IsThrown { get; private set; }
+
         private readonly Func<bool> checkCanDraw;
         private float lifespanInSeconds;
         private readonly float originalLifeSpanInSeconds;

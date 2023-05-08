@@ -11,43 +11,33 @@ namespace SaloonSlingers.Unity
     {
         public IList<Card> Cards { get => handProjectile.Cards; }
 
-        [SerializeField]
-        private float speed = 5f;
-
         private HandProjectile handProjectile;
         private Rigidbody rb;
-        private Vector3 throwDirection;
 
         public void Draw(Deck deck, ICardSpawner cardSpawner)
         {
-            handProjectile.AssignDeck(deck);
             if (Cards.Count == 0)
+            {
+                handProjectile.AssignDeck(deck);
                 handProjectile.Pickup(cardSpawner.Spawn);
+            }
             else
                 handProjectile.TryDrawCard(cardSpawner.Spawn);
         }
 
-        public void Throw(Vector3 throwDirection)
+        public void Throw(Vector3 velocity)
         {
             handProjectile.ToggleCommitHand();
             transform.Rotate(-90, 0, 0);
             handProjectile.Throw();
-            this.throwDirection = throwDirection;
+            rb.AddTorque(velocity.magnitude * transform.up, ForceMode.VelocityChange);
+            rb.AddForce(velocity, ForceMode.VelocityChange);
         }
 
         private void Start()
         {
             handProjectile = GetComponent<HandProjectile>();
             rb = GetComponent<Rigidbody>();
-        }
-
-        private void FixedUpdate()
-        {
-            if (handProjectile.IsThrown)
-            {
-                rb.AddTorque(speed * Time.fixedDeltaTime * transform.up);
-                rb.AddForce(speed * Time.fixedDeltaTime * throwDirection);
-            }
         }
     }
 }

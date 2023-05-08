@@ -11,8 +11,7 @@ namespace SaloonSlingers.Unity.CardEntities
         private const float zOffset = -0.001f;
         private readonly RectTransform handPanelRectTransform;
         private readonly RectTransform handCanvasRectTransform;
-        private readonly float handCanvasUncommittedSize;
-        private float handCanvasCommittedSize;
+        private readonly float originalCanvasWidth;
         private readonly IList<ICardGraphic> cardGraphics;
 
         public HandLayoutMediator(RectTransform handPanelRectTransform, RectTransform handCanvasRectTransform)
@@ -20,7 +19,7 @@ namespace SaloonSlingers.Unity.CardEntities
             cardGraphics = new List<ICardGraphic>();
             this.handPanelRectTransform = handPanelRectTransform;
             this.handCanvasRectTransform = handCanvasRectTransform;
-            handCanvasUncommittedSize = handCanvasRectTransform.rect.width;
+            originalCanvasWidth = handCanvasRectTransform.rect.width;
         }
 
         public void ApplyLayout(bool isHandCommitted, Func<int, IEnumerable<float>> rotationCalculator)
@@ -29,16 +28,18 @@ namespace SaloonSlingers.Unity.CardEntities
 
             if (isHandCommitted)
             {
-                newCanvasWidth = handCanvasCommittedSize;
+                newCanvasWidth = 0;
                 foreach (ICardGraphic x in cardGraphics)
                 {
-                    x.transform.localRotation = GetRevertedLocalRotation(x.transform);
-                    x.transform.localPosition = GetRevertedLocalPosition(x.transform);
+                    x.transform.SetLocalPositionAndRotation(
+                        GetRevertedLocalPosition(x.transform),
+                        GetRevertedLocalRotation(x.transform)
+                    );
                 }
             }
             else
             {
-                newCanvasWidth = handCanvasUncommittedSize;
+                newCanvasWidth = originalCanvasWidth;
                 ApplyLayoutRotation(rotationCalculator);
             }
             handCanvasRectTransform.sizeDelta = new Vector2(newCanvasWidth, handCanvasRectTransform.sizeDelta.y);
@@ -46,10 +47,8 @@ namespace SaloonSlingers.Unity.CardEntities
 
         public void AddCardToLayout(ICardGraphic cardGraphic, Func<int, IEnumerable<float>> rotationCalculator)
         {
-            if (handCanvasCommittedSize == 0)
-                handCanvasCommittedSize = cardGraphic.GetComponent<RectTransform>().rect.width;
             cardGraphic.transform.SetParent(handPanelRectTransform, false);
-            cardGraphic.transform.localPosition = new Vector3(0, 0, (cardGraphics.Count() - 1) * zOffset);
+            cardGraphic.transform.localPosition = new(0, 0, (cardGraphics.Count() - 1) * zOffset);
             cardGraphics.Add(cardGraphic);
             ApplyLayoutRotation(rotationCalculator);
         }
@@ -59,11 +58,14 @@ namespace SaloonSlingers.Unity.CardEntities
             for (int i = cardGraphics.Count() - 1; i >= 0; i--)
             {
                 ICardGraphic cardGraphic = cardGraphics[i];
-                cardGraphic.transform.localRotation = GetRevertedLocalRotation(cardGraphic.transform);
-                cardGraphic.transform.localPosition = GetRevertedLocalPosition(cardGraphic.transform);
+                cardGraphic.transform.SetLocalPositionAndRotation(
+                    GetRevertedLocalPosition(cardGraphic.transform),
+                    GetRevertedLocalRotation(cardGraphic.transform)
+                );
                 cardGraphic.transform.SetParent(null, false);
                 cardGraphics.RemoveAt(i);
             }
+            handCanvasRectTransform.sizeDelta = new Vector2(originalCanvasWidth, handCanvasRectTransform.sizeDelta.y);
         }
 
         private static void ApplyLayoutRotationToCard(float degrees, ICardGraphic cardGraphic)

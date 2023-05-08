@@ -26,10 +26,12 @@ namespace SaloonSlingers.Unity
                 case ControllerTypes.PLAYER:
                     playerController.enabled = true;
                     enemyController.enabled = false;
+                    gameObject.layer = LayerMask.NameToLayer("PlayerBody");
                     break;
                 case ControllerTypes.ENEMY:
                     enemyController.enabled = true;
                     playerController.enabled = false;
+                    gameObject.layer = LayerMask.NameToLayer("Enemy");
                     break;
             }
         }

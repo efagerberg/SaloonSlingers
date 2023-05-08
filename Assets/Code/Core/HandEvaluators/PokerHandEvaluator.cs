@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Threading;
 
 namespace SaloonSlingers.Core.HandEvaluators
 {
@@ -21,9 +19,9 @@ namespace SaloonSlingers.Core.HandEvaluators
         {
             var handList = hand.ToList();
             (HandNames handName, bool hasAcesHigh) = HandTypeDetector.Detect(handList);
-            return CreateHandType(
-                CalculateScore(handName, hasAcesHigh, handList),
-                handName
+            return new HandType(
+                handName,
+                CalculateScore(handName, hasAcesHigh, handList)
             );
         }
 
@@ -236,13 +234,6 @@ namespace SaloonSlingers.Core.HandEvaluators
             }
 
             public const int BITS_PER_NIBBLE = 4;
-        }
-
-        private HandType CreateHandType(uint score, HandNames handName)
-        {
-            string enumName = Enum.GetName(typeof(HandNames), handName);
-            TextInfo textInfo = Thread.CurrentThread.CurrentCulture.TextInfo;
-            return new HandType(handName, score);
         }
     }
 }
