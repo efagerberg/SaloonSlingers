@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 
 using SaloonSlingers.Core;
+using SaloonSlingers.Unity.CardEntities;
+using SaloonSlingers.Unity.Slingers;
 
 using Unity.XR.CoreUtils;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
+
 
 namespace SaloonSlingers.Unity
 {
@@ -20,6 +23,8 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private float peerRadius = 10;
         [SerializeField]
+        private float peerDistance = 5;
+        [SerializeField]
         private uint startingPeers = 3;
         [SerializeField]
         private float startingCooldown = 3;
@@ -27,10 +32,14 @@ namespace SaloonSlingers.Unity
         private float startingDuration = 5f;
         [SerializeField]
         private float startingRecoveryPeriod = 1f;
-
+        [SerializeField]
         private Transform cameraTransform;
+        [SerializeField]
+        private SlingerHandedness handedness;
+        [SerializeField]
+        private float peerInterval = 0.2f;
 
-        public void Peer()
+        public void CastPeer()
         {
             IEnumerator coroutine = GetActionCoroutine(Points, DoPeer);
             if (coroutine == null) return;
@@ -40,32 +49,54 @@ namespace SaloonSlingers.Unity
 
         private IEnumerator DoPeer()
         {
-            HashSet<HandPeerer> seenPeerers = new();
+            Enemy lastEnemy = null;
+            Outline lastOutline = null;
+            Enemy currentEnemy = null;
+            Outline currentOutline = null;
             float currentDuration = Points.Duration;
+            var intervalWait = new WaitForSeconds(peerInterval);
+
             while (currentDuration > 0)
             {
-                Collider[] hits = Physics.OverlapSphere(transform.position, peerRadius, LayerMask.GetMask("HandPeerer"));
-                HashSet<HandPeerer> newPeerers = hits.Where(x => x.transform.parent.gameObject.layer != LayerMask.NameToLayer("PlayerBody"))
-                                                     .Select(x => x.GetComponent<HandPeerer>())
-                                                     .Except(seenPeerers).ToHashSet();
-                foreach (HandPeerer peerer in newPeerers)
+                Collider[] hits = Physics.OverlapSphere(PeerSpherePosition,
+                                                        peerRadius,
+                                                        LayerMask.GetMask("Enemy"));
+                var closest = hits.OrderBy(x => Vector3.Dot(cameraTransform.forward, x.transform.forward))
+                                  .FirstOrDefault();
+                if (closest == null)
                 {
-                    peerer.Peer(cameraTransform);
+                    handedness.EnemyPeerDisplay.SetProjectile(null);
+                    if (lastOutline != null) lastOutline.enabled = false;
                 }
-                seenPeerers.UnionWith(newPeerers);
-                currentDuration -= Time.deltaTime;
-                yield return new WaitForEndOfFrame();
+                else
+                {
+                    currentEnemy = closest.GetComponentInParent<Enemy>();
+                    var projectile = currentEnemy.GetComponentInChildren<HandProjectile>();
+                    handedness.EnemyPeerDisplay.SetProjectile(projectile);
+
+                    if (currentEnemy != null && currentEnemy != lastEnemy)
+                    {
+                        currentOutline = currentEnemy.GetComponent<Outline>();
+                        currentOutline.enabled = true;
+                    }
+                }
+                handedness.EnemyPeerDisplay.Show();
+
+                if (lastOutline != null && currentOutline != lastOutline) lastOutline.enabled = false;
+                lastEnemy = currentEnemy;
+                lastOutline = currentOutline;
+                yield return intervalWait;
+                currentDuration -= peerInterval;
             };
-            foreach (HandPeerer peerer in seenPeerers)
-            {
-                peerer.Hide();
-            }
+            handedness.EnemyPeerDisplay.SetProjectile(null);
+            handedness.EnemyPeerDisplay.Hide();
+            if (lastEnemy != null) lastOutline.enabled = false;
         }
 
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = IsPerforming ? Color.green : Color.red;
-            Gizmos.DrawWireSphere(transform.position, peerRadius);
+            Gizmos.DrawWireSphere(PeerSpherePosition, peerRadius);
         }
 
         private void OnEnable()
@@ -80,11 +111,17 @@ namespace SaloonSlingers.Unity
                 property.action.performed -= HandlePeer;
         }
 
-        private void HandlePeer(InputAction.CallbackContext _) => Peer();
+        private void HandlePeer(InputAction.CallbackContext _) => CastPeer();
 
         private void Awake()
         {
+            if (cameraTransform != null) return;
             cameraTransform = GetComponent<XROrigin>().Camera.transform;
+        }
+
+        private Vector3 PeerSpherePosition
+        {
+            get => (cameraTransform.forward * peerDistance) + cameraTransform.position;
         }
 
         private void Start()

@@ -21,7 +21,6 @@ namespace SaloonSlingers.Unity.CardEntities
 
         private HandProjectile handProjectile;
         private DeckGraphic deckGraphic;
-        private ControllerSwapper swapper;
         private int? slingerId;
 
         public void OnSelectEnter(SelectEnterEventArgs args)
@@ -33,10 +32,10 @@ namespace SaloonSlingers.Unity.CardEntities
                 slingerId = newSlingerId;
                 SlingerHandedness handedness = origin.GetComponent<SlingerHandedness>();
                 deckGraphic = handedness.DeckGraphic;
-                swapper.SetController(ControllerTypes.PLAYER);
                 handProjectile.AssignDeck(deckGraphic.Deck);
-                peerInteractable.enabled = true;
+                handProjectile.gameObject.layer = LayerMask.NameToLayer("Player");
             }
+            peerInteractable.enabled = true;
             commitHandActionProperties.ForEach(prop => prop.action.started += OnToggleCommit);
             handProjectile.Pickup(deckGraphic.Spawn);
         }
@@ -63,7 +62,6 @@ namespace SaloonSlingers.Unity.CardEntities
         private void Awake()
         {
             handProjectile = GetComponent<HandProjectile>();
-            swapper = GetComponent<ControllerSwapper>();
         }
 
         private void OnEnable()

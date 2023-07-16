@@ -15,20 +15,38 @@ namespace SaloonSlingers.Core.Tests
             [TestCase("JC QD TH", "", "Less")]
             [TestCase("AH AD JS", "AD KS", "Less")]
             [TestCase("AH AC AS", "AH", "Greater")]
-            public void ReturnsExpectedResult(string firstHand, string secondHand, string assertionMethod)
+            public void CalculatesHandScore(string firstHand, string secondHand, string assertionMethod)
             {
-                TestHelpers.GetAssertionFromMethodString(assertionMethod)(
-                    EvaluateHandString(firstHand),
-                    EvaluateHandString(secondHand)
+                HandEvaluation firstEvaluation = TestHelpers.EvaluateHandString(firstHand, subject);
+                HandEvaluation secondEvaluation = TestHelpers.EvaluateHandString(secondHand, subject);
+                TestHelpers.GetAssertionFromMethodString<uint>(assertionMethod)(
+                    firstEvaluation.Score,
+                    secondEvaluation.Score
                 );
             }
 
-            private static readonly BlackJackHandEvaluator subject = new();
-
-            private static uint EvaluateHandString(string x)
+            [TestCase("AH", "")]
+            [TestCase("AH 2C", "")]
+            [TestCase("JH QC", "")]
+            public void ReturnsNoKeyCards(string hand, string expectedKeyCards)
             {
-                return subject.Evaluate(TestHelpers.MakeHandFromString(x)).Score;
+                HandEvaluation evaluation = TestHelpers.EvaluateHandString(hand, subject);
+                CollectionAssert.AreEqual(evaluation.KeyIndexes, TestHelpers.MakeHandFromString(expectedKeyCards));
             }
+
+            [TestCase("", HandNames.NONE)]
+            [TestCase("AH", HandNames.ELEVEN)]
+            [TestCase("AH AH", HandNames.TWELVE)]
+            [TestCase("JS JC", HandNames.TWENTY)]
+            [TestCase("AH JC JC", HandNames.TWENTY_ONE)]
+            [TestCase("AH JS", HandNames.BLACK_JACK)]
+            [TestCase("JS JC QH", HandNames.BUST)]
+            public void ReturnsExpectedHandName(string hand, HandNames expected)
+            {
+                Assert.AreEqual(expected, TestHelpers.EvaluateHandString(hand, subject).Name);
+            }
+
+            private static readonly BlackJackHandEvaluator subject = new();
         }
     }
 };

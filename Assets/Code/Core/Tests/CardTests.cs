@@ -143,5 +143,25 @@ namespace SaloonSlingers.Core.Tests
                 Assert.AreEqual(expected, actual);
             }
         }
+
+        class TestToUnicode
+        {
+            public static readonly object[][] ToUnicodeTestCases = {
+                new object[] { "KD", "K\u2666" },
+                new object[] { "QC", "Q\u2663" },
+                new object[] { "2H", "2\u2665" },
+                new object[] { "AD", "A\u2666" },
+                new object[] { "5S", "5\u2660" },
+                new object[] { "TH", "10\u2665" }
+            };
+
+            [TestCaseSource(nameof(ToUnicodeTestCases))]
+            public void ReturnsExpectedUnicode(string card, string expected)
+            {
+                Card c = new(card);
+
+                Assert.AreEqual(expected, c.ToUnicode());
+            }
+        }
     }
 }

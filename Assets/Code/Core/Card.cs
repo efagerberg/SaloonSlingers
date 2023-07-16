@@ -58,6 +58,27 @@ namespace SaloonSlingers.Core
             return string.Format(template, (value_as_int), Suit.ToString().ToLower());
         }
 
+        public string ToUnicode()
+        {
+            int value_as_int = (int)Value;
+            char suitUnicode = GetSuitUnicode(Suit);
+            if (IsFaceCard() || Value == Values.ACE)
+                return $"{Value.ToString().ToUpper()[0]}{suitUnicode}";
+
+            return $"{value_as_int}{suitUnicode}";
+        }
+
+        private char GetSuitUnicode(Suits suit)
+        {
+            Dictionary<Suits, char> suitToChar = new() {
+                { Suits.DIAMONDS, '\u2666' },
+                { Suits.SPADES, '\u2660' },
+                { Suits.HEARTS, '\u2665' },
+                { Suits.CLUBS, '\u2663' }
+            };
+            return suitToChar[suit];
+        }
+
         public override int GetHashCode() => Encode(this);
 
         /// <summary>

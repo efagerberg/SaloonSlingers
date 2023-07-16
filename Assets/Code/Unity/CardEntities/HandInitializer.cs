@@ -4,14 +4,18 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Slingers
 {
-    public class DeckGraphicPlacer : MonoBehaviour
+    public class HandInitializer : MonoBehaviour
     {
         [SerializeField]
-        private Transform LeftDeckAttachTransform;
+        private Transform leftDeckAttachTransform;
         [SerializeField]
-        private Transform RightDeckAttachTransform;
+        private Transform rightDeckAttachTransform;
         [SerializeField]
         private GameObject deckGraphicPrefab;
+        [SerializeField]
+        private Transform enemyPeerPanelAttachTransform;
+        [SerializeField]
+        private GameObject enemyPeerPanelPrefab;
 
         private Transform deckAttachTransform;
         private bool isPrimary = false;
@@ -22,10 +26,10 @@ namespace SaloonSlingers.Unity.Slingers
             switch (handedness.Current)
             {
                 case Handedness.RIGHT:
-                    deckAttachTransform = LeftDeckAttachTransform;
+                    deckAttachTransform = leftDeckAttachTransform;
                     break;
                 case Handedness.LEFT:
-                    deckAttachTransform = RightDeckAttachTransform;
+                    deckAttachTransform = rightDeckAttachTransform;
                     break;
             }
 
@@ -37,6 +41,11 @@ namespace SaloonSlingers.Unity.Slingers
             {
                 GameObject clone = Instantiate(deckGraphicPrefab, deckAttachTransform);
                 handedness.DeckGraphic = clone.GetComponent<DeckGraphic>();
+            }
+            else
+            {
+                GameObject clone = Instantiate(enemyPeerPanelPrefab, enemyPeerPanelAttachTransform);
+                handedness.EnemyPeerDisplay = clone.GetComponent<EnemyHandDisplay>();
             }
         }
     }

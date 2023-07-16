@@ -1,11 +1,13 @@
-using UnityEngine;
-
 using SaloonSlingers.Core;
+
+using UnityEngine;
 
 namespace SaloonSlingers.Unity.CardEntities
 {
     public class CardGraphic : MonoBehaviour, ICardGraphic
     {
+        public Material FaceMaterial { get => faceRenderer.material; }
+
         [SerializeField]
         private Card card;
         [SerializeField]
@@ -17,7 +19,7 @@ namespace SaloonSlingers.Unity.CardEntities
             set
             {
                 card = value;
-                name = card.ToString();
+                name = card.ToUnicode();
                 if (faceRenderer == null) faceRenderer = GetComponent<Renderer>();
                 SetGraphics(card);
             }

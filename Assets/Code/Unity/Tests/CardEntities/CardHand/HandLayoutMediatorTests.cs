@@ -19,8 +19,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             public void Test_Resets_Transform()
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform);
 
                 (Func<Card, ICardGraphic> spawner,
                  IList<ICardGraphic> expectedSpawned) = GetSpawnerWithExpectedSpawned();
@@ -38,8 +37,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             public void Test_Removes_From_HandPanel()
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform);
 
                 (Func<Card, ICardGraphic> spawner,
                  IList<ICardGraphic> expectedSpawned) = GetSpawnerWithExpectedSpawned();
@@ -76,8 +74,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             public void Test_SpawnsExpectedIntoLayout(int n)
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform);
                 (Func<Card, ICardGraphic> spawner,
                  IList<ICardGraphic> expectedGraphics) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15f);
@@ -111,13 +108,12 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             public void Test_WhenNoCardAddedAndCommitted_Returns0WidthCanvasSizeDelta_AndEmptyList()
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(-10f);
                 subject.ApplyLayout(true, rotationCalculator);
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                AssertExpectedCommittedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, 0, 0);
+                AssertExpectedCommittedLayoutResult(panelTransform.sizeDelta.x, cardGraphics, 0, 0);
             }
 
             [TestCase(1)]
@@ -126,8 +122,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             public void Test_WhenCardsAdded_ThenHandCommitted_Returns0WidthAndRotation(int n)
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Enumerable.Range(0, n).ToList().ForEach(_ =>
@@ -137,7 +132,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                 subject.ApplyLayout(true, rotationCalculator);
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                AssertExpectedCommittedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, 0, n);
+                AssertExpectedCommittedLayoutResult(panelTransform.sizeDelta.x, cardGraphics, 0, n);
             }
 
             [TestCase(1)]
@@ -146,8 +141,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             public void Test_WhenCardsAdded_ThenHandCommitted_AndUncommitted_ReturnsOriginalWidthCanvasSizeDelta_AndListWithRotation(int n)
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform);
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 Enumerable.Range(0, n).ToList().ForEach(_ =>
@@ -158,7 +152,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                 subject.ApplyLayout(false, rotationCalculator);
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                AssertExpectedLayoutResult(canvasTransform.sizeDelta.x, cardGraphics, canvasTransform.rect.width, n);
+                AssertExpectedLayoutResult(panelTransform.sizeDelta.x, cardGraphics, panelTransform.rect.width, n);
             }
 
             [TestCase(1)]
@@ -167,8 +161,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
             public void Test_WhenNotCommitted_Idempotent(int n)
             {
                 RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                RectTransform canvasTransform = CreateComponent<RectTransform>("HandCanvas");
-                HandLayoutMediator subject = new(panelTransform, canvasTransform);
+                HandLayoutMediator subject = new(panelTransform);
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 Enumerable.Range(0, n).ToList().ForEach(_ =>

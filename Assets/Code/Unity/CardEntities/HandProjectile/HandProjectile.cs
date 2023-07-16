@@ -17,11 +17,21 @@ namespace SaloonSlingers.Unity.CardEntities
         public event HandProjectileReadyToRespawn OnHandInteractableDied;
         public IList<ICardGraphic> CardGraphics { get; private set; }
         public IList<Card> Cards { get => CardGraphics.Select(x => x.Card).ToList(); }
+        public HandEvaluation HandEvaluation
+        {
+            get
+            {
+                if (requiresEvaluation)
+                {
+                    handEvaluation = gameRulesManager.GameRules.HandEvaluator.Evaluate(Cards);
+                    requiresEvaluation = false;
+                }
+                return handEvaluation;
+            }
+        }
 
         [SerializeField]
         private RectTransform handPanelRectTransform;
-        [SerializeField]
-        private RectTransform handCanvasRectTransform;
         [SerializeField]
         private float totalCardDegrees = 30f;
         [SerializeField]
@@ -42,6 +52,8 @@ namespace SaloonSlingers.Unity.CardEntities
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private Deck deck;
         private GameRulesManager gameRulesManager;
+        private HandEvaluation handEvaluation;
+        private bool requiresEvaluation = false;
 
         public void Pickup(Func<ICardGraphic> spawnCard)
         {
@@ -66,6 +78,7 @@ namespace SaloonSlingers.Unity.CardEntities
             cardGraphic.Card = card;
             CardGraphics.Add(cardGraphic);
             handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
+            requiresEvaluation = true;
         }
 
         public void Throw()
@@ -112,9 +125,8 @@ namespace SaloonSlingers.Unity.CardEntities
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
-            if (handCanvasRectTransform == null) handCanvasRectTransform = handPanelRectTransform.parent.GetComponent<RectTransform>();
 
-            handLayoutMediator = new(handPanelRectTransform, handCanvasRectTransform);
+            handLayoutMediator = new(handPanelRectTransform);
         }
 
         private void FixedUpdate()

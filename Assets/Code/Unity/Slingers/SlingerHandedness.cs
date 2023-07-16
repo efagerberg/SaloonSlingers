@@ -1,3 +1,4 @@
+using SaloonSlingers.Unity;
 using SaloonSlingers.Unity.CardEntities;
 
 using UnityEngine;
@@ -5,20 +6,21 @@ using UnityEngine.XR;
 
 public enum Handedness
 {
-    RIGHT, LEFT
+    RIGHT, LEFT, NONE
 }
 
 public class SlingerHandedness : MonoBehaviour
 {
     public Handedness Current
     {
-        get; private set;
+        get => _current; private set => _current = value;
     }
 
     public DeckGraphic DeckGraphic;
+    public EnemyHandDisplay EnemyPeerDisplay;
 
     [SerializeField]
-    private Handedness defaultHandedness = Handedness.RIGHT;
+    private Handedness _current = Handedness.NONE;
 
     private void OnEnable() => InputDevices.deviceConnected += SetHandedness;
 
@@ -28,6 +30,7 @@ public class SlingerHandedness : MonoBehaviour
 
     private Handedness GetHandedness(InputDevice device)
     {
+        if (Current != Handedness.NONE) return Current;
         if (device.TryGetFeatureValue(CommonUsages.primaryButton, out _))
         {
             switch (device.name.ToLower())
@@ -38,6 +41,6 @@ public class SlingerHandedness : MonoBehaviour
                     return Handedness.RIGHT;
             }
         }
-        return defaultHandedness;
+        return Handedness.RIGHT;
     }
 }

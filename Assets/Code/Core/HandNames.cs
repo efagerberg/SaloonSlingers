@@ -2,7 +2,7 @@
 {
     public enum HandNames
     {
-        EMPTY,
+        NONE,
         HIGH_CARD,
         PAIR,
         TWO_PAIR,
@@ -13,6 +13,27 @@
         FOUR_OF_A_KIND,
         STRAIGHT_FLUSH,
         ROYAL_FLUSH,
+        ONE,
+        TWO,
+        THREE,
+        FOUR,
+        FIVE,
+        SIX,
+        SEVEN,
+        EIGHT,
+        NINE,
+        TEN,
+        ELEVEN,
+        TWELVE,
+        THIRTEEN,
+        FOURTEEN,
+        FIFTEEN,
+        SIXTEEN,
+        SEVENTEEN,
+        EIGHTEEN,
+        NINETEEN,
+        TWENTY,
+        TWENTY_ONE,
         BUST,
         BLACK_JACK
     }

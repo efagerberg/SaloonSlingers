@@ -1,0 +1,24 @@
+using NUnit.Framework;
+
+namespace SaloonSlingers.Core.Tests
+{
+    public class HandEvaluationTests
+    {
+        public class TestDisplayName
+        {
+            [TestCaseSource(nameof(DisplayNameTestCases))]
+            public void TestReturnsExpectedNameString(HandEvaluation x, string expected)
+            {
+                Assert.AreEqual(x.DisplayName(), expected);
+            }
+
+            private static object[][] DisplayNameTestCases =
+            {
+                new object[] { new HandEvaluation(HandNames.NONE, 0), "" },
+                new object[] { new HandEvaluation(HandNames.HIGH_CARD, 10), "High Card" },
+                new object[] { new HandEvaluation(HandNames.BUST, 1), "Bust"},
+                new object[] { new HandEvaluation(HandNames.FOUR_OF_A_KIND, 4), "Four Of A Kind"}
+            };
+        }
+    }
+}

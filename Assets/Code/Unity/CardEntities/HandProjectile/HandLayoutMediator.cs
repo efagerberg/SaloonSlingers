@@ -10,16 +10,14 @@ namespace SaloonSlingers.Unity.CardEntities
     {
         private const float zOffset = -0.001f;
         private readonly RectTransform handPanelRectTransform;
-        private readonly RectTransform handCanvasRectTransform;
-        private readonly float originalCanvasWidth;
+        private readonly float originalPanelWidth;
         private readonly IList<ICardGraphic> cardGraphics;
 
-        public HandLayoutMediator(RectTransform handPanelRectTransform, RectTransform handCanvasRectTransform)
+        public HandLayoutMediator(RectTransform handPanelRectTransform)
         {
             cardGraphics = new List<ICardGraphic>();
             this.handPanelRectTransform = handPanelRectTransform;
-            this.handCanvasRectTransform = handCanvasRectTransform;
-            originalCanvasWidth = handCanvasRectTransform.rect.width;
+            originalPanelWidth = handPanelRectTransform.rect.width;
         }
 
         public void ApplyLayout(bool isHandCommitted, Func<int, IEnumerable<float>> rotationCalculator)
@@ -39,10 +37,10 @@ namespace SaloonSlingers.Unity.CardEntities
             }
             else
             {
-                newCanvasWidth = originalCanvasWidth;
+                newCanvasWidth = originalPanelWidth;
                 ApplyLayoutRotation(rotationCalculator);
             }
-            handCanvasRectTransform.sizeDelta = new Vector2(newCanvasWidth, handCanvasRectTransform.sizeDelta.y);
+            handPanelRectTransform.sizeDelta = new Vector2(newCanvasWidth, handPanelRectTransform.sizeDelta.y);
         }
 
         public void AddCardToLayout(ICardGraphic cardGraphic, Func<int, IEnumerable<float>> rotationCalculator)
@@ -65,7 +63,7 @@ namespace SaloonSlingers.Unity.CardEntities
                 cardGraphic.transform.SetParent(null, false);
                 cardGraphics.RemoveAt(i);
             }
-            handCanvasRectTransform.sizeDelta = new Vector2(originalCanvasWidth, handCanvasRectTransform.sizeDelta.y);
+            handPanelRectTransform.sizeDelta = new Vector2(originalPanelWidth, handPanelRectTransform.sizeDelta.y);
         }
 
         private static void ApplyLayoutRotationToCard(float degrees, ICardGraphic cardGraphic)

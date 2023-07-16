@@ -33,9 +33,9 @@ namespace SaloonSlingers.Core.Tests
 
             private class TestHandEvaluator : IHandEvaluator
             {
-                public HandType Evaluate(IEnumerable<Card> hand)
+                public HandEvaluation Evaluate(IEnumerable<Card> hand)
                 {
-                    return new HandType(HandNames.FOUR_OF_A_KIND, (uint)hand.Count());
+                    return new HandEvaluation(HandNames.FOUR_OF_A_KIND, (uint)hand.Count());
                 }
             }
 

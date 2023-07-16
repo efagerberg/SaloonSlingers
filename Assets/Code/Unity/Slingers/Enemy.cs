@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.CardEntities;
@@ -30,8 +29,6 @@ namespace SaloonSlingers.Unity.Slingers
         private float persueStoppingDistance = 5f;
         [SerializeField]
         private float throwSpeed = 5f;
-        [SerializeField]
-        private float releaseControlSeconds = 0.1f;
 
         private Transform target;
         private NavMeshAgent agent;
@@ -127,12 +124,13 @@ namespace SaloonSlingers.Unity.Slingers
         private void Attack()
         {
             if (!agent.hasPath) return;
-            if (currentHandController.Cards.Count == 4)
+            if (currentHandController.Cards.Count == 2)
             {
                 currentHandController.transform.SetParent(null, true);
-                currentHandController.Throw(transform.forward * throwSpeed);
-                var coroutine = ReleaseControl(currentHandController);
-                StartCoroutine(coroutine);
+                Vector3 direction = (target.position - currentHandController.transform.position).normalized;
+                currentHandController.Throw(direction * throwSpeed);
+                ControllerSwapper swapper = currentHandController.GetComponent<ControllerSwapper>();
+                swapper.SetController(ControllerTypes.PLAYER);
 
                 GameObject clone = handInteractablePool.Get();
                 currentHandController = clone.GetComponent<EnemyHandInteractableController>();
@@ -140,13 +138,6 @@ namespace SaloonSlingers.Unity.Slingers
                 return;
             }
             currentHandController.Draw(Deck, cardSpawner);
-        }
-
-        private IEnumerator ReleaseControl(EnemyHandInteractableController currentHandController)
-        {
-            yield return new WaitForSeconds(releaseControlSeconds);
-            ControllerSwapper swapper = currentHandController.GetComponent<ControllerSwapper>();
-            swapper.SetController(ControllerTypes.PLAYER);
         }
 
         private void HandInteractableDiedHandler(HandProjectile sender, EventArgs _)
@@ -160,6 +151,12 @@ namespace SaloonSlingers.Unity.Slingers
         {
             handInteractablePool.Clear();
             CancelInvoke(nameof(Attack));
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(currentHandController.transform.position, target.position);
         }
     }
 }

@@ -20,6 +20,7 @@ namespace SaloonSlingers.Unity
             {
                 handProjectile.AssignDeck(deck);
                 handProjectile.Pickup(cardSpawner.Spawn);
+                handProjectile.gameObject.layer = LayerMask.NameToLayer("EnemyProjectile");
             }
             else
                 handProjectile.TryDrawCard(cardSpawner.Spawn);

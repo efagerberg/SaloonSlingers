@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+
 using NUnit.Framework;
 
 using SaloonSlingers.Core.HandEvaluators;
@@ -10,6 +13,14 @@ namespace SaloonSlingers.Core.Tests
         {
             private static readonly PokerHandEvaluator subject = new();
 
+            [TestCase("AH 2H 3H 4H 5H 6H 7H 8H")]
+            [TestCase("AH 2H 3H 4H 5H 6H 7H 8H 9H")]
+            [TestCase("AH 2H 3H 4H 5H 6H 7H 8H 9H TH")]
+            public void ThrowsWhenInvalidHandSize(string handString)
+            {
+                Assert.Throws<ArgumentException>(() => TestHelpers.EvaluateHandString(handString, subject));
+            }
+
             [TestCaseSource(nameof(HighCardTestCases))]
             [TestCaseSource(nameof(PairTestCases))]
             [TestCaseSource(nameof(TwoPairTestCases))]
@@ -20,12 +31,11 @@ namespace SaloonSlingers.Core.Tests
             [TestCaseSource(nameof(FourOfAKindTestCases))]
             [TestCaseSource(nameof(StraightFlushCases))]
             [TestCaseSource(nameof(RoyalFlushTestCases))]
-            public void ReturnsExpectedResult(string firstHand, string secondHand, string assertionMethod)
+            public void ReturnsExpectedScore(string firstHand, string secondHand, string assertionMethod)
             {
-                TestHelpers.GetAssertionFromMethodString(assertionMethod)(
-                    EvaluateHandString(firstHand),
-                    EvaluateHandString(secondHand)
-                );
+                HandEvaluation x = TestHelpers.EvaluateHandString(firstHand, subject);
+                HandEvaluation y = TestHelpers.EvaluateHandString(secondHand, subject);
+                TestHelpers.GetAssertionFromMethodString<uint>(assertionMethod)(x.Score, y.Score);
             }
 
             private static readonly object[][] HighCardTestCases = {
@@ -84,7 +94,9 @@ namespace SaloonSlingers.Core.Tests
                 new object[] { "2C 2H 3D 3C 3S", "AH AD AS 2H 2D", "Less" },
                 new object[] { "2C 2H 3D 3C 3S 4D", "2C 2H 3D 3C 3S AD", "AreEqual" },
                 new object[] { "AH AS 3H 3D 3S", "2C 2H 4H 4D 4S", "Less" },
-                new object[] { "AH AS 3H 3D 3S", "AH AS 3H 3D 3S JD", "AreEqual" }
+                new object[] { "AH AS 3H 3D 3S", "AH AS 3H 3D 3S JD", "AreEqual" },
+                new object[] { "AH AS AD 3H 3D 3S", "AH AS 3H 3D 3S JD", "Greater" },
+                new object[] { "3H 3D 3S AH AS AD", "4H 4D 4S AH AS AD", "Less" }
             };
             private static readonly object[][] FourOfAKindTestCases = {
                 new object[] { "2H 2D 2S 2C 3D", "AH AD AS 2H 2D", "Greater" },
@@ -105,9 +117,44 @@ namespace SaloonSlingers.Core.Tests
                 new object[] { "TD JD QD KD AD", "TS JS QS KS AS AC", "AreEqual" },
             };
 
-            private static uint EvaluateHandString(string x)
+            [TestCase("AH", "AH")]
+            [TestCase("AH JS", "AH")]
+            [TestCase("JS JC QH", "JS JC")]
+            [TestCase("JS JC AH AD", "JS JC AH AD")]
+            [TestCase("JS JC JH", "JS JC JH")]
+            [TestCase("AH 2C 3H 4D 5H", "AH 2C 3H 4D 5H")]
+            [TestCase("AH 2C 3H 4D 5H KH", "AH 2C 3H 4D 5H")]
+            [TestCase("AH 3H 5H TH 8H", "AH 3H 5H TH 8H")]
+            [TestCase("JC JS AH AD AS", "JC JS AH AD AS")]
+            [TestCase("AH 2H 3H 4H 5H", "AH 2H 3H 4H 5H")]
+            [TestCase("TH JH KH QH AH", "TH JH KH QH AH")]
+            [TestCase("AH AC AS QH QC KH", "AH AC AS QH QC")]
+            [TestCase("AH AC AS QH QC QD", "AH AC AS QH QC")]
+            public void ReturnsExpectedKeyCards(string handString, string expectedKeyCards)
             {
-                return subject.Evaluate(TestHelpers.MakeHandFromString(x)).Score;
+                var hand = TestHelpers.MakeHandFromString(handString).ToList();
+                HandEvaluation evaluation = subject.Evaluate(hand);
+                CollectionAssert.AreEquivalent(TestHelpers.MakeHandFromString(expectedKeyCards),
+                                               evaluation.KeyIndexes.Select(i => hand[i]));
+            }
+
+            [TestCase("AH", HandNames.HIGH_CARD)]
+            [TestCase("AH JS", HandNames.HIGH_CARD)]
+            [TestCase("JS JC QH", HandNames.PAIR)]
+            [TestCase("JS JC AH AD", HandNames.TWO_PAIR)]
+            [TestCase("JS JC JH", HandNames.THREE_OF_A_KIND)]
+            [TestCase("AH 2C 3H 4D 5H", HandNames.STRAIGHT)]
+            [TestCase("AH 3H 5H TH 8H", HandNames.FLUSH)]
+            [TestCase("JC JS AH AD AS", HandNames.FULL_HOUSE)]
+            [TestCase("AH AC AS QH QC KD", HandNames.FULL_HOUSE)]
+            [TestCase("AH AC AS QH QC QD", HandNames.FULL_HOUSE)]
+            [TestCase("AH 2H 3H 4H 5H", HandNames.STRAIGHT_FLUSH)]
+            [TestCase("9H TH JH QH KH", HandNames.STRAIGHT_FLUSH)]
+            [TestCase("TH JH KH QH AH", HandNames.ROYAL_FLUSH)]
+            [TestCase("9H TH JH QH KH AH", HandNames.ROYAL_FLUSH)]
+            public void ReturnsExpectedHandName(string hand, HandNames expected)
+            {
+                Assert.AreEqual(expected, TestHelpers.EvaluateHandString(hand, subject).Name);
             }
         }
     }
