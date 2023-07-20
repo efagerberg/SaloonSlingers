@@ -38,6 +38,10 @@ namespace SaloonSlingers.Unity
         private SlingerHandedness handedness;
         [SerializeField]
         private float peerInterval = 0.2f;
+        [SerializeField]
+        private const int maxPeerHits = 10;
+        [SerializeField]
+        private Collider[] peerHits = new Collider[maxPeerHits];
 
         public void CastPeer()
         {
@@ -58,11 +62,11 @@ namespace SaloonSlingers.Unity
 
             while (currentDuration > 0)
             {
-                Collider[] hits = Physics.OverlapSphere(PeerSpherePosition,
-                                                        peerRadius,
-                                                        LayerMask.GetMask("Enemy"));
-                var closest = hits.OrderBy(x => Vector3.Dot(cameraTransform.forward, x.transform.forward))
-                                  .FirstOrDefault();
+                int nHits = Physics.OverlapSphereNonAlloc(PeerSpherePosition, peerRadius, peerHits, LayerMask.GetMask("Enemy"));
+
+                var closest = peerHits.Take(nHits)
+                                      .OrderByDescending(hit => CalculateGazeAlignment(hit.transform, cameraTransform))
+                                      .FirstOrDefault();
                 if (closest == null)
                 {
                     handedness.EnemyPeerDisplay.SetProjectile(null);
@@ -91,6 +95,12 @@ namespace SaloonSlingers.Unity
             handedness.EnemyPeerDisplay.SetProjectile(null);
             handedness.EnemyPeerDisplay.Hide();
             if (lastEnemy != null) lastOutline.enabled = false;
+        }
+
+        private static float CalculateGazeAlignment(Transform targetTransform, Transform gazeTransform)
+        {
+            var toPlayerVector = (targetTransform.position - gazeTransform.position).normalized;
+            return Mathf.Abs(Vector3.Dot(gazeTransform.forward, toPlayerVector));
         }
 
         private void OnDrawGizmosSelected()
