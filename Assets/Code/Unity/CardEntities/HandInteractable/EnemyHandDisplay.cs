@@ -11,9 +11,9 @@ namespace SaloonSlingers.Unity
     public class EnemyHandDisplay : HandDisplay
     {
         [SerializeField]
-        private GameObject enemyPanel;
+        private GameObject enemyPeerPanel;
         [SerializeField]
-        private GameObject enemyUICardPrefab;
+        private GameObject enemyPeerCardPrefab;
 
         private TextMeshProUGUI handValueText;
         private LayoutGroup peerOtherCardLayoutGroup;
@@ -26,14 +26,14 @@ namespace SaloonSlingers.Unity
         public override void Hide()
         {
             base.Hide();
-            enemyPanel.SetActive(false);
+            enemyPeerPanel.SetActive(false);
             projectile = null;
         }
 
         public override void Show()
         {
             base.Show();
-            enemyPanel.SetActive(true);
+            enemyPeerPanel.SetActive(true);
             if (projectile == null)
             {
                 for (int i = 0; i < peerOtherCardLayoutGroup.transform.childCount; i++)
@@ -46,13 +46,13 @@ namespace SaloonSlingers.Unity
         {
             handValueText.text = evaluation.DisplayName();
 
-            LayoutGroup peerOtherCardLayoutGroup = enemyPanel.GetComponentInChildren<LayoutGroup>();
+            LayoutGroup peerOtherCardLayoutGroup = enemyPeerPanel.GetComponentInChildren<LayoutGroup>();
 
             int nCards = projectile.Cards.Count;
             int delta = nCards - peerOtherCardLayoutGroup.transform.childCount;
 
             for (; delta > 0; delta--)
-                Instantiate(enemyUICardPrefab, peerOtherCardLayoutGroup.transform, false);
+                Instantiate(enemyPeerCardPrefab, peerOtherCardLayoutGroup.transform, false);
 
             for (; delta < 0; delta++)
                 peerOtherCardLayoutGroup.transform.GetChild(nCards - delta - 1).gameObject.SetActive(false);
@@ -75,8 +75,8 @@ namespace SaloonSlingers.Unity
         private void Start()
         {
             Hide();
-            handValueText = enemyPanel.GetComponentInImmediateChildren<TextMeshProUGUI>();
-            peerOtherCardLayoutGroup = enemyPanel.GetComponentInChildren<LayoutGroup>();
+            handValueText = enemyPeerPanel.GetComponentInImmediateChildren<TextMeshProUGUI>();
+            peerOtherCardLayoutGroup = enemyPeerPanel.GetComponentInChildren<LayoutGroup>();
         }
     }
 }

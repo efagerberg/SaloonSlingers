@@ -11,20 +11,24 @@ namespace SaloonSlingers.Unity
         private readonly InputDeviceCharacteristics headsetCharacteristic = InputDeviceCharacteristics.HeadMounted;
         private XRDeviceSimulator simulator;
 
-        private void Awake()
+        private void Start()
         {
             simulator = GetComponent<XRDeviceSimulator>();
-            simulator.enabled = true;
-
-            CheckAlreadyConnectedHeadset();
+            bool alreadyConnected = CheckAlreadyConnectedHeadset();
+            if (!alreadyConnected)
+                simulator.enabled = true;
         }
 
-        private void CheckAlreadyConnectedHeadset()
+        private bool CheckAlreadyConnectedHeadset()
         {
-            List<InputDevice> inputDevices = new List<InputDevice>();
+            List<InputDevice> inputDevices = new();
             InputDevices.GetDevicesWithCharacteristics(headsetCharacteristic, inputDevices);
             foreach (InputDevice device in inputDevices)
+            {
                 SetSimulatorEnabledIfHMD(device, false);
+                return true;
+            }
+            return false;
         }
 
         private void OnEnable()

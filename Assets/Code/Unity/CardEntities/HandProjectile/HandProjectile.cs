@@ -13,8 +13,8 @@ namespace SaloonSlingers.Unity.CardEntities
 
     public class HandProjectile : MonoBehaviour
     {
-        public event HandProjectileHeld OnHandInteractableHeld;
-        public event HandProjectileReadyToRespawn OnHandInteractableDied;
+        public event HandProjectileHeld OnHandProjectileHeld;
+        public event HandProjectileReadyToRespawn OnHandProjectileDied;
         public IList<ICardGraphic> CardGraphics { get; private set; }
         public IList<Card> Cards { get => CardGraphics.Select(x => x.Card).ToList(); }
         public HandEvaluation HandEvaluation
@@ -64,7 +64,7 @@ namespace SaloonSlingers.Unity.CardEntities
             if (committedBefore != state.IsCommitted)
                 handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
             if (CardGraphics.Count == 0) TryDrawCard(spawnCard);
-            OnHandInteractableHeld?.Invoke(this, EventArgs.Empty);
+            OnHandProjectileHeld?.Invoke(this, EventArgs.Empty);
         }
 
         public void TryDrawCard(Func<ICardGraphic> spawnCard)
@@ -134,12 +134,44 @@ namespace SaloonSlingers.Unity.CardEntities
             state.Update(Time.fixedDeltaTime);
             if (state.IsAlive) return;
 
+            Reset();
+        }
+
+        private void Reset()
+        {
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             state = state.Reset();
             handLayoutMediator.Dispose();
-            OnHandInteractableDied?.Invoke(this, EventArgs.Empty);
+            OnHandProjectileDied?.Invoke(this, EventArgs.Empty);
             CardGraphics.Clear();
+            requiresEvaluation = true;
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (!collision.gameObject.TryGetComponent(out Health targetHealth)) return;
+
+            HandProjectile[] targetProjectiles = collision.gameObject.GetComponentsInChildren<HandProjectile>();
+            if (targetProjectiles.Length == 0)
+            {
+                targetHealth.Points.Value--;
+                return;
+            };
+
+            // If target has any hand better than this instance, they should not lose health;
+            bool targetHasSuperiorHand = false;
+            foreach (var targetProjectile in targetProjectiles)
+            {
+                if (HandEvaluation.Score < targetProjectile.HandEvaluation.Score)
+                {
+                    targetHasSuperiorHand = true;
+                    break;
+                }
+            }
+            if (!targetHasSuperiorHand) targetHealth.Points.Value--;
+
+            Reset();
         }
     }
 }

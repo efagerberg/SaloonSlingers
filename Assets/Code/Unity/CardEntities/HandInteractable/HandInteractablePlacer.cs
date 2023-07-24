@@ -28,8 +28,8 @@ namespace SaloonSlingers.Unity.CardEntities
                 {
                     go.SetActive(true);
                     HandProjectile cardHand = go.GetComponent<HandProjectile>();
-                    cardHand.OnHandInteractableHeld += HandInteractableHeldHandler;
-                    cardHand.OnHandInteractableDied += HandInteractableDiedHandler;
+                    cardHand.OnHandProjectileHeld += HandInteractableHeldHandler;
+                    cardHand.OnHandProjectileDied += HandInteractableDiedHandler;
                     ControllerSwapper swapper = go.GetComponent<ControllerSwapper>();
                     swapper.SetController(ControllerTypes.PLAYER);
                 },
@@ -37,8 +37,8 @@ namespace SaloonSlingers.Unity.CardEntities
                 {
                     go.SetActive(false);
                     HandProjectile cardHand = go.GetComponent<HandProjectile>();
-                    cardHand.OnHandInteractableHeld -= HandInteractableHeldHandler;
-                    cardHand.OnHandInteractableDied -= HandInteractableDiedHandler;
+                    cardHand.OnHandProjectileHeld -= HandInteractableHeldHandler;
+                    cardHand.OnHandProjectileDied -= HandInteractableDiedHandler;
                 },
                 defaultCapacity: poolSize
             );

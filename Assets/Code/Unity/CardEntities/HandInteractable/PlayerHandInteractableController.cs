@@ -27,22 +27,29 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             XROrigin origin = args.interactorObject.transform.GetComponentInParent<XROrigin>();
             int newSlingerId = origin.transform.GetInstanceID();
-            if (slingerId == null || slingerId != newSlingerId)
+            bool sameSlinger = newSlingerId == slingerId;
+            if (slingerId == null || !sameSlinger)
             {
                 slingerId = newSlingerId;
                 SlingerHandedness handedness = origin.GetComponent<SlingerHandedness>();
                 deckGraphic = handedness.DeckGraphic;
                 handProjectile.AssignDeck(deckGraphic.Deck);
-                handProjectile.gameObject.layer = LayerMask.NameToLayer("Player");
+                handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
             }
             peerInteractable.enabled = true;
             commitHandActionProperties.ForEach(prop => prop.action.started += OnToggleCommit);
             handProjectile.Pickup(deckGraphic.Spawn);
+
+            // If we try to set the parent when we are passing between our hands, the interactable
+            // will oscillate between the two controller parents making a weird effect. So only
+            // set parent when this is a new interactable.
+            if (!sameSlinger) handProjectile.transform.SetParent(args.interactorObject.transform, false);
         }
 
         public void OnSelectExit()
         {
             handProjectile.Throw();
+            handProjectile.transform.parent = null;
             commitHandActionProperties.ForEach(prop => prop.action.started -= OnToggleCommit);
             peerInteractable.enabled = false;
         }

@@ -50,6 +50,7 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void OnRelease(Enemy enemy)
         {
+            enemy.OnEnemyDied -= HandleEnemyDied;
             enemy.gameObject.SetActive(false);
         }
 
@@ -60,7 +61,12 @@ namespace SaloonSlingers.Unity.Slingers
             int randomSpawnpointIndex = Random.Range(0, spawnPoints.Count - 1);
             Transform spawnPoint = spawnPoints[randomSpawnpointIndex];
             Enemy enemy = Spawn(spawnPoint.position, Quaternion.identity);
+            Health health = enemy.GetComponent<Health>();
+            health.Points.Value = health.Points.MaxValue;
+            enemy.OnEnemyDied += HandleEnemyDied;
             enemy.gameObject.SetActive(true);
         }
+
+        private void HandleEnemyDied(Enemy sender, System.EventArgs e) => Despawn(sender);
     }
 }

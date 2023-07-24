@@ -11,9 +11,12 @@ using UnityEngine.Pool;
 
 namespace SaloonSlingers.Unity.Slingers
 {
+    public delegate void EnemyDied(Enemy sender, EventArgs e);
+
     public class Enemy : MonoBehaviour
     {
         public Deck Deck { get; private set; }
+        public event EnemyDied OnEnemyDied;
 
         [SerializeField]
         private float lookDistance = 10f;
@@ -30,7 +33,10 @@ namespace SaloonSlingers.Unity.Slingers
         [SerializeField]
         private float throwSpeed = 5f;
 
-        private Transform target;
+        private Transform playerTarget;
+        private Transform currentTarget;
+        private Health targetHealth;
+        private Health health;
         private NavMeshAgent agent;
         private IObjectPool<GameObject> handInteractablePool;
         private EnemyHandInteractableController currentHandController;
@@ -40,7 +46,11 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void Awake()
         {
-            target = GameObject.FindGameObjectWithTag("Player").GetComponent<XROrigin>().Camera.transform;
+            var player = GameObject.FindGameObjectWithTag("Player");
+            playerTarget = player.GetComponent<XROrigin>().Camera.transform;
+            currentTarget = playerTarget;
+            targetHealth = player.GetComponent<Health>();
+            health = GetComponent<Health>();
             cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<CardSpawner>();
             handInteractablePool = new UnityEngine.Pool.ObjectPool<GameObject>(
                 () =>
@@ -52,16 +62,16 @@ namespace SaloonSlingers.Unity.Slingers
                 (GameObject go) =>
                 {
                     go.SetActive(true);
-                    HandProjectile cardHand = go.GetComponent<HandProjectile>();
-                    cardHand.OnHandInteractableDied += HandInteractableDiedHandler;
+                    HandProjectile projectile = go.GetComponent<HandProjectile>();
+                    projectile.OnHandProjectileDied += DespawnHandProjectile;
                     ControllerSwapper swapper = go.GetComponent<ControllerSwapper>();
                     swapper.SetController(ControllerTypes.ENEMY);
                 },
                 (GameObject go) =>
                 {
                     go.SetActive(false);
-                    HandProjectile cardHand = go.GetComponent<HandProjectile>();
-                    cardHand.OnHandInteractableDied -= HandInteractableDiedHandler;
+                    HandProjectile projectile = go.GetComponent<HandProjectile>();
+                    projectile.OnHandProjectileDied -= DespawnHandProjectile;
                     go.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
                 },
                 defaultCapacity: interactablePoolSize
@@ -79,21 +89,29 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void Update()
         {
-            float distance = Vector3.Distance(target.position, transform.position);
+            if (currentTarget == null)
+            {
+                ReturnHome();
+                return;
+            }
+
+            float distance = Vector3.Distance(currentTarget.position, transform.position);
             if (distance <= lookDistance)
             {
                 FaceTarget();
-                agent.SetDestination(target.position);
+                agent.SetDestination(currentTarget.position);
                 agent.stoppingDistance = persueStoppingDistance;
                 if (!IsInvoking(nameof(Attack)))
                     InvokeRepeating(nameof(Attack), 0.0f, 1.0f);
             }
-            else
-            {
-                agent.SetDestination(spawnPosition);
-                agent.stoppingDistance = 0f;
-                CancelInvoke(nameof(Attack));
-            }
+            else ReturnHome();
+        }
+
+        private void ReturnHome()
+        {
+            agent.SetDestination(spawnPosition);
+            agent.stoppingDistance = 0f;
+            CancelInvoke(nameof(Attack));
         }
 
         private void OnDrawGizmosSelected()
@@ -104,7 +122,7 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void FaceTarget()
         {
-            Vector3 direction = (target.position - transform.position).normalized;
+            Vector3 direction = (currentTarget.position - transform.position).normalized;
             Quaternion lookRotations = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotations, Time.deltaTime * lookSpeed);
         }
@@ -114,11 +132,31 @@ namespace SaloonSlingers.Unity.Slingers
             Deck = new Deck().Shuffle();
             Deck.OnDeckEmpty += DeckEmptyHandler;
             spawnPosition = transform.position;
+            targetHealth.Points.OnPointsChanged += HandleTargetHealthChanged;
+            health.Points.OnPointsChanged += HandleHealthChanged;
         }
 
         private void OnDisable()
         {
             Deck.OnDeckEmpty -= DeckEmptyHandler;
+            targetHealth.Points.OnPointsChanged -= HandleTargetHealthChanged;
+            health.Points.OnPointsChanged -= HandleHealthChanged;
+        }
+
+        private void HandleTargetHealthChanged(Points sender, ValueChangeEvent<uint> e)
+        {
+            if (e.After == 0) currentTarget = null;
+            if (e.Before == 0 && e.After != 0) currentTarget = playerTarget;
+        }
+
+        private void HandleHealthChanged(Points sender, ValueChangeEvent<uint> e)
+        {
+            if (e.After == 0)
+            {
+                CancelInvoke(nameof(Attack));
+                handInteractablePool.Clear();
+                OnEnemyDied?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         private void Attack()
@@ -127,7 +165,7 @@ namespace SaloonSlingers.Unity.Slingers
             if (currentHandController.Cards.Count == 2)
             {
                 currentHandController.transform.SetParent(null, true);
-                Vector3 direction = (target.position - currentHandController.transform.position).normalized;
+                Vector3 direction = (currentTarget.position - currentHandController.transform.position).normalized;
                 currentHandController.Throw(direction * throwSpeed);
                 ControllerSwapper swapper = currentHandController.GetComponent<ControllerSwapper>();
                 swapper.SetController(ControllerTypes.PLAYER);
@@ -140,7 +178,7 @@ namespace SaloonSlingers.Unity.Slingers
             currentHandController.Draw(Deck, cardSpawner);
         }
 
-        private void HandInteractableDiedHandler(HandProjectile sender, EventArgs _)
+        private void DespawnHandProjectile(HandProjectile sender, EventArgs _)
         {
             foreach (ICardGraphic c in sender.CardGraphics)
                 cardSpawner.Despawn(c);
@@ -156,7 +194,7 @@ namespace SaloonSlingers.Unity.Slingers
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.blue;
-            Gizmos.DrawLine(currentHandController.transform.position, target.position);
+            Gizmos.DrawLine(currentHandController.transform.position, currentTarget.position);
         }
     }
 }
