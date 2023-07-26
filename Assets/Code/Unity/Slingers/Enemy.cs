@@ -32,6 +32,8 @@ namespace SaloonSlingers.Unity.Slingers
         private float persueStoppingDistance = 5f;
         [SerializeField]
         private float throwSpeed = 5f;
+        [SerializeField]
+        private int handSizeBeforeAttack = 5;
 
         private Transform playerTarget;
         private Transform currentTarget;
@@ -162,7 +164,7 @@ namespace SaloonSlingers.Unity.Slingers
         private void Attack()
         {
             if (!agent.hasPath) return;
-            if (currentHandController.Cards.Count == 2)
+            if (currentHandController.Cards.Count == handSizeBeforeAttack)
             {
                 currentHandController.transform.SetParent(null, true);
                 Vector3 direction = (currentTarget.position - currentHandController.transform.position).normalized;
