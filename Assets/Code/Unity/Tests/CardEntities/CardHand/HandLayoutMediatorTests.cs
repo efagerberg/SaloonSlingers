@@ -13,7 +13,7 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
 {
     public class HandLayoutMediatorTests
     {
-        public class TestDispose
+        public class TestReset
         {
             [Test]
             public void Test_Resets_Transform()
@@ -28,27 +28,9 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15);
                 subject.AddCardToLayout(spawner(new Card("AC")), rotationCalculator);
                 subject.AddCardToLayout(spawner(new Card("TC")), rotationCalculator);
-                subject.Dispose();
+                subject.Reset();
 
                 AssertCardTransformReset(expectedSpawned);
-            }
-
-            [Test]
-            public void Test_Removes_From_HandPanel()
-            {
-                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
-                HandLayoutMediator subject = new(panelTransform);
-
-                (Func<Card, ICardGraphic> spawner,
-                 IList<ICardGraphic> expectedSpawned) = GetSpawnerWithExpectedSpawned();
-
-                List<ICardGraphic> actualDespawned = new();
-                Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(15);
-                subject.AddCardToLayout(spawner(new Card("AC")), rotationCalculator);
-                subject.AddCardToLayout(spawner(new Card("TC")), rotationCalculator);
-                subject.Dispose();
-
-                CollectionAssert.IsEmpty(panelTransform.GetComponentsInChildren<ICardGraphic>());
             }
 
             private static void AssertCardTransformReset(IList<ICardGraphic> expectedSpawned)
@@ -62,7 +44,6 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
                     expectedSpawned.Select(c => c.transform.localPosition),
                     expectedSpawned.Select(c => c.transform.localPosition).OrderBy(pos => pos.z)
                 );
-                Assert.That(expectedSpawned.Select(c => c.transform.parent).All(p => p == null));
             }
         }
 
@@ -210,8 +191,13 @@ namespace SaloonSlingers.Unity.Tests.CardEntities
         private class TestCardGraphic : MonoBehaviour, ICardGraphic
         {
             private Card card;
+
+            public event EventHandler Death;
+
             public Card Card { get => card; set => card = value; }
             public void SetGraphics(Card card) { }
+            public void Die() { }
+            public void Reset() { }
         }
 
         private static (Func<Card, ICardGraphic> spawner, IList<ICardGraphic> spawned) GetSpawnerWithExpectedSpawned()

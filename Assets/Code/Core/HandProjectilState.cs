@@ -1,5 +1,3 @@
-using System;
-
 namespace SaloonSlingers.Core
 {
     public class HandProjectileState
@@ -9,20 +7,17 @@ namespace SaloonSlingers.Core
             get => lifespanInSeconds > 0;
         }
         public bool IsCommitted { get; private set; }
-        public bool CanDraw { get => !IsCommitted && checkCanDraw(); }
         public bool IsThrown { get; private set; }
 
-        private readonly Func<bool> checkCanDraw;
         private float lifespanInSeconds;
         private readonly float originalLifeSpanInSeconds;
 
-        public HandProjectileState(float lifespanInSeconds, Func<bool> checkCanDraw)
+        public HandProjectileState(float lifespanInSeconds)
         {
             IsThrown = false;
             IsCommitted = false;
             this.lifespanInSeconds = lifespanInSeconds;
             originalLifeSpanInSeconds = lifespanInSeconds;
-            this.checkCanDraw = checkCanDraw;
         }
 
         public HandProjectileState Throw()

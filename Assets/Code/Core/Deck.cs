@@ -63,7 +63,7 @@ namespace SaloonSlingers.Core
 
         public IEnumerable<Card> RemoveFromTop(int amount)
         {
-            for (int i = 0; i < amount; i++)
+            for (int i = 0; i < amount && Count > 0; i++)
                 yield return RemoveFromTop();
         }
 
