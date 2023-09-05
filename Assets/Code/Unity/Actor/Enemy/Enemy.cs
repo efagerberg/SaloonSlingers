@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.CardEntities;
@@ -17,8 +18,6 @@ namespace SaloonSlingers.Unity.Slingers
         public event EventHandler Death;
 
         [SerializeField]
-        private float lookDistance = 10f;
-        [SerializeField]
         private float lookSpeed = 5f;
         [SerializeField]
         private Transform handAttachTransform;
@@ -28,8 +27,6 @@ namespace SaloonSlingers.Unity.Slingers
         private float throwSpeed = 5f;
         [SerializeField]
         private int handSizeBeforeAttack = 5;
-        [SerializeField]
-        private float lineOfSightSphereCastRaidus = 0.25f;
         [SerializeField]
         private Renderer _renderer;
 
@@ -44,50 +41,44 @@ namespace SaloonSlingers.Unity.Slingers
         private Vector3 spawnPosition;
         private HandInteractableSpawner handInteractableSpawner;
         private Color originalColor;
+        private VisibilityDetector visibilityDetector;
 
         public void Reset()
         {
-            var health = GetComponent<Health>();
             health.Reset();
         }
 
         private void Awake()
         {
-            var player = GameObject.FindGameObjectWithTag("Player");
-            playerTarget = player.GetComponent<XROrigin>().Camera.transform;
-            currentTarget = playerTarget;
-            targetHealth = player.GetComponent<Health>();
+            agent = GetComponent<NavMeshAgent>();
+            rigidBody = GetComponent<Rigidbody>();
+            visibilityDetector = GetComponent<VisibilityDetector>();
             health = GetComponent<Health>();
+
             cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<CardSpawner>();
             handInteractableSpawner = GameObject.FindGameObjectWithTag("HandInteractableSpawner")
                                                 .GetComponent<HandInteractableSpawner>();
             originalColor = _renderer.material.color;
         }
 
-        private void Start()
-        {
-            agent = GetComponent<NavMeshAgent>();
-            rigidBody = GetComponent<Rigidbody>();
-        }
-
         private void Update()
         {
-            if (currentTarget == null)
+            if (currentTarget != null)
             {
-                ReturnHome();
+                agent.SetDestination(currentTarget.position);
+                FaceTarget();
                 return;
             }
 
-            float distance = Vector3.Distance(currentTarget.position, transform.position);
-            if (distance <= lookDistance)
+            foreach (var target in visibilityDetector.GetVisible(LayerMask.GetMask("Player")))
             {
-                FaceTarget();
-                agent.SetDestination(currentTarget.position);
+                currentTarget = target.transform.GetComponent<XROrigin>().Camera.transform;
+                targetHealth = currentTarget.GetComponent<Health>();
                 agent.stoppingDistance = persueStoppingDistance;
                 if (!IsInvoking(nameof(Attack)))
                     InvokeRepeating(nameof(Attack), 0.0f, 1.0f);
+                Debug.DrawLine(transform.position, target.point, Color.blue, 1f);
             }
-            else ReturnHome();
         }
 
         private void ReturnHome()
@@ -99,8 +90,10 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void OnDrawGizmosSelected()
         {
+            if (visibilityDetector == null) return;
+
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, lookDistance);
+            Gizmos.DrawWireSphere(transform.position, visibilityDetector.SightDistance);
         }
 
         private void FaceTarget()
@@ -115,20 +108,26 @@ namespace SaloonSlingers.Unity.Slingers
             Deck = new Deck().Shuffle();
             Deck.OnDeckEmpty += DeckEmptyHandler;
             spawnPosition = transform.position;
-            targetHealth.Points.OnPointsChanged += HandleTargetHealthChanged;
+            if (targetHealth != null)
+                targetHealth.Points.OnPointsChanged += HandleTargetHealthChanged;
             health.Points.OnPointsChanged += HandleHealthChanged;
         }
 
         private void OnDisable()
         {
             Deck.OnDeckEmpty -= DeckEmptyHandler;
-            targetHealth.Points.OnPointsChanged -= HandleTargetHealthChanged;
+            if (targetHealth != null)
+                targetHealth.Points.OnPointsChanged -= HandleTargetHealthChanged;
             health.Points.OnPointsChanged -= HandleHealthChanged;
         }
 
         private void HandleTargetHealthChanged(Points sender, ValueChangeEvent<uint> e)
         {
-            if (e.After == 0) currentTarget = null;
+            if (e.After == 0)
+            {
+                currentTarget = null;
+                ReturnHome();
+            }
             if (e.Before == 0 && e.After != 0) currentTarget = playerTarget;
         }
 
@@ -166,25 +165,14 @@ namespace SaloonSlingers.Unity.Slingers
                 return;
             }
 
-            if (Physics.SphereCast(transform.position,
-                           lineOfSightSphereCastRaidus,
-                           transform.forward,
-                           out RaycastHit hit,
-                           lookDistance,
-                           LayerMask.GetMask("Player", "Envionrment")))
-            {
-                Debug.DrawLine(transform.position, hit.point, Color.blue, 1f);
-                if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Environment")) return; ;
-
-                currentHandController.transform.SetParent(null, true);
-                // Aim for more center mass
-                Vector3 heightOffset = new(0, 0.25f, 0);
-                Vector3 direction = (currentTarget.position - heightOffset - transform.position).normalized;
-                currentHandController.Throw(direction * throwSpeed);
-                ControllerSwapper swapper = currentHandController.GetComponent<ControllerSwapper>();
-                swapper.SetController(ControllerTypes.PLAYER);
-                currentHandController = null;
-            }
+            currentHandController.transform.SetParent(null, true);
+            // Aim for more center mass
+            Vector3 heightOffset = new(0, 0.25f, 0);
+            Vector3 direction = (currentTarget.position - transform.position - heightOffset).normalized;
+            currentHandController.Throw(direction * throwSpeed);
+            ControllerSwapper swapper = currentHandController.GetComponent<ControllerSwapper>();
+            swapper.SetController(ControllerTypes.PLAYER);
+            currentHandController = null;
         }
 
         private void DespawnHandProjectile(object sender, EventArgs _)

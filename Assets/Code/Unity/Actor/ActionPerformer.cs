@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
+    /// <summary>
+    /// Abstracts some action to be taken that costs some amount of action points to perform.
+    /// </summary>
     public class ActionPerformer : MonoBehaviour
     {
         private bool canPerformAction = true;

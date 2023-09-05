@@ -20,21 +20,16 @@ namespace SaloonSlingers.Unity.CardEntities
         private XRBaseInteractable mainInteractable;
         [SerializeField]
         private XRBaseInteractable peerInteractable;
-        [SerializeField]
-        private float homingSphereCastRadius = 0.25f;
-        [SerializeField]
-        private float homingSphereCastDistance = 15f;
 
         private HandProjectile handProjectile;
         private DeckGraphic deckGraphic;
         private Homable homable;
         private int? slingerId;
-        private Transform playerCamera;
 
-        private readonly RaycastHit[] spherecastHits = new RaycastHit[5];
         private Rigidbody rb;
         private HomingStrengthCalculator homingStrengthCalculator;
         private CharacterControllerThrowOffsetCalculator throwOffsetCalculator;
+        private VisibilityDetector visibilityDetector;
 
         public void OnSelectEnter(SelectEnterEventArgs args)
         {
@@ -48,9 +43,9 @@ namespace SaloonSlingers.Unity.CardEntities
                 ActorHandedness handedness = origin.GetComponent<ActorHandedness>();
                 homingStrengthCalculator = origin.GetComponent<HomingStrengthCalculator>();
                 throwOffsetCalculator = origin.GetComponent<CharacterControllerThrowOffsetCalculator>();
+                visibilityDetector = origin.GetComponent<VisibilityDetector>();
                 deckGraphic = handedness.DeckGraphic;
                 handProjectile.AssignDeck(deckGraphic.Deck);
-                playerCamera = origin.Camera.transform;
             }
             handProjectile.transform.SetParent(args.interactorObject.transform);
             peerInteractable.enabled = true;
@@ -68,28 +63,15 @@ namespace SaloonSlingers.Unity.CardEntities
             peerInteractable.enabled = false;
             handProjectile.Death += OnHandProjectileDied;
 
-            int nHits = Physics.SphereCastNonAlloc(playerCamera.position,
-                                                   homingSphereCastRadius,
-                                                   playerCamera.forward,
-                                                   spherecastHits,
-                                                   homingSphereCastDistance,
-                                                   LayerMask.GetMask("Enemy"));
-
-            var target = spherecastHits.Take(nHits)
-                                       .OrderByDescending(hit => playerCamera.GetAlignment(hit.point))
-                                       .Where(hit => !IsObstructed(hit, playerCamera))
-                                       .Select(hit => hit.transform)
-                                       .FirstOrDefault();
+            var target = visibilityDetector.GetVisible(LayerMask.GetMask("Enemy"))
+                                           .Select(hit => hit.transform)
+                                           .FirstOrDefault();
             if (target != null) homable.Target = target;
 
             handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
             homingStrengthCalculator.StartNewThrow();
         }
 
-        private bool IsObstructed(RaycastHit hit, Transform gazeTransform)
-        {
-            return Physics.Linecast(gazeTransform.position, hit.point, LayerMask.GetMask("Environment"));
-        }
 
         private void OnHandProjectileDied(object sender, EventArgs e)
         {
@@ -130,15 +112,6 @@ namespace SaloonSlingers.Unity.CardEntities
         {
             mainInteractable.enabled = false;
             peerInteractable.enabled = false;
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (playerCamera == null) return;
-            SpherecastVisualizer.DrawSphereCastAll(playerCamera,
-                                                   homingSphereCastRadius,
-                                                   homingSphereCastDistance,
-                                                   LayerMask.GetMask("Enemy", "Environment"));
         }
 
         private void OnToggleCommit(InputAction.CallbackContext _)
