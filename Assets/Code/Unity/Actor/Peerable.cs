@@ -42,6 +42,8 @@ namespace SaloonSlingers.Unity
         private const int maxPeerHits = 10;
         [SerializeField]
         private Collider[] peerHits = new Collider[maxPeerHits];
+        [SerializeField]
+        private VisibilityDetector visibilityDetector;
 
         public void CastPeer()
         {
@@ -62,11 +64,10 @@ namespace SaloonSlingers.Unity
 
             while (currentDuration > 0)
             {
-                int nHits = Physics.OverlapSphereNonAlloc(PeerSpherePosition, peerRadius, peerHits, LayerMask.GetMask("Enemy"));
+                var closest = visibilityDetector.GetVisible(LayerMask.GetMask("Enemy"), xRay: true)
+                                                .Select(hit => hit.transform)
+                                                .FirstOrDefault();
 
-                var closest = peerHits.Take(nHits)
-                                      .OrderByDescending(hit => cameraTransform.GetAlignment(hit.transform))
-                                      .FirstOrDefault();
                 if (closest == null)
                 {
                     handedness.EnemyPeerDisplay.SetProjectile(null);
@@ -97,12 +98,6 @@ namespace SaloonSlingers.Unity
             if (lastEnemy != null) lastOutline.enabled = false;
         }
 
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = IsPerforming ? Color.green : Color.red;
-            Gizmos.DrawWireSphere(PeerSpherePosition, peerRadius);
-        }
-
         private void OnEnable()
         {
             foreach (var property in peerActionProperties)
@@ -119,13 +114,9 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
+            visibilityDetector = GetComponent<VisibilityDetector>();
             if (cameraTransform != null) return;
             cameraTransform = GetComponent<XROrigin>().Camera.transform;
-        }
-
-        private Vector3 PeerSpherePosition
-        {
-            get => (cameraTransform.forward * peerDistance) + cameraTransform.position;
         }
 
         private void Start()

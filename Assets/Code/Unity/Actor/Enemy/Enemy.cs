@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.Linq;
-
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.CardEntities;
 
@@ -30,13 +28,11 @@ namespace SaloonSlingers.Unity.Slingers
         [SerializeField]
         private Renderer _renderer;
 
-        private Transform playerTarget;
         private Transform currentTarget;
         private Health targetHealth;
         private Health health;
         private NavMeshAgent agent;
         private EnemyHandInteractableController currentHandController;
-        private Rigidbody rigidBody;
         private CardSpawner cardSpawner;
         private Vector3 spawnPosition;
         private HandInteractableSpawner handInteractableSpawner;
@@ -51,7 +47,6 @@ namespace SaloonSlingers.Unity.Slingers
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
-            rigidBody = GetComponent<Rigidbody>();
             visibilityDetector = GetComponent<VisibilityDetector>();
             health = GetComponent<Health>();
 
@@ -65,6 +60,11 @@ namespace SaloonSlingers.Unity.Slingers
         {
             if (currentTarget != null)
             {
+                if (Vector3.Distance(currentTarget.position, transform.position) > visibilityDetector.SightDistance)
+                {
+                    ReturnHome();
+                    return;
+                }
                 agent.SetDestination(currentTarget.position);
                 FaceTarget();
                 return;
@@ -83,17 +83,10 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void ReturnHome()
         {
+            currentTarget = null;
             agent.SetDestination(spawnPosition);
             agent.stoppingDistance = 0f;
             CancelInvoke(nameof(Attack));
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            if (visibilityDetector == null) return;
-
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, visibilityDetector.SightDistance);
         }
 
         private void FaceTarget()
@@ -128,7 +121,6 @@ namespace SaloonSlingers.Unity.Slingers
                 currentTarget = null;
                 ReturnHome();
             }
-            if (e.Before == 0 && e.After != 0) currentTarget = playerTarget;
         }
 
         private IEnumerator HitEffect()

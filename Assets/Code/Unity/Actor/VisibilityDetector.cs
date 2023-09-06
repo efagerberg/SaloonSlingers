@@ -25,7 +25,7 @@ namespace SaloonSlingers.Unity
 
         private RaycastHit[] hits;
 
-        public IEnumerable<RaycastHit> GetVisible(LayerMask mask = default)
+        public IEnumerable<RaycastHit> GetVisible(LayerMask mask = default, bool xRay = false)
         {
             if (mask == default) mask = layerMask;
             int nHitsFound = Physics.SphereCastNonAlloc(sightTransform.position,
@@ -37,7 +37,7 @@ namespace SaloonSlingers.Unity
 
             return hits.Take(nHitsFound)
                        .OrderByDescending(hit => sightTransform.GetAlignment(hit.point))
-                       .Where(hit => !IsObstructed(hit, sightTransform));
+                       .Where(hit => xRay || !IsObstructed(hit, sightTransform));
         }
 
         private bool IsObstructed(RaycastHit hit, Transform gazeTransform)

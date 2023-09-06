@@ -23,17 +23,18 @@ namespace SaloonSlingers.Unity
         private float[] maxes;
         private int currentIndex = 0;
 
-        public float Calculate(float yAngularVelocity)
-        {
-            float scaled = Mathf.Abs(yAngularVelocity) / effectivenessThreshold;
-            float strength = baseStrength * Sigmoid(sigmoidSlope * scaled);
+    public float Calculate(float yAngularVelocity)
+    {
+        float absYAngVel = Mathf.Abs(yAngularVelocity);
+        float scaled = (absYAngVel - effectivenessThreshold) / sigmoidSlope;
+        float strength = baseStrength * Sigmoid(sigmoidSlope * scaled);
 
-            maxes[currentIndex] = Mathf.Max(maxes[currentIndex], yAngularVelocity);
-            var newThreshold = CalculateEffectivenessThreshold(maxes, percentOfAverage);
-            if (newThreshold != null) effectivenessThreshold = newThreshold.Value;
+        maxes[currentIndex] = Mathf.Max(maxes[currentIndex], absYAngVel);
+        var newThreshold = CalculateEffectivenessThreshold(maxes, percentOfAverage);
+        if (newThreshold != null) effectivenessThreshold = newThreshold.Value;
             
-            return strength;
-        }
+        return strength;
+    }
 
         private static float? CalculateEffectivenessThreshold(float[] maxes, float percentOfAverage)
         {
