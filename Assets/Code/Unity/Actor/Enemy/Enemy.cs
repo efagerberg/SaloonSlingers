@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Linq;
+
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.CardEntities;
 
@@ -27,8 +29,20 @@ namespace SaloonSlingers.Unity.Slingers
         private int handSizeBeforeAttack = 5;
         [SerializeField]
         private Renderer _renderer;
+        [SerializeField]
+        private float visibilityIntervalSeconds = 1f;
 
-        private Transform currentTarget;
+        private Transform _currentTarget;
+        private Transform currentTarget {
+            get => _currentTarget;
+            set {
+                if (value == default)
+                    _renderer.material.color = originalColor;
+                else
+                    _renderer.material.color = Color.red;
+                _currentTarget = value;
+            }
+        }
         private Health targetHealth;
         private Health health;
         private NavMeshAgent agent;
@@ -42,6 +56,10 @@ namespace SaloonSlingers.Unity.Slingers
         public void Reset()
         {
             health.Reset();
+            currentTarget = null;
+            agent.stoppingDistance = 0f;
+            currentHandController = null;
+            CancelInvoke(nameof(Attack));
         }
 
         private void Awake()
@@ -70,15 +88,8 @@ namespace SaloonSlingers.Unity.Slingers
                 return;
             }
 
-            foreach (var target in visibilityDetector.GetVisible(LayerMask.GetMask("Player")))
-            {
-                currentTarget = target.transform.GetComponent<XROrigin>().Camera.transform;
-                targetHealth = currentTarget.GetComponent<Health>();
-                agent.stoppingDistance = persueStoppingDistance;
-                if (!IsInvoking(nameof(Attack)))
-                    InvokeRepeating(nameof(Attack), 0.0f, 1.0f);
-                Debug.DrawLine(transform.position, target.point, Color.blue, 1f);
-            }
+            if (!IsInvoking(nameof(LookForPlayer)))
+                InvokeRepeating(nameof(LookForPlayer), visibilityIntervalSeconds, visibilityIntervalSeconds);
         }
 
         private void ReturnHome()
@@ -130,12 +141,26 @@ namespace SaloonSlingers.Unity.Slingers
             _renderer.material.color = originalColor;
         }
 
+        private void LookForPlayer()
+        {
+            var player = visibilityDetector.GetVisible(LayerMask.GetMask("Player")).FirstOrDefault();
+            if (player == null) return;
+
+            currentTarget = player.GetComponent<XROrigin>().Camera.transform;
+            targetHealth = currentTarget.GetComponent<Health>();
+            agent.stoppingDistance = persueStoppingDistance;
+            CancelInvoke(nameof(LookForPlayer));
+            if (!IsInvoking(nameof(Attack)))
+                InvokeRepeating(nameof(Attack), 0.0f, 1.0f);
+        }
+
         private void HandleHealthChanged(Points sender, ValueChangeEvent<uint> e)
         {
             if (e.Before > e.After && e.After != 0) StartCoroutine(nameof(HitEffect));
             if (e.After == 0)
             {
                 CancelInvoke(nameof(Attack));
+                CancelInvoke(nameof(LookForPlayer));
                 StopCoroutine(nameof(HitEffect));
                 _renderer.material.color = originalColor;
                 Death?.Invoke(gameObject, EventArgs.Empty);
@@ -144,7 +169,7 @@ namespace SaloonSlingers.Unity.Slingers
 
         private void Attack()
         {
-            if (!agent.hasPath) return;
+            if (currentTarget == null) return;
             if (currentHandController == null)
             {
                 GameObject clone = SpawnInteractable();
@@ -180,6 +205,7 @@ namespace SaloonSlingers.Unity.Slingers
         {
             CancelInvoke(nameof(Attack));
         }
+
         private GameObject SpawnInteractable()
         {
             GameObject spawned = handInteractableSpawner.Spawn();
