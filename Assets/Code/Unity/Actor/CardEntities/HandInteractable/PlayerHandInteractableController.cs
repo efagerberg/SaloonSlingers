@@ -64,7 +64,6 @@ public class PlayerHandInteractableController : MonoBehaviour
         handProjectile.Death += OnHandProjectileDied;
 
         var target = visibilityDetector.GetVisible(LayerMask.GetMask("Enemy"))
-                                        .Select(hit => hit.transform)
                                         .FirstOrDefault();
         if (target != null) homable.Target = target;
 

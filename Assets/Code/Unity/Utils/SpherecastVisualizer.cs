@@ -18,8 +18,6 @@ public class SpherecastVisualizer : MonoBehaviour
 
     public static void DrawSpherecast(Transform transform, float radius, float maxDistance, LayerMask mask)
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, radius);
         bool isHit = Physics.SphereCast(transform.position, radius, transform.forward, out RaycastHit hit, maxDistance, mask);
         Gizmos.color = Color.green;
         Gizmos.DrawRay(transform.position, transform.forward * maxDistance);
@@ -30,10 +28,8 @@ public class SpherecastVisualizer : MonoBehaviour
         }
     }
 
-    public static void DrawSphereCastAll(Transform transform, float radius, float maxDistance, LayerMask mask, uint n = 5)
+    public static void DrawSphereCastAll(Transform transform, float radius, float maxDistance, LayerMask mask, int n = 5)
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, radius);
         var hits = new RaycastHit[n];
         int nHits = Physics.SphereCastNonAlloc(transform.position, radius, transform.forward, hits, maxDistance, mask);
         Gizmos.color = Color.green;

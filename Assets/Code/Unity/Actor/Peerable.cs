@@ -21,10 +21,6 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private List<InputActionProperty> peerActionProperties;
         [SerializeField]
-        private float peerRadius = 10;
-        [SerializeField]
-        private float peerDistance = 5;
-        [SerializeField]
         private uint startingPeers = 3;
         [SerializeField]
         private float startingCooldown = 3;
@@ -65,7 +61,6 @@ namespace SaloonSlingers.Unity
             while (currentDuration > 0)
             {
                 var closest = visibilityDetector.GetVisible(LayerMask.GetMask("Enemy"), xRay: true)
-                                                .Select(hit => hit.transform)
                                                 .FirstOrDefault();
 
                 if (closest == null)
