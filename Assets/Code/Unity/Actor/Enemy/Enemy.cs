@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
 using System.Linq;
-using System.Threading;
-
-using NUnit.Framework.Constraints;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.CardEntities;
