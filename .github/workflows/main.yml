@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  tests:
     name: ${{ matrix.testMode }} Mode Test
     runs-on: ubuntu-latest
     strategy:
@@ -24,13 +24,13 @@ jobs:
           - editmode
           # - standalone
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           lfs: true
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: Library
-          key: Library-SaloonSlingers
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
             Library-
       - uses: game-ci/unity-test-runner@v3
@@ -42,43 +42,13 @@ jobs:
           artifactsPath: ${{ matrix.testMode }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: ${{ matrix.testMode }} Test Results
-          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+my.assembly.*'
-      - uses: actions/upload-artifact@v2
-        if: always()
+          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+SaloonSlingers.*'
+      - uses: actions/upload-artifact@v3
         with:
           name: Test results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.artifactsPath }}
-      - uses: actions/upload-artifact@v2
-        if: always()
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
         with:
-          name: Coverage results for ${{ matrix.testMode }}
-          path: ${{ steps.tests.outputs.coveragePath }}
-  build:
-    name: ${{ matrix.targetPlatform }} Build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-          targetPlatform:
-            - Android
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-      - uses: actions/cache@v2
-        with:
-          path: Library
-          key: Library-SaloonSlingers-${{ matrix.targetPlatform }}
-          restore-keys: |
-            Library-
-      - if: matrix.targetPlatform == 'Android'
-        uses: jlumbroso/free-disk-space@v1.2.0
-      - uses: game-ci/unity-builder@v3
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-        with:
-          targetPlatform: ${{ matrix.targetPlatform }}
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Build-${{ matrix.targetPlatform }}
-          path: build/${{ matrix.targetPlatform }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ${{ steps.tests.outputs.coveragePath }}/**/*.xml
