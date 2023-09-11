@@ -284,18 +284,6 @@ namespace SaloonSlingers.Core.HandEvaluators
                 return totalBitSize - pos * BITS_PER_NIBBLE - BITS_PER_NIBBLE;
             }
 
-            public static List<uint> ToList(uint nibbles)
-            {
-                List<uint> nibbleList = new();
-                while (nibbles > 0)
-                {
-                    uint subNibble = nibbles & 0xF;
-                    nibbleList.Insert(0, subNibble);
-                    nibbles >>= BITS_PER_NIBBLE;
-                }
-                return nibbleList;
-            }
-
             public const int BITS_PER_NIBBLE = 4;
         }
 
