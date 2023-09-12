@@ -6,8 +6,6 @@ using Newtonsoft.Json;
 
 using NUnit.Framework;
 
-using SaloonSlingers.Core;
-
 namespace SaloonSlingers.Core.Tests
 {
     class GameRulesTests

@@ -71,7 +71,7 @@ namespace SaloonSlingers.Unity.Actor
         public void TryDrawCard(Func<GameObject> spawnCard)
         {
             drawCtx.Deck = deck;
-            drawCtx.Evaluation = handEvaluation;
+            drawCtx.Evaluation = HandEvaluation;
             drawCtx.Hand = Cards;
             bool canDraw = (
                 !state.IsCommitted &&

@@ -11,7 +11,7 @@ namespace SaloonSlingers.Core
 
         public bool CanDraw(DrawContext ctx)
         {
-            return ctx.Deck.HasCards && ctx.Evaluation.Score <= maxScore;
+            return ctx.Evaluation.Score <= maxScore;
         }
     }
 }

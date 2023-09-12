@@ -13,7 +13,7 @@ namespace SaloonSlingers.Core
 
         public bool CanDraw(DrawContext ctx)
         {
-            return ctx.Deck.HasCards && ctx.Hand.Count() < maxSize;
+            return ctx.Hand.Count() < maxSize;
         }
     }
 }

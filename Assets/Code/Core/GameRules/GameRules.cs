@@ -15,7 +15,7 @@ namespace SaloonSlingers.Core
         private IHandEvaluator handEvaluator;
 
         public readonly bool CanDraw(DrawContext ctx) {
-            return ctx.Deck.HasCards && drawRules.All(x => x.CanDraw(ctx));
+             return ctx.Deck.HasCards && drawRules.All(x => x.CanDraw(ctx));
         }
 
         public readonly HandEvaluation Evaluate(IEnumerable<Card> hand) => handEvaluator.Evaluate(hand);
@@ -51,6 +51,16 @@ namespace SaloonSlingers.Core
             {
                 int maxHandSize = Convert.ToInt32(rawConfig["MaxHandSize"]);
                 rules.Add(new MaxHandSizeDrawRule(maxHandSize));
+            }
+            if (rawConfig.ContainsKey("MaxScore"))
+            {
+                uint maxScore = Convert.ToUInt32(rawConfig["MaxScore"]);
+                rules.Add(new MaxScoreDrawRule(maxScore));
+            }
+            if (rawConfig.ContainsKey("MinScore"))
+            {
+                uint minScore = Convert.ToUInt32(rawConfig["MinScore"]);
+                rules.Add(new MinScoreDrawRule(minScore));
             }
             return rules;
         }
