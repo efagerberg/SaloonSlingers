@@ -5,10 +5,8 @@ using SaloonSlingers.Core;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity.CardEntities
+namespace SaloonSlingers.Unity.Actor
 {
-    public delegate void DeckGraphicEmptyHandler(DeckGraphic sender, EventArgs e);
-
     public class DeckGraphic : MonoBehaviour
     {
         public Transform TopCardTransform { get => cardGraphics.Peek().transform; }

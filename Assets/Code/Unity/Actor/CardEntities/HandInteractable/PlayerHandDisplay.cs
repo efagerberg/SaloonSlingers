@@ -1,12 +1,11 @@
 using SaloonSlingers.Core;
-using SaloonSlingers.Unity.CardEntities;
 
 using TMPro;
 
 using UnityEngine;
 
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     public class PlayerHandDisplay : HandDisplay
     {

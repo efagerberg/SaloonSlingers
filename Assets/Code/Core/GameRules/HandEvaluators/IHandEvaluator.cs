@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SaloonSlingers.Core.HandEvaluators
+namespace SaloonSlingers.Core
 {
     public interface IHandEvaluator
     {

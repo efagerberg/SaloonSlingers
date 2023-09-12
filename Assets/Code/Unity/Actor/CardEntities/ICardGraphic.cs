@@ -2,7 +2,7 @@ using SaloonSlingers.Core;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity.CardEntities
+namespace SaloonSlingers.Unity.Actor
 {
     public interface ICardGraphic : IActor
     {

@@ -2,7 +2,7 @@ using System;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity.CardEntities
+namespace SaloonSlingers.Unity.Actor
 {
     public class HandInteractablePlacer : MonoBehaviour
     {
@@ -10,12 +10,16 @@ namespace SaloonSlingers.Unity.CardEntities
         private HandInteractableSpawner handInteractableSpawner;
         private GameObject placed;
 
+        private void Awake()
+        {
+            deckGraphic = GetComponent<DeckGraphic>();
+        }
+
         private void Start()
         {
             handInteractableSpawner = GameObject.FindGameObjectWithTag("HandInteractableSpawner")
                                                 .GetComponent<HandInteractableSpawner>();
 
-            deckGraphic = GetComponent<DeckGraphic>();
             if (!deckGraphic.CanDraw) return;
 
             PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
@@ -58,6 +62,23 @@ namespace SaloonSlingers.Unity.CardEntities
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();
             swapper.SetController(ControllerTypes.PLAYER);
             return spawned;
+        }
+
+        private void OnEnable()
+        {
+            deckGraphic.Deck.OnDeckEmpty += OnDeckEmpty;
+        }
+
+        private void OnDisable()
+        {
+            deckGraphic.Deck.OnDeckEmpty -= OnDeckEmpty;
+        }
+
+        private void OnDeckEmpty(Core.Deck sender, EventArgs e)
+        {
+            if (placed == null) return;
+            var projectile = placed.GetComponent<HandProjectile>();
+            projectile.Kill();
         }
     }
 }

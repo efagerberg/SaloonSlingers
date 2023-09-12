@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 using NUnit.Framework;
 
-using SaloonSlingers.Core.HandEvaluators;
-
 namespace SaloonSlingers.Core.Tests
 {
     public static class TestHelpers

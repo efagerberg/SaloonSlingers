@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SaloonSlingers.Core.HandEvaluators
+namespace SaloonSlingers.Core
 {
     public class PokerHandEvaluator : IHandEvaluator
     {

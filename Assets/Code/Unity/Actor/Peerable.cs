@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using SaloonSlingers.Core;
-using SaloonSlingers.Unity.CardEntities;
-using SaloonSlingers.Unity.Slingers;
 
 using Unity.XR.CoreUtils;
 
@@ -12,7 +10,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     public class Peerable : ActionPerformer
     {

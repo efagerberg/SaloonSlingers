@@ -1,6 +1,6 @@
 using System;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     public interface IActor
     {

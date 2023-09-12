@@ -3,14 +3,13 @@ using System.Collections;
 using System.Linq;
 
 using SaloonSlingers.Core;
-using SaloonSlingers.Unity.CardEntities;
 
 using Unity.XR.CoreUtils;
 
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace SaloonSlingers.Unity.Slingers
+namespace SaloonSlingers.Unity.Actor
 {
     public class Enemy : MonoBehaviour, IActor
     {
@@ -25,8 +24,6 @@ namespace SaloonSlingers.Unity.Slingers
         private float persueStoppingDistance = 5f;
         [SerializeField]
         private float throwSpeed = 5f;
-        [SerializeField]
-        private int handSizeBeforeAttack = 5;
         [SerializeField]
         private Renderer _renderer;
         [SerializeField]
@@ -52,6 +49,8 @@ namespace SaloonSlingers.Unity.Slingers
         private HandInteractableSpawner handInteractableSpawner;
         private Color originalColor;
         private VisibilityDetector visibilityDetector;
+        private GameRulesManager gameRulesManager;
+        private DrawContext drawCtx;
 
         public void Reset()
         {
@@ -72,6 +71,7 @@ namespace SaloonSlingers.Unity.Slingers
             handInteractableSpawner = GameObject.FindGameObjectWithTag("HandInteractableSpawner")
                                                 .GetComponent<HandInteractableSpawner>();
             originalColor = _renderer.material.color;
+            gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
         }
 
         private void Update()
@@ -176,7 +176,11 @@ namespace SaloonSlingers.Unity.Slingers
                 currentHandController = clone.GetComponent<EnemyHandInteractableController>();
                 currentHandController.transform.SetParent(handAttachTransform, false);
             }
-            if (currentHandController.Cards.Count < handSizeBeforeAttack)
+            HandProjectile projectile = currentHandController.GetComponent<HandProjectile>();
+            drawCtx.Hand = projectile.Cards;
+            drawCtx.Evaluation = projectile.HandEvaluation;
+            drawCtx.Deck = Deck;
+            if (gameRulesManager.GameRules.CanDraw(drawCtx))
             {
                 currentHandController.Draw(Deck, cardSpawner.Spawn);
                 return;

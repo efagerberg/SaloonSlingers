@@ -5,7 +5,7 @@ using SaloonSlingers.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     public class PlayerHit : MonoBehaviour
     {

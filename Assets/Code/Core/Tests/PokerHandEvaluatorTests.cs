@@ -3,8 +3,6 @@ using System.Linq;
 
 using NUnit.Framework;
 
-using SaloonSlingers.Core.HandEvaluators;
-
 namespace SaloonSlingers.Core.Tests
 {
     public class PokerHandEvaluatorTests

@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace SaloonSlingers.Core
 {
-    public struct HandEvaluation
+    public struct HandEvaluation: IEquatable<HandEvaluation>
     {
         public HandEvaluation(HandNames name, uint score, IEnumerable<int> keyIndexes = null)
         {
@@ -26,6 +26,11 @@ namespace SaloonSlingers.Core
             string enumName = Enum.GetName(typeof(HandNames), Name);
             TextInfo textInfo = Thread.CurrentThread.CurrentCulture.TextInfo;
             return textInfo.ToTitleCase(enumName.Replace("_", " ").ToLower());
+        }
+
+        public readonly bool Equals(HandEvaluation other)
+        {
+            return Name == other.Name && Score == other.Score && KeyIndexes.SequenceEqual(other.KeyIndexes);
         }
     }
 }

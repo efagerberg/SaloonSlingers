@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     /// <summary>
     /// Calculates the homing strength of a card throw based off of the angular velocity in the y axis, and previous throw data.

@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     /// <summary>
     /// When throwing objects as the player it can become important to ignore the character's velocity which gets added to the rigidbody being thrown.
