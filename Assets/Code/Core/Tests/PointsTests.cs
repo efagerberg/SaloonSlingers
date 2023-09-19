@@ -41,4 +41,13 @@ public class PointsTests
 
         Assert.That(subject.Value, Is.EqualTo(2));
     }
+
+    [Test]
+    public void TestPointsBelowMinIsClampedTo0()
+    {
+        var subject = new Points(2);
+        subject.Value -= 10;
+
+        Assert.That(subject.Value, Is.EqualTo(0));
+    }
 }
