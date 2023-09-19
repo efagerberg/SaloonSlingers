@@ -1,8 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
-
 using NUnit.Framework;
 
 using SaloonSlingers.Core;
@@ -43,7 +38,7 @@ public class PointsTests
     {
         var subject = new Points(2);
         subject.Value *= 2;
-        
+
         Assert.That(subject.Value, Is.EqualTo(2));
     }
 }

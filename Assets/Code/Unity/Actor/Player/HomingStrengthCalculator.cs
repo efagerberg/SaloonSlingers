@@ -19,22 +19,22 @@ namespace SaloonSlingers.Unity.Actor
 
         [SerializeField]
         private int nMaxesToTrack = 5;
-        
+
         private float[] maxes;
         private int currentIndex = 0;
 
-    public float Calculate(float yAngularVelocity)
-    {
-        float absYAngVel = Mathf.Abs(yAngularVelocity);
-        float scaled = (absYAngVel - effectivenessThreshold) / sigmoidSlope;
-        float strength = baseStrength * Sigmoid(sigmoidSlope * scaled);
+        public float Calculate(float yAngularVelocity)
+        {
+            float absYAngVel = Mathf.Abs(yAngularVelocity);
+            float scaled = (absYAngVel - effectivenessThreshold) / sigmoidSlope;
+            float strength = baseStrength * Sigmoid(sigmoidSlope * scaled);
 
-        maxes[currentIndex] = Mathf.Max(maxes[currentIndex], absYAngVel);
-        var newThreshold = CalculateEffectivenessThreshold(maxes, percentOfAverage);
-        if (newThreshold != null) effectivenessThreshold = newThreshold.Value;
-            
-        return strength;
-    }
+            maxes[currentIndex] = Mathf.Max(maxes[currentIndex], absYAngVel);
+            var newThreshold = CalculateEffectivenessThreshold(maxes, percentOfAverage);
+            if (newThreshold != null) effectivenessThreshold = newThreshold.Value;
+
+            return strength;
+        }
 
         private static float? CalculateEffectivenessThreshold(float[] maxes, float percentOfAverage)
         {

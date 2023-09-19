@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace SaloonSlingers.Core
 {
-    public struct HandEvaluation: IEquatable<HandEvaluation>
+    public struct HandEvaluation : IEquatable<HandEvaluation>
     {
         public HandEvaluation(HandNames name, uint score, IEnumerable<int> keyIndexes = null)
         {

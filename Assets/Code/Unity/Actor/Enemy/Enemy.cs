@@ -30,9 +30,11 @@ namespace SaloonSlingers.Unity.Actor
         private float visibilityIntervalSeconds = 1f;
 
         private Transform _currentTarget;
-        private Transform currentTarget {
+        private Transform currentTarget
+        {
             get => _currentTarget;
-            set {
+            set
+            {
                 if (value == default)
                     _renderer.material.color = originalColor;
                 else

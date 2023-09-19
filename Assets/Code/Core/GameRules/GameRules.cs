@@ -10,12 +10,13 @@ namespace SaloonSlingers.Core
     public struct GameRules : IDrawRule, IHandEvaluator
     {
         public string Name { get; private set; }
-        
+
         private IList<IDrawRule> drawRules;
         private IHandEvaluator handEvaluator;
 
-        public readonly bool CanDraw(DrawContext ctx) {
-             return ctx.Deck.HasCards && drawRules.All(x => x.CanDraw(ctx));
+        public readonly bool CanDraw(DrawContext ctx)
+        {
+            return ctx.Deck.HasCards && drawRules.All(x => x.CanDraw(ctx));
         }
 
         public readonly HandEvaluation Evaluate(IEnumerable<Card> hand) => handEvaluator.Evaluate(hand);
