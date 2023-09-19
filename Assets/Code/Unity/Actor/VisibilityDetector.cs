@@ -1,10 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     public class VisibilityDetector : MonoBehaviour
     {

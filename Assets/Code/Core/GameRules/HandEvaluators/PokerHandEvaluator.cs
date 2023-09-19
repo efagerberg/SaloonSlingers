@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SaloonSlingers.Core.HandEvaluators
+namespace SaloonSlingers.Core
 {
     public class PokerHandEvaluator : IHandEvaluator
     {
@@ -282,18 +282,6 @@ namespace SaloonSlingers.Core.HandEvaluators
             public static int GetLeftNibbleOffset(int totalBitSize, int pos)
             {
                 return totalBitSize - pos * BITS_PER_NIBBLE - BITS_PER_NIBBLE;
-            }
-
-            public static List<uint> ToList(uint nibbles)
-            {
-                List<uint> nibbleList = new();
-                while (nibbles > 0)
-                {
-                    uint subNibble = nibbles & 0xF;
-                    nibbleList.Insert(0, subNibble);
-                    nibbles >>= BITS_PER_NIBBLE;
-                }
-                return nibbleList;
             }
 
             public const int BITS_PER_NIBBLE = 4;

@@ -5,7 +5,7 @@ using SaloonSlingers.Core;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     /// <summary>
     /// Abstracts some action to be taken that costs some amount of action points to perform.

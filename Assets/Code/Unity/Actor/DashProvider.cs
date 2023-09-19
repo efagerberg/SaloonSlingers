@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace SaloonSlingers.Unity.Slingers
+namespace SaloonSlingers.Unity.Actor
 {
     public class DashProvider : LocomotionProvider
     {

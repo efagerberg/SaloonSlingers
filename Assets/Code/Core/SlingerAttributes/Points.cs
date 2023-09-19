@@ -11,7 +11,9 @@ namespace SaloonSlingers.Core
             set
             {
                 uint before = _value;
-                _value = Math.Clamp(value, 0, MaxValue);
+                // Value could be negative technically, but the actual _value variable needs to be
+                // positive.
+                _value = (uint)Math.Clamp((int)value, 0, MaxValue);
                 if (before == _value) return;
 
                 OnPointsChanged?.Invoke(
@@ -26,7 +28,7 @@ namespace SaloonSlingers.Core
         public Points(uint initial)
         {
             MaxValue = initial;
-            Value = initial;
+            _value = initial;
         }
 
         private uint _value;

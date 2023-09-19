@@ -6,7 +6,7 @@ using SaloonSlingers.Core;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity.CardEntities
+namespace SaloonSlingers.Unity.Actor
 {
     public delegate void HandProjectileHeld(HandProjectile sender, EventArgs e);
 
@@ -22,7 +22,7 @@ namespace SaloonSlingers.Unity.CardEntities
             {
                 if (requiresEvaluation)
                 {
-                    handEvaluation = gameRulesManager.GameRules.HandEvaluator.Evaluate(Cards);
+                    handEvaluation = gameRulesManager.GameRules.Evaluate(Cards);
                     requiresEvaluation = false;
                 }
                 return handEvaluation;
@@ -53,6 +53,7 @@ namespace SaloonSlingers.Unity.CardEntities
         private GameRulesManager gameRulesManager;
         private HandEvaluation handEvaluation;
         private bool requiresEvaluation = false;
+        private DrawContext drawCtx;
 
         public void Pickup(Func<GameObject> spawnCard)
         {
@@ -69,10 +70,12 @@ namespace SaloonSlingers.Unity.CardEntities
 
         public void TryDrawCard(Func<GameObject> spawnCard)
         {
+            drawCtx.Deck = deck;
+            drawCtx.Evaluation = HandEvaluation;
+            drawCtx.Hand = Cards;
             bool canDraw = (
                 !state.IsCommitted &&
-                CardGraphics.Count < gameRulesManager.GameRules.MaxHandSize &&
-                deck.Count > 0
+                gameRulesManager.GameRules.CanDraw(drawCtx)
             );
             if (!canDraw) return;
 
@@ -127,6 +130,11 @@ namespace SaloonSlingers.Unity.CardEntities
             gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
         }
 
+        public void Kill()
+        {
+            Death?.Invoke(gameObject, EventArgs.Empty);
+        }
+
         private void OnEnable()
         {
             cardRotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
@@ -147,7 +155,7 @@ namespace SaloonSlingers.Unity.CardEntities
             state.Update(Time.fixedDeltaTime);
             if (state.IsAlive) return;
 
-            Death?.Invoke(gameObject, EventArgs.Empty);
+            Kill();
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -170,7 +178,7 @@ namespace SaloonSlingers.Unity.CardEntities
                 if (!targetHasSuperiorHand) targetHealth.Points.Value--;
             }
 
-            Death?.Invoke(gameObject, EventArgs.Empty);
+            Kill();
         }
     }
 }

@@ -4,7 +4,7 @@ using SaloonSlingers.Core;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity.CardEntities
+namespace SaloonSlingers.Unity.Actor
 {
     public class CardGraphic : MonoBehaviour, ICardGraphic
     {

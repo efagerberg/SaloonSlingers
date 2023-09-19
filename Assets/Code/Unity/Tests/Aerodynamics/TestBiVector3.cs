@@ -1,9 +1,8 @@
-using System.Collections;
-
 using NUnit.Framework;
-using UnityEngine;
 
 using SaloonSlingers.Unity.Aerodynamics;
+
+using UnityEngine;
 
 namespace SaloonSlingers.Unity.Tests.Aerodynamics
 {

@@ -36,6 +36,7 @@ namespace SaloonSlingers.Core
         }
 
         public int Count { get => cards.Count; }
+        public bool HasCards { get => Count > 0; }
 
         public Deck Shuffle()
         {

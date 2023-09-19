@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity.Slingers
+namespace SaloonSlingers.Unity.Actor
 {
     public class EnemySpawner : MonoBehaviour
     {

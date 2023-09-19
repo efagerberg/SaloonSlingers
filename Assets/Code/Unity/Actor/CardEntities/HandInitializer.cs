@@ -1,8 +1,6 @@
-using SaloonSlingers.Unity.CardEntities;
-
 using UnityEngine;
 
-namespace SaloonSlingers.Unity.Slingers
+namespace SaloonSlingers.Unity.Actor
 {
     public class HandInitializer : MonoBehaviour
     {

@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 
 using SaloonSlingers.Core;
-using SaloonSlingers.Unity.CardEntities;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     public abstract class HandDisplay : MonoBehaviour
     {

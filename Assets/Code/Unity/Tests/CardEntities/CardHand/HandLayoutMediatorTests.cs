@@ -5,11 +5,10 @@ using System.Linq;
 using NUnit.Framework;
 
 using SaloonSlingers.Core;
-using SaloonSlingers.Unity.CardEntities;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity.Tests.CardEntities
+namespace SaloonSlingers.Unity.Actor.Tests
 {
     public class HandLayoutMediatorTests
     {

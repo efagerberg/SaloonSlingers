@@ -1,5 +1,6 @@
 {
   "Name": "BlackJack",
-  "MaxHandSize": 21,
+  "MinScore": 1,
+  "MaxScore": 22,
   "HandEvaluator": "BlackJack"
 }
