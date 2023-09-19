@@ -11,7 +11,7 @@ namespace SaloonSlingers.Core
             set
             {
                 uint before = _value;
-                _value = Math.Clamp(value, 0, MaxValue);
+                _value = Math.Min(value, MaxValue);
                 if (before == _value) return;
 
                 OnPointsChanged?.Invoke(
