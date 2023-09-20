@@ -1,7 +1,7 @@
 {
   "SaloonId":  "NightClub",
   "InterestRisk": 0.05,
-  "HouseGames": [ "BlackJack", "5CardPoker" ],
+  "HouseGame": "5CardPoker",
   "EnemyInventory": {
     "Enemy":  10
   }

@@ -26,6 +26,7 @@ namespace SaloonSlingers.Unity.Actor
         private float maxRotationNoise = 200f;
 
         private bool currentlyVisible = false;
+        private HeistManager heistManager;
 
         public GameObject Spawn() => pool.Get(false);
 
@@ -38,6 +39,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Awake()
         {
+            heistManager = GameObject.FindGameObjectWithTag("HeistManager").GetComponent<HeistManager>();
             if (pool == null) pool = GetComponent<ActorPool>();
             InvokeRepeating(nameof(SpawnEnemy), 1, spawnPerSecond);
             currentlyVisible = true;
@@ -59,8 +61,9 @@ namespace SaloonSlingers.Unity.Actor
 
         private void SpawnEnemy()
         {
-            if (pool.CountActive == maxActiveEnemies) return;
+            if (pool.CountActive == maxActiveEnemies || heistManager.Heist.Complete) return;
 
+            heistManager.Heist.GetRandomEnemy();
             int randomSpawnpointIndex = Random.Range(0, spawnPoints.Count - 1);
             Transform spawnPoint = spawnPoints[randomSpawnpointIndex];
             Vector3 positionNoise = new(Random.Range(minPositionNoise, maxPositionNoise),

@@ -13,22 +13,17 @@ namespace SaloonSlingers.Core.Tests
                 { "enemy1", 3 },
                 { "enemy2", 2 }
             };
-            var games = new CardGameConfig[] {
-                new CardGameConfig() {
-                    Name="Game1",
-                    HandEvaluator="BlackJack"
-                },
-                new CardGameConfig() {
-                    Name="Game2",
-                    HandEvaluator="Poker"
-                },
+            var game = new CardGameConfig()
+            {
+                Name = "TestGame",
+                HandEvaluator = "BlackJack"
             };
             var config = new HeistConfig
             {
                 SaloonId = "TestSaloon",
                 InterestRisk = 0.0f,
                 EnemyInventory = enemyManifest,
-                HouseGames = games
+                HouseGame = game
             };
             var subject = Heist.Load(config);
 
@@ -39,22 +34,17 @@ namespace SaloonSlingers.Core.Tests
         public void TestCompleteWhenEnemyInventoryEmpty()
         {
             var enemyManifest = new Dictionary<string, int>();
-            var games = new CardGameConfig[] {
-                new CardGameConfig() {
-                    Name="Game1",
-                    HandEvaluator="BlackJack"
-                },
-                new CardGameConfig() {
-                    Name="Game2",
-                    HandEvaluator="Poker"
-                },
+            var game = new CardGameConfig()
+            {
+                Name = "TestGame",
+                HandEvaluator = "BlackJack"
             };
             var config = new HeistConfig
             {
                 SaloonId = "TestSaloon",
                 InterestRisk = 0.0f,
                 EnemyInventory = enemyManifest,
-                HouseGames = games
+                HouseGame = game
             };
             var subject = Heist.Load(config);
 
@@ -69,22 +59,17 @@ namespace SaloonSlingers.Core.Tests
                 { "enemy1", 1 },
                 { "enemy2", 1 }
             };
-            var games = new CardGameConfig[] {
-                new CardGameConfig() {
-                    Name="Game1",
-                    HandEvaluator="BlackJack"
-                },
-                new CardGameConfig() {
-                    Name="Game2",
-                    HandEvaluator="Poker"
-                },
+            var game = new CardGameConfig()
+            {
+                Name = "TestGame",
+                HandEvaluator = "BlackJack"
             };
             var config = new HeistConfig
             {
                 SaloonId = "TestSaloon",
                 InterestRisk = 0.0f,
                 EnemyInventory = enemyManifest,
-                HouseGames = games
+                HouseGame = game
             };
             var subject = Heist.Load(config);
             subject.GetRandomEnemy();
@@ -101,22 +86,17 @@ namespace SaloonSlingers.Core.Tests
                 { "enemy1", 1 },
                 { "enemy2", 1 }
             };
-            var games = new CardGameConfig[] {
-                new CardGameConfig() {
-                    Name="Game1",
-                    HandEvaluator="BlackJack"
-                },
-                new CardGameConfig() {
-                    Name="Game2",
-                    HandEvaluator="Poker"
-                },
+            var game = new CardGameConfig()
+            {
+                Name = "TestGame",
+                HandEvaluator = "BlackJack"
             };
             var config = new HeistConfig
             {
                 SaloonId = "TestSaloon",
                 InterestRisk = 0.0f,
                 EnemyInventory = enemyManifest,
-                HouseGames = games
+                HouseGame = game
             };
             var subject = Heist.Load(config);
             var enemy1 = subject.GetRandomEnemy();

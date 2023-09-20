@@ -5,13 +5,16 @@ using System.Linq;
 
 namespace SaloonSlingers.Core
 {
+    public delegate void CurrentGameChangedHandler(CardGame sender, EventArgs e);
+
     [Serializable]
     public struct Heist
     {
+        public event CurrentGameChangedHandler OnCurrentGameChanged;
         public readonly bool Complete { get => enemyInventory.Manifest.Count == 0; }
         public float InterestRisk { get; private set; }
         public string SaloonId { get; private set; }
-        public CardGame[] HouseGames { get; private set; }
+        public CardGame HouseGame { get; private set; }
 
         private EnemyInventory enemyInventory;
         private Random random;
@@ -28,15 +31,14 @@ namespace SaloonSlingers.Core
 
         public static Heist Load(HeistConfig config)
         {
-            var rules = new Heist
+            return new Heist
             {
                 SaloonId = config.SaloonId,
                 InterestRisk = config.InterestRisk,
-                HouseGames = config.HouseGames.Select(CardGame.Load).ToArray(),
+                HouseGame = CardGame.Load(config.HouseGame),
                 enemyInventory = new EnemyInventory(config.EnemyInventory),
-                random = new Random()
+                random = new Random(),
             };
-            return rules;
         }
     }
 
@@ -45,7 +47,7 @@ namespace SaloonSlingers.Core
         public string SaloonId { get; set; }
         public float InterestRisk { get; set; }
         public IDictionary<string, int> EnemyInventory { get; set; }
-        public CardGameConfig[] HouseGames { get; set; }
+        public CardGameConfig HouseGame { get; set; }
     }
 
     class EnemyInventory
