@@ -51,7 +51,7 @@ namespace SaloonSlingers.Unity.Actor
         private HandInteractableSpawner handInteractableSpawner;
         private Color originalColor;
         private VisibilityDetector visibilityDetector;
-        private GameRulesManager gameRulesManager;
+        private CardGameManager gameRulesManager;
         private DrawContext drawCtx;
 
         public void Reset()
@@ -73,7 +73,7 @@ namespace SaloonSlingers.Unity.Actor
             handInteractableSpawner = GameObject.FindGameObjectWithTag("HandInteractableSpawner")
                                                 .GetComponent<HandInteractableSpawner>();
             originalColor = _renderer.material.color;
-            gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
+            gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<CardGameManager>();
         }
 
         private void Update()
@@ -182,7 +182,7 @@ namespace SaloonSlingers.Unity.Actor
             drawCtx.Hand = projectile.Cards;
             drawCtx.Evaluation = projectile.HandEvaluation;
             drawCtx.Deck = Deck;
-            if (gameRulesManager.GameRules.CanDraw(drawCtx))
+            if (gameRulesManager.Game.CanDraw(drawCtx))
             {
                 currentHandController.Draw(Deck, cardSpawner.Spawn);
                 return;
@@ -203,7 +203,7 @@ namespace SaloonSlingers.Unity.Actor
             var instance = sender as GameObject;
             var projectile = instance.GetComponent<HandProjectile>();
             foreach (ICardGraphic c in projectile.CardGraphics)
-                c.Die();
+                c.Kill();
             projectile.Death -= DespawnHandProjectile;
         }
 

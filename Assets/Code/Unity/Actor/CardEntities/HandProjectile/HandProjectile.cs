@@ -22,7 +22,7 @@ namespace SaloonSlingers.Unity.Actor
             {
                 if (requiresEvaluation)
                 {
-                    handEvaluation = gameRulesManager.GameRules.Evaluate(Cards);
+                    handEvaluation = gameRulesManager.Game.Evaluate(Cards);
                     requiresEvaluation = false;
                 }
                 return handEvaluation;
@@ -50,7 +50,7 @@ namespace SaloonSlingers.Unity.Actor
         private HandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private Deck deck;
-        private GameRulesManager gameRulesManager;
+        private CardGameManager gameRulesManager;
         private HandEvaluation handEvaluation;
         private bool requiresEvaluation = false;
         private DrawContext drawCtx;
@@ -75,7 +75,7 @@ namespace SaloonSlingers.Unity.Actor
             drawCtx.Hand = Cards;
             bool canDraw = (
                 !state.IsCommitted &&
-                gameRulesManager.GameRules.CanDraw(drawCtx)
+                gameRulesManager.Game.CanDraw(drawCtx)
             );
             if (!canDraw) return;
 
@@ -143,7 +143,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Awake()
         {
-            gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<GameRulesManager>();
+            gameRulesManager = GameObject.FindGameObjectWithTag("GameRulesManager").GetComponent<CardGameManager>();
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;

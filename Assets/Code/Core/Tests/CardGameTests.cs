@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-using Newtonsoft.Json;
+﻿using System.Linq;
 
 using NUnit.Framework;
 
@@ -15,13 +12,12 @@ namespace SaloonSlingers.Core.Tests
             public void TestEvaluateUsesPassedEvaluator(string evaluatorName,
                                                         IHandEvaluator expectedEvaluator)
             {
-                Dictionary<string, object> config = new()
+                CardGameConfig config = new()
                 {
-                    { "Name", "TestConfig" },
-                    { "HandEvaluator", evaluatorName }
+                    Name = "TestGame",
+                    HandEvaluator = evaluatorName
                 };
-                string raw = JsonConvert.SerializeObject(config);
-                GameRules actual = GameRules.Load(raw);
+                CardGame actual = CardGame.Load(config);
                 Deck deck = new();
                 var hand = deck.Draw(2).ToList();
                 DrawContext ctx = new()
@@ -31,34 +27,32 @@ namespace SaloonSlingers.Core.Tests
                     Evaluation = expectedEvaluator.Evaluate(hand)
                 };
 
-                Assert.AreEqual(actual.Name, config["Name"]);
+                Assert.AreEqual(actual.Name, config.Name);
                 Assert.AreEqual(actual.Evaluate(ctx.Hand), ctx.Evaluation);
             }
 
             [Test]
             public void TestRaisesWhenInvalidHandlerString()
             {
-                Dictionary<string, object> config = new()
+                CardGameConfig config = new()
                 {
-                    { "Name", "TestConfig" },
-                    { "HandEvaluator", "SomeNonexistingEvaluator" }
+                    Name = "TestGame",
+                    HandEvaluator = "SomeNonexistingEvaluator"
                 };
-                string raw = JsonConvert.SerializeObject(config);
 
-                Assert.Throws<InvalidGameRulesConfig>(() => GameRules.Load(raw));
+                Assert.Throws<InvalidGameRulesConfig>(() => CardGame.Load(config));
             }
 
             [TestCaseSource(nameof(MaxHandSizeTestCases))]
             public void TestCanOnlyDrawWhenHandsizeAtOrBelowMax(int maxHandSize, int handSize, bool expected)
             {
-                Dictionary<string, object> config = new()
+                CardGameConfig config = new()
                 {
-                    { "Name", "TestConfig" },
-                    { "HandEvaluator", "BlackJack" },
-                    { "MaxHandSize", maxHandSize },
+                    Name = "TestGame",
+                    HandEvaluator = "BlackJack",
+                    MaxHandSize = maxHandSize
                 };
-                string raw = JsonConvert.SerializeObject(config);
-                GameRules actual = GameRules.Load(raw);
+                CardGame actual = CardGame.Load(config);
                 Deck deck = new();
                 var hand = deck.Draw(handSize).ToList();
                 DrawContext ctx = new()
@@ -74,14 +68,13 @@ namespace SaloonSlingers.Core.Tests
             [TestCaseSource(nameof(MinScoreTestCases))]
             public void TestCanOnlyDrawWhenScoreAtOrAboveMinimum(int minScore, int evaluationScore, bool expected)
             {
-                Dictionary<string, object> config = new()
+                CardGameConfig config = new()
                 {
-                    { "Name", "TestConfig" },
-                    { "MinScore", minScore },
-                    { "HandEvaluator", "BlackJack" }
+                    Name = "TestGame",
+                    MinScore = (uint)minScore,
+                    HandEvaluator = "BlackJack"
                 };
-                string raw = JsonConvert.SerializeObject(config);
-                GameRules actual = GameRules.Load(raw);
+                CardGame actual = CardGame.Load(config);
                 Deck deck = new();
                 var hand = deck.Draw(3).ToList();
                 DrawContext ctx = new()
@@ -97,14 +90,13 @@ namespace SaloonSlingers.Core.Tests
             [TestCaseSource(nameof(MaxScoreTestCases))]
             public void TestCanOnlyDrawWhenScoreAtOrBelowMaximum(int maxScore, int evaluationScore, bool expected)
             {
-                Dictionary<string, object> config = new()
+                CardGameConfig config = new()
                 {
-                    { "Name", "TestConfig" },
-                    { "MaxScore", maxScore },
-                    { "HandEvaluator", "BlackJack" }
+                    Name = "TestGame",
+                    MaxScore = (uint)maxScore,
+                    HandEvaluator = "BlackJack"
                 };
-                string raw = JsonConvert.SerializeObject(config);
-                GameRules actual = GameRules.Load(raw);
+                CardGame actual = CardGame.Load(config);
                 Deck deck = new();
                 var hand = deck.Draw(3).ToList();
                 DrawContext ctx = new()
@@ -120,15 +112,14 @@ namespace SaloonSlingers.Core.Tests
             [TestCaseSource(nameof(MinMaxScoreTestCases))]
             public void TestCanOnlyDrawWhenAllRulesAreTure(int minScore, int maxScore, int actualScore, bool expected)
             {
-                Dictionary<string, object> config = new()
+                CardGameConfig config = new()
                 {
-                    { "Name", "TestConfig" },
-                    { "MaxScore", maxScore },
-                    { "MinScore", minScore },
-                    { "HandEvaluator", "BlackJack" }
+                    Name = "TestGame",
+                    MaxScore = (uint)maxScore,
+                    MinScore = (uint)minScore,
+                    HandEvaluator = "BlackJack"
                 };
-                string raw = JsonConvert.SerializeObject(config);
-                GameRules actual = GameRules.Load(raw);
+                CardGame actual = CardGame.Load(config);
                 Deck deck = new();
                 var hand = deck.Draw(3).ToList();
                 DrawContext ctx = new()

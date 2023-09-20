@@ -1,4 +1,5 @@
 ﻿using System;
+
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -184,7 +185,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.DeviceSimulator
         Text m_RightControllerButtonText;
 
         static readonly Color k_EnabledColorDark = new Color(0xC4 / 255f, 0xC4 / 255f, 0xC4 / 255f);
-        static readonly Color k_EnabledColorLight = new Color(0x55/255f, 0x55/255f, 0x55/255f);
+        static readonly Color k_EnabledColorLight = new Color(0x55 / 255f, 0x55 / 255f, 0x55 / 255f);
         [HideInInspector]
         [SerializeField]
         Color m_EnabledColor = Color.clear;
@@ -201,7 +202,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.DeviceSimulator
         }
 
         static readonly Color k_DisabledColorDark = new Color(0xC4 / 255f, 0xC4 / 255f, 0xC4 / 255f, 0.5f);
-        static readonly Color k_DisabledColorLight = new Color(0x55/255f, 0x55/255f, 0x55/255f, 0.5f);
+        static readonly Color k_DisabledColorLight = new Color(0x55 / 255f, 0x55 / 255f, 0x55 / 255f, 0.5f);
         [HideInInspector]
         [SerializeField]
         Color m_DisabledColor = Color.clear;
@@ -218,7 +219,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.DeviceSimulator
         }
 
         static readonly Color k_ButtonColorDark = new Color(0x55 / 255f, 0x55 / 255f, 0x55 / 255f);
-        static readonly Color k_ButtonColorLight = new Color(0xE4/255f, 0xE4/255f, 0xE4/255f);
+        static readonly Color k_ButtonColorLight = new Color(0xE4 / 255f, 0xE4 / 255f, 0xE4 / 255f);
         [HideInInspector]
         [SerializeField]
         Color m_ButtonColor = Color.clear;
@@ -252,7 +253,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.DeviceSimulator
         }
 
         static readonly Color k_SelectedColorDark = new Color(0x4F / 255f, 0x65 / 255f, 0x7F / 255f);
-        static readonly Color k_SelectedColorLight = new Color(0x96/255f, 0xC3/255f, 0xFB/255f);
+        static readonly Color k_SelectedColorLight = new Color(0x96 / 255f, 0xC3 / 255f, 0xFB / 255f);
         [HideInInspector]
         [SerializeField]
         Color m_SelectedColor = Color.clear;
@@ -269,7 +270,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.DeviceSimulator
         }
 
         static readonly Color k_BackgroundColorDark = Color.black;
-        static readonly Color k_BackgroundColorLight = new Color(0xB6/255f, 0xB6/255f, 0xB6/255f);
+        static readonly Color k_BackgroundColorLight = new Color(0xB6 / 255f, 0xB6 / 255f, 0xB6 / 255f);
         [HideInInspector]
         [SerializeField]
         Color m_BackgroundColor = Color.clear;
@@ -427,7 +428,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.DeviceSimulator
 
             var manipulateHeadActionControl = m_Simulator.manipulateHeadAction.action.controls[0];
             m_HeadsetLookValueIcon.sprite = GetInputIcon(manipulateHeadActionControl);
-            if (manipulateHeadActionControl.name.Equals("leftButton") ||  manipulateHeadActionControl.name.Equals("rightButton"))
+            if (manipulateHeadActionControl.name.Equals("leftButton") || manipulateHeadActionControl.name.Equals("rightButton"))
             {
                 m_HeadsetLookValueIcon.color = Color.white;
 

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using Newtonsoft.Json;
 
 namespace SaloonSlingers.Core
 {
-    public struct GameRules : IDrawRule, IHandEvaluator
+    public struct CardGame : IDrawRule, IHandEvaluator
     {
         public string Name { get; private set; }
 
@@ -21,15 +20,12 @@ namespace SaloonSlingers.Core
 
         public readonly HandEvaluation Evaluate(IEnumerable<Card> hand) => handEvaluator.Evaluate(hand);
 
-        public static GameRules Load(string raw)
+        public static CardGame Load(CardGameConfig config)
         {
-            IReadOnlyDictionary<string, object> config;
-            config = JsonConvert.DeserializeObject<Dictionary<string, object>>(raw);
-
-            var rules = new GameRules
+            var rules = new CardGame
             {
-                Name = (string)config["Name"],
-                handEvaluator = GetHandEvaluatorFromString((string)config["HandEvaluator"]),
+                Name = config.Name,
+                handEvaluator = GetHandEvaluatorFromString(config.HandEvaluator),
                 drawRules = GetDrawRulesFromConfig(config)
             };
             return rules;
@@ -45,24 +41,15 @@ namespace SaloonSlingers.Core
             };
         }
 
-        private static IList<IDrawRule> GetDrawRulesFromConfig(IReadOnlyDictionary<string, object> rawConfig)
+        private static IList<IDrawRule> GetDrawRulesFromConfig(CardGameConfig config)
         {
             var rules = new List<IDrawRule>();
-            if (rawConfig.ContainsKey("MaxHandSize"))
-            {
-                int maxHandSize = Convert.ToInt32(rawConfig["MaxHandSize"]);
-                rules.Add(new MaxHandSizeDrawRule(maxHandSize));
-            }
-            if (rawConfig.ContainsKey("MaxScore"))
-            {
-                uint maxScore = Convert.ToUInt32(rawConfig["MaxScore"]);
-                rules.Add(new MaxScoreDrawRule(maxScore));
-            }
-            if (rawConfig.ContainsKey("MinScore"))
-            {
-                uint minScore = Convert.ToUInt32(rawConfig["MinScore"]);
-                rules.Add(new MinScoreDrawRule(minScore));
-            }
+            if (config.MaxHandSize.HasValue)
+                rules.Add(new MaxHandSizeDrawRule(config.MaxHandSize.Value));
+            if (config.MaxScore.HasValue)
+                rules.Add(new MaxScoreDrawRule(config.MaxScore.Value));
+            if (config.MinScore.HasValue)
+                rules.Add(new MinScoreDrawRule(config.MinScore.Value));
             return rules;
         }
     }
@@ -70,5 +57,14 @@ namespace SaloonSlingers.Core
     public class InvalidGameRulesConfig : Exception
     {
         public InvalidGameRulesConfig(string message) : base(message) { }
+    }
+
+    public struct CardGameConfig
+    {
+        public string Name { get; set; }
+        public string HandEvaluator { get; set; }
+        public int? MaxHandSize { get; set; }
+        public uint? MaxScore { get; set; }
+        public uint? MinScore { get; set; }
     }
 }

@@ -25,6 +25,15 @@ namespace SaloonSlingers.Unity.Actor
             PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
         }
 
+        private void Update()
+        {
+            if (!deckGraphic.CanDraw && placed != null)
+            {
+                var unusableProjectile = placed.GetComponent<HandProjectile>();
+                unusableProjectile.Kill();
+            }
+        }
+
         private void PlaceOnTop(Transform topCardTransform, GameObject cardHandGO)
         {
             cardHandGO.transform.SetPositionAndRotation(
@@ -38,7 +47,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (sender.gameObject == placed) placed = null;
 
-            if (!deckGraphic.CanDraw || placed) return;
+            if (!deckGraphic.CanDraw || placed != null) return;
 
             PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
         }
@@ -48,7 +57,7 @@ namespace SaloonSlingers.Unity.Actor
             var instance = sender as GameObject;
             var projectile = instance.GetComponent<HandProjectile>();
             foreach (ICardGraphic c in projectile.CardGraphics)
-                c.Die();
+                c.Kill();
             projectile.OnHandProjectileHeld -= HandInteractableHeldHandler;
             projectile.Death -= HandleInteractableDeath;
         }
@@ -62,23 +71,6 @@ namespace SaloonSlingers.Unity.Actor
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();
             swapper.SetController(ControllerTypes.PLAYER);
             return spawned;
-        }
-
-        private void OnEnable()
-        {
-            deckGraphic.Deck.OnDeckEmpty += OnDeckEmpty;
-        }
-
-        private void OnDisable()
-        {
-            deckGraphic.Deck.OnDeckEmpty -= OnDeckEmpty;
-        }
-
-        private void OnDeckEmpty(Core.Deck sender, EventArgs e)
-        {
-            if (placed == null) return;
-            var projectile = placed.GetComponent<HandProjectile>();
-            projectile.Kill();
         }
     }
 }
