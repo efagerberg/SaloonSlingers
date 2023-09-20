@@ -79,7 +79,7 @@ namespace SaloonSlingers.Unity.Actor
             );
             if (!canDraw) return;
 
-            Card card = deck.RemoveFromTop();
+            Card card = deck.Draw();
             audioSource.clip = drawSFX;
             audioSource.Play();
             GameObject spawned = spawnCard();

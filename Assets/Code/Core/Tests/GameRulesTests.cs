@@ -23,7 +23,7 @@ namespace SaloonSlingers.Core.Tests
                 string raw = JsonConvert.SerializeObject(config);
                 GameRules actual = GameRules.Load(raw);
                 Deck deck = new();
-                var hand = deck.RemoveFromTop(2).ToList();
+                var hand = deck.Draw(2).ToList();
                 DrawContext ctx = new()
                 {
                     Deck = deck,
@@ -60,7 +60,7 @@ namespace SaloonSlingers.Core.Tests
                 string raw = JsonConvert.SerializeObject(config);
                 GameRules actual = GameRules.Load(raw);
                 Deck deck = new();
-                var hand = deck.RemoveFromTop(handSize).ToList();
+                var hand = deck.Draw(handSize).ToList();
                 DrawContext ctx = new()
                 {
                     Deck = deck,
@@ -83,7 +83,7 @@ namespace SaloonSlingers.Core.Tests
                 string raw = JsonConvert.SerializeObject(config);
                 GameRules actual = GameRules.Load(raw);
                 Deck deck = new();
-                var hand = deck.RemoveFromTop(3).ToList();
+                var hand = deck.Draw(3).ToList();
                 DrawContext ctx = new()
                 {
                     Deck = deck,
@@ -106,7 +106,7 @@ namespace SaloonSlingers.Core.Tests
                 string raw = JsonConvert.SerializeObject(config);
                 GameRules actual = GameRules.Load(raw);
                 Deck deck = new();
-                var hand = deck.RemoveFromTop(3).ToList();
+                var hand = deck.Draw(3).ToList();
                 DrawContext ctx = new()
                 {
                     Deck = deck,
@@ -130,7 +130,7 @@ namespace SaloonSlingers.Core.Tests
                 string raw = JsonConvert.SerializeObject(config);
                 GameRules actual = GameRules.Load(raw);
                 Deck deck = new();
-                var hand = deck.RemoveFromTop(3).ToList();
+                var hand = deck.Draw(3).ToList();
                 DrawContext ctx = new()
                 {
                     Deck = deck,
