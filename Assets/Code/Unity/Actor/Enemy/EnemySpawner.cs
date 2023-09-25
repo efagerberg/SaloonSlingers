@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 
@@ -13,8 +14,6 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private int maxActiveEnemies = 3;
         [SerializeField]
-        private ActorPool pool;
-        [SerializeField]
         private bool visibleSpawnPointsOnRun = false;
         [SerializeField]
         private float minPositionNoise = -0.25f;
@@ -26,22 +25,43 @@ namespace SaloonSlingers.Unity.Actor
         private float maxRotationNoise = 200f;
 
         private bool currentlyVisible = false;
+        private HeistManager heistManager;
+        private IDictionary<string, ActorPool> pools = new Dictionary<string, ActorPool>();
 
-        public GameObject Spawn() => pool.Get(false);
+        public GameObject Spawn(string enemyStr) => pools[enemyStr].Get(false);
 
-        public GameObject Spawn(Vector3 position, Quaternion rotation)
+        public GameObject Spawn(Vector3 position, Quaternion rotation, string enemyStr)
         {
-            GameObject go = Spawn();
+            GameObject go = Spawn(enemyStr);
             go.transform.SetPositionAndRotation(position, rotation);
+            go.name = enemyStr;
+            var actor = go.GetComponent<IActor>();
+            actor.Death += RecordDeath;
             return go;
         }
 
-        private void Awake()
+        private void RecordDeath(object sender, System.EventArgs e)
         {
-            if (pool == null) pool = GetComponent<ActorPool>();
+            var go = (GameObject)sender;
+            heistManager.Heist.EnemyInventory.RecordDeath(go.name);
+
+            var actor = go.GetComponent<IActor>();
+            actor.Death -= RecordDeath;
+        }
+
+        private void Start()
+        {
+            heistManager = GameObject.FindGameObjectWithTag("HeistManager").GetComponent<HeistManager>();
+            foreach (string enemyStr in heistManager.Heist.EnemyInventory.Manifest.Keys)
+            {
+                pools[enemyStr] = gameObject.AddComponent<ActorPool>();
+                var prefab = Resources.Load<GameObject>($"prefabs/{enemyStr}");
+                pools[enemyStr].Prefab = prefab;
+            }
             InvokeRepeating(nameof(SpawnEnemy), 1, spawnPerSecond);
             currentlyVisible = true;
         }
+
         private void Update()
         {
             if (currentlyVisible != visibleSpawnPointsOnRun)
@@ -59,7 +79,8 @@ namespace SaloonSlingers.Unity.Actor
 
         private void SpawnEnemy()
         {
-            if (pool.CountActive == maxActiveEnemies) return;
+            var enemyStr = heistManager.Heist.EnemyInventory.GetRandomEnemy();
+            if (enemyStr == null || pools.Values.Sum(p => p.CountActive) == maxActiveEnemies || heistManager.Heist.EnemyInventory.Completed) return;
 
             int randomSpawnpointIndex = Random.Range(0, spawnPoints.Count - 1);
             Transform spawnPoint = spawnPoints[randomSpawnpointIndex];
@@ -68,7 +89,7 @@ namespace SaloonSlingers.Unity.Actor
                                         0f);
             Vector3 spawnPosition = spawnPoint.position + positionNoise;
             Quaternion rotation = Quaternion.Euler(0, Random.Range(minRotationNoise, maxRotationNoise), 0f);
-            GameObject go = Spawn(spawnPosition, rotation);
+            GameObject go = Spawn(spawnPosition, rotation, enemyStr);
             go.SetActive(true);
         }
     }

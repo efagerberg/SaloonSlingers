@@ -195,7 +195,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
 
             public Card Card { get => card; set => card = value; }
             public void SetGraphics(Card card) { }
-            public void Die() { }
+            public void Kill() { }
             public void Reset() { }
         }
 

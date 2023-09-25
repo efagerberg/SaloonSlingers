@@ -39,7 +39,7 @@ namespace SaloonSlingers.Unity.Actor
             faceRenderer.material.mainTexture = null;
         }
 
-        public void Die()
+        public void Kill()
         {
             Death?.Invoke(gameObject, EventArgs.Empty);
         }

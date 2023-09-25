@@ -33,7 +33,7 @@ namespace SaloonSlingers.Core.Tests
             List<Card> cards = new();
 
             for (int _ = 0; _ < deckUnderTest.Count; _++)
-                cards.Add(deckUnderTest.RemoveFromTop());
+                cards.Add(deckUnderTest.Draw());
 
             foreach (Suits suit in expectedSuits)
                 foreach (Values val in expectedValues)
@@ -54,85 +54,85 @@ namespace SaloonSlingers.Core.Tests
         }
 
         [Test]
-        public void RemoveFromTop_NoParam_ReturnsExpectedCard()
+        public void Draw_NoParam_ReturnsExpectedCard()
         {
             var expectedCount = deckUnderTest.Count - 1;
-            deckUnderTest.RemoveFromTop();
+            deckUnderTest.Draw();
 
             Assert.AreEqual(deckUnderTest.Count, expectedCount);
         }
 
         [Test]
-        public void RemoveFromTop_EmitsEmptyEvent_WhenDeckBecomesEmpty()
+        public void Draw_EmitsEmptyEvent_WhenDeckBecomesEmpty()
         {
             var singleCardDeck = new Deck(1);
             bool eventTriggered = false;
             singleCardDeck.OnDeckEmpty += (_, __) => eventTriggered = true;
-            singleCardDeck.RemoveFromTop();
+            singleCardDeck.Draw();
 
             Assert.That(eventTriggered);
         }
 
         [Test]
-        public void RemoveFromTop_DoesNotEmitEmptyEvent_WhenDeckDoesNotBecomeEmpty()
+        public void Draw_DoesNotEmitEmptyEvent_WhenDeckDoesNotBecomeEmpty()
         {
             var twoCardDeck = new Deck(2);
             bool eventTriggered = false;
             twoCardDeck.OnDeckEmpty += (_, __) => eventTriggered = true;
-            twoCardDeck.RemoveFromTop();
+            twoCardDeck.Draw();
 
             Assert.IsFalse(eventTriggered);
         }
 
         [Test]
-        public void RemoveFromTop_WithAmount_ReturnExpectedCards()
+        public void Draw_WithAmount_ReturnExpectedCards()
         {
             var amountToTake = 7;
             var expectedCount = deckUnderTest.Count - amountToTake;
-            var cards = deckUnderTest.RemoveFromTop(amountToTake).ToList();
+            var cards = deckUnderTest.Draw(amountToTake).ToList();
 
             Assert.AreEqual(deckUnderTest.Count, expectedCount);
             Assert.AreEqual(cards.ToList().Count, amountToTake);
         }
 
         [Test]
-        public void ReturnCard_ReturnsCardToDeck()
+        public void Return_ReturnsCardToDeck()
         {
             var expectedCount = deckUnderTest.Count;
-            var card = deckUnderTest.RemoveFromTop();
-            deckUnderTest.ReturnCard(card);
+            var card = deckUnderTest.Draw();
+            deckUnderTest.Return(card);
 
             Assert.AreEqual(deckUnderTest.Count, expectedCount);
         }
 
         [Test]
-        public void ReturnCard_EmitsRefillEvent_WhenSizeIncreasesFrom0()
+        public void Return_EmitsRefillEvent_WhenSizeIncreasesFrom0()
         {
             bool eventTriggered = false;
             var emptyDeck = new Deck(0);
             emptyDeck.OnDeckRefilled += (sender, __) => eventTriggered = true;
-            emptyDeck.ReturnCard(new Card(Values.ACE, Suits.CLUBS));
+            emptyDeck.Return(new Card(Values.ACE, Suits.CLUBS));
 
             Assert.That(eventTriggered);
         }
 
         [Test]
-        public void ReturnCard_DoesNotEmitsRefillEvent_WhenSizeAbove0()
+        public void Return_DoesNotEmitsRefillEvent_WhenSizeAbove0()
         {
             bool eventTriggered = false;
             var singleCardDeck = new Deck(1);
             singleCardDeck.OnDeckRefilled += (sender, __) => eventTriggered = true;
-            singleCardDeck.ReturnCard(new Card(Values.ACE, Suits.CLUBS));
+            singleCardDeck.Return(new Card(Values.ACE, Suits.CLUBS));
 
             Assert.IsFalse(eventTriggered);
         }
 
         [Test]
-        public void ReturnCards_ReturnsCardsToDeck()
+        public void Return_ReturnsCardsToDeck()
         {
             var expectedCount = deckUnderTest.Count;
-            var cards = deckUnderTest.RemoveFromTop(7);
-            deckUnderTest.ReturnCards(cards);
+            var cards = deckUnderTest.Draw(7);
+            deckUnderTest.Return(cards);
 
             Assert.AreEqual(deckUnderTest.Count, expectedCount);
         }

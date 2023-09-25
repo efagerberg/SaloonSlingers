@@ -1,4 +1,5 @@
 using Unity.XR.CoreUtils;
+
 using UnityEngine.Assertions;
 
 namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets

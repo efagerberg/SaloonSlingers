@@ -8,7 +8,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private int poolSize = 10;
         [SerializeField]
-        private GameObject prefab;
+        public GameObject Prefab;
 
         private IObjectPool<GameObject> _pool;
 
@@ -27,7 +27,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private GameObject CreateInstance()
         {
-            GameObject instance = Instantiate(prefab);
+            GameObject instance = Instantiate(Prefab);
             instance.SetActive(false);
             instance.transform.SetParent(transform);
             instance.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);

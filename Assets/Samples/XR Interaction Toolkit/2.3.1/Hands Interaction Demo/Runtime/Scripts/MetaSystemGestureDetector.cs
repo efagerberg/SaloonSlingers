@@ -1,5 +1,7 @@
 using System;
+
 using Unity.XR.CoreUtils.Bindings.Variables;
+
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;

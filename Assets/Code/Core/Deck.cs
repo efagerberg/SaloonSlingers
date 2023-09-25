@@ -55,26 +55,26 @@ namespace SaloonSlingers.Core
             return this;
         }
 
-        public Card RemoveFromTop()
+        public Card Draw()
         {
             Card c = cards.Dequeue();
             if (cards.Count == 0) OnDeckEmpty?.Invoke(this, EventArgs.Empty);
             return c;
         }
 
-        public IEnumerable<Card> RemoveFromTop(int amount)
+        public IEnumerable<Card> Draw(int amount)
         {
             for (int i = 0; i < amount && Count > 0; i++)
-                yield return RemoveFromTop();
+                yield return Draw();
         }
 
-        public void ReturnCard(Card card)
+        public void Return(Card card)
         {
             if (cards.Count == 0) OnDeckRefilled?.Invoke(this, EventArgs.Empty);
             cards.Enqueue(card);
         }
 
-        public void ReturnCards(IEnumerable<Card> _cards)
+        public void Return(IEnumerable<Card> _cards)
         {
             foreach (Card card in _cards)
                 cards.Enqueue(card);
