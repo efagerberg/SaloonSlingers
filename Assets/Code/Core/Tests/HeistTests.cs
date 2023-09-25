@@ -9,7 +9,7 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void TestLoadCreatesExpectedInstance()
         {
-            var enemyManifest = new Dictionary<string, int> {
+            var manifest = new Dictionary<string, int> {
                 { "enemy1", 3 },
                 { "enemy2", 2 }
             };
@@ -22,12 +22,12 @@ namespace SaloonSlingers.Core.Tests
             {
                 SaloonId = "TestSaloon",
                 InterestRisk = 0.0f,
-                EnemyInventory = enemyManifest,
+                EnemyManifest = manifest,
                 HouseGame = game
             };
             var subject = Heist.Load(config);
 
-            Assert.That(subject.EnemyInventory.Manifest, Is.EqualTo(enemyManifest));
+            Assert.That(subject.EnemyInventory.Manifest, Is.EqualTo(manifest));
             Assert.That(subject.InterestRisk, Is.EqualTo(config.InterestRisk));
             Assert.That(subject.HouseGame.Name, Is.EqualTo(config.HouseGame.Name));
             Assert.That(subject.SaloonId, Is.EqualTo(config.SaloonId));
@@ -39,7 +39,10 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void TestCompleteWhenEnemyInventoryEmpty()
         {
-            var subject = new EnemyInventory();
+            var manifest = new Dictionary<string, int>
+            {
+            };
+            var subject = new EnemyInventory(manifest);
 
             Assert.That(subject.Completed, Is.True);
         }

@@ -22,7 +22,7 @@ namespace SaloonSlingers.Unity
             var config = new HeistConfig
             {
                 SaloonId = rawConfig.SaloonId,
-                EnemyInventory = rawConfig.EnemyInventory,
+                EnemyManifest = rawConfig.EnemyManifest,
                 InterestRisk = rawConfig.InterestRisk,
                 HouseGame = JsonConvert.DeserializeObject<CardGameConfig>(cardGameTextAsset)
             };
@@ -36,7 +36,7 @@ namespace SaloonSlingers.Unity
     {
         public string SaloonId { get; set; }
         public float InterestRisk { get; set; }
-        public IReadOnlyDictionary<string, int> EnemyInventory { get; set; }
+        public IReadOnlyDictionary<string, int> EnemyManifest { get; set; }
         public string HouseGame { get; set; }
     }
 }
