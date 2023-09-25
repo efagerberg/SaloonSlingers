@@ -4,11 +4,8 @@ using System.Linq;
 
 namespace SaloonSlingers.Core
 {
-    public delegate void CurrentGameChangedHandler(CardGame sender, EventArgs e);
-
     public struct Heist
     {
-        public event CurrentGameChangedHandler OnCurrentGameChanged;
         public float InterestRisk { get; private set; }
         public string SaloonId { get; private set; }
         public CardGame HouseGame { get; private set; }
