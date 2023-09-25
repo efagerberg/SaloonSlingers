@@ -34,7 +34,8 @@ namespace SaloonSlingers.Core
     public readonly struct EnemyInventory
     {
         public readonly IReadOnlyDictionary<string, int> Manifest;
-        public bool Completed {
+        public bool Completed
+        {
             get => remaining.Count == 0;
         }
 
@@ -50,7 +51,8 @@ namespace SaloonSlingers.Core
             random = new Random();
         }
 
-        public void Reset() {
+        public void Reset()
+        {
             spawned.Clear();
             remaining.Clear();
             foreach (var pair in Manifest)

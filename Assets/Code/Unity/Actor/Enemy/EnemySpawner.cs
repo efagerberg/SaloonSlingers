@@ -52,7 +52,8 @@ namespace SaloonSlingers.Unity.Actor
         private void Start()
         {
             heistManager = GameObject.FindGameObjectWithTag("HeistManager").GetComponent<HeistManager>();
-            foreach (string enemyStr in heistManager.Heist.EnemyInventory.Manifest.Keys) {
+            foreach (string enemyStr in heistManager.Heist.EnemyInventory.Manifest.Keys)
+            {
                 pools[enemyStr] = gameObject.AddComponent<ActorPool>();
                 var prefab = Resources.Load<GameObject>($"prefabs/{enemyStr}");
                 pools[enemyStr].Prefab = prefab;
