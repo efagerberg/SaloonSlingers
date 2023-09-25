@@ -3,6 +3,6 @@
   "InterestRisk": 0.05,
   "HouseGame": "5CardPoker",
   "EnemyInventory": {
-    "Enemy":  10
+    "Enemy":  3
   }
 }

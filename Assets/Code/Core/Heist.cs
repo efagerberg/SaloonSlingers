@@ -1,33 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace SaloonSlingers.Core
 {
     public delegate void CurrentGameChangedHandler(CardGame sender, EventArgs e);
 
-    [Serializable]
     public struct Heist
     {
         public event CurrentGameChangedHandler OnCurrentGameChanged;
-        public readonly bool Complete { get => enemyInventory.Manifest.Count == 0; }
         public float InterestRisk { get; private set; }
         public string SaloonId { get; private set; }
         public CardGame HouseGame { get; private set; }
-
-        private EnemyInventory enemyInventory;
-        private Random random;
-
-
-        public readonly string GetRandomEnemy()
-        {
-            var enemiesAvailable = enemyInventory.Manifest;
-            if (enemiesAvailable.Count == 0) return null;
-
-            int randomIndex = random.Next(enemiesAvailable.Count);
-            return enemyInventory.GetEnemy(enemiesAvailable.Keys.ElementAt(randomIndex));
-        }
+        public EnemyInventory EnemyInventory { get; private set; }
 
         public static Heist Load(HeistConfig config)
         {
@@ -36,8 +21,7 @@ namespace SaloonSlingers.Core
                 SaloonId = config.SaloonId,
                 InterestRisk = config.InterestRisk,
                 HouseGame = CardGame.Load(config.HouseGame),
-                enemyInventory = new EnemyInventory(config.EnemyInventory),
-                random = new Random(),
+                EnemyInventory = new EnemyInventory(config.EnemyInventory),
             };
         }
     }
@@ -46,31 +30,61 @@ namespace SaloonSlingers.Core
     {
         public string SaloonId { get; set; }
         public float InterestRisk { get; set; }
-        public IDictionary<string, int> EnemyInventory { get; set; }
+        public IReadOnlyDictionary<string, int> EnemyInventory { get; set; }
         public CardGameConfig HouseGame { get; set; }
     }
 
-    class EnemyInventory
+    public readonly struct EnemyInventory
     {
-        private readonly IDictionary<string, int> manifest;
-
-        public EnemyInventory(IDictionary<string, int> manifest)
-        {
-            this.manifest = manifest;
+        public readonly IReadOnlyDictionary<string, int> Manifest;
+        public bool Completed {
+            get => remaining.Count == 0;
         }
 
-        public string GetEnemy(string name)
+        private readonly IDictionary<string, int> spawned;
+        private readonly IDictionary<string, int> remaining;
+        private readonly Random random;
+
+        public EnemyInventory(IReadOnlyDictionary<string, int> manifest)
         {
-            if (manifest.ContainsKey(name))
-            {
-                int nLeft = manifest[name];
-                nLeft--;
-                if (nLeft == 0) manifest.Remove(name);
-                return name;
-            }
-            return null;
+            Manifest = manifest;
+            spawned = new Dictionary<string, int>();
+            remaining = new Dictionary<string, int>(manifest);
+            random = new Random();
         }
 
-        public IReadOnlyDictionary<string, int> Manifest { get => new ReadOnlyDictionary<string, int>(manifest); }
+        public void Reset() {
+            spawned.Clear();
+            remaining.Clear();
+            foreach (var pair in Manifest)
+                remaining.Add(pair.Key, pair.Value);
+        }
+
+        public readonly string GetEnemyToSpawn(string name)
+        {
+            if (!Manifest.ContainsKey(name)) return null;
+
+            spawned.TryGetValue(name, out var spawnedCount);
+            if (spawnedCount == Manifest[name]) return null;
+
+            spawned[name] = spawnedCount + 1;
+            return name;
+        }
+
+        public readonly string GetRandomEnemy()
+        {
+            if (Completed) return null;
+
+            int randomIndex = random.Next(remaining.Count);
+            return GetEnemyToSpawn(remaining.Keys.ElementAt(randomIndex));
+        }
+
+        public void RecordDeath(string name)
+        {
+            if (!spawned.ContainsKey(name)) return;
+
+            remaining[name]--;
+            if (remaining[name] == 0) remaining.Remove(name);
+        }
     }
 }
