@@ -18,7 +18,7 @@ namespace SaloonSlingers.Core
                 SaloonId = config.SaloonId,
                 InterestRisk = config.InterestRisk,
                 HouseGame = CardGame.Load(config.HouseGame),
-                EnemyInventory = new EnemyInventory(config.EnemyManifest),
+                EnemyInventory = new EnemyInventory((IReadOnlyDictionary<string, int>)config.EnemyManifest),
             };
         }
     }
@@ -27,7 +27,7 @@ namespace SaloonSlingers.Core
     {
         public string SaloonId { get; set; }
         public float InterestRisk { get; set; }
-        public IReadOnlyDictionary<string, int> EnemyManifest { get; set; }
+        public IDictionary<string, int> EnemyManifest { get; set; }
         public CardGameConfig HouseGame { get; set; }
     }
 

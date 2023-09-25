@@ -36,7 +36,7 @@ namespace SaloonSlingers.Unity
     {
         public string SaloonId { get; set; }
         public float InterestRisk { get; set; }
-        public IReadOnlyDictionary<string, int> EnemyManifest { get; set; }
+        public IDictionary<string, int> EnemyManifest { get; set; }
         public string HouseGame { get; set; }
     }
 }

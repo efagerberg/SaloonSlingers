@@ -33,10 +33,6 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float peerInterval = 0.2f;
         [SerializeField]
-        private const int maxPeerHits = 10;
-        [SerializeField]
-        private Collider[] peerHits = new Collider[maxPeerHits];
-        [SerializeField]
         private VisibilityDetector visibilityDetector;
 
         public void CastPeer()

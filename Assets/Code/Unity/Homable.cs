@@ -23,7 +23,7 @@ namespace SaloonSlingers.Unity
             Vector3 directionToTarget = (Target.position - transform.position).normalized;
             Vector3 velocityChange = Vector3.Scale(
                 directionToTarget * currentVelocity.magnitude - currentVelocity,
-                new Vector3(Strength, Strength, 1f)
+                new Vector3(Strength, Strength, Strength)
             );
             rb.AddForce(velocityChange * Time.fixedDeltaTime, ForceMode.VelocityChange);
         }
