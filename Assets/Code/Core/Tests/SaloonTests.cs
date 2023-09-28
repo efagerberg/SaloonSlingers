@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace SaloonSlingers.Core.Tests
 {
-    public class HeistTests
+    public class SaloonTests
     {
         [Test]
         public void TestLoadCreatesExpectedInstance()
@@ -18,19 +18,19 @@ namespace SaloonSlingers.Core.Tests
                 Name = "TestGame",
                 HandEvaluator = "BlackJack"
             };
-            var config = new HeistConfig
+            var config = new SaloonConfig
             {
-                SaloonId = "TestSaloon",
+                Id = "TestSaloon",
                 InterestRisk = 0.0f,
                 EnemyManifest = manifest,
                 HouseGame = game
             };
-            var subject = Heist.Load(config);
+            var subject = Saloon.Load(config);
 
             Assert.That(subject.EnemyInventory.Manifest, Is.EqualTo(manifest));
             Assert.That(subject.InterestRisk, Is.EqualTo(config.InterestRisk));
             Assert.That(subject.HouseGame.Name, Is.EqualTo(config.HouseGame.Name));
-            Assert.That(subject.SaloonId, Is.EqualTo(config.SaloonId));
+            Assert.That(subject.Id, Is.EqualTo(config.Id));
         }
     }
 

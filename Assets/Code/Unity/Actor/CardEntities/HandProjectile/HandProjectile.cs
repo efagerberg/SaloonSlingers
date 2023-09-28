@@ -22,7 +22,7 @@ namespace SaloonSlingers.Unity.Actor
             {
                 if (requiresEvaluation)
                 {
-                    handEvaluation = heistManager.Heist.HouseGame.Evaluate(Cards);
+                    handEvaluation = saloonManager.Saloon.HouseGame.Evaluate(Cards);
                     requiresEvaluation = false;
                 }
                 return handEvaluation;
@@ -50,7 +50,7 @@ namespace SaloonSlingers.Unity.Actor
         private HandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private Deck deck;
-        private HeistManager heistManager;
+        private SaloonManager saloonManager;
         private HandEvaluation handEvaluation;
         private bool requiresEvaluation = false;
         private DrawContext drawCtx;
@@ -75,7 +75,7 @@ namespace SaloonSlingers.Unity.Actor
             drawCtx.Hand = Cards;
             bool canDraw = (
                 !state.IsCommitted &&
-                heistManager.Heist.HouseGame.CanDraw(drawCtx)
+                saloonManager.Saloon.HouseGame.CanDraw(drawCtx)
             );
             if (!canDraw) return;
 
@@ -143,7 +143,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Awake()
         {
-            heistManager = GameObject.FindGameObjectWithTag("HeistManager").GetComponent<HeistManager>();
+            saloonManager = GameObject.FindGameObjectWithTag("SaloonManager").GetComponent<SaloonManager>();
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;

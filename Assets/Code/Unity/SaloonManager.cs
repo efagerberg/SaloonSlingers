@@ -8,31 +8,31 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
-    public class HeistManager : MonoBehaviour
+    public class SaloonManager : MonoBehaviour
     {
-        public Heist Heist { get; private set; }
+        public Saloon Saloon { get; private set; }
 
         [SerializeField]
         private TextAsset ConfigTextAsset;
 
         public void LoadRules()
         {
-            var rawConfig = JsonConvert.DeserializeObject<RawHeistConfig>(ConfigTextAsset.text);
+            var rawConfig = JsonConvert.DeserializeObject<RawConfig>(ConfigTextAsset.text);
             var cardGameTextAsset = Resources.Load<TextAsset>($"CardGameConfigs/{rawConfig.HouseGame}").text;
-            var config = new HeistConfig
+            var config = new SaloonConfig
             {
-                SaloonId = rawConfig.SaloonId,
+                Id = rawConfig.SaloonId,
                 EnemyManifest = rawConfig.EnemyManifest,
                 InterestRisk = rawConfig.InterestRisk,
                 HouseGame = JsonConvert.DeserializeObject<CardGameConfig>(cardGameTextAsset)
             };
-            Heist = Heist.Load(config);
+            Saloon = Saloon.Load(config);
         }
 
         private void Awake() => LoadRules();
     }
 
-    struct RawHeistConfig
+    struct RawConfig
     {
         public string SaloonId { get; set; }
         public float InterestRisk { get; set; }

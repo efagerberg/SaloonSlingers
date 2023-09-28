@@ -4,18 +4,18 @@ using System.Linq;
 
 namespace SaloonSlingers.Core
 {
-    public struct Heist
+    public struct Saloon
     {
         public float InterestRisk { get; private set; }
-        public string SaloonId { get; private set; }
+        public string Id { get; private set; }
         public CardGame HouseGame { get; private set; }
         public EnemyInventory EnemyInventory { get; private set; }
 
-        public static Heist Load(HeistConfig config)
+        public static Saloon Load(SaloonConfig config)
         {
-            return new Heist
+            return new Saloon
             {
-                SaloonId = config.SaloonId,
+                Id = config.Id,
                 InterestRisk = config.InterestRisk,
                 HouseGame = CardGame.Load(config.HouseGame),
                 EnemyInventory = new EnemyInventory((IReadOnlyDictionary<string, int>)config.EnemyManifest),
@@ -23,9 +23,9 @@ namespace SaloonSlingers.Core
         }
     }
 
-    public struct HeistConfig
+    public struct SaloonConfig
     {
-        public string SaloonId { get; set; }
+        public string Id { get; set; }
         public float InterestRisk { get; set; }
         public IDictionary<string, int> EnemyManifest { get; set; }
         public CardGameConfig HouseGame { get; set; }
