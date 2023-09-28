@@ -7,7 +7,7 @@ namespace SaloonSlingers.Unity.Actor
     public class HandInteractablePlacer : MonoBehaviour
     {
         private DeckGraphic deckGraphic;
-        private HandInteractableSpawner handInteractableSpawner;
+        private ISpawner<GameObject> handInteractableSpawner;
         private GameObject placed;
 
         private void Awake()
@@ -17,8 +17,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            handInteractableSpawner = GameObject.FindGameObjectWithTag("HandInteractableSpawner")
-                                                .GetComponent<HandInteractableSpawner>();
+            handInteractableSpawner = SaloonManager.Instance.HandInteractableSpawner;
 
             if (!deckGraphic.CanDraw) return;
 

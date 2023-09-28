@@ -26,7 +26,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private bool currentlyVisible = false;
         private SaloonManager saloonManager;
-        private IDictionary<string, ActorPool> pools = new Dictionary<string, ActorPool>();
+        private readonly IDictionary<string, ActorPool> pools = new Dictionary<string, ActorPool>();
 
         public GameObject Spawn(string enemyStr) => pools[enemyStr].Get(false);
 
@@ -51,7 +51,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            saloonManager = GameObject.FindGameObjectWithTag("SaloonManager").GetComponent<SaloonManager>();
+            saloonManager = SaloonManager.Instance;
             foreach (string enemyStr in saloonManager.Saloon.EnemyInventory.Manifest.Keys)
             {
                 pools[enemyStr] = gameObject.AddComponent<ActorPool>();

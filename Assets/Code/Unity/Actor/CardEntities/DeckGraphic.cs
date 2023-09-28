@@ -16,7 +16,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private int numberOfCards = Deck.NUMBER_OF_CARDS_IN_STANDARD_DECK;
 
-        private CardSpawner cardSpawner;
+        private ISpawner<GameObject> cardSpawner;
         private const float zOffset = 0.001f;
         private readonly Stack<GameObject> cardGraphics = new();
 
@@ -49,7 +49,7 @@ namespace SaloonSlingers.Unity.Actor
         private void Start()
         {
             Deck.OnDeckEmpty += DeckEmptyHandler;
-            cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<CardSpawner>();
+            cardSpawner = SaloonManager.Instance.CardSpawner;
             SpawnDeck();
         }
 

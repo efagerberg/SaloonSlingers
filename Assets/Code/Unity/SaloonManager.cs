@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 using SaloonSlingers.Core;
+using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 
@@ -10,14 +11,28 @@ namespace SaloonSlingers.Unity
 {
     public class SaloonManager : MonoBehaviour
     {
+        public static SaloonManager Instance { get; private set; }
+
         public Saloon Saloon { get; private set; }
+        public ISpawner<GameObject> CardSpawner { get => cardSpawner; }
+        public ISpawner<GameObject> HandInteractableSpawner { get => handInteractableSpawner; }
+        public EnemySpawner EnemySpawner { get => enemySpawner; }
+        public GameObject Player { get => player; } 
 
         [SerializeField]
-        private TextAsset ConfigTextAsset;
+        private TextAsset configTextAsset;
+        [SerializeField]
+        private CardSpawner cardSpawner;
+        [SerializeField]
+        private HandInteractableSpawner handInteractableSpawner;
+        [SerializeField]
+        private EnemySpawner enemySpawner;
+        [SerializeField]
+        private GameObject player;
 
         public void LoadRules()
         {
-            var rawConfig = JsonConvert.DeserializeObject<RawConfig>(ConfigTextAsset.text);
+            var rawConfig = JsonConvert.DeserializeObject<RawConfig>(configTextAsset.text);
             var cardGameTextAsset = Resources.Load<TextAsset>($"CardGameConfigs/{rawConfig.HouseGame}").text;
             var config = new SaloonConfig
             {
@@ -29,7 +44,12 @@ namespace SaloonSlingers.Unity
             Saloon = Saloon.Load(config);
         }
 
-        private void Awake() => LoadRules();
+        private void Awake()
+        {
+            LoadRules();
+            if (Instance == null) Instance = this;
+            else Destroy(gameObject);
+        }
     }
 
     struct RawConfig

@@ -143,7 +143,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Awake()
         {
-            saloonManager = GameObject.FindGameObjectWithTag("SaloonManager").GetComponent<SaloonManager>();
+            saloonManager = SaloonManager.Instance;
             trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;

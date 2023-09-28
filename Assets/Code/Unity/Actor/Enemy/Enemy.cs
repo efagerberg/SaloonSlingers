@@ -46,9 +46,9 @@ namespace SaloonSlingers.Unity.Actor
         private Health health;
         private NavMeshAgent agent;
         private EnemyHandInteractableController currentHandController;
-        private CardSpawner cardSpawner;
+        private ISpawner<GameObject> cardSpawner;
         private Vector3 spawnPosition;
-        private HandInteractableSpawner handInteractableSpawner;
+        private ISpawner<GameObject> handInteractableSpawner;
         private Color originalColor;
         private VisibilityDetector visibilityDetector;
         private SaloonManager saloonManager;
@@ -69,11 +69,10 @@ namespace SaloonSlingers.Unity.Actor
             visibilityDetector = GetComponent<VisibilityDetector>();
             health = GetComponent<Health>();
 
-            cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<CardSpawner>();
-            handInteractableSpawner = GameObject.FindGameObjectWithTag("HandInteractableSpawner")
-                                                .GetComponent<HandInteractableSpawner>();
+            cardSpawner = SaloonManager.Instance.CardSpawner;
+            handInteractableSpawner = SaloonManager.Instance.HandInteractableSpawner;
             originalColor = _renderer.material.color;
-            saloonManager = GameObject.FindGameObjectWithTag("SaloonManager").GetComponent<SaloonManager>();
+            saloonManager = SaloonManager.Instance;
         }
 
         private void Update()

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class CardSpawner : MonoBehaviour
+    public class CardSpawner : MonoBehaviour, ISpawner<GameObject>
     {
         public GameObject Spawn() => pool.Get();
 
