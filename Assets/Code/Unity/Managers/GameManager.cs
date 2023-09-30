@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-
 using SaloonSlingers.Core;
 
 using UnityEngine;
@@ -8,10 +5,10 @@ using UnityEngine;
 namespace SaloonSlingers.Unity
 {
     [RequireComponent(typeof(SceneLoader))]
-    public class GameManager : MonoBehaviour
+    public class GameManager : Singleton<GameManager>
     {
-        public static GameManager Instance { get; private set; }
-        public Saloon Saloon {
+        public Saloon Saloon
+        {
             get;
             private set;
         }
@@ -24,15 +21,10 @@ namespace SaloonSlingers.Unity
             sceneLoader.LoadScene(Saloon.Id);
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             sceneLoader = GetComponent<SceneLoader>();
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(this);
-            }
-            else Destroy(gameObject);
         }
     }
 }

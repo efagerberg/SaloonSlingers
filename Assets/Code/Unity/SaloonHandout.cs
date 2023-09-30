@@ -1,5 +1,3 @@
-using System;
-
 using SaloonSlingers.Core;
 
 using TMPro;

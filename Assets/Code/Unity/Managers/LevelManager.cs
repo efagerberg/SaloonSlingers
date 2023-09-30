@@ -9,10 +9,8 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
-    public class LevelManager : MonoBehaviour
+    public class LevelManager : Singleton<LevelManager>
     {
-        public static LevelManager Instance { get; private set; }
-
         public ISpawner<GameObject> CardSpawner { get => cardSpawner; }
         public ISpawner<GameObject> HandInteractableSpawner { get => handInteractableSpawner; }
         public EnemySpawner EnemySpawner { get => enemySpawner; }
@@ -26,12 +24,6 @@ namespace SaloonSlingers.Unity
         private EnemySpawner enemySpawner;
         [SerializeField]
         private GameObject player;
-
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-        }
 
         public static Saloon Load(string configFileContents)
         {
