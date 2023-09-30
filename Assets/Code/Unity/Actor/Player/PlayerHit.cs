@@ -20,7 +20,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private SceneLoader sceneLoader;
         [SerializeField]
-        private SceneAsset gameOverScene;
+        private string gameOverSceneName;
 
         private Vector3 startingPosition;
         private Coroutine flashCoroutine;
@@ -50,7 +50,7 @@ namespace SaloonSlingers.Unity.Actor
 
             if (e.After == 0)
             {
-                sceneLoader.LoadScene(gameOverScene.name);
+                sceneLoader.LoadScene(gameOverSceneName);
                 return;
             }
 

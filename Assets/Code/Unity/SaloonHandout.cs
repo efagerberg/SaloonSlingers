@@ -19,8 +19,6 @@ namespace SaloonSlingers.Unity
         private TextMeshProUGUI houseGame;
         [SerializeField]
         private TextMeshProUGUI interestRisk;
-        [SerializeField]
-        private SceneLoader sceneLoader;
 
         private Saloon saloon;
         private XRBaseInteractable interactable;
