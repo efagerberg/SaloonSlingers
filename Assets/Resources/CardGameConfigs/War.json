@@ -1,6 +1,5 @@
 {
   "Name": "War",
-  "MinScore": 1,
-  "MaxScore": 13,
+  "MaxHandSize":  1,
   "HandEvaluator": "War"
 }

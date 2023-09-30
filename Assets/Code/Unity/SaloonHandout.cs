@@ -29,7 +29,7 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
-            saloon = SaloonManager.Load(saloonConifgAsset.text);
+            saloon = LevelManager.Load(saloonConifgAsset.text);
             interestRisk.text = string.Format("{0}%", saloon.InterestRisk * 100.0f);
             title.text = saloon.Name;
             description.text = saloon.Description;
@@ -50,7 +50,7 @@ namespace SaloonSlingers.Unity
 
         private void OnActivate(ActivateEventArgs arg0)
         {
-            sceneLoader.LoadScene(saloon.Id);
+            GameManager.Instance.LoadSaloon(saloon);
         }
     }
 }

@@ -4,7 +4,7 @@
   "InterestRisk": 0,
   "HouseGame": "War",
   "EnemyManifest": {
-    "Enemy": 100
+    "Target": 100
   },
   "Description": "Pracice makes perfect"
 }

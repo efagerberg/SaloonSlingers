@@ -49,7 +49,7 @@ namespace SaloonSlingers.Unity.Actor
         private void Start()
         {
             Deck.OnDeckEmpty += DeckEmptyHandler;
-            cardSpawner = SaloonManager.Instance.CardSpawner;
+            cardSpawner = LevelManager.Instance.CardSpawner;
             SpawnDeck();
         }
 

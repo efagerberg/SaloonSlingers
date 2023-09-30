@@ -17,7 +17,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            handInteractableSpawner = SaloonManager.Instance.HandInteractableSpawner;
+            handInteractableSpawner = LevelManager.Instance.HandInteractableSpawner;
 
             if (!deckGraphic.CanDraw) return;
 

@@ -9,18 +9,15 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
-    public class SaloonManager : MonoBehaviour
+    public class LevelManager : MonoBehaviour
     {
-        public static SaloonManager Instance { get; private set; }
+        public static LevelManager Instance { get; private set; }
 
-        public Saloon Saloon { get; private set; }
         public ISpawner<GameObject> CardSpawner { get => cardSpawner; }
         public ISpawner<GameObject> HandInteractableSpawner { get => handInteractableSpawner; }
         public EnemySpawner EnemySpawner { get => enemySpawner; }
         public GameObject Player { get => player; }
 
-        [SerializeField]
-        private TextAsset configTextAsset;
         [SerializeField]
         private CardSpawner cardSpawner;
         [SerializeField]
@@ -32,7 +29,6 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
-            Saloon = Load(configTextAsset.text);
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
         }
