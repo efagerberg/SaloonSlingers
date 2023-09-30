@@ -1,3 +1,5 @@
+using UnityEditor;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,5 +11,7 @@ namespace SaloonSlingers.Unity
         {
             SceneManager.LoadScene(sceneName);
         }
+
+        public void LoadScene(SceneAsset asset) => LoadScene(asset.name);
     }
 }

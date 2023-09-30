@@ -2,6 +2,8 @@ using System.Collections;
 
 using SaloonSlingers.Core;
 
+using UnityEditor;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +19,8 @@ namespace SaloonSlingers.Unity.Actor
         private float hitFlashDuration = 1f;
         [SerializeField]
         private SceneLoader sceneLoader;
+        [SerializeField]
+        private SceneAsset gameOverScene;
 
         private Vector3 startingPosition;
         private Coroutine flashCoroutine;
@@ -46,7 +50,7 @@ namespace SaloonSlingers.Unity.Actor
 
             if (e.After == 0)
             {
-                sceneLoader.LoadScene("GameOver");
+                sceneLoader.LoadScene(gameOverScene.name);
                 return;
             }
 

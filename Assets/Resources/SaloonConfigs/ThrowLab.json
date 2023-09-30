@@ -1,0 +1,10 @@
+{
+  "SaloonId": "ThrowLab",
+  "Name":  "Throw Lab",
+  "InterestRisk": 0,
+  "HouseGame": "War",
+  "EnemyManifest": {
+    "Enemy": 100
+  },
+  "Description": "Pracice makes perfect"
+}
