@@ -13,6 +13,9 @@ namespace SaloonSlingers.Unity
             private set;
         }
 
+        [SerializeField]
+        private TextAsset saloonConfigAsset;
+
         private SceneLoader sceneLoader;
 
         public void LoadSaloon(Saloon saloon)
@@ -25,6 +28,11 @@ namespace SaloonSlingers.Unity
         {
             base.Awake();
             sceneLoader = GetComponent<SceneLoader>();
+            if (saloonConfigAsset != null)
+            {
+                Saloon = LevelManager.Load(saloonConfigAsset.text);
+                LoadSaloon(Saloon);
+            }
         }
     }
 }

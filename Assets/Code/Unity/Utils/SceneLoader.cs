@@ -7,11 +7,10 @@ namespace SaloonSlingers.Unity
 {
     public class SceneLoader : MonoBehaviour
     {
-        public void LoadScene(string sceneName)
+        public void LoadScene(string sceneName, bool forceReload = false)
         {
-            SceneManager.LoadScene(sceneName);
+            if (SceneManager.GetActiveScene().name != sceneName || forceReload)
+                SceneManager.LoadScene(sceneName);
         }
-
-        public void LoadScene(SceneAsset asset) => LoadScene(asset.name);
     }
 }
