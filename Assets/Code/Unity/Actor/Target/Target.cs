@@ -61,7 +61,7 @@ namespace SaloonSlingers.Unity.Actor
                 switchDirection = false;
             }
             float velocity = speed * Time.deltaTime;
-           transform.Translate(velocity * Vector3.forward);
+            transform.Translate(velocity * Vector3.forward);
         }
     }
 }

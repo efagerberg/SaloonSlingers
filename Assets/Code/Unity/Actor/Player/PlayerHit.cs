@@ -2,8 +2,6 @@ using System.Collections;
 
 using SaloonSlingers.Core;
 
-using UnityEditor;
-
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,21 +14,17 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private Image hitFlashImage;
         [SerializeField]
-        private float hitFlashDuration = 1f;
-        [SerializeField]
-        private SceneLoader sceneLoader;
+        private float duration = 1f;
         [SerializeField]
         private string gameOverSceneName;
 
-        private Vector3 startingPosition;
-        private Coroutine flashCoroutine;
-        private float startingFlashAlpha;
+        private IEnumerator flashCoroutine;
+        private float originalAlpha;
 
         private void Awake()
         {
             if (health == null) health = GetComponent<Health>();
-            startingPosition = transform.position;
-            startingFlashAlpha = hitFlashImage.color.a;
+            originalAlpha = hitFlashImage.color.a;
         }
 
         private void OnEnable()
@@ -45,41 +39,29 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HealthPointsChangedHandler(Points sender, ValueChangeEvent<uint> e)
         {
-            if (flashCoroutine != null)
-                StopCoroutine(nameof(DisableFlashSmoothly));
+            flashCoroutine = Flash(hitFlashImage, originalAlpha, 0, duration, flashCoroutine);
+            StartCoroutine(flashCoroutine);
+            if (e.After != 0) return;
 
-            if (e.After == 0)
-            {
-                sceneLoader.LoadScene(gameOverSceneName);
-                return;
-            }
-
-            hitFlashImage.gameObject.SetActive(true);
-            flashCoroutine = StartCoroutine(nameof(DisableFlashSmoothly));
+            GameManager.Instance.SceneLoader.LoadScene(gameOverSceneName);
         }
 
-        private IEnumerator DisableFlashSmoothly()
+        public IEnumerator Flash(Image image, float startAlpha, float endAlpha, float duration, IEnumerator previousCoroutine)
         {
-            float targetAlpha = 0f;
-            float elapsedTime = 0f;
-
-            while (elapsedTime < hitFlashDuration)
+            if (previousCoroutine != null)
             {
-                elapsedTime += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsedTime / hitFlashDuration);
-
-                // Lerp the alpha value from the original alpha to the target alpha
-                float lerpedAlpha = Mathf.Lerp(startingFlashAlpha, targetAlpha, t);
-
-                // Set the red flash image color with the updated alpha
-                Color redFlashColor = hitFlashImage.color;
-                redFlashColor.a = lerpedAlpha;
-                hitFlashImage.color = redFlashColor;
-
-                yield return null;
+                StopCoroutine(previousCoroutine);
+                Color newColor = image.color;
+                newColor.a = startAlpha;
+                image.color = newColor;
             }
 
-            hitFlashImage.gameObject.SetActive(false);
+            image.gameObject.SetActive(true);
+            yield return Fader.FadeTo(image, endAlpha, duration);
+            image.gameObject.SetActive(false);
+            var originalColor = image.color;
+            originalColor.a = startAlpha;
+            image.color = originalColor;
         }
     }
 }
