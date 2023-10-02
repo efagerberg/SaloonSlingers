@@ -1,0 +1,4 @@
+coverage:
+  status:
+    # Like this in theory but for now Unity code is rarely tested but often changed.
+    patch: off
