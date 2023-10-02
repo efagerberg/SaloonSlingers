@@ -37,6 +37,7 @@ namespace SaloonSlingers.Core
             {
                 "blackjack" => new BlackJackHandEvaluator(),
                 "poker" => new PokerHandEvaluator(),
+                "war" => new WarHandEvaluator(),
                 _ => throw new InvalidGameRulesConfig($"Unknown value for HandEvaluator {v}"),
             };
         }

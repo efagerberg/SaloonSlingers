@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class HandInteractableSpawner : MonoBehaviour
+    public class HandInteractableSpawner : MonoBehaviour, ISpawner<GameObject>
     {
         public GameObject Spawn() => pool.Get();
 

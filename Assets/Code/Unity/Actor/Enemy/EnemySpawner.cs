@@ -25,8 +25,8 @@ namespace SaloonSlingers.Unity.Actor
         private float maxRotationNoise = 200f;
 
         private bool currentlyVisible = false;
-        private HeistManager heistManager;
-        private IDictionary<string, ActorPool> pools = new Dictionary<string, ActorPool>();
+        private GameManager gameManager;
+        private readonly IDictionary<string, ActorPool> pools = new Dictionary<string, ActorPool>();
 
         public GameObject Spawn(string enemyStr) => pools[enemyStr].Get(false);
 
@@ -43,7 +43,7 @@ namespace SaloonSlingers.Unity.Actor
         private void RecordDeath(object sender, System.EventArgs e)
         {
             var go = (GameObject)sender;
-            heistManager.Heist.EnemyInventory.RecordDeath(go.name);
+            gameManager.Saloon.EnemyInventory.RecordDeath(go.name);
 
             var actor = go.GetComponent<IActor>();
             actor.Death -= RecordDeath;
@@ -51,8 +51,8 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            heistManager = GameObject.FindGameObjectWithTag("HeistManager").GetComponent<HeistManager>();
-            foreach (string enemyStr in heistManager.Heist.EnemyInventory.Manifest.Keys)
+            gameManager = GameManager.Instance;
+            foreach (string enemyStr in gameManager.Saloon.EnemyInventory.Manifest.Keys)
             {
                 pools[enemyStr] = gameObject.AddComponent<ActorPool>();
                 var prefab = Resources.Load<GameObject>($"prefabs/{enemyStr}");
@@ -79,8 +79,8 @@ namespace SaloonSlingers.Unity.Actor
 
         private void SpawnEnemy()
         {
-            var enemyStr = heistManager.Heist.EnemyInventory.GetRandomEnemy();
-            if (enemyStr == null || pools.Values.Sum(p => p.CountActive) == maxActiveEnemies || heistManager.Heist.EnemyInventory.Completed) return;
+            var enemyStr = gameManager.Saloon.EnemyInventory.GetRandomEnemy();
+            if (enemyStr == null || pools.Values.Sum(p => p.CountActive) == maxActiveEnemies || gameManager.Saloon.EnemyInventory.Completed) return;
 
             int randomSpawnpointIndex = Random.Range(0, spawnPoints.Count - 1);
             Transform spawnPoint = spawnPoints[randomSpawnpointIndex];

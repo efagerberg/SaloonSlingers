@@ -12,10 +12,11 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float speed = 1.0f;
         [SerializeField]
-        private float moveDistance = 5.0f;
+        private float raycastDistance = 0.1f;
 
         private Health health;
-        private bool movingRight = true;
+        private Rigidbody rb;
+        private bool switchDirection = false;
 
         public void Reset()
         {
@@ -25,6 +26,7 @@ namespace SaloonSlingers.Unity.Actor
         private void Awake()
         {
             health = GetComponent<Health>();
+            rb = GetComponent<Rigidbody>();
         }
 
         private void OnEnable()
@@ -43,19 +45,23 @@ namespace SaloonSlingers.Unity.Actor
                 Death?.Invoke(gameObject, EventArgs.Empty);
         }
 
+        private void FixedUpdate()
+        {
+            if (switchDirection == false && Physics.Raycast(transform.position, transform.forward, out _, raycastDistance))
+            {
+                switchDirection = true;
+            }
+        }
+
         private void Update()
         {
-            // Calculate translation based on speed and direction
-            float translation = speed * Time.deltaTime * (movingRight ? 1 : -1);
-
-            // Translate the object's position
-            transform.Translate(translation, 0, 0);
-
-            // Change direction at boundaries
-            if (transform.position.x > moveDistance || transform.position.x < -moveDistance)
+            if (switchDirection)
             {
-                movingRight = !movingRight;
+                transform.Rotate(Vector3.up, 180);
+                switchDirection = false;
             }
+            float velocity = speed * Time.deltaTime;
+            transform.Translate(velocity * Vector3.forward);
         }
     }
 }

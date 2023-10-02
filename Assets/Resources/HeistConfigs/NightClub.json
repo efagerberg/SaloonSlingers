@@ -1,8 +1,0 @@
-{
-  "SaloonId":  "NightClub",
-  "InterestRisk": 0.05,
-  "HouseGame": "5CardPoker",
-  "EnemyManifest": {
-    "Enemy":  10
-  }
-}

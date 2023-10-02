@@ -1,0 +1,5 @@
+{
+  "Name": "War",
+  "MaxHandSize":  1,
+  "HandEvaluator": "War"
+}

@@ -46,12 +46,12 @@ namespace SaloonSlingers.Unity.Actor
         private Health health;
         private NavMeshAgent agent;
         private EnemyHandInteractableController currentHandController;
-        private CardSpawner cardSpawner;
+        private ISpawner<GameObject> cardSpawner;
         private Vector3 spawnPosition;
-        private HandInteractableSpawner handInteractableSpawner;
+        private ISpawner<GameObject> handInteractableSpawner;
         private Color originalColor;
         private VisibilityDetector visibilityDetector;
-        private HeistManager heistManager;
+        private GameManager gameManager;
         private DrawContext drawCtx;
 
         public void Reset()
@@ -69,11 +69,10 @@ namespace SaloonSlingers.Unity.Actor
             visibilityDetector = GetComponent<VisibilityDetector>();
             health = GetComponent<Health>();
 
-            cardSpawner = GameObject.FindGameObjectWithTag("CardSpawner").GetComponent<CardSpawner>();
-            handInteractableSpawner = GameObject.FindGameObjectWithTag("HandInteractableSpawner")
-                                                .GetComponent<HandInteractableSpawner>();
+            cardSpawner = LevelManager.Instance.CardSpawner;
+            handInteractableSpawner = LevelManager.Instance.HandInteractableSpawner;
             originalColor = _renderer.material.color;
-            heistManager = GameObject.FindGameObjectWithTag("HeistManager").GetComponent<HeistManager>();
+            gameManager = GameManager.Instance;
         }
 
         private void Update()
@@ -182,7 +181,7 @@ namespace SaloonSlingers.Unity.Actor
             drawCtx.Hand = projectile.Cards;
             drawCtx.Evaluation = projectile.HandEvaluation;
             drawCtx.Deck = Deck;
-            if (heistManager.Heist.HouseGame.CanDraw(drawCtx))
+            if (gameManager.Saloon.HouseGame.CanDraw(drawCtx))
             {
                 currentHandController.Draw(Deck, cardSpawner.Spawn);
                 return;

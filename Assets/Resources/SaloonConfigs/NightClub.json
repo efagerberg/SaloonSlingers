@@ -1,0 +1,10 @@
+{
+  "SaloonId": "NightClub",
+  "Name":  "Night Club",
+  "InterestRisk": 0.05,
+  "HouseGame": "5CardPoker",
+  "EnemyManifest": {
+    "Enemy": 10
+  },
+  "Description": "Loud music, expensive cocktails, and deep pockets. The perfect recipe for a heist!"
+}
