@@ -137,7 +137,9 @@ namespace SaloonSlingers.Core.Tests
                 new object[] { "poker", new PokerHandEvaluator() },
                 new object[] { "  pokeR  ", new PokerHandEvaluator() },
                 new object[] { "BLACKJACK", new BlackJackHandEvaluator() },
-                new object[] { "Black  Jack", new BlackJackHandEvaluator() }
+                new object[] { "Black  Jack", new BlackJackHandEvaluator() },
+                new object[] { "wAR", new WarHandEvaluator() },
+                new object[] { "War", new WarHandEvaluator() },
             };
 
             private static readonly object[][] MinScoreTestCases = {
