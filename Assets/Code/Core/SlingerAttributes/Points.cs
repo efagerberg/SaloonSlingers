@@ -2,7 +2,9 @@ using System;
 
 namespace SaloonSlingers.Core
 {
-    public delegate void PointsChangedHandler(Points sender, ValueChangeEvent<uint> e);
+    public delegate void PointsIncreasedHandler(Points sender, ValueChangeEvent<uint> e);
+    public delegate void PointsDecreasedHandler(Points sender, ValueChangeEvent<uint> e);
+
     public class Points
     {
         public uint Value
@@ -14,16 +16,16 @@ namespace SaloonSlingers.Core
                 // Value could be negative technically, but the actual _value variable needs to be
                 // positive.
                 _value = (uint)Math.Clamp((int)value, 0, MaxValue);
-                if (before == _value) return;
+                var e = new ValueChangeEvent<uint>(before, _value);
+                if (e.Before == e.After) return;
 
-                OnPointsChanged?.Invoke(
-                    this,
-                    new ValueChangeEvent<uint>(before, _value)
-                );
+                if (e.Before > e.After) PointsDecreased?.Invoke(this, e);
+                else PointsIncreased?.Invoke(this, e);
             }
         }
         public uint MaxValue { get; }
-        public event PointsChangedHandler OnPointsChanged;
+        public event PointsIncreasedHandler PointsIncreased;
+        public event PointsDecreasedHandler PointsDecreased;
 
         public Points(uint initial)
         {

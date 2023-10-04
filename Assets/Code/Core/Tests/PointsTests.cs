@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 using NUnit.Framework;
 
 namespace SaloonSlingers.Core.Tests
@@ -8,18 +10,16 @@ namespace SaloonSlingers.Core.Tests
         public void TestPointsSetButUnchangedDoesNotEmitEvent()
         {
             var subject = new Points(2);
-            void handler(Points sender, ValueChangeEvent<uint> e)
-            {
-                Assert.That(true == false);
-            }
-            subject.OnPointsChanged += handler;
+            subject.PointsIncreased += failIfHandled;
+            subject.PointsDecreased += failIfHandled;
             subject.Value = subject.Value;
         }
 
         [Test]
-        public void TestPointsChangedEmitsEvent()
+        public void TestPointsDecreaseEmitsEvent()
         {
             var subject = new Points(2);
+            subject.Value--;
             bool eventHandled = false;
             void handler(Points sender, ValueChangeEvent<uint> e)
             {
@@ -27,8 +27,28 @@ namespace SaloonSlingers.Core.Tests
                 Assert.AreEqual(e.Before, 2);
                 Assert.AreEqual(e.After, 1);
             }
-            subject.OnPointsChanged += handler;
+            subject.PointsDecreased += handler;
+            subject.PointsIncreased += failIfHandled;
             subject.Value--;
+
+            Assert.That(eventHandled);
+        }
+
+        [Test]
+        public void TestPointsIncreaseEmitsEvent()
+        {
+            var subject = new Points(2);
+            subject.Value--;
+            bool eventHandled = false;
+            void handler(Points sender, ValueChangeEvent<uint> e)
+            {
+                eventHandled = true;
+                Assert.AreEqual(e.Before, 2);
+                Assert.AreEqual(e.After, 1);
+            }
+            subject.PointsIncreased += handler;
+            subject.PointsDecreased += failIfHandled;
+            subject.Value++;
 
             Assert.That(eventHandled);
         }
@@ -38,6 +58,7 @@ namespace SaloonSlingers.Core.Tests
         {
             var subject = new Points(2);
             subject.Value *= 2;
+            subject.PointsIncreased += failIfHandled;
 
             Assert.That(subject.Value, Is.EqualTo(2));
         }
@@ -47,8 +68,14 @@ namespace SaloonSlingers.Core.Tests
         {
             var subject = new Points(2);
             subject.Value -= 10;
+            subject.PointsDecreased += failIfHandled;
 
             Assert.That(subject.Value, Is.EqualTo(0));
+        }
+
+        private void failIfHandled(Points sender, ValueChangeEvent<uint> e)
+        {
+            Assert.Fail($"Handled unexpected event {e}");
         }
     }
 

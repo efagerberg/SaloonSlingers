@@ -31,15 +31,15 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnEnable()
         {
-            hitPoints.Points.OnPointsChanged += HandleHitPointsChanged;
+            hitPoints.Points.PointsDecreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
-            hitPoints.Points.OnPointsChanged -= HandleHitPointsChanged;
+            hitPoints.Points.PointsDecreased -= OnHitPointsDecreased;
         }
 
-        private void HandleHitPointsChanged(Points sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
         {
             if (e.After == 0)
                 Death?.Invoke(gameObject, EventArgs.Empty);

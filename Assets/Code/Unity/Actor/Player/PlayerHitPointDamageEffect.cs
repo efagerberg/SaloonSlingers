@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class PlayerHit : MonoBehaviour
+    public class PlayerHitPointDamageEffect : MonoBehaviour
     {
         [SerializeField]
         private HitPoints hitPoints;
@@ -15,8 +15,6 @@ namespace SaloonSlingers.Unity.Actor
         private Image hitFlashImage;
         [SerializeField]
         private float duration = 1f;
-        [SerializeField]
-        private string gameOverSceneName;
 
         private IEnumerator flashCoroutine;
         private float originalAlpha;
@@ -29,21 +27,18 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnEnable()
         {
-            hitPoints.Points.OnPointsChanged += HitPointsChangedHandler;
+            hitPoints.Points.PointsDecreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
-            hitPoints.Points.OnPointsChanged -= HitPointsChangedHandler;
+            hitPoints.Points.PointsDecreased -= OnHitPointsDecreased;
         }
 
-        private void HitPointsChangedHandler(Points sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
         {
             flashCoroutine = Flash(hitFlashImage, originalAlpha, 0, duration, flashCoroutine);
             StartCoroutine(flashCoroutine);
-            if (e.After != 0) return;
-
-            GameManager.Instance.SceneLoader.LoadScene(gameOverSceneName);
         }
 
         public IEnumerator Flash(Image image, float startAlpha, float endAlpha, float duration, IEnumerator previousCoroutine)

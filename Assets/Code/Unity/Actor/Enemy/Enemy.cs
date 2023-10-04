@@ -114,19 +114,19 @@ namespace SaloonSlingers.Unity.Actor
             Deck.OnDeckEmpty += DeckEmptyHandler;
             spawnPosition = transform.position;
             if (targetHitPoints != null)
-                targetHitPoints.Points.OnPointsChanged += HandleTargetHealthChanged;
-            hitPoints.Points.OnPointsChanged += HandleHealthChanged;
+                targetHitPoints.Points.PointsDecreased += OnTargetHitPointsDecreased;
+            hitPoints.Points.PointsDecreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
             Deck.OnDeckEmpty -= DeckEmptyHandler;
             if (targetHitPoints != null)
-                targetHitPoints.Points.OnPointsChanged -= HandleTargetHealthChanged;
-            hitPoints.Points.OnPointsChanged -= HandleHealthChanged;
+                targetHitPoints.Points.PointsDecreased -= OnTargetHitPointsDecreased;
+            hitPoints.Points.PointsDecreased -= OnHitPointsDecreased;
         }
 
-        private void HandleTargetHealthChanged(Points sender, ValueChangeEvent<uint> e)
+        private void OnTargetHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
         {
             if (e.After == 0)
             {
@@ -155,7 +155,7 @@ namespace SaloonSlingers.Unity.Actor
                 InvokeRepeating(nameof(Attack), 0.0f, 1.0f);
         }
 
-        private void HandleHealthChanged(Points sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
         {
             if (e.Before > e.After && e.After != 0) StartCoroutine(nameof(HitEffect));
             if (e.After == 0)
