@@ -160,7 +160,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnCollisionEnter(Collision collision)
         {
-            bool damagable = collision.gameObject.TryGetComponent(out Health targetHealth);
+            bool damagable = collision.gameObject.TryGetComponent(out HitPoints targetHitPoints);
             if (damagable)
             {
                 HandProjectile[] targetProjectiles = collision.gameObject.GetComponentsInChildren<HandProjectile>();
@@ -175,7 +175,7 @@ namespace SaloonSlingers.Unity.Actor
                         break;
                     }
                 }
-                if (!targetHasSuperiorHand) targetHealth.Points.Value--;
+                if (!targetHasSuperiorHand) targetHitPoints.Points.Value--;
             }
 
             Kill();

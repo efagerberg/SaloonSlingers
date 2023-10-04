@@ -10,7 +10,7 @@ namespace SaloonSlingers.Unity.Actor
     public class PlayerHit : MonoBehaviour
     {
         [SerializeField]
-        private Health health;
+        private HitPoints hitPoints;
         [SerializeField]
         private Image hitFlashImage;
         [SerializeField]
@@ -23,21 +23,21 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Awake()
         {
-            if (health == null) health = GetComponent<Health>();
+            if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
             originalAlpha = hitFlashImage.color.a;
         }
 
         private void OnEnable()
         {
-            health.Points.OnPointsChanged += HealthPointsChangedHandler;
+            hitPoints.Points.OnPointsChanged += HitPointsChangedHandler;
         }
 
         private void OnDisable()
         {
-            health.Points.OnPointsChanged -= HealthPointsChangedHandler;
+            hitPoints.Points.OnPointsChanged -= HitPointsChangedHandler;
         }
 
-        private void HealthPointsChangedHandler(Points sender, ValueChangeEvent<uint> e)
+        private void HitPointsChangedHandler(Points sender, ValueChangeEvent<uint> e)
         {
             flashCoroutine = Flash(hitFlashImage, originalAlpha, 0, duration, flashCoroutine);
             StartCoroutine(flashCoroutine);
