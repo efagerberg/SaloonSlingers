@@ -15,7 +15,7 @@ namespace SaloonSlingers.Core
                 uint before = _value;
                 // Value could be negative technically, but the actual _value variable needs to be
                 // positive.
-                _value = (uint)Math.Clamp((int)value, 0, MaxValue);
+                _value = Math.Clamp(value, 0, MaxValue);
                 var e = new ValueChangeEvent<uint>(before, _value);
                 if (e.Before == e.After) return;
 
@@ -30,6 +30,12 @@ namespace SaloonSlingers.Core
         public Points(uint initial)
         {
             MaxValue = initial;
+            _value = initial;
+        }
+
+        public Points(uint initial, uint max)
+        {
+            MaxValue = max;
             _value = initial;
         }
 
