@@ -10,7 +10,7 @@ namespace SaloonSlingers.Unity
 
         private Rigidbody rb;
 
-        private void Start()
+        private void Awake()
         {
             rb = GetComponent<Rigidbody>();
         }
@@ -23,7 +23,7 @@ namespace SaloonSlingers.Unity
             Vector3 directionToTarget = (Target.position - transform.position).normalized;
             Vector3 velocityChange = Vector3.Scale(
                 directionToTarget * currentVelocity.magnitude - currentVelocity,
-                new Vector3(Strength, Strength, Strength)
+                Vector3.one * Strength
             );
             rb.AddForce(velocityChange * Time.fixedDeltaTime, ForceMode.VelocityChange);
         }

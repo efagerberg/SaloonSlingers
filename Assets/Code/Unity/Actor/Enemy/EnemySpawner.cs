@@ -23,6 +23,8 @@ namespace SaloonSlingers.Unity.Actor
         private float minRotationNoise = 0;
         [SerializeField]
         private float maxRotationNoise = 200f;
+        [SerializeField]
+        private int poolSize = 10;
 
         private bool currentlyVisible = false;
         private GameManager gameManager;
@@ -54,9 +56,8 @@ namespace SaloonSlingers.Unity.Actor
             gameManager = GameManager.Instance;
             foreach (string enemyStr in gameManager.Saloon.EnemyInventory.Manifest.Keys)
             {
-                pools[enemyStr] = gameObject.AddComponent<ActorPool>();
                 var prefab = Resources.Load<GameObject>($"prefabs/{enemyStr}");
-                pools[enemyStr].Prefab = prefab;
+                pools[enemyStr] = new ActorPool(poolSize, prefab, transform);
             }
             InvokeRepeating(nameof(SpawnEnemy), 1, spawnPerSecond);
             currentlyVisible = true;
@@ -80,7 +81,7 @@ namespace SaloonSlingers.Unity.Actor
         private void SpawnEnemy()
         {
             var enemyStr = gameManager.Saloon.EnemyInventory.GetRandomEnemy();
-            if (enemyStr == null || pools.Values.Sum(p => p.CountActive) == maxActiveEnemies || gameManager.Saloon.EnemyInventory.Completed) return;
+            if (enemyStr == null || pools.Values.Sum(p => p.CountSpanwed) == maxActiveEnemies || gameManager.Saloon.EnemyInventory.Completed) return;
 
             int randomSpawnpointIndex = Random.Range(0, spawnPoints.Count - 1);
             Transform spawnPoint = spawnPoints[randomSpawnpointIndex];

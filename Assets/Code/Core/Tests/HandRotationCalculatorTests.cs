@@ -11,7 +11,7 @@ namespace SaloonSlingers.Core.Tests
         public class TestCalculateRotations
         {
             [TestCaseSource(nameof(TestCases))]
-            public void TestReturnsExpectedDegrees(int n, float totalDegrees, List<float> expected)
+            public void ReturnsExpectedDegrees(int n, float totalDegrees, List<float> expected)
             {
                 Assert.AreEqual(
                     expected,

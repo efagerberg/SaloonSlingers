@@ -7,7 +7,7 @@ namespace SaloonSlingers.Core.Tests
     public class SaloonTests
     {
         [Test]
-        public void TestLoadCreatesExpectedInstance()
+        public void Load_CreatesExpectedInstance()
         {
             var manifest = new Dictionary<string, int> {
                 { "enemy1", 3 },
@@ -37,7 +37,7 @@ namespace SaloonSlingers.Core.Tests
     public class EnemyInventoryTests
     {
         [Test]
-        public void TestCompleteWhenEnemyInventoryEmpty()
+        public void WhenEnemyInventoryEmpty_IsComplete()
         {
             var manifest = new Dictionary<string, int>
             {
@@ -48,7 +48,7 @@ namespace SaloonSlingers.Core.Tests
         }
 
         [Test]
-        public void TestCompleteWhenNonRemaining()
+        public void WhenNonRemaining_IsComplete()
         {
             var enemyManifest = new Dictionary<string, int>
             {
@@ -63,7 +63,7 @@ namespace SaloonSlingers.Core.Tests
         }
 
         [Test]
-        public void TestGetsRandomEnemy()
+        public void GetsRandomEnemy()
         {
             var enemyManifest = new Dictionary<string, int>
             {
@@ -78,7 +78,7 @@ namespace SaloonSlingers.Core.Tests
         }
 
         [Test]
-        public void TestResetResetsCompletedInventoryToIncomplete()
+        public void Reset_ResetsCompletedInventoryToIncomplete()
         {
             var enemyManifest = new Dictionary<string, int>
             {

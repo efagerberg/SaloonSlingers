@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 
 using SaloonSlingers.Core;
+using SaloonSlingers.Unity.Tests;
 
 using UnityEngine;
 
@@ -15,9 +16,9 @@ namespace SaloonSlingers.Unity.Actor.Tests
         public class TestReset
         {
             [Test]
-            public void Test_Resets_Transform()
+            public void Resets_Transform()
             {
-                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform panelTransform = TestUtils.CreateComponent<RectTransform>("HandPanel");
                 HandLayoutMediator subject = new(panelTransform);
 
                 (Func<Card, ICardGraphic> spawner,
@@ -51,9 +52,9 @@ namespace SaloonSlingers.Unity.Actor.Tests
             [TestCase(1)]
             [TestCase(2)]
             [TestCase(10)]
-            public void Test_SpawnsExpectedIntoLayout(int n)
+            public void SpawnsExpectedIntoLayout(int n)
             {
-                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform panelTransform = TestUtils.CreateComponent<RectTransform>("HandPanel");
                 HandLayoutMediator subject = new(panelTransform);
                 (Func<Card, ICardGraphic> spawner,
                  IList<ICardGraphic> expectedGraphics) = GetSpawnerWithExpectedSpawned();
@@ -85,9 +86,9 @@ namespace SaloonSlingers.Unity.Actor.Tests
         public class TestApplyLayout
         {
             [Test]
-            public void Test_WhenNoCardAddedAndCommitted_Returns0WidthCanvasSizeDelta_AndEmptyList()
+            public void WhenNoCardAddedAndCommitted_Returns0WidthCanvasSizeDelta_AndEmptyList()
             {
-                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform panelTransform = TestUtils.CreateComponent<RectTransform>("HandPanel");
                 HandLayoutMediator subject = new(panelTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(-10f);
                 subject.ApplyLayout(true, rotationCalculator);
@@ -99,9 +100,9 @@ namespace SaloonSlingers.Unity.Actor.Tests
             [TestCase(1)]
             [TestCase(3)]
             [TestCase(5)]
-            public void Test_WhenCardsAdded_ThenHandCommitted_Returns0WidthAndRotation(int n)
+            public void WhenCardsAdded_ThenHandCommitted_Returns0WidthAndRotation(int n)
             {
-                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform panelTransform = TestUtils.CreateComponent<RectTransform>("HandPanel");
                 HandLayoutMediator subject = new(panelTransform);
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
@@ -118,9 +119,9 @@ namespace SaloonSlingers.Unity.Actor.Tests
             [TestCase(1)]
             [TestCase(3)]
             [TestCase(5)]
-            public void Test_WhenCardsAdded_ThenHandCommitted_AndUncommitted_ReturnsOriginalWidthCanvasSizeDelta_AndListWithRotation(int n)
+            public void WhenCardsAdded_ThenHandCommitted_AndUncommitted_ReturnsOriginalWidthCanvasSizeDelta_AndListWithRotation(int n)
             {
-                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform panelTransform = TestUtils.CreateComponent<RectTransform>("HandPanel");
                 HandLayoutMediator subject = new(panelTransform);
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
@@ -138,9 +139,9 @@ namespace SaloonSlingers.Unity.Actor.Tests
             [TestCase(1)]
             [TestCase(3)]
             [TestCase(5)]
-            public void Test_WhenNotCommitted_Idempotent(int n)
+            public void WhenNotCommitted_Idempotent(int n)
             {
-                RectTransform panelTransform = CreateComponent<RectTransform>("HandPanel");
+                RectTransform panelTransform = TestUtils.CreateComponent<RectTransform>("HandPanel");
                 HandLayoutMediator subject = new(panelTransform);
                 (var spawner, var spawned) = GetSpawnerWithExpectedSpawned();
                 Func<int, IEnumerable<float>> rotationCalculator = SimpleRotationCalculatorFactory(10f);
@@ -174,14 +175,6 @@ namespace SaloonSlingers.Unity.Actor.Tests
             }
         }
 
-        private static T CreateComponent<T>(string name = null) where T : Component
-        {
-            GameObject go = new();
-            T comp = go.AddComponent<T>();
-            if (name != null) comp.name = name;
-            return comp;
-        }
-
         private static Func<int, IEnumerable<float>> SimpleRotationCalculatorFactory(float step)
         {
             return (n) => Enumerable.Range(0, n).Select((x, i) => i * step);
@@ -204,7 +197,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
             List<ICardGraphic> spawned = new();
             ICardGraphic cardSpawner(Card c)
             {
-                ICardGraphic t = CreateComponent<TestCardGraphic>();
+                ICardGraphic t = TestUtils.CreateComponent<TestCardGraphic>();
                 t.gameObject.AddComponent<RectTransform>();
                 t.Card = c;
                 spawned.Add(t);

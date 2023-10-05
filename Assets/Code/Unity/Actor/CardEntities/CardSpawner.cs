@@ -6,11 +6,16 @@ namespace SaloonSlingers.Unity.Actor
     {
         public GameObject Spawn() => pool.Get();
 
+        [SerializeField]
+        private int poolSize;
+        [SerializeField]
+        private GameObject prefab;
+
         private ActorPool pool;
 
         private void Awake()
         {
-            if (pool == null) pool = GetComponent<ActorPool>();
+            pool = new ActorPool(poolSize, prefab, transform);
         }
     }
 }

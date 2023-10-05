@@ -62,21 +62,21 @@ namespace SaloonSlingers.Core.Tests
         class TestToString
         {
             [Test]
-            public void ToString_AceCard_ReturnsExpectedString()
+            public void AceCard_ReturnsExpectedString()
             {
                 Card cardUnderTest = new(Values.ACE, Suits.CLUBS);
                 Assert.AreEqual(cardUnderTest.ToString(), "ace_of_clubs");
             }
 
             [Test]
-            public void ToString_NumberCard_ReturnsExpectedString()
+            public void NumberCard_ReturnsExpectedString()
             {
                 Card cardUnderTest = new(Values.EIGHT, Suits.CLUBS);
                 Assert.AreEqual(cardUnderTest.ToString(), "8_of_clubs");
             }
 
             [Test]
-            public void ToString_FaceCard_ReturnsExpectedString()
+            public void FaceCard_ReturnsExpectedString()
             {
                 Card cardUnderTest = new(Values.JACK, Suits.DIAMONDS);
                 Assert.AreEqual(cardUnderTest.ToString(), "jack_of_diamonds");
@@ -116,7 +116,7 @@ namespace SaloonSlingers.Core.Tests
             };
 
             [TestCaseSource(nameof(EncodeTestCases))]
-            public void ReturnsExpectedByte_WhenEncoded(string cardString, string expected)
+            public void WhenEncoded_ReturnsExpectedByte(string cardString, string expected)
             {
                 Card subject = new(cardString);
                 byte actual = Card.Encode(subject);
@@ -133,7 +133,7 @@ namespace SaloonSlingers.Core.Tests
             );
 
             [TestCaseSource(nameof(DecodeTestCases))]
-            public void ReturnsExpectedCard_WhenDecoded(string cardBinaryString, string expectedCardString)
+            public void WhenDecoded_ReturnsExpectedCard(string cardBinaryString, string expectedCardString)
             {
                 Card expected = new(expectedCardString);
                 byte binaryCard = Convert.ToByte(cardBinaryString, 2);
