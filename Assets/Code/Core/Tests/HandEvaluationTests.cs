@@ -7,13 +7,12 @@ namespace SaloonSlingers.Core.Tests
         public class TestDisplayName
         {
             [TestCaseSource(nameof(DisplayNameTestCases))]
-            public void TestReturnsExpectedNameString(HandEvaluation x, string expected)
+            public void ReturnsExpectedNameString(HandEvaluation x, string expected)
             {
                 Assert.AreEqual(x.DisplayName(), expected);
             }
 
-            private static object[][] DisplayNameTestCases =
-            {
+            private static readonly object[][] DisplayNameTestCases = {
                 new object[] { new HandEvaluation(HandNames.NONE, 0), "" },
                 new object[] { new HandEvaluation(HandNames.HIGH_CARD, 10), "High Card" },
                 new object[] { new HandEvaluation(HandNames.BUST, 1), "Bust"},

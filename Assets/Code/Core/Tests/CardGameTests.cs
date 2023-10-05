@@ -9,8 +9,7 @@ namespace SaloonSlingers.Core.Tests
         class TestLoad
         {
             [TestCaseSource(nameof(StringEvaluatorTestCases))]
-            public void TestEvaluateUsesPassedEvaluator(string evaluatorName,
-                                                        IHandEvaluator expectedEvaluator)
+            public void UsesPassedEvaluator(string evaluatorName, IHandEvaluator expectedEvaluator)
             {
                 CardGameConfig config = new()
                 {
@@ -32,7 +31,7 @@ namespace SaloonSlingers.Core.Tests
             }
 
             [Test]
-            public void TestRaisesWhenInvalidHandlerString()
+            public void WhenInvalidHandlerString_Raises()
             {
                 CardGameConfig config = new()
                 {
@@ -44,7 +43,7 @@ namespace SaloonSlingers.Core.Tests
             }
 
             [TestCaseSource(nameof(MaxHandSizeTestCases))]
-            public void TestCanOnlyDrawWhenHandsizeAtOrBelowMax(int maxHandSize, int handSize, bool expected)
+            public void WhenHandsizeAtOrBelowMax_CanDraw(int maxHandSize, int handSize, bool expected)
             {
                 CardGameConfig config = new()
                 {
@@ -66,7 +65,7 @@ namespace SaloonSlingers.Core.Tests
             }
 
             [TestCaseSource(nameof(MinScoreTestCases))]
-            public void TestCanOnlyDrawWhenScoreAtOrAboveMinimum(int minScore, int evaluationScore, bool expected)
+            public void WhenScoreAtOrAboveMinimum_CanDraw(int minScore, int evaluationScore, bool expected)
             {
                 CardGameConfig config = new()
                 {
@@ -88,7 +87,7 @@ namespace SaloonSlingers.Core.Tests
             }
 
             [TestCaseSource(nameof(MaxScoreTestCases))]
-            public void TestCanOnlyDrawWhenScoreAtOrBelowMaximum(int maxScore, int evaluationScore, bool expected)
+            public void WhenScoreAtOrBelowMaximum_CanDraw(int maxScore, int evaluationScore, bool expected)
             {
                 CardGameConfig config = new()
                 {
@@ -110,7 +109,7 @@ namespace SaloonSlingers.Core.Tests
             }
 
             [TestCaseSource(nameof(MinMaxScoreTestCases))]
-            public void TestCanOnlyDrawWhenAllRulesAreTure(int minScore, int maxScore, int actualScore, bool expected)
+            public void WhenAllRulesAreTure_CanDraw(int minScore, int maxScore, int actualScore, bool expected)
             {
                 CardGameConfig config = new()
                 {
