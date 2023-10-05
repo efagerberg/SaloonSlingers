@@ -15,28 +15,28 @@ namespace SaloonSlingers.Unity.Actor
         private bool canPerformAction = true;
         protected bool IsPerforming { get; set; }
 
-        public IEnumerator GetActionCoroutine(ActionPoints points, Func<IEnumerator> action)
+        public IEnumerator GetActionCoroutine(Points points, ActionMetaData metaData, Func<IEnumerator> action)
         {
             if (!canPerformAction) return null;
-            return DoAction(points, action);
+            return DoAction(points, metaData, action);
         }
 
-        private IEnumerator DoAction(ActionPoints points, Func<IEnumerator> action)
+        private IEnumerator DoAction(Points points, ActionMetaData metaData, Func<IEnumerator> action)
         {
             canPerformAction = false;
-            points.Value -= 1;
+            points.Decrement();
             IsPerforming = true;
             yield return StartCoroutine(action());
             IsPerforming = false;
 
-            yield return new WaitForSeconds(points.CoolDown);
+            yield return new WaitForSeconds(metaData.CoolDown);
             canPerformAction = points.Value > 0;
 
             // Assumes the cooldown is always smaller than the recovery period
             // Game-wise this makes sense, why would the player be allowed to regen
             // points faster than they can use them.
-            yield return new WaitForSeconds(points.PointRecoveryPeriod - points.CoolDown);
-            points.Value += 1;
+            yield return new WaitForSeconds(metaData.PointRecoveryPeriod - metaData.CoolDown);
+            points.Increment();
             canPerformAction = true;
         }
     }

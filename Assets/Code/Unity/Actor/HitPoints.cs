@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class Health : MonoBehaviour
+    public class HitPoints : MonoBehaviour
     {
         public Points Points
         {
             get
             {
-                _points ??= new Points(startingHealthPoints);
+                _points ??= new Points(startingPoints);
                 return _points;
             }
             set { _points = value; }
@@ -18,11 +18,6 @@ namespace SaloonSlingers.Unity.Actor
         private Points _points;
 
         [SerializeField]
-        private uint startingHealthPoints = 5;
-
-        public void Reset()
-        {
-            _points.Value = startingHealthPoints;
-        }
+        private uint startingPoints = 5;
     }
 }

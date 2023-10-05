@@ -12,7 +12,7 @@ namespace SaloonSlingers.Unity.Actor
 
     public class HandProjectile : MonoBehaviour, IActor
     {
-        public event HandProjectileHeld OnHandProjectileHeld;
+        public event HandProjectileHeld HandProjectileHeld;
         public event EventHandler Death;
         public IList<ICardGraphic> CardGraphics { get; private set; } = new List<ICardGraphic>();
         public IList<Card> Cards { get => CardGraphics.Select(x => x.Card).ToList(); }
@@ -65,7 +65,7 @@ namespace SaloonSlingers.Unity.Actor
                 handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
             if (CardGraphics.Count == 0) TryDrawCard(spawnCard);
             gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
-            OnHandProjectileHeld?.Invoke(this, EventArgs.Empty);
+            HandProjectileHeld?.Invoke(this, EventArgs.Empty);
         }
 
         public void TryDrawCard(Func<GameObject> spawnCard)
@@ -160,22 +160,18 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnCollisionEnter(Collision collision)
         {
-            bool damagable = collision.gameObject.TryGetComponent(out Health targetHealth);
-            if (damagable)
-            {
-                HandProjectile[] targetProjectiles = collision.gameObject.GetComponentsInChildren<HandProjectile>();
+            bool targetHasHitPoints = collision.gameObject.TryGetComponent(out HitPoints targetHitPoints);
+            bool targetHasTempHitPoints = collision.gameObject.TryGetComponent(out TemporaryHitPoints targetTempHitPoints);
 
-                // If target has any hand better than this instance, they should not lose health;
-                bool targetHasSuperiorHand = false;
-                foreach (var targetProjectile in targetProjectiles)
+            if (targetHasHitPoints)
+            {
+                if (targetHasTempHitPoints && targetTempHitPoints.Points.Value > 0)
                 {
-                    if (HandEvaluation.Score < targetProjectile.HandEvaluation.Score)
-                    {
-                        targetHasSuperiorHand = true;
-                        break;
-                    }
+                    bool shouldDamageHitPoints = targetTempHitPoints.Points.Value < HandEvaluation.Score;
+                    targetTempHitPoints.Points.Decrease(shouldDamageHitPoints ? 0 : targetTempHitPoints.Points.Value - HandEvaluation.Score);
+                    if (shouldDamageHitPoints) targetHitPoints.Points.Decrement();
                 }
-                if (!targetHasSuperiorHand) targetHealth.Points.Value--;
+                else targetHitPoints.Points.Decrement();
             }
 
             Kill();

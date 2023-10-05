@@ -57,7 +57,7 @@ namespace SaloonSlingers.Unity.Actor
             var projectile = instance.GetComponent<HandProjectile>();
             foreach (ICardGraphic c in projectile.CardGraphics)
                 c.Kill();
-            projectile.OnHandProjectileHeld -= HandInteractableHeldHandler;
+            projectile.HandProjectileHeld -= HandInteractableHeldHandler;
             projectile.Death -= HandleInteractableDeath;
         }
 
@@ -65,7 +65,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             GameObject spawned = handInteractableSpawner.Spawn();
             HandProjectile projectile = spawned.GetComponent<HandProjectile>();
-            projectile.OnHandProjectileHeld += HandInteractableHeldHandler;
+            projectile.HandProjectileHeld += HandInteractableHeldHandler;
             projectile.Death += HandleInteractableDeath;
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();
             swapper.SetController(ControllerTypes.PLAYER);

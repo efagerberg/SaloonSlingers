@@ -42,8 +42,8 @@ namespace SaloonSlingers.Unity.Actor
                 _currentTarget = value;
             }
         }
-        private Health targetHealth;
-        private Health health;
+        private HitPoints targetHitPoints;
+        private HitPoints hitPoints;
         private NavMeshAgent agent;
         private EnemyHandInteractableController currentHandController;
         private ISpawner<GameObject> cardSpawner;
@@ -56,7 +56,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Reset()
         {
-            health.Reset();
+            hitPoints.Points.Reset();
             currentTarget = null;
             agent.stoppingDistance = 0f;
             currentHandController = null;
@@ -67,7 +67,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             agent = GetComponent<NavMeshAgent>();
             visibilityDetector = GetComponent<VisibilityDetector>();
-            health = GetComponent<Health>();
+            hitPoints = GetComponent<HitPoints>();
 
             cardSpawner = LevelManager.Instance.CardSpawner;
             handInteractableSpawner = LevelManager.Instance.HandInteractableSpawner;
@@ -113,20 +113,20 @@ namespace SaloonSlingers.Unity.Actor
             Deck = new Deck().Shuffle();
             Deck.OnDeckEmpty += DeckEmptyHandler;
             spawnPosition = transform.position;
-            if (targetHealth != null)
-                targetHealth.Points.OnPointsChanged += HandleTargetHealthChanged;
-            health.Points.OnPointsChanged += HandleHealthChanged;
+            if (targetHitPoints != null)
+                targetHitPoints.Points.PointsDecreased += OnTargetHitPointsDecreased;
+            hitPoints.Points.PointsDecreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
             Deck.OnDeckEmpty -= DeckEmptyHandler;
-            if (targetHealth != null)
-                targetHealth.Points.OnPointsChanged -= HandleTargetHealthChanged;
-            health.Points.OnPointsChanged -= HandleHealthChanged;
+            if (targetHitPoints != null)
+                targetHitPoints.Points.PointsDecreased -= OnTargetHitPointsDecreased;
+            hitPoints.Points.PointsDecreased -= OnHitPointsDecreased;
         }
 
-        private void HandleTargetHealthChanged(Points sender, ValueChangeEvent<uint> e)
+        private void OnTargetHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
         {
             if (e.After == 0)
             {
@@ -148,14 +148,14 @@ namespace SaloonSlingers.Unity.Actor
             if (player == null) return;
 
             currentTarget = player.GetComponent<XROrigin>().Camera.transform;
-            targetHealth = currentTarget.GetComponent<Health>();
+            targetHitPoints = currentTarget.GetComponent<HitPoints>();
             agent.stoppingDistance = persueStoppingDistance;
             CancelInvoke(nameof(LookForPlayer));
             if (!IsInvoking(nameof(Attack)))
                 InvokeRepeating(nameof(Attack), 0.0f, 1.0f);
         }
 
-        private void HandleHealthChanged(Points sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
         {
             if (e.Before > e.After && e.After != 0) StartCoroutine(nameof(HitEffect));
             if (e.After == 0)
