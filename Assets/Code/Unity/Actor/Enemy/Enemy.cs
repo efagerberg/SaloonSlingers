@@ -56,7 +56,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Reset()
         {
-            hitPoints.Reset();
+            hitPoints.Points.Reset();
             currentTarget = null;
             agent.stoppingDistance = 0f;
             currentHandController = null;

@@ -12,10 +12,5 @@ namespace SaloonSlingers.Unity
         {
             Points = new(0, uint.MaxValue);
         }
-
-        public void Reset()
-        {
-            Points.Value = 0;
-        }
     }
 }

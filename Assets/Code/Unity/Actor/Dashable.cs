@@ -8,7 +8,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Dashable : ActionPerformer
     {
-        public ActionPoints Points { get; private set; }
+        public Points Points { get; private set; }
 
         [SerializeField]
         private float dashSpeed = 6f;
@@ -21,11 +21,13 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float startingPointRecoveryPeriod = 1f;
 
+        private ActionMetaData metaData;
+
         public void Dash(CharacterController controller, Vector3 forward)
         {
             IEnumerator onStart()
             {
-                float currentDuration = Points.Duration;
+                float currentDuration = metaData.Duration;
                 while (currentDuration > 0)
                 {
                     controller.Move(dashSpeed * Time.deltaTime * forward);
@@ -33,7 +35,7 @@ namespace SaloonSlingers.Unity.Actor
                     yield return new WaitForEndOfFrame();
                 }
             }
-            IEnumerator coroutine = GetActionCoroutine(Points, onStart);
+            IEnumerator coroutine = GetActionCoroutine(Points, metaData, onStart);
             if (coroutine == null) return;
 
             StartCoroutine(coroutine);
@@ -41,12 +43,11 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            Points = new ActionPoints(
-                startingDashes,
-                startingDashDuration,
+            Points = new Points(startingDashes);
+            metaData = new(startingDashDuration,
                 startingDashCooldown,
-                startingPointRecoveryPeriod
-            );
+                startingPointRecoveryPeriod);
+
         }
     }
 }

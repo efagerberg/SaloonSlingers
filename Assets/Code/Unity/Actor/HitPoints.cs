@@ -19,10 +19,5 @@ namespace SaloonSlingers.Unity.Actor
 
         [SerializeField]
         private uint startingPoints = 5;
-
-        public void Reset()
-        {
-            _points.Value = startingPoints;
-        }
     }
 }

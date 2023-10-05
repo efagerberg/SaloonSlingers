@@ -168,10 +168,10 @@ namespace SaloonSlingers.Unity.Actor
                 if (targetHasTempHitPoints && targetTempHitPoints.Points.Value > 0)
                 {
                     bool shouldDamageHitPoints = targetTempHitPoints.Points.Value < HandEvaluation.Score;
-                    targetTempHitPoints.Points.Value = shouldDamageHitPoints ? 0 : targetTempHitPoints.Points.Value - HandEvaluation.Score;
-                    if (shouldDamageHitPoints) targetHitPoints.Points.Value--;
+                    targetTempHitPoints.Points.Decrease(shouldDamageHitPoints ? 0 : targetTempHitPoints.Points.Value - HandEvaluation.Score);
+                    if (shouldDamageHitPoints) targetHitPoints.Points.Decrement();
                 }
-                else targetHitPoints.Points.Value--;
+                else targetHitPoints.Points.Decrement();
             }
 
             Kill();

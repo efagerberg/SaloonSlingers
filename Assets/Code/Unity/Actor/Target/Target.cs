@@ -20,7 +20,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Reset()
         {
-            hitPoints.Reset();
+            hitPoints.Points.Reset();
         }
 
         private void Awake()

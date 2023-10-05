@@ -10,12 +10,13 @@ namespace SaloonSlingers.Core
         public uint Value
         {
             get { return _value; }
-            set
+            private set
             {
                 uint before = _value;
-                // Value could be negative technically, but the actual _value variable needs to be
-                // positive.
-                _value = Math.Clamp(value, 0, MaxValue);
+
+                if (value == uint.MaxValue && before == 0) _value = 0;
+                else _value = Math.Clamp(value, 0, MaxValue);
+
                 var e = new ValueChangeEvent<uint>(before, _value);
                 if (e.Before == e.After) return;
 
@@ -24,8 +25,14 @@ namespace SaloonSlingers.Core
             }
         }
         public uint MaxValue { get; }
+        public uint InitialValue { get; }
         public event PointsIncreasedHandler PointsIncreased;
         public event PointsDecreasedHandler PointsDecreased;
+
+        public void Reset()
+        {
+            Value = InitialValue;
+        }
 
         public Points(uint initial)
         {
@@ -38,6 +45,24 @@ namespace SaloonSlingers.Core
             MaxValue = max;
             _value = initial;
         }
+
+        public void Decrement()
+        {
+            Decrease(1);
+        }
+
+        public void Decrease(uint amount)
+        {
+            // Check for underflow
+            if (Value >= amount)
+                Value -= amount;
+            else Value = 0;
+        }
+
+
+        public void Increment() => Value++;
+
+        public void Increase(uint amount) => Value += amount;
 
         private uint _value;
     }

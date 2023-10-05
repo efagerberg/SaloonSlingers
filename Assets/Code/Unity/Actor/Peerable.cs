@@ -14,7 +14,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Peerable : ActionPerformer
     {
-        public ActionPoints Points { get; private set; }
+        public Points tsnPoi { get; private set; }
 
         [SerializeField]
         private List<InputActionProperty> peerActionProperties;
@@ -35,9 +35,11 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private VisibilityDetector visibilityDetector;
 
+        private ActionMetaData metaData;
+
         public void CastPeer()
         {
-            IEnumerator coroutine = GetActionCoroutine(Points, DoPeer);
+            IEnumerator coroutine = GetActionCoroutine(tsnPoi, metaData, DoPeer);
             if (coroutine == null) return;
 
             StartCoroutine(coroutine);
@@ -49,7 +51,7 @@ namespace SaloonSlingers.Unity.Actor
             Outline lastOutline = null;
             Enemy currentEnemy = null;
             Outline currentOutline = null;
-            float currentDuration = Points.Duration;
+            float currentDuration = metaData.Duration;
             var intervalWait = new WaitForSeconds(peerInterval);
 
             while (currentDuration > 0)
@@ -110,12 +112,12 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            Points = new ActionPoints(
-                startingPeers,
-                startingDuration,
-                startingCooldown,
-                startingRecoveryPeriod
+            tsnPoi = new(
+                startingPeers
             );
+            metaData = new(startingDuration,
+                startingCooldown,
+                startingRecoveryPeriod);
         }
     }
 }
