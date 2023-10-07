@@ -27,15 +27,15 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnEnable()
         {
-            hitPoints.Points.PointsDecreased += OnHitPointsDecreased;
+            hitPoints.Points.Decreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
-            hitPoints.Points.PointsDecreased -= OnHitPointsDecreased;
+            hitPoints.Points.Decreased -= OnHitPointsDecreased;
         }
 
-        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(Core.HitPoints sender, ValueChangeEvent<uint> e)
         {
             flashCoroutine = Flash(hitFlashImage, originalAlpha, 0, duration, flashCoroutine);
             StartCoroutine(flashCoroutine);

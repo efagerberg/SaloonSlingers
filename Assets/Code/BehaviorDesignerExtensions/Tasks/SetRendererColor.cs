@@ -3,13 +3,8 @@ using BehaviorDesigner.Runtime.Tasks;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.BehaviorDesignerExtensions
 {
-    public class SharedRenderer : SharedVariable<Renderer>
-    {
-        public static implicit operator SharedRenderer(Renderer value) { return new SharedRenderer { mValue = value }; }
-    }
-
     public class SetRendererColor : Action
     {
         public SharedColor Color;

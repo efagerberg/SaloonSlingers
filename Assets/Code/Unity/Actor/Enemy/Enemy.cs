@@ -9,32 +9,25 @@ namespace SaloonSlingers.Unity.Actor
     public class Enemy : MonoBehaviour, IActor
     {
         public event EventHandler Death;
+        public Deck Deck { get; private set; }
 
         private HitPoints hitPoints;
-
-        public void Reset()
-        {
-            hitPoints.Points.Reset();
-        }
 
         private void Awake()
         {
             hitPoints = GetComponent<HitPoints>();
+            Deck = new Deck().Shuffle();
+    }
+
+        public void Reset()
+        {
+            hitPoints.Points.Reset();
+            Deck = new Deck().Shuffle();
         }
 
-        private void OnEnable()
+        public void Kill()
         {
-            hitPoints.Points.PointsDecreased += OnHitPointsDecreased;
-        }
-
-        private void OnDisable()
-        {
-            hitPoints.Points.PointsDecreased -= OnHitPointsDecreased;
-        }
-
-        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
-        {
-            if (e.After == 0) Death?.Invoke(gameObject, EventArgs.Empty);
+            Death?.Invoke(gameObject, EventArgs.Empty);
         }
     }
 }

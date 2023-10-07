@@ -14,7 +14,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Peerable : ActionPerformer
     {
-        public Points tsnPoi { get; private set; }
+        public Core.HitPoints tsnPoi { get; private set; }
 
         [SerializeField]
         private List<InputActionProperty> peerActionProperties;

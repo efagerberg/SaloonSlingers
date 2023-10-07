@@ -132,6 +132,8 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
+            foreach (ICardGraphic c in CardGraphics)
+                c.Kill();
             Death?.Invoke(gameObject, EventArgs.Empty);
         }
 

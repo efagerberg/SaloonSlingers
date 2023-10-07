@@ -8,26 +8,26 @@ namespace SaloonSlingers.Unity
     public class PlayerDeath : MonoBehaviour
     {
         [SerializeField]
-        private HitPoints hitPoints;
+        private Actor.HitPoints hitPoints;
         [SerializeField]
         private string gameOverSceneName;
 
         private void Awake()
         {
-            if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
+            if (hitPoints == null) hitPoints = GetComponent<Actor.HitPoints>();
         }
 
         private void OnEnable()
         {
-            hitPoints.Points.PointsDecreased += OnHitPointsDecreased;
+            hitPoints.Points.Decreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
-            hitPoints.Points.PointsDecreased -= OnHitPointsDecreased;
+            hitPoints.Points.Decreased -= OnHitPointsDecreased;
         }
 
-        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(Core.HitPoints sender, ValueChangeEvent<uint> e)
         {
             if (e.After != 0) return;
 

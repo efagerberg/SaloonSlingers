@@ -2,10 +2,11 @@ using System;
 
 namespace SaloonSlingers.Core
 {
-    public delegate void PointsIncreasedHandler(Points sender, ValueChangeEvent<uint> e);
-    public delegate void PointsDecreasedHandler(Points sender, ValueChangeEvent<uint> e);
+    public delegate void PointsIncreasedHandler(HitPoints sender, ValueChangeEvent<uint> e);
+    public delegate void PointsDecreasedHandler(HitPoints sender, ValueChangeEvent<uint> e);
 
-    public class Points
+    [Serializable]
+    public class HitPoints
     {
         public uint Value
         {
@@ -20,24 +21,26 @@ namespace SaloonSlingers.Core
                 var e = new ValueChangeEvent<uint>(before, _value);
                 if (e.Before == e.After) return;
 
-                if (e.Before > e.After) PointsDecreased?.Invoke(this, e);
+                if (e.Before > e.After) Decreased?.Invoke(this, e);
                 else PointsIncreased?.Invoke(this, e);
             }
         }
         public uint MaxValue { get; }
         public uint InitialValue { get; }
         public event PointsIncreasedHandler PointsIncreased;
-        public event PointsDecreasedHandler PointsDecreased;
+        public event PointsDecreasedHandler Decreased;
 
         public void Reset()
         {
             Value = InitialValue;
         }
 
-        public Points(uint initial) : this(initial, initial)
+        public HitPoints() { }
+
+        public HitPoints(uint initial) : this(initial, initial)
         { }
 
-        public Points(uint initial, uint max)
+        public HitPoints(uint initial, uint max)
         {
             InitialValue = initial;
             MaxValue = max;

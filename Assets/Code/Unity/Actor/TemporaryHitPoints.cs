@@ -6,7 +6,7 @@ namespace SaloonSlingers.Unity
 {
     public class TemporaryHitPoints : MonoBehaviour
     {
-        public Points Points { get; set; }
+        public HitPoints Points { get; set; }
 
         private void Awake()
         {

@@ -5,7 +5,7 @@ using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.BehaviorDesignerExtensions
 {
     public class Throw : Action
     {
