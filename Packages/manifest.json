@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.starasgames.tmpro-dynamic-data-cleaner": "https://github.com/STARasGAMES/tmpro-dynamic-data-cleaner.git#upm",
-    "com.unity.ai.navigation": "1.1.4",
+    "com.unity.ai.navigation": "1.1.5",
     "com.unity.analytics": "3.8.1",
     "com.unity.collab-proxy": "2.0.7",
     "com.unity.ide.visualstudio": "2.0.21",
@@ -10,7 +10,6 @@
     "com.unity.probuilder": "5.1.1",
     "com.unity.recorder": "4.0.1",
     "com.unity.test-framework": "2.0.1-pre.18",
-    "nuget.moq": "2.0.0-pre.2",
     "com.unity.testtools.codecoverage": "1.2.4",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.7.5",
@@ -19,6 +18,7 @@
     "com.unity.xr.interaction.toolkit": "2.5.0",
     "com.unity.xr.management": "4.4.0",
     "com.unity.xr.openxr": "1.8.2",
+    "nuget.moq": "2.0.0-pre.2",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",

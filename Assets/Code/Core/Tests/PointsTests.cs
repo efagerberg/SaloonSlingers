@@ -5,6 +5,16 @@ namespace SaloonSlingers.Core.Tests
     public class PointsTests
     {
         [Test]
+        public void HasExpectedFieldValues_WhenConstructed()
+        {
+            var subject = new Points(2, 4);
+
+            Assert.AreEqual(subject.MaxValue, 4);
+            Assert.AreEqual(subject.InitialValue, 2);
+            Assert.AreEqual(subject.Value, 2);
+        }
+
+        [Test]
         public void Unchanged_DoesNotEmitEvent()
         {
             var subject = new Points(2);

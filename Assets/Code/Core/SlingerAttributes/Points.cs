@@ -34,14 +34,12 @@ namespace SaloonSlingers.Core
             Value = InitialValue;
         }
 
-        public Points(uint initial)
-        {
-            MaxValue = initial;
-            _value = initial;
-        }
+        public Points(uint initial): this(initial, initial)
+        {}
 
         public Points(uint initial, uint max)
         {
+            InitialValue = initial;
             MaxValue = max;
             _value = initial;
         }
