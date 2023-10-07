@@ -34,8 +34,8 @@ namespace SaloonSlingers.Core
             Value = InitialValue;
         }
 
-        public Points(uint initial): this(initial, initial)
-        {}
+        public Points(uint initial) : this(initial, initial)
+        { }
 
         public Points(uint initial, uint max)
         {

@@ -1,4 +1,5 @@
 using NUnit.Framework;
+
 using UnityEngine;
 
 namespace SaloonSlingers.Unity.Tests
@@ -33,7 +34,7 @@ namespace SaloonSlingers.Unity.Tests
 
         }
     }
-    
+
     public class TransformExtensionsTests
     {
         [Test]

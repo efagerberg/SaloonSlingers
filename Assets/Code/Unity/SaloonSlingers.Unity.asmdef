@@ -7,7 +7,8 @@
         "GUID:fe685ec1767f73d42b749ea8045bfe43",
         "GUID:75469ad4d38634e559750d17036d5f7c",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
-        "GUID:134840c4c2bb7aa45943bb2615619c05"
+        "GUID:134840c4c2bb7aa45943bb2615619c05",
+        "GUID:546decc14fbeca541a30f71ee28244e4"
     ],
     "includePlatforms": [
         "Android",
@@ -18,7 +19,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "Newtonsoft.Json.dll"
+        "Newtonsoft.Json.dll",
+        "BehaviorDesigner.Runtime.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
