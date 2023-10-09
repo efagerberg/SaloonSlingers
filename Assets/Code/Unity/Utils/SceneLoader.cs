@@ -13,7 +13,6 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private float transitionDuration = 1f;
 
-        private IEnumerator fader;
         private AsyncOperation loadOperation;
 
         public void LoadScene(string sceneName)
