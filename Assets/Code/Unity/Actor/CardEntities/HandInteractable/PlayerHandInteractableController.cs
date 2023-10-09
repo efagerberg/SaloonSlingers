@@ -15,8 +15,6 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float maxDeckDistance = 0.08f;
         [SerializeField]
-        private List<InputActionProperty> commitHandActionProperties;
-        [SerializeField]
         private XRBaseInteractable mainInteractable;
         [SerializeField]
         private XRBaseInteractable peerInteractable;
@@ -49,7 +47,6 @@ namespace SaloonSlingers.Unity.Actor
             }
             handProjectile.transform.SetParent(args.interactorObject.transform);
             peerInteractable.enabled = true;
-            commitHandActionProperties.ForEach(prop => prop.action.started += OnToggleCommit);
             handProjectile.Pickup(deckGraphic.Spawn);
         }
 
@@ -59,7 +56,6 @@ namespace SaloonSlingers.Unity.Actor
 
             Vector3 offset = throwOffsetCalculator.Calculate((XRGrabInteractable)args.interactableObject);
             handProjectile.Throw(offset);
-            commitHandActionProperties.ForEach(prop => prop.action.started -= OnToggleCommit);
             peerInteractable.enabled = false;
             handProjectile.Death += OnHandProjectileDied;
 
@@ -111,11 +107,6 @@ namespace SaloonSlingers.Unity.Actor
         {
             mainInteractable.enabled = false;
             peerInteractable.enabled = false;
-        }
-
-        private void OnToggleCommit(InputAction.CallbackContext _)
-        {
-            handProjectile.ToggleCommitHand();
         }
 
         private void FixedUpdate()

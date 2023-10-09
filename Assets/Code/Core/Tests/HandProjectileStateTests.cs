@@ -27,20 +27,20 @@ namespace SaloonSlingers.Core.Tests
             }
         }
 
-        public class TestToggleCommit
+        public class TestToggleStacked
         {
             [Test]
-            public void WhenNotCommitted_IsCommitted()
+            public void WhenNotStacked_IsStacked()
             {
                 HandProjectileState x = new HandProjectileState(1f);
-                Assert.IsTrue(x.ToggleCommit().IsCommitted);
+                Assert.IsTrue(x.ToggleStacked().IsStacked);
             }
 
             [Test]
-            public void WhenCommitted_IsUncommitted()
+            public void WhenStacked_IsUnStacked()
             {
                 HandProjectileState x = new(1f);
-                Assert.IsFalse(x.ToggleCommit().ToggleCommit().IsCommitted);
+                Assert.IsFalse(x.ToggleStacked().ToggleStacked().IsStacked);
             }
         }
 
