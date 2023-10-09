@@ -1,0 +1,25 @@
+{
+    "name": "BehaviorDesignerExtensions",
+    "rootNamespace": "",
+    "references": [
+        "GUID:15b54c79343b4614195c3259778ba043",
+        "GUID:c66fc65b715c3654480b9aefb8817423",
+        "GUID:546decc14fbeca541a30f71ee28244e4"
+    ],
+    "includePlatforms": [
+        "Android",
+        "Editor",
+        "WindowsStandalone64"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "BehaviorDesigner.Runtime.dll",
+        "BehaviorDesigner.Editor.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -7,8 +7,8 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class EnemySpawner : MonoBehaviour
     {
-        [SerializeField]
-        private List<Transform> spawnPoints;
+        public List<Transform> SpawnPoints;
+
         [SerializeField]
         private float spawnPerSecond = 4f;
         [SerializeField]
@@ -67,7 +67,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (currentlyVisible != visibleSpawnPointsOnRun)
             {
-                foreach (var t in spawnPoints)
+                foreach (var t in SpawnPoints)
                 {
                     for (int i = 0; i < t.childCount; i++)
                     {
@@ -80,11 +80,19 @@ namespace SaloonSlingers.Unity.Actor
 
         private void SpawnEnemy()
         {
-            var enemyStr = gameManager.Saloon.EnemyInventory.GetRandomEnemy();
-            if (enemyStr == null || pools.Values.Sum(p => p.CountSpanwed) == maxActiveEnemies || gameManager.Saloon.EnemyInventory.Completed) return;
+            if (pools.Values.Sum(p => p.CountSpanwed) == maxActiveEnemies || gameManager.Saloon.EnemyInventory.Completed) return;
 
-            int randomSpawnpointIndex = Random.Range(0, spawnPoints.Count - 1);
-            Transform spawnPoint = spawnPoints[randomSpawnpointIndex];
+            if (gameManager.Saloon.EnemyInventory.Completed) return;
+
+            var enemyStr = gameManager.Saloon.EnemyInventory.GetRandomEnemy();
+            if (enemyStr == null)
+            {
+                Debug.LogError("No enemies left to spawn despite inventory not being marked complete");
+                return;
+            }
+
+            int randomSpawnpointIndex = Random.Range(0, SpawnPoints.Count - 1);
+            Transform spawnPoint = SpawnPoints[randomSpawnpointIndex];
             Vector3 positionNoise = new(Random.Range(minPositionNoise, maxPositionNoise),
                                         Random.Range(minPositionNoise, maxPositionNoise),
                                         0f);

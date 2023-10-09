@@ -461,6 +461,17 @@
                 },
                 {
                     "name": "",
+                    "id": "00dbf072-0e20-4328-b271-c2a80959f2b0",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "c3d64e8d-6aad-4ae5-ae14-5e020a658014",
                     "path": "<Keyboard>/1",
                     "interactions": "",
