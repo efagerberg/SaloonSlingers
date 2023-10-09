@@ -6,7 +6,7 @@ namespace SaloonSlingers.Core
         {
             get => lifespanInSeconds > 0;
         }
-        public bool IsCommitted { get; private set; }
+        public bool IsStacked { get; private set; }
         public bool IsThrown { get; private set; }
 
         private float lifespanInSeconds;
@@ -15,7 +15,7 @@ namespace SaloonSlingers.Core
         public HandProjectileState(float lifespanInSeconds)
         {
             IsThrown = false;
-            IsCommitted = false;
+            IsStacked = false;
             this.lifespanInSeconds = lifespanInSeconds;
             originalLifeSpanInSeconds = lifespanInSeconds;
         }
@@ -26,16 +26,16 @@ namespace SaloonSlingers.Core
             return this;
         }
 
-        public HandProjectileState ToggleCommit()
+        public HandProjectileState ToggleStacked()
         {
-            IsCommitted = !IsCommitted;
+            IsStacked = !IsStacked;
             return this;
         }
 
         public HandProjectileState Reset()
         {
             IsThrown = false;
-            IsCommitted = false;
+            IsStacked = false;
             lifespanInSeconds = originalLifeSpanInSeconds;
             return this;
         }

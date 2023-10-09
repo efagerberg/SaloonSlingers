@@ -27,7 +27,6 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Throw(Vector3 velocity)
         {
-            handProjectile.ToggleCommitHand();
             transform.Rotate(-90, 0, 0);
             handProjectile.Throw();
             rb.AddTorque(velocity.magnitude * transform.up, ForceMode.VelocityChange);

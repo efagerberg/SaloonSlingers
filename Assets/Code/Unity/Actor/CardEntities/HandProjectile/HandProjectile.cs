@@ -59,10 +59,10 @@ namespace SaloonSlingers.Unity.Actor
         {
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
-            bool committedBefore = state.IsCommitted;
+            bool stackedBefore = state.IsStacked;
             state = state.Reset();
-            if (committedBefore != state.IsCommitted)
-                handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
+            if (stackedBefore != state.IsStacked)
+                handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
             if (CardGraphics.Count == 0) TryDrawCard(spawnCard);
             gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
             HandProjectileHeld?.Invoke(this, EventArgs.Empty);
@@ -73,11 +73,7 @@ namespace SaloonSlingers.Unity.Actor
             drawCtx.Deck = deck;
             drawCtx.Evaluation = HandEvaluation;
             drawCtx.Hand = Cards;
-            bool canDraw = (
-                !state.IsCommitted &&
-                gameManager.Saloon.HouseGame.CanDraw(drawCtx)
-            );
-            if (!canDraw) return;
+            if (!gameManager.Saloon.HouseGame.CanDraw(drawCtx)) return;
 
             Card card = deck.Draw();
             audioSource.clip = drawSFX;
@@ -95,6 +91,7 @@ namespace SaloonSlingers.Unity.Actor
             trailRenderer.enabled = true;
             rigidBody.isKinematic = false;
             state = state.Throw();
+            ToggleStacked();
             audioSource.clip = throwSFX;
             audioSource.Play();
         }
@@ -111,10 +108,10 @@ namespace SaloonSlingers.Unity.Actor
                 deck = newDeck;
         }
 
-        public void ToggleCommitHand()
+        public void ToggleStacked()
         {
-            state = state.ToggleCommit();
-            handLayoutMediator.ApplyLayout(state.IsCommitted, cardRotationCalculator);
+            state = state.ToggleStacked();
+            handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
         }
 
         public bool IsThrown { get => state.IsThrown; }

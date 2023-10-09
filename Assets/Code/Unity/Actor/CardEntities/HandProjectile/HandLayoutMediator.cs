@@ -20,11 +20,11 @@ namespace SaloonSlingers.Unity.Actor
             originalPanelWidth = handPanelRectTransform.rect.width;
         }
 
-        public void ApplyLayout(bool isHandCommitted, Func<int, IEnumerable<float>> rotationCalculator)
+        public void ApplyLayout(bool isStacked, Func<int, IEnumerable<float>> rotationCalculator)
         {
             float newCanvasWidth;
 
-            if (isHandCommitted)
+            if (isStacked)
             {
                 newCanvasWidth = 0;
                 foreach (ICardGraphic x in cardGraphics)

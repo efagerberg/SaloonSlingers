@@ -123,15 +123,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ToggleCommit",
-                    "type": "Button",
-                    "id": "d54587b9-2567-4aab-8d07-71a8f1f9bdec",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Dash",
                     "type": "Button",
                     "id": "a9be24e7-5712-4701-8721-5b729526d1ce",
@@ -434,17 +425,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Secondary Touch",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b54da58d-6e1a-445c-ba07-7f94f365bcff",
-                    "path": "<Keyboard>/2",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ToggleCommit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

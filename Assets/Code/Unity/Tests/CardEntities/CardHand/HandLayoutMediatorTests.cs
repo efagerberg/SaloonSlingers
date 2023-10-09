@@ -86,7 +86,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
         public class TestApplyLayout
         {
             [Test]
-            public void WhenNoCardAddedAndCommitted_Returns0WidthCanvasSizeDelta_AndEmptyList()
+            public void WhenNoCardAddedAndStacked_Returns0WidthCanvasSizeDelta_AndEmptyList()
             {
                 RectTransform panelTransform = TestUtils.CreateComponent<RectTransform>("HandPanel");
                 HandLayoutMediator subject = new(panelTransform);
@@ -94,13 +94,13 @@ namespace SaloonSlingers.Unity.Actor.Tests
                 subject.ApplyLayout(true, rotationCalculator);
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                AssertExpectedCommittedLayoutResult(panelTransform.sizeDelta.x, cardGraphics, 0, 0);
+                AssertExpectedStackedLayoutResult(panelTransform.sizeDelta.x, cardGraphics, 0, 0);
             }
 
             [TestCase(1)]
             [TestCase(3)]
             [TestCase(5)]
-            public void WhenCardsAdded_ThenHandCommitted_Returns0WidthAndRotation(int n)
+            public void WhenCardsAdded_ThenHandStacked_Returns0WidthAndRotation(int n)
             {
                 RectTransform panelTransform = TestUtils.CreateComponent<RectTransform>("HandPanel");
                 HandLayoutMediator subject = new(panelTransform);
@@ -113,13 +113,13 @@ namespace SaloonSlingers.Unity.Actor.Tests
                 subject.ApplyLayout(true, rotationCalculator);
 
                 ICardGraphic[] cardGraphics = panelTransform.GetComponentsInChildren<ICardGraphic>();
-                AssertExpectedCommittedLayoutResult(panelTransform.sizeDelta.x, cardGraphics, 0, n);
+                AssertExpectedStackedLayoutResult(panelTransform.sizeDelta.x, cardGraphics, 0, n);
             }
 
             [TestCase(1)]
             [TestCase(3)]
             [TestCase(5)]
-            public void WhenCardsAdded_ThenHandCommitted_AndUncommitted_ReturnsOriginalWidthCanvasSizeDelta_AndListWithRotation(int n)
+            public void WhenCardsAdded_ThenHandStacked_AndUnStacked_ReturnsOriginalWidthCanvasSizeDelta_AndListWithRotation(int n)
             {
                 RectTransform panelTransform = TestUtils.CreateComponent<RectTransform>("HandPanel");
                 HandLayoutMediator subject = new(panelTransform);
@@ -139,7 +139,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
             [TestCase(1)]
             [TestCase(3)]
             [TestCase(5)]
-            public void WhenNotCommitted_Idempotent(int n)
+            public void WhenNotStacked_Idempotent(int n)
             {
                 RectTransform panelTransform = TestUtils.CreateComponent<RectTransform>("HandPanel");
                 HandLayoutMediator subject = new(panelTransform);
@@ -163,7 +163,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
                 Assert.AreEqual(cards.Count(), expectedCount);
             }
 
-            private static void AssertExpectedCommittedLayoutResult(float actualWidthDelta, IList<ICardGraphic> cards, float expectedWidthDelta, int expectedCount)
+            private static void AssertExpectedStackedLayoutResult(float actualWidthDelta, IList<ICardGraphic> cards, float expectedWidthDelta, int expectedCount)
             {
                 AssertExpectedLayoutResult(
                     actualWidthDelta,
