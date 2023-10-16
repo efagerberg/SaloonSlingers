@@ -90,8 +90,8 @@ namespace SaloonSlingers.Unity.Actor
         {
             trailRenderer.enabled = true;
             rigidBody.isKinematic = false;
+            Stack();
             state = state.Throw();
-            ToggleStacked();
             audioSource.clip = throwSFX;
             audioSource.Play();
         }
@@ -108,9 +108,15 @@ namespace SaloonSlingers.Unity.Actor
                 deck = newDeck;
         }
 
-        public void ToggleStacked()
+        public void Stack()
         {
-            state = state.ToggleStacked();
+            state = state.Stack();
+            handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
+        }
+
+        public void Unstack()
+        {
+            state = state.Unstack();
             handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
         }
 
@@ -132,6 +138,13 @@ namespace SaloonSlingers.Unity.Actor
             foreach (ICardGraphic c in CardGraphics)
                 c.Kill();
             Death?.Invoke(gameObject, EventArgs.Empty);
+        }
+
+        public void Pause()
+        {
+            state = state.Pause();
+            trailRenderer.enabled = false;
+            rigidBody.isKinematic = true;
         }
 
         private void OnEnable()

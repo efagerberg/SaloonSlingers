@@ -1,5 +1,4 @@
 using SaloonSlingers.Core;
-using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 

@@ -26,9 +26,21 @@ namespace SaloonSlingers.Core
             return this;
         }
 
-        public HandProjectileState ToggleStacked()
+        public HandProjectileState Pause()
         {
-            IsStacked = !IsStacked;
+            IsThrown = false;
+            return this;
+        }
+
+        public HandProjectileState Stack()
+        {
+            IsStacked = true;
+            return this;
+        }
+
+        public HandProjectileState Unstack()
+        {
+            IsStacked = false;
             return this;
         }
 

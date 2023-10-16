@@ -27,23 +27,57 @@ namespace SaloonSlingers.Core.Tests
             }
         }
 
-        public class TestToggleStacked
+        public class TestStack
         {
             [Test]
             public void WhenNotStacked_IsStacked()
             {
                 HandProjectileState x = new HandProjectileState(1f);
-                Assert.IsTrue(x.ToggleStacked().IsStacked);
+                Assert.IsTrue(x.Stack().IsStacked);
             }
 
             [Test]
-            public void WhenStacked_IsUnStacked()
+            public void WhenStacked_IsStillStacked()
             {
                 HandProjectileState x = new(1f);
-                Assert.IsFalse(x.ToggleStacked().ToggleStacked().IsStacked);
+                Assert.IsTrue(x.Stack().Stack().IsStacked);
             }
         }
 
+        public class TestUnstack
+        {
+            [Test]
+            public void WhenNotStacked_StillNotStacked()
+            {
+                HandProjectileState x = new HandProjectileState(1f);
+                Assert.IsFalse(x.Unstack().IsStacked);
+            }
+
+            [Test]
+            public void WhenStacked_IsUnstacked()
+            {
+                HandProjectileState x = new(1f);
+                Assert.IsFalse(x.Stack().Unstack().IsStacked);
+            }
+        }
+
+        public class TestPause
+        {
+            [Test]
+            public void WhenThrown_PauseSetsIsThrownToFalse()
+            {
+                HandProjectileState x = new(1f);
+                Assert.IsFalse(x.Throw().Pause().IsThrown);
+            }
+
+            [Test]
+            public void WhenNotThrown_PauseSetsIsThrownToFalse()
+            {
+                HandProjectileState x = new(1f);
+                Assert.IsFalse(x.Pause().IsThrown);
+            }
+        }
+        
         public class TestReset
         {
             [Test]
