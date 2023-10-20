@@ -4,16 +4,16 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class HitPoints : MonoBehaviour
     {
-        public Core.HitPoints Points
+        public Core.Points Points
         {
             get
             {
-                _points ??= new Core.HitPoints(startingPoints);
+                _points ??= new Core.Points(startingPoints);
                 return _points;
             }
             private set { _points = value; }
         }
-        private Core.HitPoints _points;
+        private Core.Points _points;
 
         [SerializeField]
         private uint startingPoints = 5;

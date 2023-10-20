@@ -13,9 +13,9 @@ namespace SaloonSlingers.Unity
 
         private Coroutine absorbCoroutine;
 
-        public void Absorb(HandProjectile projectile)
+        public void Absorb(TemporaryHitPoints tempHitPoints, HandProjectile projectile)
         {
-            absorbCoroutine = StartCoroutine(DoAbsorb(LevelManager.Instance.Player.GetComponent<TemporaryHitPoints>(), projectile));
+            absorbCoroutine = StartCoroutine(DoAbsorb(tempHitPoints, projectile));
         }
 
         public void Cancel()

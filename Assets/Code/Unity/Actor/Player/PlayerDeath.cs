@@ -26,7 +26,7 @@ namespace SaloonSlingers.Unity
             hitPoints.Points.Decreased -= OnHitPointsDecreased;
         }
 
-        private void OnHitPointsDecreased(Core.HitPoints sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(Core.Points sender, ValueChangeEvent<uint> e)
         {
             if (e.After != 0) return;
 

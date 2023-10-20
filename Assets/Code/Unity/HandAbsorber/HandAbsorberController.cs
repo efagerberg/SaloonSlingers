@@ -9,6 +9,15 @@ namespace SaloonSlingers.Unity
     {
         [SerializeField]
         private HandAbsorber absorber;
+        [SerializeField]
+        private GameObject gazeUI;
+
+        private TemporaryHitPoints tempHitPoints;
+
+        private void Start()
+        {
+            tempHitPoints = LevelManager.Instance.Player.GetComponent<TemporaryHitPoints>();
+        }
 
         public void OnHoverEnter(HoverEnterEventArgs args)
         {
@@ -28,12 +37,22 @@ namespace SaloonSlingers.Unity
         {
             if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile)) return;
 
-            absorber.Absorb(projectile);
+            absorber.Absorb(tempHitPoints, projectile);
         }
 
         public void OnSelectExit(SelectExitEventArgs _)
         {
             absorber.Cancel();
+        }
+
+        public void OnGazeEnter()
+        {
+            gazeUI.SetActive(true);
+        }
+
+        public void OnGazeExit()
+        {
+            gazeUI.SetActive(false);
         }
     }
 }

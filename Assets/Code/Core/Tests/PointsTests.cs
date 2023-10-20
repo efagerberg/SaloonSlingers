@@ -7,7 +7,7 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void HasExpectedFieldValues_WhenConstructed()
         {
-            var subject = new HitPoints(2, 4);
+            var subject = new Points(2, 4);
 
             Assert.AreEqual(subject.MaxValue, 4);
             Assert.AreEqual(subject.InitialValue, 2);
@@ -17,8 +17,8 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void Unchanged_DoesNotEmitEvent()
         {
-            var subject = new HitPoints(2);
-            subject.PointsIncreased += FailIfHandled;
+            var subject = new Points(2);
+            subject.Increased += FailIfHandled;
             subject.Decreased += FailIfHandled;
             subject.Increase(0);
         }
@@ -26,16 +26,16 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void Decrease_EmitsEvent()
         {
-            var subject = new HitPoints(1);
+            var subject = new Points(1);
             bool eventHandled = false;
-            void handler(HitPoints sender, ValueChangeEvent<uint> e)
+            void handler(Points sender, ValueChangeEvent<uint> e)
             {
                 eventHandled = true;
                 Assert.AreEqual(e.Before, 1);
                 Assert.AreEqual(e.After, 0);
             }
             subject.Decreased += handler;
-            subject.PointsIncreased += FailIfHandled;
+            subject.Increased += FailIfHandled;
             subject.Decrease(1);
 
             Assert.That(eventHandled);
@@ -44,16 +44,16 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void Decrement_EmitsEvent()
         {
-            var subject = new HitPoints(1);
+            var subject = new Points(1);
             bool eventHandled = false;
-            void handler(HitPoints sender, ValueChangeEvent<uint> e)
+            void handler(Points sender, ValueChangeEvent<uint> e)
             {
                 eventHandled = true;
                 Assert.AreEqual(e.Before, 1);
                 Assert.AreEqual(e.After, 0);
             }
             subject.Decreased += handler;
-            subject.PointsIncreased += FailIfHandled;
+            subject.Increased += FailIfHandled;
             subject.Decrement();
 
             Assert.That(eventHandled);
@@ -62,15 +62,15 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void Increase_EmitsEvent()
         {
-            var subject = new HitPoints(0, 1);
+            var subject = new Points(0, 1);
             bool eventHandled = false;
-            void handler(HitPoints sender, ValueChangeEvent<uint> e)
+            void handler(Points sender, ValueChangeEvent<uint> e)
             {
                 eventHandled = true;
                 Assert.AreEqual(e.Before, 0);
                 Assert.AreEqual(e.After, 1);
             }
-            subject.PointsIncreased += handler;
+            subject.Increased += handler;
             subject.Decreased += FailIfHandled;
             subject.Increment();
 
@@ -80,8 +80,8 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void PastMax_ClampsToMax()
         {
-            var subject = new HitPoints(2);
-            subject.PointsIncreased += FailIfHandled;
+            var subject = new Points(2);
+            subject.Increased += FailIfHandled;
             subject.Increase(100);
 
             Assert.That(subject.Value, Is.EqualTo(2));
@@ -90,9 +90,9 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void BelowMin_ClampsToMin()
         {
-            var subject = new HitPoints(0, 1);
+            var subject = new Points(0, 1);
             subject.Decreased += FailIfHandled;
-            subject.PointsIncreased += FailIfHandled;
+            subject.Increased += FailIfHandled;
             subject.Decrement();
 
             Assert.That(subject.Value, Is.EqualTo(0));
@@ -101,14 +101,14 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void SetsMaxAndIncreases_ClampsToMax()
         {
-            var subject = new HitPoints(2, 3);
+            var subject = new Points(2, 3);
             subject.Increase(100);
 
             Assert.That(subject.MaxValue, Is.EqualTo(3));
             Assert.That(subject.Value, Is.EqualTo(subject.MaxValue));
         }
 
-        private void FailIfHandled(HitPoints sender, ValueChangeEvent<uint> e)
+        private void FailIfHandled(Points sender, ValueChangeEvent<uint> e)
         {
             Assert.Fail($"Handled unexpected event {e}");
         }
@@ -116,7 +116,7 @@ namespace SaloonSlingers.Core.Tests
         [Test]
         public void Reset_ReturnsValueToInitialValue()
         {
-            var subject = new HitPoints(10);
+            var subject = new Points(10);
             subject.Decrease(9);
             subject.Reset();
 

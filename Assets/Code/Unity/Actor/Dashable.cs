@@ -8,7 +8,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Dashable : ActionPerformer
     {
-        public Core.HitPoints Points { get; private set; }
+        public Core.Points Points { get; private set; }
 
         [SerializeField]
         private float dashSpeed = 6f;
@@ -43,7 +43,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            Points = new Core.HitPoints(startingDashes);
+            Points = new Core.Points(startingDashes);
             metaData = new(startingDashDuration,
                 startingDashCooldown,
                 startingPointRecoveryPeriod);

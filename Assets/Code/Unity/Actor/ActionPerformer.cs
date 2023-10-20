@@ -15,13 +15,13 @@ namespace SaloonSlingers.Unity.Actor
         private bool canPerformAction = true;
         protected bool IsPerforming { get; set; }
 
-        public IEnumerator GetActionCoroutine(Core.HitPoints points, ActionMetaData metaData, Func<IEnumerator> action)
+        public IEnumerator GetActionCoroutine(Core.Points points, ActionMetaData metaData, Func<IEnumerator> action)
         {
             if (!canPerformAction) return null;
             return DoAction(points, metaData, action);
         }
 
-        private IEnumerator DoAction(Core.HitPoints points, ActionMetaData metaData, Func<IEnumerator> action)
+        private IEnumerator DoAction(Core.Points points, ActionMetaData metaData, Func<IEnumerator> action)
         {
             canPerformAction = false;
             points.Decrement();
