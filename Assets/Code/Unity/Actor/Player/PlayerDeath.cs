@@ -1,19 +1,19 @@
 using SaloonSlingers.Core;
+using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
-    public class PlayerDeath : MonoBehaviour
-    {
+    public class PlayerDeath : MonoBehaviour {
+        public string GameOverSceneName;
+
         [SerializeField]
-        private Actor.HitPoints hitPoints;
-        [SerializeField]
-        private string gameOverSceneName;
+        private HitPoints hitPoints;
 
         private void Awake()
         {
-            if (hitPoints == null) hitPoints = GetComponent<Actor.HitPoints>();
+            if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
         }
 
         private void OnEnable()
@@ -30,7 +30,7 @@ namespace SaloonSlingers.Unity
         {
             if (e.After != 0) return;
 
-            GameManager.Instance.SceneLoader.LoadScene(gameOverSceneName);
+            GameManager.Instance.SceneLoader.LoadScene(GameOverSceneName);
         }
     }
 }
