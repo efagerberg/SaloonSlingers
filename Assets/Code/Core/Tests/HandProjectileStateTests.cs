@@ -77,7 +77,7 @@ namespace SaloonSlingers.Core.Tests
                 Assert.IsFalse(x.Pause().IsThrown);
             }
         }
-        
+
         public class TestReset
         {
             [Test]

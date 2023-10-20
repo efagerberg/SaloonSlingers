@@ -5,7 +5,7 @@ namespace SaloonSlingers.Core.Tests
     public class PointsTests
     {
         [Test]
-        public void HasExpectedFieldValues_WhenConstructed()
+        public void Constructor_HasExpectedFieldValues()
         {
             var subject = new Points(2, 4);
 
@@ -121,6 +121,43 @@ namespace SaloonSlingers.Core.Tests
             subject.Reset();
 
             Assert.That(subject.InitialValue, Is.EqualTo(subject.Value));
+        }
+
+
+        [Test]
+        public void Reset_WithNewValue_SetsValueAndInitialToNewValue()
+        {
+            var subject = new Points(10);
+            subject.Decrease(9);
+            subject.Reset(2);
+
+            Assert.That(subject.Value, Is.EqualTo(2));
+            Assert.That(subject.InitialValue, Is.EqualTo(subject.Value));
+        }
+
+        [Test]
+        public void AsPercent_Returns0_WhenNoStartingValue()
+        {
+            var subject = new Points(0);
+
+            Assert.That(subject.AsPercent(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void AsPercent_Returns1_WhenStartingValuePositive()
+        {
+            var subject = new Points(1);
+
+            Assert.That(subject.AsPercent(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void AsPercent_ReturnsFraction_WhenDecreasedWithRemainder()
+        {
+            var subject = new Points(2);
+            subject.Decrement();
+
+            Assert.That(subject.AsPercent(), Is.EqualTo(0.5));
         }
     }
 

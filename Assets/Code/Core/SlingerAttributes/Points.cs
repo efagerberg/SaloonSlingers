@@ -41,8 +41,6 @@ namespace SaloonSlingers.Core
             Value = newValue;
         }
 
-        public Points() { }
-
         public Points(uint initial) : this(initial, initial)
         { }
 
@@ -51,12 +49,6 @@ namespace SaloonSlingers.Core
             InitialValue = initial;
             MaxValue = max;
             _value = initial;
-        }
-
-        public float AsPercent()
-        {
-            if (_value == 0) return 0;
-            return _value / (float)InitialValue;
         }
 
         public void Decrement()
@@ -72,10 +64,16 @@ namespace SaloonSlingers.Core
             else Value = 0;
         }
 
-
         public void Increment() => Value++;
 
         public void Increase(uint amount) => Value += amount;
+
+        public float AsPercent()
+        {
+            if (_value == 0) return 0;
+
+            return _value / (float)InitialValue;
+        }
 
         private uint _value;
     }
