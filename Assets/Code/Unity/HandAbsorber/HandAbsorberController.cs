@@ -15,6 +15,7 @@ namespace SaloonSlingers.Unity
         private float fadeDuration = 0.5f;
 
         private TemporaryHitPoints tempHitPoints;
+        private Transform gazer;
 
         private void Start()
         {
@@ -23,6 +24,8 @@ namespace SaloonSlingers.Unity
 
         public void OnHoverEnter(HoverEnterEventArgs args)
         {
+            gazer = args.interactorObject.transform;
+
             if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile)) return;
 
             projectile.Stack();
@@ -47,8 +50,10 @@ namespace SaloonSlingers.Unity
             absorber.Cancel();
         }
 
-        public void OnGazeEnter()
+        public void OnGazeEnter(HoverEnterEventArgs args)
         {
+            gazer = args.interactorObject.transform;
+
             if (!gameObject.activeInHierarchy) return;
 
             StartCoroutine(Fader.FadeTo(gazeUI, 1, fadeDuration));
@@ -56,9 +61,18 @@ namespace SaloonSlingers.Unity
 
         public void OnGazeExit()
         {
+            gazer = null;
+
             if (!gameObject.activeInHierarchy) return;
 
             StartCoroutine(Fader.FadeTo(gazeUI, 0, fadeDuration));
+        }
+
+        private void Update()
+        {
+            if (gazer == null) return;
+
+            gazeUI.transform.LookAt(-gazer.position);
         }
     }
 }

@@ -33,7 +33,6 @@ namespace SaloonSlingers.Unity
             UpdateFill(healthBar, hitPoints.Points);
             healthPercentText.text = hitPoints.Points.AsPercent().ToString("P0");
             healthPercentText.color = healthBar.color;
-
         }
 
         private void OnEnable()
