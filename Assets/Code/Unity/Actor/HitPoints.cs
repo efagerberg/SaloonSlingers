@@ -1,19 +1,21 @@
+using SaloonSlingers.Core;
+
 using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
     public class HitPoints : MonoBehaviour
     {
-        public Core.Points Points
+        public Points Points
         {
             get
             {
-                _points ??= new Core.Points(startingPoints);
+                _points ??= new Points(startingPoints);
                 return _points;
             }
             private set { _points = value; }
         }
-        private Core.Points _points;
+        private Points _points;
 
         [SerializeField]
         private uint startingPoints = 5;
