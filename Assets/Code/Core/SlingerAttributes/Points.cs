@@ -26,13 +26,19 @@ namespace SaloonSlingers.Core
             }
         }
         public uint MaxValue { get; }
-        public uint InitialValue { get; }
+        public uint InitialValue { get; private set; }
         public event PointsIncreasedHandler Increased;
         public event PointsDecreasedHandler Decreased;
 
         public void Reset()
         {
             Value = InitialValue;
+        }
+
+        public void Reset(uint newValue)
+        {
+            InitialValue = newValue;
+            Value = newValue;
         }
 
         public Points() { }

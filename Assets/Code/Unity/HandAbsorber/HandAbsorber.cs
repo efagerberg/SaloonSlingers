@@ -29,8 +29,7 @@ namespace SaloonSlingers.Unity
         {
             projectile.Pause();
             yield return new WaitForSeconds(absorbTime);
-            tempHitPoints.Points.Reset();
-            tempHitPoints.Points.Increase(projectile.HandEvaluation.Score);
+            tempHitPoints.Points.Reset(projectile.HandEvaluation.Score);
             projectile.Kill();
         }
     }
