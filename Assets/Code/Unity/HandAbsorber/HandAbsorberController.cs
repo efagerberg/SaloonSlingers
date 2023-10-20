@@ -10,7 +10,9 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private HandAbsorber absorber;
         [SerializeField]
-        private GameObject gazeUI;
+        private CanvasGroup gazeUI;
+        [SerializeField]
+        private float fadeDuration = 0.5f;
 
         private TemporaryHitPoints tempHitPoints;
 
@@ -47,12 +49,12 @@ namespace SaloonSlingers.Unity
 
         public void OnGazeEnter()
         {
-            gazeUI.SetActive(true);
+            StartCoroutine(Fader.FadeTo(gazeUI, 1, fadeDuration));
         }
 
         public void OnGazeExit()
         {
-            gazeUI.SetActive(false);
+            StartCoroutine(Fader.FadeTo(gazeUI, 0, fadeDuration));
         }
     }
 }

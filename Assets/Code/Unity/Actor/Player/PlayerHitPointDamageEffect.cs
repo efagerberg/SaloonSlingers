@@ -3,7 +3,6 @@ using System.Collections;
 using SaloonSlingers.Core;
 
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SaloonSlingers.Unity.Actor
 {
@@ -12,7 +11,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private HitPoints hitPoints;
         [SerializeField]
-        private Image hitFlashImage;
+        private CanvasGroup hitFlashCanvasGroup;
         [SerializeField]
         private float duration = 1f;
 
@@ -22,7 +21,7 @@ namespace SaloonSlingers.Unity.Actor
         private void Awake()
         {
             if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
-            originalAlpha = hitFlashImage.color.a;
+            originalAlpha = hitFlashCanvasGroup.alpha;
         }
 
         private void OnEnable()
@@ -35,28 +34,24 @@ namespace SaloonSlingers.Unity.Actor
             hitPoints.Points.Decreased -= OnHitPointsDecreased;
         }
 
-        private void OnHitPointsDecreased(Core.Points sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
         {
-            flashCoroutine = Flash(hitFlashImage, originalAlpha, 0, duration, flashCoroutine);
+            flashCoroutine = Flash(hitFlashCanvasGroup, originalAlpha, 0, duration, flashCoroutine);
             StartCoroutine(flashCoroutine);
         }
 
-        public IEnumerator Flash(Image image, float startAlpha, float endAlpha, float duration, IEnumerator previousCoroutine)
+        public IEnumerator Flash(CanvasGroup flashCanvasGroup, float startAlpha, float endAlpha, float duration, IEnumerator previousCoroutine)
         {
             if (previousCoroutine != null)
             {
                 StopCoroutine(previousCoroutine);
-                Color newColor = image.color;
-                newColor.a = startAlpha;
-                image.color = newColor;
+                hitFlashCanvasGroup.alpha = startAlpha;
             }
 
-            image.gameObject.SetActive(true);
-            yield return Fader.FadeTo(image, endAlpha, duration);
-            image.gameObject.SetActive(false);
-            var originalColor = image.color;
-            originalColor.a = startAlpha;
-            image.color = originalColor;
+            flashCanvasGroup.gameObject.SetActive(true);
+            yield return Fader.FadeTo(flashCanvasGroup, endAlpha, duration);
+            flashCanvasGroup.gameObject.SetActive(false);
+            flashCanvasGroup.alpha = startAlpha;
         }
     }
 }
