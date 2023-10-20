@@ -49,11 +49,15 @@ namespace SaloonSlingers.Unity
 
         public void OnGazeEnter()
         {
+            if (!gameObject.activeInHierarchy) return;
+
             StartCoroutine(Fader.FadeTo(gazeUI, 1, fadeDuration));
         }
 
         public void OnGazeExit()
         {
+            if (!gameObject.activeInHierarchy) return;
+
             StartCoroutine(Fader.FadeTo(gazeUI, 0, fadeDuration));
         }
     }
