@@ -11,8 +11,6 @@ namespace SaloonSlingers.Unity.Actor
         public float SightDistance => sightDistance;
 
         [SerializeField]
-        private float perceptionRadius = 2f;
-        [SerializeField]
         private float sightRadius = 0.25f;
         [SerializeField]
         private float sightDistance = 15f;
@@ -26,7 +24,6 @@ namespace SaloonSlingers.Unity.Actor
         private bool drawGizmo = false;
 
         private RaycastHit[] spherecastHits;
-        private Collider[] perceptionHits;
 
         public IEnumerable<Transform> GetVisible(LayerMask mask = default, bool xRay = false)
         {
@@ -43,18 +40,6 @@ namespace SaloonSlingers.Unity.Actor
                                      .OrderByDescending(hit => sightTransform.GetAlignment(hit.point))
                                      .Where(hit => xRay || !IsObstructed(hit.point, sightTransform))
                                      .Select(hit => hit.transform);
-            if (perceptionRadius > 0)
-            {
-                // Spherecasts don't really work when the distance is too close compared to the radius so also use overlap
-                // sphere close to the entity to model their perception.
-                int nPerceptionHits = Physics.OverlapSphereNonAlloc(sightTransform.position,
-                                                                    perceptionRadius,
-                                                                    perceptionHits,
-                                                                    mask);
-                if (perceptionHits == default) perceptionHits = new Collider[maxSeeable];
-                var percepted = perceptionHits.Take(nPerceptionHits).Where(hit => xRay || !IsObstructed(hit.bounds.max, sightTransform)).Select(x => x.transform);
-                seen = percepted.Concat(seen);
-            }
             return seen.Take(maxSeeable).Distinct();
 
         }
@@ -74,8 +59,6 @@ namespace SaloonSlingers.Unity.Actor
         private void OnDrawGizmos()
         {
             if (sightTransform == null || !drawGizmo) return;
-            if (perceptionRadius > 0)
-                Gizmos.DrawWireSphere(sightTransform.position, perceptionRadius);
             SpherecastVisualizer.DrawSphereCastAll(sightTransform,
                                                    sightRadius,
                                                    sightDistance,

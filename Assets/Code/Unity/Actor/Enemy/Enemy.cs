@@ -17,7 +17,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             hitPoints = GetComponent<HitPoints>();
             Deck = new Deck().Shuffle();
-    }
+        }
 
         public void Reset()
         {

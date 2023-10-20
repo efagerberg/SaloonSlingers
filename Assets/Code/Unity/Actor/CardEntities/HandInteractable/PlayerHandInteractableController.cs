@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Unity.XR.CoreUtils;
-
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
+
 
 namespace SaloonSlingers.Unity.Actor
 {
@@ -28,39 +26,48 @@ namespace SaloonSlingers.Unity.Actor
         private HomingStrengthCalculator homingStrengthCalculator;
         private CharacterControllerThrowOffsetCalculator throwOffsetCalculator;
         private VisibilityDetector visibilityDetector;
+        private readonly HashSet<int> registeredProjectileIds = new();
 
         public void OnSelectEnter(SelectEnterEventArgs args)
         {
-            homable.enabled = true;
-            XROrigin origin = args.interactorObject.transform.GetComponentInParent<XROrigin>();
-            int newSlingerId = origin.transform.GetInstanceID();
+            if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
+
+            var player = LevelManager.Instance.Player;
+            int newSlingerId = player.transform.GetInstanceID();
             bool sameSlinger = newSlingerId == slingerId;
             if (slingerId == null || !sameSlinger)
             {
                 slingerId = newSlingerId;
-                ActorHandedness handedness = origin.GetComponent<ActorHandedness>();
-                homingStrengthCalculator = origin.GetComponent<HomingStrengthCalculator>();
-                throwOffsetCalculator = origin.GetComponent<CharacterControllerThrowOffsetCalculator>();
-                visibilityDetector = origin.GetComponent<VisibilityDetector>();
+                ActorHandedness handedness = player.GetComponent<ActorHandedness>();
+                homingStrengthCalculator = player.GetComponent<HomingStrengthCalculator>();
+                throwOffsetCalculator = player.GetComponent<CharacterControllerThrowOffsetCalculator>();
+                visibilityDetector = player.GetComponent<VisibilityDetector>();
                 deckGraphic = handedness.DeckGraphic;
                 handProjectile.AssignDeck(deckGraphic.Deck);
             }
+
+            handProjectile.Pickup(deckGraphic.Spawn);
             handProjectile.transform.SetParent(args.interactorObject.transform);
             peerInteractable.enabled = true;
-            handProjectile.Pickup(deckGraphic.Spawn);
+            homable.enabled = true;
+            if (!registeredProjectileIds.Contains(handProjectile.GetInstanceID()))
+            {
+                handProjectile.Death += OnHandProjectileDied;
+                registeredProjectileIds.Add(handProjectile.GetInstanceID());
+            }
         }
 
         public void OnSelectExit(SelectExitEventArgs args)
         {
-            handProjectile.transform.parent = null;
+            if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
 
+            handProjectile.transform.parent = null;
             Vector3 offset = throwOffsetCalculator.Calculate((XRGrabInteractable)args.interactableObject);
             handProjectile.Throw(offset);
             peerInteractable.enabled = false;
-            handProjectile.Death += OnHandProjectileDied;
 
             var target = visibilityDetector.GetVisible(LayerMask.GetMask("Enemy"))
-                                            .FirstOrDefault();
+                                           .FirstOrDefault();
             if (target != null) homable.Target = target;
 
             handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
@@ -81,6 +88,7 @@ namespace SaloonSlingers.Unity.Actor
         public void OnActivate()
         {
             if (!deckGraphic.CanDraw || !IsTouchingDeck()) return;
+
             handProjectile.TryDrawCard(deckGraphic.Spawn);
         }
 

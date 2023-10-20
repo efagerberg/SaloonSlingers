@@ -12,7 +12,11 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private GameObject cardsPanel;
         [SerializeField]
-        private GameObject handValuePanel;
+        private CanvasGroup handValueCanvasGroup;
+        [SerializeField]
+        private TextMeshProUGUI handValueText;
+        [SerializeField]
+        private float fadeDuration = 0.5f;
 
         public override void Hide()
         {
@@ -23,12 +27,17 @@ namespace SaloonSlingers.Unity.Actor
                 CardGraphic graphic = element.GetComponent<CardGraphic>();
                 graphic.FaceMaterial.color = Color.white;
             }
-            handValuePanel.SetActive(false);
+            StartCoroutine(Fader.FadeTo(handValueCanvasGroup, 0, fadeDuration));
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            StartCoroutine(Fader.FadeTo(handValueCanvasGroup, 1, fadeDuration));
         }
 
         protected override void UpdateContents(HandEvaluation evaluation)
         {
-            TextMeshProUGUI handValueText = handValuePanel.GetComponentInChildren<TextMeshProUGUI>();
             handValueText.text = evaluation.DisplayName();
             for (int i = 0; i < projectile.Cards.Count; i++)
             {
@@ -37,7 +46,6 @@ namespace SaloonSlingers.Unity.Actor
                 CardGraphic graphic = element.GetComponent<CardGraphic>();
                 graphic.FaceMaterial.color = color;
             }
-            handValuePanel.SetActive(true);
         }
 
         private void Start() => projectile = transform.parent.GetComponent<HandProjectile>();

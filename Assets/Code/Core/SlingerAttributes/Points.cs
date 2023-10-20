@@ -2,11 +2,11 @@ using System;
 
 namespace SaloonSlingers.Core
 {
-    public delegate void PointsIncreasedHandler(HitPoints sender, ValueChangeEvent<uint> e);
-    public delegate void PointsDecreasedHandler(HitPoints sender, ValueChangeEvent<uint> e);
+    public delegate void PointsIncreasedHandler(Points sender, ValueChangeEvent<uint> e);
+    public delegate void PointsDecreasedHandler(Points sender, ValueChangeEvent<uint> e);
 
     [Serializable]
-    public class HitPoints
+    public class Points
     {
         public uint Value
         {
@@ -22,12 +22,12 @@ namespace SaloonSlingers.Core
                 if (e.Before == e.After) return;
 
                 if (e.Before > e.After) Decreased?.Invoke(this, e);
-                else PointsIncreased?.Invoke(this, e);
+                else Increased?.Invoke(this, e);
             }
         }
         public uint MaxValue { get; }
-        public uint InitialValue { get; }
-        public event PointsIncreasedHandler PointsIncreased;
+        public uint InitialValue { get; private set; }
+        public event PointsIncreasedHandler Increased;
         public event PointsDecreasedHandler Decreased;
 
         public void Reset()
@@ -35,12 +35,16 @@ namespace SaloonSlingers.Core
             Value = InitialValue;
         }
 
-        public HitPoints() { }
+        public void Reset(uint newValue)
+        {
+            InitialValue = newValue;
+            Value = newValue;
+        }
 
-        public HitPoints(uint initial) : this(initial, initial)
+        public Points(uint initial) : this(initial, initial)
         { }
 
-        public HitPoints(uint initial, uint max)
+        public Points(uint initial, uint max)
         {
             InitialValue = initial;
             MaxValue = max;
@@ -60,10 +64,16 @@ namespace SaloonSlingers.Core
             else Value = 0;
         }
 
-
         public void Increment() => Value++;
 
         public void Increase(uint amount) => Value += amount;
+
+        public float AsPercent()
+        {
+            if (_value == 0) return 0;
+
+            return _value / (float)InitialValue;
+        }
 
         private uint _value;
     }

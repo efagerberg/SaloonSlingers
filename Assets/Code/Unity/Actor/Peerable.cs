@@ -14,7 +14,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Peerable : ActionPerformer
     {
-        public Core.HitPoints tsnPoi { get; private set; }
+        public Points Points { get; private set; }
 
         [SerializeField]
         private List<InputActionProperty> peerActionProperties;
@@ -39,7 +39,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void CastPeer()
         {
-            IEnumerator coroutine = GetActionCoroutine(tsnPoi, metaData, DoPeer);
+            IEnumerator coroutine = GetActionCoroutine(Points, metaData, DoPeer);
             if (coroutine == null) return;
 
             StartCoroutine(coroutine);
@@ -112,7 +112,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            tsnPoi = new(
+            Points = new(
                 startingPeers
             );
             metaData = new(startingDuration,

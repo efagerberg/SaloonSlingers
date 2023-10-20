@@ -5,16 +5,15 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
-    public class PlayerDeath : MonoBehaviour
-    {
+    public class PlayerDeath : MonoBehaviour {
+        public string GameOverSceneName;
+
         [SerializeField]
-        private Actor.HitPoints hitPoints;
-        [SerializeField]
-        private string gameOverSceneName;
+        private HitPoints hitPoints;
 
         private void Awake()
         {
-            if (hitPoints == null) hitPoints = GetComponent<Actor.HitPoints>();
+            if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
         }
 
         private void OnEnable()
@@ -27,11 +26,11 @@ namespace SaloonSlingers.Unity
             hitPoints.Points.Decreased -= OnHitPointsDecreased;
         }
 
-        private void OnHitPointsDecreased(Core.HitPoints sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
         {
             if (e.After != 0) return;
 
-            GameManager.Instance.SceneLoader.LoadScene(gameOverSceneName);
+            GameManager.Instance.SceneLoader.LoadScene(GameOverSceneName);
         }
     }
 }
