@@ -10,18 +10,20 @@ namespace SaloonSlingers.Unity.Actor
     {
         public event EventHandler Death;
         public Deck Deck { get; private set; }
-
-        private HitPoints hitPoints;
+        public HitPoints HitPoints { get; private set; }
+        public TemporaryHitPoints TemporaryHitPoints { get; private set; }
 
         private void Awake()
         {
-            hitPoints = GetComponent<HitPoints>();
+            HitPoints = GetComponent<HitPoints>();
+            TemporaryHitPoints = GetComponent<TemporaryHitPoints>();
             Deck = new Deck().Shuffle();
         }
 
         public void Reset()
         {
-            hitPoints.Points.Reset();
+            HitPoints.Points.Reset();
+            TemporaryHitPoints.Points.Reset(0);
             Deck = new Deck().Shuffle();
         }
 
