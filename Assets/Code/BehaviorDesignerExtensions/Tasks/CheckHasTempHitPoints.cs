@@ -2,7 +2,7 @@
 
 namespace SaloonSlingers.BehaviorDesignerExtensions
 {
-    public class CheckHasTempHitPoints: Conditional
+    public class CheckHasTempHitPoints : Conditional
     {
         public SharedEnemy Enemy;
 
