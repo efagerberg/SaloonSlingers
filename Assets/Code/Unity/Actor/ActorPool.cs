@@ -39,7 +39,6 @@ namespace SaloonSlingers.Unity.Actor
         {
             var actor = instance.GetComponent<IActor>();
             actor.Death += HandleDeath;
-            actor.Reset();
             CountSpanwed++;
         }
 
@@ -48,6 +47,7 @@ namespace SaloonSlingers.Unity.Actor
             var actor = instance.GetComponent<IActor>();
             actor.Death -= HandleDeath;
             instance.SetActive(false);
+            actor.Reset();
             instance.transform.SetParent(root);
             instance.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             CountSpanwed--;

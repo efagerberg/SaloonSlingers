@@ -55,8 +55,6 @@ namespace SaloonSlingers.Unity.Actor
         {
             var instance = sender as GameObject;
             var projectile = instance.GetComponent<HandProjectile>();
-            foreach (ICardGraphic c in projectile.CardGraphics)
-                c.Kill();
             projectile.HandProjectileHeld -= HandInteractableHeldHandler;
             projectile.Death -= HandleInteractableDeath;
         }

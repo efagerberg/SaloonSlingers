@@ -1,22 +1,13 @@
-using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 
 using SaloonSlingers.Unity.Actor;
-
-using UnityEngine;
 
 namespace SaloonSlingers.BehaviorDesignerExtensions
 {
     public class Die : Action
     {
         public SharedEnemyHandInteractableController Controller;
-
-        private Enemy enemy;
-
-        public override void OnStart()
-        {
-            enemy = GetComponent<Enemy>();
-        }
+        public SharedEnemy Enemy;
 
         public override TaskStatus OnUpdate()
         {
@@ -32,7 +23,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
                 projectile.Kill();
                 Controller.Value = null;
             }
-            enemy.Kill();
+            Enemy.Value.Kill();
         }
     }
 }

@@ -14,6 +14,13 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
         public SharedGameObject Target;
         public SharedEnemyHandInteractableController Controller;
 
+        private ControllerSwapper swapper;
+
+        public override void OnStart()
+        {
+            swapper = Controller.Value.GetComponent<ControllerSwapper>();
+        }
+
         public override TaskStatus OnUpdate()
         {
             if (Target == null)
@@ -34,7 +41,6 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
             Vector3 heightOffset = new(0, 0.25f, 0);
             Vector3 direction = (Target.Value.transform.position - transform.position - heightOffset).normalized;
             Controller.Value.Throw(direction * ThrowSpeed);
-            ControllerSwapper swapper = Controller.Value.GetComponent<ControllerSwapper>();
             swapper.SetController(ControllerTypes.PLAYER);
             Controller.Value = null;
         }
