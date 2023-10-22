@@ -1,6 +1,6 @@
 {
-    "name": "BehaviorDesignerExtensions",
-    "rootNamespace": "",
+    "name": "SaloonSlingers.BehaviorDesignerExtensions",
+    "rootNamespace": "SaloonSlingers.BehaviorDesignerExtensions",
     "references": [
         "GUID:15b54c79343b4614195c3259778ba043",
         "GUID:c66fc65b715c3654480b9aefb8817423",

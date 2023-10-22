@@ -16,6 +16,7 @@ namespace SaloonSlingers.Unity
 
         private TemporaryHitPoints tempHitPoints;
         private Transform gazer;
+        private Coroutine absorbCoroutine;
 
         private void Start()
         {
@@ -42,12 +43,14 @@ namespace SaloonSlingers.Unity
         {
             if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile)) return;
 
-            absorber.Absorb(tempHitPoints, projectile);
+            absorbCoroutine = StartCoroutine(absorber.Absorb(tempHitPoints, projectile));
         }
 
         public void OnSelectExit(SelectExitEventArgs _)
         {
-            absorber.Cancel();
+            if (absorbCoroutine == null) return;
+
+            StopCoroutine(absorbCoroutine);
         }
 
         public void OnGazeEnter(HoverEnterEventArgs args)

@@ -1,9 +1,6 @@
-using System;
-
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 
-using SaloonSlingers.Core;
 using SaloonSlingers.Unity;
 using SaloonSlingers.Unity.Actor;
 
@@ -11,13 +8,11 @@ using UnityEngine;
 
 namespace SaloonSlingers.BehaviorDesignerExtensions
 {
-    public class Draw : BehaviorDesigner.Runtime.Tasks.Action
+    public class Draw : Action
     {
+        public SharedEnemy Enemy;
         public SharedTransform AttachTransform;
         public SharedEnemyHandInteractableController ReturnedObject;
-
-        private readonly Deck deck = new Deck().Shuffle();
-        private DrawContext drawCtx;
 
         public override TaskStatus OnUpdate()
         {
@@ -33,15 +28,8 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
                 ReturnedObject.Value = clone.GetComponent<EnemyHandInteractableController>();
                 ReturnedObject.Value.transform.SetParent(AttachTransform.Value, false);
             }
-            HandProjectile projectile = ReturnedObject.Value.GetComponent<HandProjectile>();
-            drawCtx.Hand = projectile.Cards;
-            drawCtx.Evaluation = projectile.HandEvaluation;
-            drawCtx.Deck = deck;
-            if (GameManager.Instance.Saloon.HouseGame.CanDraw(drawCtx))
-            {
-                ReturnedObject.Value.Draw(deck, LevelManager.Instance.CardSpawner.Spawn);
-                return;
-            }
+            ReturnedObject.Value.Draw(Enemy.Value.Deck, LevelManager.Instance.CardSpawner.Spawn);
+            return;
         }
 
         private GameObject SpawnInteractable()

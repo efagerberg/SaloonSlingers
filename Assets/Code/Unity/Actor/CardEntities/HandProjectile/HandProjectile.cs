@@ -14,8 +14,7 @@ namespace SaloonSlingers.Unity.Actor
     {
         public event HandProjectileHeld HandProjectileHeld;
         public event EventHandler Death;
-        public IList<ICardGraphic> CardGraphics { get; private set; } = new List<ICardGraphic>();
-        public IList<Card> Cards { get => CardGraphics.Select(x => x.Card).ToList(); }
+        public IList<Card> Cards { get; private set; } = new List<Card>();
         public HandEvaluation HandEvaluation
         {
             get
@@ -63,7 +62,7 @@ namespace SaloonSlingers.Unity.Actor
             state = state.Reset();
             if (stackedBefore != state.IsStacked)
                 handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
-            if (CardGraphics.Count == 0) TryDrawCard(spawnCard);
+            TryDrawCard(spawnCard);
             gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
             HandProjectileHeld?.Invoke(this, EventArgs.Empty);
         }
@@ -76,12 +75,12 @@ namespace SaloonSlingers.Unity.Actor
             if (!gameManager.Saloon.HouseGame.CanDraw(drawCtx)) return;
 
             Card card = deck.Draw();
+            Cards.Add(card);
             audioSource.clip = drawSFX;
             audioSource.Play();
             GameObject spawned = spawnCard();
             ICardGraphic cardGraphic = spawned.GetComponent<ICardGraphic>();
             cardGraphic.Card = card;
-            CardGraphics.Add(cardGraphic);
             handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
             requiresEvaluation = true;
         }
@@ -128,15 +127,13 @@ namespace SaloonSlingers.Unity.Actor
             rigidBody.isKinematic = true;
             state = state.Reset();
             handLayoutMediator.Reset();
-            CardGraphics.Clear();
+            Cards.Clear();
             requiresEvaluation = true;
             gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
         }
 
         public void Kill()
         {
-            foreach (ICardGraphic c in CardGraphics)
-                c.Kill();
             Death?.Invoke(gameObject, EventArgs.Empty);
         }
 

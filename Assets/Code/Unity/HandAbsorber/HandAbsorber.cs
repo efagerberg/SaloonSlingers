@@ -13,19 +13,7 @@ namespace SaloonSlingers.Unity
 
         private Coroutine absorbCoroutine;
 
-        public void Absorb(TemporaryHitPoints tempHitPoints, HandProjectile projectile)
-        {
-            absorbCoroutine = StartCoroutine(DoAbsorb(tempHitPoints, projectile));
-        }
-
-        public void Cancel()
-        {
-            if (absorbCoroutine == null) return;
-
-            StopCoroutine(absorbCoroutine);
-        }
-
-        private IEnumerator DoAbsorb(TemporaryHitPoints tempHitPoints, HandProjectile projectile)
+        public IEnumerator Absorb(TemporaryHitPoints tempHitPoints, HandProjectile projectile)
         {
             projectile.Pause();
             yield return new WaitForSeconds(absorbTime);
