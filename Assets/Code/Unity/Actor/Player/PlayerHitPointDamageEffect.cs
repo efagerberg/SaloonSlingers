@@ -14,6 +14,10 @@ namespace SaloonSlingers.Unity.Actor
         private CanvasGroup hitFlashCanvasGroup;
         [SerializeField]
         private float duration = 1f;
+        [SerializeField]
+        private AudioSource audioSource;
+        [SerializeField]
+        private AudioClip hitSoundFX;
 
         private IEnumerator flashCoroutine;
         private float originalAlpha;
@@ -21,6 +25,7 @@ namespace SaloonSlingers.Unity.Actor
         private void Awake()
         {
             if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
+            if (audioSource == null) audioSource = GetComponent<AudioSource>();
             originalAlpha = hitFlashCanvasGroup.alpha;
         }
 
@@ -37,6 +42,8 @@ namespace SaloonSlingers.Unity.Actor
         private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
         {
             flashCoroutine = Flash(hitFlashCanvasGroup, originalAlpha, 0, duration, flashCoroutine);
+            audioSource.clip = hitSoundFX;
+            audioSource.Play();
             StartCoroutine(flashCoroutine);
         }
 
