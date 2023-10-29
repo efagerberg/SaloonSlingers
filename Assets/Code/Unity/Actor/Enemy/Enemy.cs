@@ -16,7 +16,7 @@ namespace SaloonSlingers.Unity.Actor
         private void Awake()
         {
             HitPoints = GetComponent<HitPoints>();
-            TemporaryHitPoints = GetComponent<TemporaryHitPoints>();
+            TemporaryHitPoints = GetComponentInChildren<TemporaryHitPoints>();
             Deck = new Deck().Shuffle();
         }
 
