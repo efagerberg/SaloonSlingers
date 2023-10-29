@@ -11,8 +11,6 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private float absorbTime = 0.5f;
 
-        private Coroutine absorbCoroutine;
-
         public IEnumerator Absorb(TemporaryHitPoints tempHitPoints, HandProjectile projectile)
         {
             projectile.Pause();

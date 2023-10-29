@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using SaloonSlingers.Core;
 
@@ -170,20 +169,23 @@ namespace SaloonSlingers.Unity.Actor
         private void OnCollisionEnter(Collision collision)
         {
             bool targetHasHitPoints = collision.gameObject.TryGetComponent(out HitPoints targetHitPoints);
-            bool targetHasTempHitPoints = collision.gameObject.TryGetComponent(out TemporaryHitPoints targetTempHitPoints);
-
-            if (targetHasHitPoints)
-            {
-                if (targetHasTempHitPoints && targetTempHitPoints.Points.Value > 0)
-                {
-                    bool shouldDamageHitPoints = targetTempHitPoints.Points.Value < HandEvaluation.Score;
-                    targetTempHitPoints.Points.Decrease(HandEvaluation.Score);
-                    if (shouldDamageHitPoints) targetHitPoints.Points.Decrement();
-                }
-                else targetHitPoints.Points.Decrement();
-            }
+            if (targetHasHitPoints) targetHitPoints.Points.Decrement();
 
             Kill();
+        }
+
+        private void OnTriggerEnter(Collider collider)
+        {
+            bool targetHasTempHitPoints = collider.gameObject.TryGetComponent(out TemporaryHitPoints targetTempHitPoints);
+
+            if (!targetHasTempHitPoints) return;
+
+            targetTempHitPoints.Points.Decrease(HandEvaluation.Score);
+            if (targetTempHitPoints.Points.Value != 0)
+            {
+                Kill();
+                return;
+            }
         }
     }
 }
