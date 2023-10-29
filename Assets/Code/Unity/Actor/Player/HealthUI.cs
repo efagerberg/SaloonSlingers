@@ -24,7 +24,7 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
-            tempHitPoints = LevelManager.Instance.Player.GetComponent<TemporaryHitPoints>();
+            tempHitPoints = LevelManager.Instance.Player.GetComponentInChildren<TemporaryHitPoints>();
             UpdateFill(tempHealthBar, tempHitPoints.Points);
             tempHealthPercentText.text = tempHitPoints.Points.AsPercent().ToString("P0");
             tempHealthPercentText.color = tempHealthBar.color;

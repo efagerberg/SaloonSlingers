@@ -20,7 +20,7 @@ namespace SaloonSlingers.Unity
 
         private void Start()
         {
-            tempHitPoints = LevelManager.Instance.Player.GetComponent<TemporaryHitPoints>();
+            tempHitPoints = LevelManager.Instance.Player.GetComponentInChildren<TemporaryHitPoints>();
         }
 
         public void OnHoverEnter(HoverEnterEventArgs args)
@@ -75,7 +75,8 @@ namespace SaloonSlingers.Unity
         {
             if (gazer == null) return;
 
-            gazeUI.transform.LookAt(-gazer.position);
+            gazeUI.transform.forward = gazer.forward;
+            gazeUI.transform.right = gazer.right;
         }
     }
 }
