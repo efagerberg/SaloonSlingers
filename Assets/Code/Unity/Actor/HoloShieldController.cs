@@ -45,5 +45,13 @@ namespace SaloonSlingers.Unity
             shieldModel.SetActive(active);
             sphereCollider.enabled = active;
         }
+
+        private void LateUpdate()
+        {
+            // Looks better if the rotation is frozen
+            // Eventually, there will be collision ripples to tell
+            // the player where they hit an enemy or where they were hit.
+            sphereCollider.transform.rotation = Quaternion.identity;
+        }
     }
 }
