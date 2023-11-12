@@ -168,15 +168,19 @@ namespace SaloonSlingers.Unity.Actor
         private void OnCollisionEnter(Collision collision)
         {
             bool targetHasHitPoints = collision.collider.gameObject.TryGetComponent(out HitPoints targetHitPoints);
-            if (targetHasHitPoints)
-            {
-                if (collision.collider.gameObject.CompareTag("HoloShield"))
-                    targetHitPoints.Points.Decrease(HandEvaluation.Score);
-                else
-                    targetHitPoints.Points.Decrement();
-            }
+            if (targetHasHitPoints) targetHitPoints.Points.Decrement();
 
             Kill();
+        }
+
+        private void OnTriggerEnter(Collider collider)
+        {
+            bool targetHasHitPoints = collider.gameObject.TryGetComponent(out HitPoints targetHitPoints);
+            if (targetHasHitPoints && collider.gameObject.CompareTag("HoloShield"))
+            {
+                targetHitPoints.Points.Decrease(HandEvaluation.Score);
+                if (targetHitPoints.Points.Value > 0) Kill();
+            }
         }
     }
 }

@@ -27,6 +27,8 @@ namespace SaloonSlingers.Unity
         private AudioClip shieldHitClip;
         [SerializeField]
         private AudioClip shieldBrokenClip;
+        [SerializeField]
+        private AudioClip shieldChargeClip;
 
         private Material hitRippleMaterial;
         private Vector3 localCollisionPoint;
@@ -59,36 +61,33 @@ namespace SaloonSlingers.Unity
 
         private void Update()
         {
-            if (localCollisionPoint != Vector3.zero && hitRippleParticleSystem.isPlaying)
+            if (localCollisionPoint != Vector3.zero)
             {
                 Vector3 worldCollisionPoint = transform.TransformPoint(localCollisionPoint);
                 hitRippleMaterial.SetVector("_Center", worldCollisionPoint);
             }
         }
 
-        private void OnCollisionEnter(Collision collision)
+        private void OnTriggerEnter(Collider collider)
         {
             if (hitRippleMaterial == null)
                 hitRippleMaterial = hitRippleParticleSystem.GetComponent<Renderer>().material;
-            localCollisionPoint = transform.InverseTransformPoint(collision.GetContact(0).point);
+            localCollisionPoint = transform.InverseTransformPoint(collider.ClosestPoint(transform.position));
         }
 
         private void OnIncrease(Points sender, ValueChangeEvent<uint> e)
         {
-            SetShieldStrengthColor(e.After);
-            if (e.Before == 0) SetShieldActive(true);
+            if (e.Before == 0)
+            {
+                SetShieldActive(true);
+                shieldAudioSource.PlayOneShot(shieldChargeClip);
+            }
         }
 
         private void OnDecreased(Points sender, ValueChangeEvent<uint> e)
         {
             if (e.After == 0) StartCoroutine(DoShieldBreak(e.After));
-            else
-            {
-                SetShieldStrengthColor(e.After);
-                hitRippleParticleSystem.Emit(1);
-                shieldAudioSource.PlayOneShot(shieldHitClip);
-                shieldAudioSource.pitch = hitPoints.Points.InitialValue / ((float)e.After + 1);
-            }
+            else StartCoroutine(DoShieldHit(e.After));
         }
 
         private void SetShieldStrengthColor(uint current)
@@ -114,7 +113,18 @@ namespace SaloonSlingers.Unity
             shieldAudioSource.PlayOneShot(shieldBrokenClip);
             hitRippleParticleSystem.Emit(1);
             yield return new WaitForSeconds(hitRippleParticleSystem.main.startLifetime.constant);
+            localCollisionPoint = Vector3.zero;
             SetShieldActive(false);
+        }
+        private IEnumerator DoShieldHit(uint after)
+        {
+            SetShieldStrengthColor(after);
+            hitRippleParticleSystem.Emit(1);
+            shieldAudioSource.pitch = hitPoints.Points.InitialValue / ((float)after + 1);
+            shieldAudioSource.PlayOneShot(shieldHitClip);
+            yield return new WaitForSeconds(shieldHitClip.length);
+            localCollisionPoint = Vector3.zero;
+            shieldAudioSource.pitch = 1;
         }
     }
 }
