@@ -6,18 +6,21 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class HitPoints : MonoBehaviour
     {
+        [SerializeField]
+        private uint startingPoints = 5;
+        [SerializeField]
+        private uint maxPoints;
+
         public Points Points
         {
             get
             {
-                _points ??= new Points(startingPoints);
+                if (maxPoints == 0) maxPoints = startingPoints;
+                _points ??= new Points(startingPoints, maxPoints);
                 return _points;
             }
             private set { _points = value; }
         }
         private Points _points;
-
-        [SerializeField]
-        private uint startingPoints = 5;
     }
 }

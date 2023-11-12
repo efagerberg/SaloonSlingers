@@ -53,6 +53,7 @@ namespace SaloonSlingers.Unity.Actor
             if (!registeredProjectileIds.Contains(handProjectile.GetInstanceID()))
             {
                 handProjectile.Death += OnHandProjectileDied;
+                handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
                 registeredProjectileIds.Add(handProjectile.GetInstanceID());
             }
         }
@@ -70,19 +71,19 @@ namespace SaloonSlingers.Unity.Actor
                                            .FirstOrDefault();
             if (target != null) homable.Target = target;
 
-            handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
             homingStrengthCalculator.StartNewThrow();
         }
 
 
         private void OnHandProjectileDied(object sender, EventArgs e)
         {
-            var instance = sender as GameObject;
-            var actor = instance.GetComponent<IActor>();
-            actor.Death -= OnHandProjectileDied;
             homable.Target = null;
             homable.Strength = 0;
             homable.enabled = false;
+            var instance = sender as GameObject;
+            var projectile = instance.GetComponent<HandProjectile>();
+            registeredProjectileIds.Remove(projectile.GetInstanceID());
+            projectile.Death -= OnHandProjectileDied;
         }
 
         public void OnActivate()

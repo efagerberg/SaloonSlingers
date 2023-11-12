@@ -11,11 +11,11 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private float absorbTime = 0.5f;
 
-        public IEnumerator Absorb(TemporaryHitPoints tempHitPoints, HandProjectile projectile)
+        public IEnumerator Absorb(HitPoints hitPoints, HandProjectile projectile)
         {
             projectile.Pause();
             yield return new WaitForSeconds(absorbTime);
-            tempHitPoints.Points.Reset(projectile.HandEvaluation.Score);
+            hitPoints.Points.Reset(projectile.HandEvaluation.Score);
             projectile.Kill();
         }
     }

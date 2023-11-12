@@ -1,5 +1,7 @@
 using SaloonSlingers.Unity.Actor;
 
+using Unity.XR.CoreUtils;
+
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -14,13 +16,14 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private float fadeDuration = 0.5f;
 
-        private TemporaryHitPoints tempHitPoints;
+        private HitPoints shieldHitPoints;
         private Transform gazer;
         private Coroutine absorbCoroutine;
 
         private void Start()
         {
-            tempHitPoints = LevelManager.Instance.Player.GetComponentInChildren<TemporaryHitPoints>();
+            var cam = LevelManager.Instance.Player.GetComponent<XROrigin>().Camera;
+            shieldHitPoints = cam.GetComponentInChildren<HitPoints>();
         }
 
         public void OnHoverEnter(HoverEnterEventArgs args)
@@ -43,7 +46,7 @@ namespace SaloonSlingers.Unity
         {
             if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile)) return;
 
-            absorbCoroutine = StartCoroutine(absorber.Absorb(tempHitPoints, projectile));
+            absorbCoroutine = StartCoroutine(absorber.Absorb(shieldHitPoints, projectile));
         }
 
         public void OnSelectExit(SelectExitEventArgs _)

@@ -62,7 +62,6 @@ namespace SaloonSlingers.Unity.Actor
             if (stackedBefore != state.IsStacked)
                 handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
             TryDrawCard(spawnCard);
-            gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
             HandProjectileHeld?.Invoke(this, EventArgs.Empty);
         }
 
@@ -168,24 +167,16 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnCollisionEnter(Collision collision)
         {
-            bool targetHasHitPoints = collision.gameObject.TryGetComponent(out HitPoints targetHitPoints);
-            if (targetHasHitPoints) targetHitPoints.Points.Decrement();
+            bool targetHasHitPoints = collision.collider.gameObject.TryGetComponent(out HitPoints targetHitPoints);
+            if (targetHasHitPoints)
+            {
+                if (collision.collider.gameObject.CompareTag("HoloShield"))
+                    targetHitPoints.Points.Decrease(HandEvaluation.Score);
+                else
+                    targetHitPoints.Points.Decrement();
+            }
 
             Kill();
-        }
-
-        private void OnTriggerEnter(Collider collider)
-        {
-            bool targetHasTempHitPoints = collider.gameObject.TryGetComponent(out TemporaryHitPoints targetTempHitPoints);
-
-            if (!targetHasTempHitPoints) return;
-
-            targetTempHitPoints.Points.Decrease(HandEvaluation.Score);
-            if (targetTempHitPoints.Points.Value != 0)
-            {
-                Kill();
-                return;
-            }
         }
     }
 }
