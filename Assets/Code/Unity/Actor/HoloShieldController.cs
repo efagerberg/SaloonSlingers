@@ -1,9 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
+using UnityEngine.VFX;
 
 namespace SaloonSlingers.Unity
 {
@@ -16,7 +18,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private SphereCollider sphereCollider;
         [SerializeField]
-        private ParticleSystem hitRippleParticleSystem;
+        private VisualEffect hitRippleVFX;
         [SerializeField]
         [Tooltip("Shield strength from weakest to strongest")]
         [GradientUsage(true)]
@@ -29,102 +31,159 @@ namespace SaloonSlingers.Unity
         private AudioClip shieldBrokenClip;
         [SerializeField]
         private AudioClip shieldChargeClip;
+        [SerializeField]
+        private AnimationCurve scaleCurve;
+        [SerializeField]
+        private float activityTransitionTime = 2;
+        [SerializeField]
+        [GradientUsage(true)]
+        private Gradient fresnelGradient;
 
-        private Material hitRippleMaterial;
         private Vector3 localCollisionPoint;
+        private Material shieldMaterial;
+        private readonly Queue<ShieldState> nextStates = new();
 
         private void OnEnable()
         {
             hitPoints.Points.Increased += OnIncrease;
-            hitPoints.Points.Decreased += OnDecreased;
+            hitPoints.Points.Decreased += OnDecrease;
+            StartCoroutine(nameof(StateMachine));
         }
 
         private void OnDisable()
         {
             hitPoints.Points.Increased -= OnIncrease;
-            hitPoints.Points.Decreased -= OnDecreased;
+            hitPoints.Points.Decreased -= OnDecrease;
+            CancelInvoke(nameof(StateMachine));
+            nextStates.Clear();
+            shieldModel.SetActive(false);
+            sphereCollider.enabled = false;
         }
 
         private void Awake()
         {
-            SetShieldActive(hitPoints.Points.Value > 0);
-            hitRippleMaterial = hitRippleParticleSystem.GetComponent<Renderer>().material;
-        }
+            shieldMaterial = shieldModel.GetComponent<MeshRenderer>().material;
+            hitRippleVFX.SetGradient("Gradient", shieldStrengthGradient);
+            if (hitPoints.Points.Value > 0) nextStates.Enqueue(ShieldState.Activating);
 
-        private void LateUpdate()
-        {
-            // Looks better if the rotation is frozen
-            // Eventually, there will be collision ripples to tell
-            // the player where they hit an enemy or where they were hit.
-            sphereCollider.transform.rotation = Quaternion.identity;
         }
 
         private void Update()
         {
-            if (localCollisionPoint != Vector3.zero)
-            {
-                Vector3 worldCollisionPoint = transform.TransformPoint(localCollisionPoint);
-                hitRippleMaterial.SetVector("_Center", worldCollisionPoint);
-            }
+            Vector3 worldCollisionPoint = transform.TransformPoint(localCollisionPoint);
+            hitRippleVFX.SetVector3("Center", worldCollisionPoint);
+        }
+
+        private void LateUpdate()
+        {
+            // Makes the hit effects more consistent where the collision happened on the shield.
+            sphereCollider.transform.rotation = Quaternion.identity;
         }
 
         private void OnTriggerEnter(Collider collider)
         {
-            if (hitRippleMaterial == null)
-                hitRippleMaterial = hitRippleParticleSystem.GetComponent<Renderer>().material;
             localCollisionPoint = transform.InverseTransformPoint(collider.ClosestPoint(transform.position));
         }
 
         private void OnIncrease(Points sender, ValueChangeEvent<uint> e)
         {
-            if (e.Before == 0)
+            if (e.Before == 0) nextStates.Enqueue(ShieldState.Activating);
+        }
+
+        private void OnDecrease(Points sender, ValueChangeEvent<uint> e)
+        {
+            nextStates.Enqueue(e.After == 0 ? ShieldState.Broken : ShieldState.Hit);
+        }
+
+        private void UpdateShieldHitColor()
+        {
+            if (hitPoints.Points.Value != 0)
             {
-                SetShieldActive(true);
-                shieldAudioSource.PlayOneShot(shieldChargeClip);
+                float ratio = hitPoints.Points.Value / (float)hitPoints.Points.InitialValue;
+                hitRippleVFX.SetFloat("ShieldStrength", ratio);
             }
         }
 
-        private void OnDecreased(Points sender, ValueChangeEvent<uint> e)
+        private IEnumerator ActivateShield()
         {
-            if (e.After == 0) StartCoroutine(DoShieldBreak(e.After));
-            else StartCoroutine(DoShieldHit(e.After));
-        }
+            shieldAudioSource.PlayOneShot(shieldChargeClip);
+            shieldMaterial.SetColor("_FresnelColor", fresnelGradient.Evaluate(0f));
+            shieldModel.SetActive(true);
+            sphereCollider.enabled = true;
+            float elapsedTime = 0f;
 
-        private void SetShieldStrengthColor(uint current)
-        {
-            if (hitRippleMaterial != null)
+            while (elapsedTime < activityTransitionTime)
             {
-                float ratio = current / (float)hitPoints.Points.InitialValue;
-                hitRippleMaterial.SetColor("_Color", shieldStrengthGradient.Evaluate(ratio));
+                elapsedTime += Time.deltaTime;
+                float scaleValue = scaleCurve.Evaluate(elapsedTime / activityTransitionTime);
+                transform.localScale = Vector3.one * scaleValue;
+
+                yield return null;
             }
+
+            transform.localScale = Vector3.one * scaleCurve.Evaluate(1f);
         }
 
-        private void SetShieldActive(bool active)
-        {
-            shieldModel.SetActive(active);
-            sphereCollider.enabled = active;
-        }
-
-        private IEnumerator DoShieldBreak(uint after)
+        private IEnumerator DoShieldBreak()
         {
             sphereCollider.enabled = false;
-            SetShieldStrengthColor(after);
+            UpdateShieldHitColor();
             shieldAudioSource.pitch = 1;
             shieldAudioSource.PlayOneShot(shieldBrokenClip);
-            hitRippleParticleSystem.Emit(1);
-            yield return new WaitForSeconds(hitRippleParticleSystem.main.startLifetime.constant);
-            localCollisionPoint = Vector3.zero;
-            SetShieldActive(false);
+            hitRippleVFX.Play();
+
+            float elapsedTime = 0f;
+            while (elapsedTime < activityTransitionTime)
+            {
+                elapsedTime += Time.deltaTime;
+                shieldMaterial.SetColor("_FresnelColor", fresnelGradient.Evaluate(elapsedTime / activityTransitionTime));
+
+                yield return null;
+            }
+
+            shieldModel.SetActive(false);
         }
-        private IEnumerator DoShieldHit(uint after)
+        private IEnumerator DoShieldHit()
         {
-            SetShieldStrengthColor(after);
-            hitRippleParticleSystem.Emit(1);
-            shieldAudioSource.pitch = hitPoints.Points.InitialValue / ((float)after + 1);
+            UpdateShieldHitColor();
+            hitRippleVFX.Play();
+            shieldAudioSource.pitch = hitPoints.Points.InitialValue / ((float)hitPoints.Points.Value + 1);
             shieldAudioSource.PlayOneShot(shieldHitClip);
             yield return new WaitForSeconds(shieldHitClip.length);
             localCollisionPoint = Vector3.zero;
             shieldAudioSource.pitch = 1;
         }
+
+        public enum ShieldState
+        {
+            Idle,
+            Activating,
+            Hit,
+            Broken
+        }
+
+        private IEnumerator StateMachine()
+        {
+            while (true)
+            {
+                var currentState = nextStates.Count == 0 ? ShieldState.Idle : nextStates.Dequeue();
+                switch (currentState)
+                {
+                    case ShieldState.Activating:
+                        yield return StartCoroutine(nameof(ActivateShield));
+                        break;
+                    case ShieldState.Broken:
+                        yield return StartCoroutine(nameof(DoShieldBreak));
+                        break;
+                    case ShieldState.Hit:
+                        yield return StartCoroutine(nameof(DoShieldHit));
+                        break;
+                    default:
+                        yield return new WaitForSeconds(0.2f);
+                        break;
+                }
+            }
+        }
+
     }
 }

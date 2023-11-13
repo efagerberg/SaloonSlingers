@@ -1176,7 +1176,7 @@
     "m_Hidden": false,
     "m_Value": {
         "r": 0.0,
-        "g": 1.0216193199157715,
+        "g": 8.276087760925293,
         "b": 42.72250747680664,
         "a": 1.0
     },
@@ -1255,7 +1255,7 @@
     "m_ReceiveShadows": false,
     "m_SupportsLODCrossFade": false,
     "m_CustomEditorGUI": "",
-    "m_SupportVFX": false
+    "m_SupportVFX": true
 }
 
 {
@@ -1522,9 +1522,9 @@
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
     "m_Value": {
-        "r": 0.0,
-        "g": 0.0,
-        "b": 0.0,
+        "r": 0.0117647061124444,
+        "g": 0.04313725605607033,
+        "b": 0.03921568766236305,
         "a": 1.0
     },
     "isMainColor": false,
@@ -2699,7 +2699,7 @@
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
-    "m_Value": 6.0,
+    "m_Value": 10.0,
     "m_FloatType": 0,
     "m_RangeValues": {
         "x": 0.0,
@@ -3359,9 +3359,9 @@
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
     "m_Value": {
-        "r": 1.0,
-        "g": 1.0,
-        "b": 1.0,
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
         "a": 1.0
     },
     "isMainColor": false,
