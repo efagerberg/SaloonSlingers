@@ -37,7 +37,7 @@ namespace SaloonSlingers.Unity
         private float activityTransitionTime = 2;
         [SerializeField]
         [GradientUsage(true)]
-        private Gradient fresnelGradient;
+        private Gradient fresnelDecayGradient;
 
         private Vector3 localCollisionPoint;
         private Material shieldMaterial;
@@ -57,6 +57,7 @@ namespace SaloonSlingers.Unity
             CancelInvoke(nameof(StateMachine));
             nextStates.Clear();
             shieldModel.SetActive(false);
+            hitRippleVFX.Reinit();
             sphereCollider.enabled = false;
         }
 
@@ -107,7 +108,7 @@ namespace SaloonSlingers.Unity
         private IEnumerator ActivateShield()
         {
             shieldAudioSource.PlayOneShot(shieldChargeClip);
-            shieldMaterial.SetColor("_FresnelColor", fresnelGradient.Evaluate(0f));
+            shieldMaterial.SetColor("_FresnelColor", fresnelDecayGradient.Evaluate(0f));
             shieldModel.SetActive(true);
             sphereCollider.enabled = true;
             float elapsedTime = 0f;
@@ -128,15 +129,15 @@ namespace SaloonSlingers.Unity
         {
             sphereCollider.enabled = false;
             UpdateShieldHitColor();
+            hitRippleVFX.Play();
             shieldAudioSource.pitch = 1;
             shieldAudioSource.PlayOneShot(shieldBrokenClip);
-            hitRippleVFX.Play();
 
             float elapsedTime = 0f;
             while (elapsedTime < activityTransitionTime)
             {
                 elapsedTime += Time.deltaTime;
-                shieldMaterial.SetColor("_FresnelColor", fresnelGradient.Evaluate(elapsedTime / activityTransitionTime));
+                shieldMaterial.SetColor("_FresnelColor", fresnelDecayGradient.Evaluate(elapsedTime / activityTransitionTime));
 
                 yield return null;
             }
