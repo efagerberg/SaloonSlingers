@@ -34,7 +34,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private AnimationCurve scaleCurve;
         [SerializeField]
-        private float activityTransitionTime = 2;
+        private float activationTransitionSeconds = 2;
         [SerializeField]
         [GradientUsage(true)]
         private Gradient fresnelDecayGradient;
@@ -65,7 +65,7 @@ namespace SaloonSlingers.Unity
         {
             shieldMaterial = shieldModel.GetComponent<MeshRenderer>().material;
             hitRippleVFX.SetGradient("Gradient", shieldStrengthGradient);
-            if (hitPoints.Points.Value > 0) nextStates.Enqueue(ShieldState.Activating);
+            if (hitPoints.Points.Value > 0) nextStates.Enqueue(ShieldState.Active);
 
         }
 
@@ -73,6 +73,7 @@ namespace SaloonSlingers.Unity
         {
             Vector3 worldCollisionPoint = transform.TransformPoint(localCollisionPoint);
             hitRippleVFX.SetVector3("Center", worldCollisionPoint);
+            shieldMaterial.SetVector("_Position", transform.position);
         }
 
         private void LateUpdate()
@@ -88,12 +89,13 @@ namespace SaloonSlingers.Unity
 
         private void OnIncrease(Points sender, ValueChangeEvent<uint> e)
         {
-            if (e.Before == 0) nextStates.Enqueue(ShieldState.Activating);
+            if (e.Before == 0) nextStates.Enqueue(ShieldState.Active);
         }
 
         private void OnDecrease(Points sender, ValueChangeEvent<uint> e)
         {
-            nextStates.Enqueue(e.After == 0 ? ShieldState.Broken : ShieldState.Hit);
+            if (e.After > 0) StartCoroutine(nameof(DoShieldHit));
+            else nextStates.Enqueue(ShieldState.Broken);
         }
 
         private void UpdateShieldHitColor()
@@ -113,10 +115,10 @@ namespace SaloonSlingers.Unity
             sphereCollider.enabled = true;
             float elapsedTime = 0f;
 
-            while (elapsedTime < activityTransitionTime)
+            while (elapsedTime < activationTransitionSeconds)
             {
                 elapsedTime += Time.deltaTime;
-                float scaleValue = scaleCurve.Evaluate(elapsedTime / activityTransitionTime);
+                float scaleValue = scaleCurve.Evaluate(elapsedTime / activationTransitionSeconds);
                 transform.localScale = Vector3.one * scaleValue;
 
                 yield return null;
@@ -129,15 +131,17 @@ namespace SaloonSlingers.Unity
         {
             sphereCollider.enabled = false;
             UpdateShieldHitColor();
+            hitRippleVFX.SetFloat("Lifetime", shieldBrokenClip.length);
             hitRippleVFX.Play();
             shieldAudioSource.pitch = 1;
             shieldAudioSource.PlayOneShot(shieldBrokenClip);
 
             float elapsedTime = 0f;
-            while (elapsedTime < activityTransitionTime)
+            while (elapsedTime < shieldBrokenClip.length)
             {
                 elapsedTime += Time.deltaTime;
-                shieldMaterial.SetColor("_FresnelColor", fresnelDecayGradient.Evaluate(elapsedTime / activityTransitionTime));
+                var decayColor = fresnelDecayGradient.Evaluate(elapsedTime / shieldBrokenClip.length);
+                shieldMaterial.SetColor("_FresnelColor", decayColor);
 
                 yield return null;
             }
@@ -147,6 +151,7 @@ namespace SaloonSlingers.Unity
         private IEnumerator DoShieldHit()
         {
             UpdateShieldHitColor();
+            hitRippleVFX.SetFloat("Lifetime", shieldHitClip.length);
             hitRippleVFX.Play();
             shieldAudioSource.pitch = hitPoints.Points.InitialValue / ((float)hitPoints.Points.Value + 1);
             shieldAudioSource.PlayOneShot(shieldHitClip);
@@ -158,8 +163,7 @@ namespace SaloonSlingers.Unity
         public enum ShieldState
         {
             Idle,
-            Activating,
-            Hit,
+            Active,
             Broken
         }
 
@@ -170,19 +174,14 @@ namespace SaloonSlingers.Unity
                 var currentState = nextStates.Count == 0 ? ShieldState.Idle : nextStates.Dequeue();
                 switch (currentState)
                 {
-                    case ShieldState.Activating:
+                    case ShieldState.Active:
                         yield return StartCoroutine(nameof(ActivateShield));
                         break;
                     case ShieldState.Broken:
                         yield return StartCoroutine(nameof(DoShieldBreak));
                         break;
-                    case ShieldState.Hit:
-                        yield return StartCoroutine(nameof(DoShieldHit));
-                        break;
-                    default:
-                        yield return new WaitForSeconds(0.2f);
-                        break;
                 }
+                yield return new WaitForSeconds(0.2f);
             }
         }
 
