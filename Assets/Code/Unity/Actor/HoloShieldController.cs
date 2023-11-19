@@ -20,10 +20,6 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private VisualEffect hitRippleVFX;
         [SerializeField]
-        [Tooltip("Shield strength from weakest to strongest")]
-        [GradientUsage(true)]
-        private Gradient shieldStrengthGradient;
-        [SerializeField]
         private AudioSource shieldAudioSource;
         [SerializeField]
         private AudioClip shieldHitClip;
@@ -57,14 +53,16 @@ namespace SaloonSlingers.Unity
             CancelInvoke(nameof(StateMachine));
             nextStates.Clear();
             shieldModel.SetActive(false);
+            hitRippleVFX.Stop();
             hitRippleVFX.Reinit();
             sphereCollider.enabled = false;
+            shieldAudioSource.pitch = 1;
         }
 
         private void Awake()
         {
             shieldMaterial = shieldModel.GetComponent<MeshRenderer>().material;
-            hitRippleVFX.SetGradient("Gradient", shieldStrengthGradient);
+            shieldMaterial.SetFloat("_BreathOffset", Random.Range(0f, 1f));
             if (hitPoints.Points.Value > 0) nextStates.Enqueue(ShieldState.Active);
 
         }
@@ -109,7 +107,7 @@ namespace SaloonSlingers.Unity
 
         private IEnumerator ActivateShield()
         {
-            shieldAudioSource.PlayOneShot(shieldChargeClip);
+            PlayOneShotRandomPitch(shieldChargeClip, 1f, 2f);
             shieldMaterial.SetColor("_FresnelColor", fresnelDecayGradient.Evaluate(0f));
             shieldModel.SetActive(true);
             sphereCollider.enabled = true;
@@ -131,10 +129,8 @@ namespace SaloonSlingers.Unity
         {
             sphereCollider.enabled = false;
             UpdateShieldHitColor();
-            hitRippleVFX.SetFloat("Lifetime", shieldBrokenClip.length);
             hitRippleVFX.Play();
-            shieldAudioSource.pitch = 1;
-            shieldAudioSource.PlayOneShot(shieldBrokenClip);
+            PlayOneShotRandomPitch(shieldBrokenClip, 1f, 2f);
 
             float elapsedTime = 0f;
             while (elapsedTime < shieldBrokenClip.length)
@@ -151,13 +147,10 @@ namespace SaloonSlingers.Unity
         private IEnumerator DoShieldHit()
         {
             UpdateShieldHitColor();
-            hitRippleVFX.SetFloat("Lifetime", shieldHitClip.length);
             hitRippleVFX.Play();
-            shieldAudioSource.pitch = hitPoints.Points.InitialValue / ((float)hitPoints.Points.Value + 1);
-            shieldAudioSource.PlayOneShot(shieldHitClip);
+            PlayOneShotRandomPitch(shieldHitClip, 1f, 2f);
             yield return new WaitForSeconds(shieldHitClip.length);
             localCollisionPoint = Vector3.zero;
-            shieldAudioSource.pitch = 1;
         }
 
         public enum ShieldState
@@ -180,10 +173,17 @@ namespace SaloonSlingers.Unity
                     case ShieldState.Broken:
                         yield return StartCoroutine(nameof(DoShieldBreak));
                         break;
+                    default:
+                        yield return null;
+                        break;
                 }
-                yield return new WaitForSeconds(0.2f);
             }
         }
 
+        private void PlayOneShotRandomPitch(AudioClip clip, float min, float max)
+        {
+            shieldAudioSource.pitch = Random.Range(min, max);
+            shieldAudioSource.PlayOneShot(clip);
+        }
     }
 }

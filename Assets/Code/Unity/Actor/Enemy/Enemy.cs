@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 using SaloonSlingers.Core;
 
@@ -32,6 +33,12 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
+            StartCoroutine(nameof(DoDeath));
+        }
+
+        private IEnumerator DoDeath()
+        {
+            yield return new WaitForSeconds(1f);
             Death?.Invoke(gameObject, EventArgs.Empty);
         }
     }
