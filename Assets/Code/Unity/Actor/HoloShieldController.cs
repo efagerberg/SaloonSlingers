@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
@@ -37,24 +36,22 @@ namespace SaloonSlingers.Unity
 
         private Vector3 localCollisionPoint;
         private Material shieldMaterial;
-        private readonly Queue<ShieldState> nextStates = new();
 
         private void OnEnable()
         {
             hitPoints.Points.Increased += OnIncrease;
             hitPoints.Points.Decreased += OnDecrease;
-            StartCoroutine(nameof(StateMachine));
+            if (hitPoints.Points.Value > 0) StartCoroutine(nameof(ActivateShield));
         }
 
         private void OnDisable()
         {
             hitPoints.Points.Increased -= OnIncrease;
             hitPoints.Points.Decreased -= OnDecrease;
-            CancelInvoke(nameof(StateMachine));
-            nextStates.Clear();
             shieldModel.SetActive(false);
             hitRippleVFX.Stop();
             hitRippleVFX.Reinit();
+            hitRippleVFX.enabled = false;
             sphereCollider.enabled = false;
             shieldAudioSource.pitch = 1;
         }
@@ -63,8 +60,6 @@ namespace SaloonSlingers.Unity
         {
             shieldMaterial = shieldModel.GetComponent<MeshRenderer>().material;
             shieldMaterial.SetFloat("_BreathOffset", Random.Range(0f, 1f));
-            if (hitPoints.Points.Value > 0) nextStates.Enqueue(ShieldState.Active);
-
         }
 
         private void Update()
@@ -87,13 +82,14 @@ namespace SaloonSlingers.Unity
 
         private void OnIncrease(Points sender, ValueChangeEvent<uint> e)
         {
-            if (e.Before == 0) nextStates.Enqueue(ShieldState.Active);
+            if (e.Before == 0) StartCoroutine(nameof(ActivateShield));
         }
 
         private void OnDecrease(Points sender, ValueChangeEvent<uint> e)
         {
+            if (sender.Value == sender.InitialValue) return;
             if (e.After > 0) StartCoroutine(nameof(DoShieldHit));
-            else nextStates.Enqueue(ShieldState.Broken);
+            else StartCoroutine(nameof(DoShieldBreak));
         }
 
         private void UpdateShieldHitColor()
@@ -127,6 +123,7 @@ namespace SaloonSlingers.Unity
 
         private IEnumerator DoShieldBreak()
         {
+            hitRippleVFX.enabled = true;
             sphereCollider.enabled = false;
             UpdateShieldHitColor();
             hitRippleVFX.Play();
@@ -144,40 +141,15 @@ namespace SaloonSlingers.Unity
 
             shieldModel.SetActive(false);
         }
+
         private IEnumerator DoShieldHit()
         {
             UpdateShieldHitColor();
+            hitRippleVFX.enabled = true;
             hitRippleVFX.Play();
             PlayOneShotRandomPitch(shieldHitClip, 1f, 2f);
             yield return new WaitForSeconds(shieldHitClip.length);
             localCollisionPoint = Vector3.zero;
-        }
-
-        public enum ShieldState
-        {
-            Idle,
-            Active,
-            Broken
-        }
-
-        private IEnumerator StateMachine()
-        {
-            while (true)
-            {
-                var currentState = nextStates.Count == 0 ? ShieldState.Idle : nextStates.Dequeue();
-                switch (currentState)
-                {
-                    case ShieldState.Active:
-                        yield return StartCoroutine(nameof(ActivateShield));
-                        break;
-                    case ShieldState.Broken:
-                        yield return StartCoroutine(nameof(DoShieldBreak));
-                        break;
-                    default:
-                        yield return null;
-                        break;
-                }
-            }
         }
 
         private void PlayOneShotRandomPitch(AudioClip clip, float min, float max)
