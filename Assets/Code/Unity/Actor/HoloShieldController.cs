@@ -80,6 +80,11 @@ namespace SaloonSlingers.Unity
             localCollisionPoint = transform.InverseTransformPoint(collision.GetContact(0).point);
         }
 
+        private void OnTriggerEnter(Collider collider)
+        {
+            localCollisionPoint = transform.InverseTransformPoint(collider.ClosestPoint(transform.position));
+        }
+
         private void OnIncrease(Points sender, ValueChangeEvent<uint> e)
         {
             if (e.Before == 0) StartCoroutine(nameof(ActivateShield));

@@ -23,17 +23,20 @@ namespace SaloonSlingers.Unity.Actor
 
         private ActionMetaData metaData;
 
-        public void Dash(Transform origin, Vector3 forward)
+        public void Dash(CharacterController controller, Vector3 forward)
         {
             IEnumerator onStart()
             {
+                var originalMask = gameObject.layer;
+                gameObject.layer = LayerMask.NameToLayer("Invincible");
                 float currentDuration = metaData.Duration;
                 while (currentDuration > 0)
                 {
-                    origin.position += dashSpeed * Time.deltaTime * forward;
+                    controller.Move(dashSpeed * Time.deltaTime * forward);
                     currentDuration -= Time.deltaTime;
                     yield return null;
                 }
+                gameObject.layer = originalMask;
             }
             IEnumerator coroutine = GetActionCoroutine(Points, metaData, onStart);
             if (coroutine == null) return;

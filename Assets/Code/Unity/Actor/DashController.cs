@@ -10,7 +10,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private List<InputActionProperty> dashInputProperties;
         [SerializeField]
-        private Transform origin;
+        private CharacterController controller;
         [SerializeField]
         private Dashable dashable;
         [SerializeField]
@@ -30,7 +30,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleDash(InputAction.CallbackContext context)
         {
-            dashable.Dash(origin, forwardReference.forward);
+            dashable.Dash(controller, forwardReference.forward);
         }
     }
 }
