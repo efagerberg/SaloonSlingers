@@ -75,9 +75,9 @@ namespace SaloonSlingers.Unity
             sphereCollider.transform.rotation = Quaternion.identity;
         }
 
-        private void OnTriggerEnter(Collider collider)
+        private void OnCollisionEnter(Collision collision)
         {
-            localCollisionPoint = transform.InverseTransformPoint(collider.ClosestPoint(transform.position));
+            localCollisionPoint = transform.InverseTransformPoint(collision.GetContact(0).point);
         }
 
         private void OnIncrease(Points sender, ValueChangeEvent<uint> e)

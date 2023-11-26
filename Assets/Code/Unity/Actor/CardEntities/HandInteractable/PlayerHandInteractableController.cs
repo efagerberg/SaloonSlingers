@@ -32,6 +32,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
 
+            handProjectile.transform.SetParent(args.interactorObject.transform);
             var player = LevelManager.Instance.Player;
             int newSlingerId = player.transform.GetInstanceID();
             bool sameSlinger = newSlingerId == slingerId;
@@ -47,7 +48,6 @@ namespace SaloonSlingers.Unity.Actor
             }
 
             handProjectile.Pickup(deckGraphic.Spawn);
-            handProjectile.transform.SetParent(args.interactorObject.transform);
             peerInteractable.enabled = true;
             homable.enabled = true;
             if (!registeredProjectileIds.Contains(handProjectile.GetInstanceID()))
@@ -62,7 +62,6 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
 
-            handProjectile.transform.parent = null;
             Vector3 offset = throwOffsetCalculator.Calculate((XRGrabInteractable)args.interactableObject);
             handProjectile.Throw(offset);
             peerInteractable.enabled = false;

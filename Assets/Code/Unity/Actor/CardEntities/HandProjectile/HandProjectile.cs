@@ -56,7 +56,10 @@ namespace SaloonSlingers.Unity.Actor
         public void Pickup(Func<GameObject> spawnCard)
         {
             trailRenderer.enabled = false;
-            rigidBody.isKinematic = true;
+            rigidBody.useGravity = false;
+            rigidBody.velocity = Vector3.zero;
+            rigidBody.angularVelocity = Vector3.zero;
+            rigidBody.constraints = RigidbodyConstraints.None;
             bool stackedBefore = state.IsStacked;
             state = state.Reset();
             if (stackedBefore != state.IsStacked)
@@ -86,7 +89,8 @@ namespace SaloonSlingers.Unity.Actor
         public void Throw()
         {
             trailRenderer.enabled = true;
-            rigidBody.isKinematic = false;
+            rigidBody.useGravity = true;
+            rigidBody.constraints = RigidbodyConstraints.FreezeRotationX & RigidbodyConstraints.FreezePositionZ;
             Stack();
             state = state.Throw();
             audioSource.clip = throwSFX;
@@ -122,7 +126,10 @@ namespace SaloonSlingers.Unity.Actor
         public void Reset()
         {
             trailRenderer.enabled = false;
-            rigidBody.isKinematic = true;
+            rigidBody.useGravity = false;
+            rigidBody.constraints = RigidbodyConstraints.FreezeRotationX & RigidbodyConstraints.FreezeRotationZ;
+            rigidBody.velocity = Vector3.zero;
+            rigidBody.angularVelocity = Vector3.zero;
             state = state.Reset();
             handLayoutMediator.Reset();
             Cards.Clear();
@@ -139,7 +146,10 @@ namespace SaloonSlingers.Unity.Actor
         {
             state = state.Pause();
             trailRenderer.enabled = false;
-            rigidBody.isKinematic = true;
+            rigidBody.useGravity = false;
+            rigidBody.constraints = RigidbodyConstraints.FreezeRotationX & RigidbodyConstraints.FreezeRotationZ;
+            rigidBody.velocity = Vector3.zero;
+            rigidBody.angularVelocity = Vector3.zero;
         }
 
         private void OnEnable()
@@ -168,19 +178,14 @@ namespace SaloonSlingers.Unity.Actor
         private void OnCollisionEnter(Collision collision)
         {
             bool targetHasHitPoints = collision.collider.gameObject.TryGetComponent(out HitPoints targetHitPoints);
-            if (targetHasHitPoints) targetHitPoints.Points.Decrement();
-
-            Kill();
-        }
-
-        private void OnTriggerEnter(Collider collider)
-        {
-            bool targetHasHitPoints = collider.gameObject.TryGetComponent(out HitPoints targetHitPoints);
-            if (targetHasHitPoints && collider.gameObject.CompareTag("HoloShield"))
+            if (targetHasHitPoints)
             {
-                targetHitPoints.Points.Decrease(HandEvaluation.Score);
-                if (targetHitPoints.Points.Value > 0) Kill();
+                if (collision.gameObject.CompareTag("HoloShield"))
+                    targetHitPoints.Points.Decrease(HandEvaluation.Score);
+                else targetHitPoints.Points.Decrement();
             }
+
+            if (state.IsThrown) Kill();
         }
     }
 }
