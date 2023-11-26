@@ -23,16 +23,16 @@ namespace SaloonSlingers.Unity.Actor
 
         private ActionMetaData metaData;
 
-        public void Dash(CharacterController controller, Vector3 forward)
+        public void Dash(Transform origin, Vector3 forward)
         {
             IEnumerator onStart()
             {
                 float currentDuration = metaData.Duration;
                 while (currentDuration > 0)
                 {
-                    controller.Move(dashSpeed * Time.deltaTime * forward);
+                    origin.position += dashSpeed * Time.deltaTime * forward;
                     currentDuration -= Time.deltaTime;
-                    yield return new WaitForEndOfFrame();
+                    yield return null;
                 }
             }
             IEnumerator coroutine = GetActionCoroutine(Points, metaData, onStart);
