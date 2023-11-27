@@ -32,7 +32,6 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
 
-            handProjectile.transform.SetParent(args.interactorObject.transform);
             var player = LevelManager.Instance.Player;
             int newSlingerId = player.transform.GetInstanceID();
             bool sameSlinger = newSlingerId == slingerId;
