@@ -7,7 +7,7 @@ namespace SaloonSlingers.Unity.Actor
     public class HomingStrength : MonoBehaviour
     {
         [SerializeField]
-        private float baseStrength = 4f;
+        private float limit = 4f;
         [SerializeField]
         private float sigmoidSlope = 1f;
         [SerializeField]
@@ -25,7 +25,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             CalculatorLib.Config config = new()
             {
-                BaseStrength = baseStrength,
+                Limit = limit,
                 BaseEffectivenessThreshold = baseEffectivenessThreshold,
                 NMaxes = nMaxes,
                 PercentOfAverage = percentOfAverage,
