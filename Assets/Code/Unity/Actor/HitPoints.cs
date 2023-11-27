@@ -21,6 +21,12 @@ namespace SaloonSlingers.Unity.Actor
             }
             private set { _points = value; }
         }
+
+        public static implicit operator uint(HitPoints hp)
+        {
+            return hp.Points;
+        }
+
         private Points _points;
     }
 }

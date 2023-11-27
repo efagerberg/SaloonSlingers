@@ -9,14 +9,14 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 
         public override void OnAwake()
         {
-            currentPoints = hitPoints.Value.Points.Value;
+            currentPoints = hitPoints.Value;
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (currentPoints > hitPoints.Value.Points.Value)
+            if (currentPoints > hitPoints.Value)
             {
-                currentPoints = hitPoints.Value.Points.Value;
+                currentPoints = hitPoints.Value;
                 return TaskStatus.Success;
             }
             return TaskStatus.Failure;

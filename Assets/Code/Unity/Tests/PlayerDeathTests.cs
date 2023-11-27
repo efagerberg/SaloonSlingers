@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 
 using NUnit.Framework;
 
@@ -51,7 +50,7 @@ namespace SaloonSlingers.Unity.Tests
             hitPoints.Points.Increase(3);
 
             // GameManager will be null
-            Assert.Throws<NullReferenceException>(() => hitPoints.Points.Decrease(hitPoints.Points.Value));
+            Assert.Throws<NullReferenceException>(() => hitPoints.Points.Decrease(hitPoints));
         }
     }
 }

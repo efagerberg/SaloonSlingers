@@ -41,7 +41,7 @@ namespace SaloonSlingers.Unity
         {
             hitPoints.Points.Increased += OnIncrease;
             hitPoints.Points.Decreased += OnDecrease;
-            if (hitPoints.Points.Value > 0) StartCoroutine(nameof(ActivateShield));
+            if (hitPoints > 0) StartCoroutine(nameof(ActivateShield));
         }
 
         private void OnDisable()
@@ -99,9 +99,9 @@ namespace SaloonSlingers.Unity
 
         private void UpdateShieldHitColor()
         {
-            if (hitPoints.Points.Value != 0)
+            if (hitPoints != 0)
             {
-                float ratio = hitPoints.Points.Value / (float)hitPoints.Points.InitialValue;
+                float ratio = hitPoints / (float)hitPoints.Points.InitialValue;
                 hitRippleVFX.SetFloat("ShieldStrength", ratio);
             }
         }

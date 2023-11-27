@@ -8,7 +8,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 
         public override TaskStatus OnUpdate()
         {
-            return hitPoints.Value.Points.Value <= 0 ? TaskStatus.Success : TaskStatus.Failure;
+            return hitPoints.Value <= 0 ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
 }
