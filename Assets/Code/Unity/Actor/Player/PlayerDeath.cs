@@ -2,23 +2,20 @@ using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity
 {
     public class PlayerDeath : MonoBehaviour
     {
         public string GameOverSceneName;
+        public Behaviour[] ComponentsToDisable;
 
         [SerializeField]
         private HitPoints hitPoints;
-        [SerializeField]
-        private LocomotionSystem locomationSystem;
 
         private void Awake()
         {
             if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
-            if (locomationSystem == null) locomationSystem = GetComponent<LocomotionSystem>();
         }
 
         private void OnEnable()
@@ -35,7 +32,8 @@ namespace SaloonSlingers.Unity
         {
             if (e.After != 0) return;
 
-            locomationSystem.enabled = false;
+            foreach (var component in ComponentsToDisable)
+                component.enabled = false;
             GameManager.Instance.SceneLoader.LoadScene(GameOverSceneName);
         }
     }

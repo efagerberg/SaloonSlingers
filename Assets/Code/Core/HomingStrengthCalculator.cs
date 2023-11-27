@@ -35,7 +35,9 @@ namespace SaloonSlingers.Core.HomingStrengthCalculator
             float strength = config.Limit * Sigmoid(config.SigmoidSlope * scaled);
 
             maxes[currentIndex] = Math.Max(maxes[currentIndex], absYAngVel);
-            currentEffectivenessThreshold = CalculateEffectivenessThreshold(maxes, config.PercentOfAverage);
+            var newThreshold = CalculateEffectivenessThreshold(maxes, config.PercentOfAverage);
+            if (newThreshold >= 0)
+                currentEffectivenessThreshold = CalculateEffectivenessThreshold(maxes, config.PercentOfAverage);
 
             return strength;
         }
@@ -52,6 +54,7 @@ namespace SaloonSlingers.Core.HomingStrengthCalculator
                 sum += max;
                 n++;
             }
+            if (n == 0) return -1;
 
             return (sum / n) * percentOfAverage;
         }

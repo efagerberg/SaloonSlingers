@@ -44,9 +44,9 @@ namespace SaloonSlingers.Core.Tests
                 NMaxes = 2
             };
             var calculator = new Calculator(config);
-            var strongThrows = new float[] { 120f, 119f, 120f, 118f }.Select(calculator.Calculate).ToArray();
+            var strongThrows = new float[] { 120f, -119f, 120f, -118f }.Select(calculator.Calculate).ToArray();
             calculator.StartNewThrow();
-            var weakThrows = new float[] { 20f, 18f, 18f, 17f }.Select(calculator.Calculate).ToArray();
+            var weakThrows = new float[] { -20f, 18f, -18f, 17f }.Select(calculator.Calculate).ToArray();
             var tolerance = 0.001f;
 
             AssertAllElementsCloseToValue(weakThrows, 0, tolerance);
@@ -65,14 +65,36 @@ namespace SaloonSlingers.Core.Tests
                 NMaxes = 2
             };
             var calculator = new Calculator(config);
-            new float[] { 120f, 119f, 120f, 118f }.Select(calculator.Calculate).ToArray();
+            new float[] { 120f, -119f, 120f, 118f }.Select(calculator.Calculate).ToArray();
             calculator.StartNewThrow();
-            new float[] { 20f, 18f, 18f, 17f }.Select(calculator.Calculate).ToArray();
+            new float[] { -20f, 18f, -18f, 17f }.Select(calculator.Calculate).ToArray();
             var expectedThresolhold = config.PercentOfAverage * ((120 + 20) / 2f);
             calculator.StartNewThrow();
             var strength = calculator.Calculate(expectedThresolhold);
 
             Assert.That(strength, Is.EqualTo(config.Limit / 2f));
+        }
+
+        [Test]
+        public void ThrowsWith0Spin_DoNotEffectEffectivenessThreshold()
+        {
+            var config = new Config()
+            {
+                BaseEffectivenessThreshold = 1,
+                Limit = 1,
+                SigmoidSlope = 1,
+                PercentOfAverage = 0.90f,
+                NMaxes = 1
+            };
+            var calculator = new Calculator(config);
+            calculator.Calculate(0f);
+            calculator.StartNewThrow();
+            new float[] { 20f, -18f, 18f, -17f }.Select(calculator.Calculate).ToArray();
+            var expectedThresolhold = config.PercentOfAverage * 20;
+            var strength = calculator.Calculate(expectedThresolhold);
+
+            Assert.That(strength, Is.EqualTo(config.Limit / 2f));
+
         }
 
         private static void AssertAllElementsCloseToValue<IComparable>(IEnumerable<IComparable> xs, IComparable value, float tolerance)

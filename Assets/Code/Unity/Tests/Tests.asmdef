@@ -6,8 +6,7 @@
         "UnityEditor.TestRunner",
         "SaloonSlingers.Unity",
         "SaloonSlingers.Core",
-        "Unity.InputSystem",
-        "Unity.XR.Interaction.Toolkit"
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"
