@@ -52,13 +52,13 @@ namespace SaloonSlingers.Unity.Actor
         private HandEvaluation handEvaluation;
         private bool requiresEvaluation = false;
         private DrawContext drawCtx;
-        private Collider collider;
+        private Collider _collider;
 
         public void Pickup(Func<GameObject> spawnCard)
         {
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
-            collider.isTrigger = true;
+            _collider.isTrigger = true;
             bool stackedBefore = state.IsStacked;
             state = state.Reset();
             if (stackedBefore != state.IsStacked)
@@ -89,7 +89,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             trailRenderer.enabled = true;
             rigidBody.isKinematic = false;
-            collider.isTrigger = false;
+            _collider.isTrigger = false;
             Stack();
             state = state.Throw();
             audioSource.clip = throwSFX;
@@ -126,7 +126,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
-            collider.isTrigger = true;
+            _collider.isTrigger = true;
             state = state.Reset();
             handLayoutMediator.Reset();
             Cards.Clear();
@@ -144,7 +144,7 @@ namespace SaloonSlingers.Unity.Actor
             state = state.Pause();
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
-            collider.isTrigger = true;
+            _collider.isTrigger = true;
         }
 
         private void OnEnable()
@@ -160,7 +160,7 @@ namespace SaloonSlingers.Unity.Actor
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
             handLayoutMediator = new(handPanelRectTransform);
-            collider = GetComponent<Collider>();
+            _collider = GetComponent<Collider>();
         }
 
         private void FixedUpdate()

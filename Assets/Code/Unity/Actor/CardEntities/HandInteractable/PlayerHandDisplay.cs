@@ -21,7 +21,8 @@ namespace SaloonSlingers.Unity.Actor
         public override void Hide()
         {
             base.Hide();
-            for (int i = 0; i < projectile.Cards.Count; i++)
+
+            for (int i = 0; projectile != null && i < projectile.Cards.Count; i++)
             {
                 Transform element = cardsPanel.transform.GetChild(i);
                 CardGraphic graphic = element.GetComponent<CardGraphic>();
@@ -49,5 +50,10 @@ namespace SaloonSlingers.Unity.Actor
         }
 
         private void Start() => projectile = transform.parent.GetComponent<HandProjectile>();
+        private void OnDisable()
+        {
+            // Sometimes the hand interactable can be released before the hide coroutine finishes
+            handValueCanvasGroup.alpha = 0;
+        }
     }
 }

@@ -8,7 +8,11 @@ namespace SaloonSlingers.Unity.Actor
     {
         public bool IsDisplaying { get; private set; } = false;
 
-        public virtual void Show() => IsDisplaying = true;
+        public virtual void Show()
+        {
+            IsDisplaying = true;
+            UpdateContents(projectile.HandEvaluation);
+        }
 
         public virtual void Hide() => IsDisplaying = false;
 
