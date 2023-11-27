@@ -18,6 +18,7 @@ namespace SaloonSlingers.Unity
         private void Awake()
         {
             if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
+            if (locomationSystem == null) locomationSystem = GetComponent<LocomotionSystem>();
         }
 
         private void OnEnable()
