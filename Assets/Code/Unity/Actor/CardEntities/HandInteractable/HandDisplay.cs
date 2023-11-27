@@ -11,6 +11,8 @@ namespace SaloonSlingers.Unity.Actor
         public virtual void Show()
         {
             IsDisplaying = true;
+            if (projectile == null) return;
+
             UpdateContents(projectile.HandEvaluation);
         }
 

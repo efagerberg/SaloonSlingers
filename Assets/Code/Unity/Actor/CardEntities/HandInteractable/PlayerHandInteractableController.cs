@@ -23,7 +23,7 @@ namespace SaloonSlingers.Unity.Actor
         private int? slingerId;
 
         private Rigidbody rb;
-        private HomingStrengthCalculator homingStrengthCalculator;
+        private HomingStrength homingStrengthComponent;
         private CharacterControllerThrowOffsetCalculator throwOffsetCalculator;
         private VisibilityDetector visibilityDetector;
         private readonly HashSet<int> registeredProjectileIds = new();
@@ -40,7 +40,7 @@ namespace SaloonSlingers.Unity.Actor
             {
                 slingerId = newSlingerId;
                 ActorHandedness handedness = player.GetComponent<ActorHandedness>();
-                homingStrengthCalculator = player.GetComponent<HomingStrengthCalculator>();
+                homingStrengthComponent = player.GetComponent<HomingStrength>();
                 throwOffsetCalculator = player.GetComponent<CharacterControllerThrowOffsetCalculator>();
                 visibilityDetector = player.GetComponent<VisibilityDetector>();
                 deckGraphic = handedness.DeckGraphic;
@@ -70,7 +70,7 @@ namespace SaloonSlingers.Unity.Actor
                                            .FirstOrDefault();
             if (target != null) homable.Target = target;
 
-            homingStrengthCalculator.StartNewThrow();
+            homingStrengthComponent.Calculator.StartNewThrow();
         }
 
 
@@ -119,8 +119,8 @@ namespace SaloonSlingers.Unity.Actor
 
         private void FixedUpdate()
         {
-            if (homable.Target && homingStrengthCalculator != null)
-                homable.Strength = homingStrengthCalculator.Calculate(rb.angularVelocity.y);
+            if (homable.Target && homingStrengthComponent != null)
+                homable.Strength = homingStrengthComponent.Calculator.Calculate(rb.angularVelocity.y);
 
             if (throwOffsetCalculator) throwOffsetCalculator.RecordVelocity();
         }
