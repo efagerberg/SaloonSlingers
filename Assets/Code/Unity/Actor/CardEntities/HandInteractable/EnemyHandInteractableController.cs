@@ -20,6 +20,7 @@ namespace SaloonSlingers.Unity.Actor
             {
                 handProjectile.AssignDeck(deck);
                 handProjectile.Pickup(spawn);
+                handProjectile.gameObject.layer = LayerMask.NameToLayer("EnemyProjectile");
             }
             else
                 handProjectile.TryDrawCard(spawn);
@@ -31,7 +32,6 @@ namespace SaloonSlingers.Unity.Actor
             handProjectile.Throw();
             rb.AddTorque(velocity.magnitude * transform.up, ForceMode.VelocityChange);
             rb.AddForce(velocity, ForceMode.VelocityChange);
-            handProjectile.gameObject.layer = LayerMask.NameToLayer("EnemyProjectile");
         }
 
         private void Awake()

@@ -3,6 +3,8 @@ using SaloonSlingers.Unity.Actor;
 
 using TMPro;
 
+using Unity.XR.CoreUtils;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,14 +21,15 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private TextMeshProUGUI healthPercentText;
 
-        private TemporaryHitPoints tempHitPoints;
+        private HitPoints shieldHitPoints;
         private HitPoints hitPoints;
 
         private void Awake()
         {
-            tempHitPoints = LevelManager.Instance.Player.GetComponent<TemporaryHitPoints>();
-            UpdateFill(tempHealthBar, tempHitPoints.Points);
-            tempHealthPercentText.text = tempHitPoints.Points.AsPercent().ToString("P0");
+            var cam = LevelManager.Instance.Player.GetComponent<XROrigin>().Camera;
+            shieldHitPoints = cam.GetComponentInChildren<HitPoints>();
+            UpdateFill(tempHealthBar, shieldHitPoints.Points);
+            tempHealthPercentText.text = shieldHitPoints.Points.AsPercent().ToString("P0");
             tempHealthPercentText.color = tempHealthBar.color;
 
             hitPoints = LevelManager.Instance.Player.GetComponent<HitPoints>();
@@ -37,8 +40,8 @@ namespace SaloonSlingers.Unity
 
         private void OnEnable()
         {
-            tempHitPoints.Points.Increased += UpdateTempHealthBar;
-            tempHitPoints.Points.Decreased += UpdateTempHealthBar;
+            shieldHitPoints.Points.Increased += UpdateTempHealthBar;
+            shieldHitPoints.Points.Decreased += UpdateTempHealthBar;
 
             hitPoints.Points.Increased += UpdateHealthBar;
             hitPoints.Points.Decreased += UpdateHealthBar;
@@ -46,8 +49,8 @@ namespace SaloonSlingers.Unity
 
         private void OnDisable()
         {
-            tempHitPoints.Points.Increased -= UpdateTempHealthBar;
-            tempHitPoints.Points.Decreased -= UpdateTempHealthBar;
+            shieldHitPoints.Points.Increased -= UpdateTempHealthBar;
+            shieldHitPoints.Points.Decreased -= UpdateTempHealthBar;
 
             hitPoints.Points.Increased -= UpdateHealthBar;
             hitPoints.Points.Decreased -= UpdateHealthBar;

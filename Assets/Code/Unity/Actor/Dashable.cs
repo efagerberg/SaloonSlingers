@@ -27,13 +27,16 @@ namespace SaloonSlingers.Unity.Actor
         {
             IEnumerator onStart()
             {
+                var originalMask = gameObject.layer;
+                gameObject.layer = LayerMask.NameToLayer("Invincible");
                 float currentDuration = metaData.Duration;
                 while (currentDuration > 0)
                 {
                     controller.Move(dashSpeed * Time.deltaTime * forward);
                     currentDuration -= Time.deltaTime;
-                    yield return new WaitForEndOfFrame();
+                    yield return null;
                 }
+                gameObject.layer = originalMask;
             }
             IEnumerator coroutine = GetActionCoroutine(Points, metaData, onStart);
             if (coroutine == null) return;

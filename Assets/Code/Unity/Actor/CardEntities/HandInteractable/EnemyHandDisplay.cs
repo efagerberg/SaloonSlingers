@@ -31,14 +31,8 @@ namespace SaloonSlingers.Unity.Actor
 
         public override void Show()
         {
-            base.Show();
             enemyPeerPanel.SetActive(true);
-            if (projectile == null)
-            {
-                for (int i = 0; i < peerOtherCardLayoutGroup.transform.childCount; i++)
-                    peerOtherCardLayoutGroup.transform.GetChild(i).gameObject.SetActive(false);
-                handValueText.text = "";
-            }
+            base.Show();
         }
 
         protected override void UpdateContents(HandEvaluation evaluation)

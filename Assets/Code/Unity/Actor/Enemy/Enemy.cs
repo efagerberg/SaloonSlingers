@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 using SaloonSlingers.Core;
 
@@ -11,24 +12,33 @@ namespace SaloonSlingers.Unity.Actor
         public event EventHandler Death;
         public Deck Deck { get; private set; }
         public HitPoints HitPoints { get; private set; }
-        public TemporaryHitPoints TemporaryHitPoints { get; private set; }
+        public HitPoints shieldHitPoints { get; private set; }
+
+        [SerializeField]
+        private GameObject shield;
 
         private void Awake()
         {
             HitPoints = GetComponent<HitPoints>();
-            TemporaryHitPoints = GetComponent<TemporaryHitPoints>();
+            shieldHitPoints = shield.GetComponent<HitPoints>();
             Deck = new Deck().Shuffle();
         }
 
         public void Reset()
         {
             HitPoints.Points.Reset();
-            TemporaryHitPoints.Points.Reset(0);
+            shieldHitPoints.Points.Reset(0);
             Deck = new Deck().Shuffle();
         }
 
         public void Kill()
         {
+            StartCoroutine(nameof(DoDeath));
+        }
+
+        private IEnumerator DoDeath()
+        {
+            yield return new WaitForSeconds(1f);
             Death?.Invoke(gameObject, EventArgs.Empty);
         }
     }

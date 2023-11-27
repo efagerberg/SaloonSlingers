@@ -5,8 +5,10 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
-    public class PlayerDeath : MonoBehaviour {
+    public class PlayerDeath : MonoBehaviour
+    {
         public string GameOverSceneName;
+        public Behaviour[] ComponentsToDisable;
 
         [SerializeField]
         private HitPoints hitPoints;
@@ -30,6 +32,8 @@ namespace SaloonSlingers.Unity
         {
             if (e.After != 0) return;
 
+            foreach (var component in ComponentsToDisable)
+                component.enabled = false;
             GameManager.Instance.SceneLoader.LoadScene(GameOverSceneName);
         }
     }

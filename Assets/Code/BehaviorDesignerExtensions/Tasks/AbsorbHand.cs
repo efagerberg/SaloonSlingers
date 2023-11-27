@@ -24,7 +24,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
         {
             if (absorber == null || projectile == null) return TaskStatus.Failure;
 
-            StartCoroutine(absorber.Absorb(Enemy.Value.TemporaryHitPoints, projectile));
+            StartCoroutine(absorber.Absorb(Enemy.Value.shieldHitPoints, projectile));
             Controller.Value = null;
             return TaskStatus.Success;
         }

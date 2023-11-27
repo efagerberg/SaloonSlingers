@@ -23,7 +23,7 @@ namespace SaloonSlingers.Unity.Actor
         private int? slingerId;
 
         private Rigidbody rb;
-        private HomingStrengthCalculator homingStrengthCalculator;
+        private HomingStrength homingStrengthComponent;
         private CharacterControllerThrowOffsetCalculator throwOffsetCalculator;
         private VisibilityDetector visibilityDetector;
         private readonly HashSet<int> registeredProjectileIds = new();
@@ -32,6 +32,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
 
+            handProjectile.transform.SetParent(args.interactorObject.transform);
             var player = LevelManager.Instance.Player;
             int newSlingerId = player.transform.GetInstanceID();
             bool sameSlinger = newSlingerId == slingerId;
@@ -39,7 +40,7 @@ namespace SaloonSlingers.Unity.Actor
             {
                 slingerId = newSlingerId;
                 ActorHandedness handedness = player.GetComponent<ActorHandedness>();
-                homingStrengthCalculator = player.GetComponent<HomingStrengthCalculator>();
+                homingStrengthComponent = player.GetComponent<HomingStrength>();
                 throwOffsetCalculator = player.GetComponent<CharacterControllerThrowOffsetCalculator>();
                 visibilityDetector = player.GetComponent<VisibilityDetector>();
                 deckGraphic = handedness.DeckGraphic;
@@ -47,12 +48,12 @@ namespace SaloonSlingers.Unity.Actor
             }
 
             handProjectile.Pickup(deckGraphic.Spawn);
-            handProjectile.transform.SetParent(args.interactorObject.transform);
             peerInteractable.enabled = true;
             homable.enabled = true;
             if (!registeredProjectileIds.Contains(handProjectile.GetInstanceID()))
             {
                 handProjectile.Death += OnHandProjectileDied;
+                handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
                 registeredProjectileIds.Add(handProjectile.GetInstanceID());
             }
         }
@@ -61,7 +62,6 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
 
-            handProjectile.transform.parent = null;
             Vector3 offset = throwOffsetCalculator.Calculate((XRGrabInteractable)args.interactableObject);
             handProjectile.Throw(offset);
             peerInteractable.enabled = false;
@@ -70,19 +70,19 @@ namespace SaloonSlingers.Unity.Actor
                                            .FirstOrDefault();
             if (target != null) homable.Target = target;
 
-            handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
-            homingStrengthCalculator.StartNewThrow();
+            homingStrengthComponent.Calculator.StartNewThrow();
         }
 
 
         private void OnHandProjectileDied(object sender, EventArgs e)
         {
-            var instance = sender as GameObject;
-            var actor = instance.GetComponent<IActor>();
-            actor.Death -= OnHandProjectileDied;
             homable.Target = null;
             homable.Strength = 0;
             homable.enabled = false;
+            var instance = sender as GameObject;
+            var projectile = instance.GetComponent<HandProjectile>();
+            registeredProjectileIds.Remove(projectile.GetInstanceID());
+            projectile.Death -= OnHandProjectileDied;
         }
 
         public void OnActivate()
@@ -119,8 +119,8 @@ namespace SaloonSlingers.Unity.Actor
 
         private void FixedUpdate()
         {
-            if (homable.Target && homingStrengthCalculator != null)
-                homable.Strength = homingStrengthCalculator.Calculate(rb.angularVelocity.y);
+            if (homable.Target && homingStrengthComponent != null)
+                homable.Strength = homingStrengthComponent.Calculator.Calculate(rb.angularVelocity.y);
 
             if (throwOffsetCalculator) throwOffsetCalculator.RecordVelocity();
         }

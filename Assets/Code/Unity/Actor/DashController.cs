@@ -2,23 +2,19 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class DashProvider : LocomotionProvider
+    public class DashController : MonoBehaviour
     {
         [SerializeField]
         private List<InputActionProperty> dashInputProperties;
-
+        [SerializeField]
         private CharacterController controller;
+        [SerializeField]
         private Dashable dashable;
-
-        private void Start()
-        {
-            controller = system.xrOrigin.GetComponent<CharacterController>();
-            dashable = system.xrOrigin.GetComponent<Dashable>();
-        }
+        [SerializeField]
+        private Transform forwardReference;
 
         private void OnEnable()
         {
@@ -34,7 +30,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleDash(InputAction.CallbackContext context)
         {
-            dashable.Dash(controller, system.xrOrigin.Camera.transform.forward);
+            dashable.Dash(controller, forwardReference.forward);
         }
     }
 }

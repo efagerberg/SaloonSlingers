@@ -75,6 +75,11 @@ namespace SaloonSlingers.Core
             return _value / (float)InitialValue;
         }
 
+        public static implicit operator uint(Points p)
+        {
+            return p.Value;
+        }
+
         private uint _value;
     }
 }

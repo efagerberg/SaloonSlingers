@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using SaloonSlingers.Core;
 
 using UnityEngine;
@@ -10,7 +8,13 @@ namespace SaloonSlingers.Unity.Actor
     {
         public bool IsDisplaying { get; private set; } = false;
 
-        public virtual void Show() => IsDisplaying = true;
+        public virtual void Show()
+        {
+            IsDisplaying = true;
+            if (projectile == null) return;
+
+            UpdateContents(projectile.HandEvaluation);
+        }
 
         public virtual void Hide() => IsDisplaying = false;
 
@@ -20,16 +24,17 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Update()
         {
-            if (!IsDisplaying || projectile == null || projectile.Cards.Count <= 0 || lastCards == projectile.Cards)
+            if (!IsDisplaying || projectile == null ||
+                projectile.Cards.Count <= 0 || lastEvaluation.Equals(projectile.HandEvaluation))
                 return;
 
             if (projectile.HandEvaluation.Name == HandNames.NONE) return;
 
             UpdateContents(projectile.HandEvaluation);
 
-            lastCards = projectile.Cards;
+            lastEvaluation = projectile.HandEvaluation;
         }
 
-        private IList<Card> lastCards;
+        private HandEvaluation lastEvaluation;
     }
 }

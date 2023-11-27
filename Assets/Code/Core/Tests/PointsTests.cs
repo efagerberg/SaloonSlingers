@@ -11,7 +11,7 @@ namespace SaloonSlingers.Core.Tests
 
             Assert.AreEqual(subject.MaxValue, 4);
             Assert.AreEqual(subject.InitialValue, 2);
-            Assert.AreEqual(subject.Value, 2);
+            Assert.That<uint>(subject, Is.EqualTo(2));
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace SaloonSlingers.Core.Tests
             subject.Increased += FailIfHandled;
             subject.Increase(100);
 
-            Assert.That(subject.Value, Is.EqualTo(2));
+            Assert.That<uint>(subject, Is.EqualTo(2));
         }
 
         [Test]
@@ -95,7 +95,7 @@ namespace SaloonSlingers.Core.Tests
             subject.Increased += FailIfHandled;
             subject.Decrement();
 
-            Assert.That(subject.Value, Is.EqualTo(0));
+            Assert.That<uint>(subject, Is.EqualTo(0));
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace SaloonSlingers.Core.Tests
             subject.Increase(100);
 
             Assert.That(subject.MaxValue, Is.EqualTo(3));
-            Assert.That(subject.Value, Is.EqualTo(subject.MaxValue));
+            Assert.That<uint>(subject, Is.EqualTo(subject.MaxValue));
         }
 
         private void FailIfHandled(Points sender, ValueChangeEvent<uint> e)
@@ -131,7 +131,7 @@ namespace SaloonSlingers.Core.Tests
             subject.Decrease(9);
             subject.Reset(2);
 
-            Assert.That(subject.Value, Is.EqualTo(2));
+            Assert.That<uint>(subject, Is.EqualTo(2));
             Assert.That(subject.InitialValue, Is.EqualTo(subject.Value));
         }
 
