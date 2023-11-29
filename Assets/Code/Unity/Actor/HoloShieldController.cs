@@ -15,8 +15,6 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private GameObject shieldModel;
         [SerializeField]
-        private Collider _collider;
-        [SerializeField]
         private VisualEffect hitRippleVFX;
         [SerializeField]
         private AudioSource shieldAudioSource;
@@ -52,7 +50,6 @@ namespace SaloonSlingers.Unity
             hitRippleVFX.Stop();
             hitRippleVFX.Reinit();
             hitRippleVFX.enabled = false;
-            _collider.enabled = false;
             shieldAudioSource.pitch = 1;
         }
 
@@ -67,12 +64,6 @@ namespace SaloonSlingers.Unity
             Vector3 worldCollisionPoint = transform.TransformPoint(localCollisionPoint);
             hitRippleVFX.SetVector3("Center", worldCollisionPoint);
             shieldMaterial.SetVector("_Position", transform.position);
-        }
-
-        private void LateUpdate()
-        {
-            // Makes the hit effects more consistent where the collision happened on the shield.
-            _collider.transform.rotation = Quaternion.identity;
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -111,7 +102,6 @@ namespace SaloonSlingers.Unity
             PlayOneShotRandomPitch(shieldChargeClip, 1f, 2f);
             shieldMaterial.SetColor("_FresnelColor", fresnelDecayGradient.Evaluate(0f));
             shieldModel.SetActive(true);
-            _collider.enabled = true;
             float elapsedTime = 0f;
 
             while (elapsedTime < activationTransitionSeconds)
@@ -129,7 +119,6 @@ namespace SaloonSlingers.Unity
         private IEnumerator DoShieldBreak()
         {
             hitRippleVFX.enabled = true;
-            _collider.enabled = false;
             UpdateShieldHitColor();
             hitRippleVFX.Play();
             PlayOneShotRandomPitch(shieldBrokenClip, 1f, 2f);

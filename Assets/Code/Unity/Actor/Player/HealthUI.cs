@@ -26,8 +26,8 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
-            var cam = LevelManager.Instance.Player.GetComponent<XROrigin>().Camera;
-            shieldHitPoints = cam.GetComponentInChildren<HitPoints>();
+            var origin = LevelManager.Instance.Player.GetComponent<XROrigin>();
+            shieldHitPoints = origin.GetComponentInChildren<HitPoints>();
             UpdateFill(tempHealthBar, shieldHitPoints.Points);
             tempHealthPercentText.text = shieldHitPoints.Points.AsPercent().ToString("P0");
             tempHealthPercentText.color = tempHealthBar.color;

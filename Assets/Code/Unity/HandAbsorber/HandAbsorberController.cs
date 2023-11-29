@@ -22,8 +22,8 @@ namespace SaloonSlingers.Unity
 
         private void Start()
         {
-            var cam = LevelManager.Instance.Player.GetComponent<XROrigin>().Camera;
-            shieldHitPoints = cam.GetComponentInChildren<HitPoints>();
+            var origin = LevelManager.Instance.Player.GetComponent<XROrigin>();
+            shieldHitPoints = origin.GetComponentInChildren<HitPoints>();
         }
 
         public void OnHoverEnter(HoverEnterEventArgs args)

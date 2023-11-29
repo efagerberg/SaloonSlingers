@@ -20,9 +20,16 @@ namespace SaloonSlingers.Unity.Actor
         private Transform enemyPeerPanelAttachTransform;
         [SerializeField]
         private GameObject enemyPeerPanelPrefab;
+        [SerializeField]
+        private Transform leftShieldAttachTransform;
+        [SerializeField]
+        private Transform rightShieldAttachTransform;
+        [SerializeField]
+        private GameObject shieldPrefab;
 
         private Transform deckAttachTransform;
         private Transform absorberAttachTransform;
+        private Transform shieldAttachTransform;
         private bool isPrimary = false;
 
         private void Start()
@@ -33,10 +40,12 @@ namespace SaloonSlingers.Unity.Actor
                 case Handedness.RIGHT:
                     deckAttachTransform = leftDeckAttachTransform;
                     absorberAttachTransform = leftAbsorberAttachTransform;
+                    shieldAttachTransform = leftShieldAttachTransform;
                     break;
                 case Handedness.LEFT:
                     deckAttachTransform = rightDeckAttachTransform;
                     absorberAttachTransform = rightAbsorberAttachTransform;
+                    shieldAttachTransform = rightShieldAttachTransform;
                     break;
             }
 
@@ -49,6 +58,7 @@ namespace SaloonSlingers.Unity.Actor
                 GameObject clone = Instantiate(deckGraphicPrefab, deckAttachTransform);
                 handedness.DeckGraphic = clone.GetComponent<DeckGraphic>();
                 Instantiate(absorberPrefab, absorberAttachTransform);
+                Instantiate(shieldPrefab, shieldAttachTransform);
             }
             else
             {
