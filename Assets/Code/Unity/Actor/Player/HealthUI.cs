@@ -26,13 +26,9 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
-            var origin = LevelManager.Instance.Player.GetComponent<XROrigin>();
-            shieldHitPoints = origin.GetComponentInChildren<HitPoints>();
-            UpdateFill(tempHealthBar, shieldHitPoints.Points);
-            tempHealthPercentText.text = shieldHitPoints.Points.AsPercent().ToString("P0");
-            tempHealthPercentText.color = tempHealthBar.color;
-
             hitPoints = LevelManager.Instance.Player.GetComponent<HitPoints>();
+            hitPoints.Points.Increased += UpdateHealthBar;
+            hitPoints.Points.Decreased += UpdateHealthBar;
             UpdateFill(healthBar, hitPoints.Points);
             healthPercentText.text = hitPoints.Points.AsPercent().ToString("P0");
             healthPercentText.color = healthBar.color;
@@ -40,20 +36,34 @@ namespace SaloonSlingers.Unity
 
         private void OnEnable()
         {
-            shieldHitPoints.Points.Increased += UpdateTempHealthBar;
-            shieldHitPoints.Points.Decreased += UpdateTempHealthBar;
-
             hitPoints.Points.Increased += UpdateHealthBar;
             hitPoints.Points.Decreased += UpdateHealthBar;
+
+            if (shieldHitPoints)
+            {
+                shieldHitPoints.Points.Increased += UpdateTempHealthBar;
+                shieldHitPoints.Points.Decreased += UpdateTempHealthBar;
+            }
         }
 
         private void OnDisable()
         {
-            shieldHitPoints.Points.Increased -= UpdateTempHealthBar;
-            shieldHitPoints.Points.Decreased -= UpdateTempHealthBar;
-
             hitPoints.Points.Increased -= UpdateHealthBar;
             hitPoints.Points.Decreased -= UpdateHealthBar;
+
+            shieldHitPoints.Points.Increased -= UpdateTempHealthBar;
+            shieldHitPoints.Points.Decreased -= UpdateTempHealthBar;
+        }
+
+        private void Start()
+        {
+            var origin = LevelManager.Instance.Player.GetComponent<XROrigin>();
+            shieldHitPoints = origin.Camera.transform.parent.GetComponentInChildren<HitPoints>();
+            shieldHitPoints.Points.Increased += UpdateTempHealthBar;
+            shieldHitPoints.Points.Decreased += UpdateTempHealthBar;
+            UpdateFill(tempHealthBar, shieldHitPoints.Points);
+            tempHealthPercentText.text = shieldHitPoints.Points.AsPercent().ToString("P0");
+            tempHealthPercentText.color = tempHealthBar.color;
         }
 
         private void UpdateTempHealthBar(Points sender, ValueChangeEvent<uint> e)

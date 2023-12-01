@@ -23,7 +23,7 @@ namespace SaloonSlingers.Unity
         private void Start()
         {
             var origin = LevelManager.Instance.Player.GetComponent<XROrigin>();
-            shieldHitPoints = origin.GetComponentInChildren<HitPoints>();
+            shieldHitPoints = origin.Camera.transform.parent.GetComponentInChildren<HitPoints>();
         }
 
         public void OnHoverEnter(HoverEnterEventArgs args)
