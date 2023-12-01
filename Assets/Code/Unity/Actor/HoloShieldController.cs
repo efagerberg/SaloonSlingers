@@ -15,6 +15,8 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private GameObject shieldModel;
         [SerializeField]
+        private Collider shieldCollider;
+        [SerializeField]
         private VisualEffect hitRippleVFX;
         [SerializeField]
         private AudioSource shieldAudioSource;
@@ -111,6 +113,7 @@ namespace SaloonSlingers.Unity
             PlayOneShotRandomPitch(shieldChargeClip, 1f, 2f);
             shieldMaterial.SetColor("_FresnelColor", fresnelDecayGradient.Evaluate(0f));
             shieldModel.SetActive(true);
+            shieldCollider.enabled = true;
             float elapsedTime = 0f;
 
             while (elapsedTime < activationTransitionSeconds)
@@ -130,6 +133,7 @@ namespace SaloonSlingers.Unity
             hitRippleVFX.enabled = true;
             hitRippleVFX.Play();
             PlayOneShotRandomPitch(shieldBrokenClip, 1f, 2f);
+            shieldCollider.enabled = false;
 
             float elapsedTime = 0f;
             while (elapsedTime < shieldBrokenClip.length)
