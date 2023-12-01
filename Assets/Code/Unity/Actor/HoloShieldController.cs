@@ -31,6 +31,12 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         [GradientUsage(true)]
         private Gradient fresnelDecayGradient;
+        [SerializeField]
+        [GradientUsage(true)]
+        private Gradient shieldStrengthFrontGradient;
+        [SerializeField]
+        [GradientUsage(true)]
+        private Gradient shieldStrengthBackGradient;
 
         private Vector3 localCollisionPoint;
         private Material shieldMaterial;
@@ -78,23 +84,26 @@ namespace SaloonSlingers.Unity
 
         private void OnIncrease(Points sender, ValueChangeEvent<uint> e)
         {
+            UpdateShieldHitColor();
             if (e.Before == 0) StartCoroutine(nameof(ActivateShield));
         }
 
         private void OnDecrease(Points sender, ValueChangeEvent<uint> e)
         {
             if (sender.Value == sender.InitialValue) return;
+
+            UpdateShieldHitColor();
             if (e.After > 0) StartCoroutine(nameof(DoShieldHit));
             else StartCoroutine(nameof(DoShieldBreak));
         }
 
         private void UpdateShieldHitColor()
         {
-            if (hitPoints != 0)
-            {
-                float ratio = hitPoints / (float)hitPoints.Points.InitialValue;
-                hitRippleVFX.SetFloat("ShieldStrength", ratio);
-            }
+            float ratio = hitPoints / (float)hitPoints.Points.InitialValue;
+            var frontColor = shieldStrengthFrontGradient.Evaluate(ratio);
+            var backColor = shieldStrengthBackGradient.Evaluate(ratio);
+            shieldMaterial.SetColor("_FrontColor", frontColor);
+            shieldMaterial.SetColor("_BackColor", backColor);
         }
 
         private IEnumerator ActivateShield()
@@ -119,7 +128,6 @@ namespace SaloonSlingers.Unity
         private IEnumerator DoShieldBreak()
         {
             hitRippleVFX.enabled = true;
-            UpdateShieldHitColor();
             hitRippleVFX.Play();
             PlayOneShotRandomPitch(shieldBrokenClip, 1f, 2f);
 
@@ -138,7 +146,6 @@ namespace SaloonSlingers.Unity
 
         private IEnumerator DoShieldHit()
         {
-            UpdateShieldHitColor();
             hitRippleVFX.enabled = true;
             hitRippleVFX.Play();
             PlayOneShotRandomPitch(shieldHitClip, 1f, 2f);

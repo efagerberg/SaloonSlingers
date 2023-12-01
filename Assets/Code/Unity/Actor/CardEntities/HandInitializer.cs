@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
@@ -53,18 +56,26 @@ namespace SaloonSlingers.Unity.Actor
                 handedness.Current.ToString(),
                 System.StringComparison.CurrentCultureIgnoreCase
             );
+            var instantiated = new List<GameObject>();
             if (!isPrimary)
             {
-                GameObject clone = Instantiate(deckGraphicPrefab, deckAttachTransform);
-                handedness.DeckGraphic = clone.GetComponent<DeckGraphic>();
-                Instantiate(absorberPrefab, absorberAttachTransform);
-                Instantiate(shieldPrefab, shieldAttachTransform);
+                GameObject deckGraphicGO = Instantiate(deckGraphicPrefab, deckAttachTransform);
+                handedness.DeckGraphic = deckGraphicGO.GetComponent<DeckGraphic>();
+                var absorberGO = Instantiate(absorberPrefab, absorberAttachTransform);
+                var shieldGO = Instantiate(shieldPrefab, shieldAttachTransform);
+                instantiated.Append(absorberGO);
+                instantiated.Append(shieldGO);
+                instantiated.Append(deckGraphicGO);
             }
             else
             {
                 GameObject clone = Instantiate(enemyPeerPanelPrefab, enemyPeerPanelAttachTransform);
                 handedness.EnemyPeerDisplay = clone.GetComponent<EnemyHandDisplay>();
+                instantiated.Append(clone);
             }
+
+            foreach (var instance in instantiated)
+                instance.layer = LayerMask.NameToLayer("Player");
         }
     }
 }
