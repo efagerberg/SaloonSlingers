@@ -11,25 +11,18 @@ namespace SaloonSlingers.Unity
     {
         [SerializeField]
         private HandAbsorber absorber;
-        [SerializeField]
-        private CanvasGroup gazeUI;
-        [SerializeField]
-        private float fadeDuration = 0.5f;
 
         private HitPoints shieldHitPoints;
-        private Transform gazer;
         private Coroutine absorbCoroutine;
 
         private void Start()
         {
-            var cam = LevelManager.Instance.Player.GetComponent<XROrigin>().Camera;
-            shieldHitPoints = cam.GetComponentInChildren<HitPoints>();
+            var origin = LevelManager.Instance.Player.GetComponent<XROrigin>();
+            shieldHitPoints = origin.Camera.transform.parent.GetComponentInChildren<HitPoints>();
         }
 
         public void OnHoverEnter(HoverEnterEventArgs args)
         {
-            gazer = args.interactorObject.transform;
-
             if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile)) return;
 
             projectile.Stack();
@@ -54,32 +47,6 @@ namespace SaloonSlingers.Unity
             if (absorbCoroutine == null) return;
 
             StopCoroutine(absorbCoroutine);
-        }
-
-        public void OnGazeEnter(HoverEnterEventArgs args)
-        {
-            gazer = args.interactorObject.transform;
-
-            if (!gameObject.activeInHierarchy) return;
-
-            StartCoroutine(Fader.FadeTo(gazeUI, 1, fadeDuration));
-        }
-
-        public void OnGazeExit()
-        {
-            gazer = null;
-
-            if (!gameObject.activeInHierarchy) return;
-
-            StartCoroutine(Fader.FadeTo(gazeUI, 0, fadeDuration));
-        }
-
-        private void Update()
-        {
-            if (gazer == null) return;
-
-            gazeUI.transform.forward = gazer.forward;
-            gazeUI.transform.right = gazer.right;
         }
     }
 }

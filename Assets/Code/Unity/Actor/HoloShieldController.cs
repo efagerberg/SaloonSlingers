@@ -15,7 +15,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private GameObject shieldModel;
         [SerializeField]
-        private SphereCollider sphereCollider;
+        private Collider shieldCollider;
         [SerializeField]
         private VisualEffect hitRippleVFX;
         [SerializeField]
@@ -33,6 +33,12 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         [GradientUsage(true)]
         private Gradient fresnelDecayGradient;
+        [SerializeField]
+        [GradientUsage(true)]
+        private Gradient shieldStrengthFrontGradient;
+        [SerializeField]
+        [GradientUsage(true)]
+        private Gradient shieldStrengthBackGradient;
 
         private Vector3 localCollisionPoint;
         private Material shieldMaterial;
@@ -52,7 +58,6 @@ namespace SaloonSlingers.Unity
             hitRippleVFX.Stop();
             hitRippleVFX.Reinit();
             hitRippleVFX.enabled = false;
-            sphereCollider.enabled = false;
             shieldAudioSource.pitch = 1;
         }
 
@@ -69,12 +74,6 @@ namespace SaloonSlingers.Unity
             shieldMaterial.SetVector("_Position", transform.position);
         }
 
-        private void LateUpdate()
-        {
-            // Makes the hit effects more consistent where the collision happened on the shield.
-            sphereCollider.transform.rotation = Quaternion.identity;
-        }
-
         private void OnCollisionEnter(Collision collision)
         {
             localCollisionPoint = transform.InverseTransformPoint(collision.GetContact(0).point);
@@ -87,23 +86,26 @@ namespace SaloonSlingers.Unity
 
         private void OnIncrease(Points sender, ValueChangeEvent<uint> e)
         {
+            UpdateShieldHitColor();
             if (e.Before == 0) StartCoroutine(nameof(ActivateShield));
         }
 
         private void OnDecrease(Points sender, ValueChangeEvent<uint> e)
         {
             if (sender.Value == sender.InitialValue) return;
+
+            UpdateShieldHitColor();
             if (e.After > 0) StartCoroutine(nameof(DoShieldHit));
             else StartCoroutine(nameof(DoShieldBreak));
         }
 
         private void UpdateShieldHitColor()
         {
-            if (hitPoints != 0)
-            {
-                float ratio = hitPoints / (float)hitPoints.Points.InitialValue;
-                hitRippleVFX.SetFloat("ShieldStrength", ratio);
-            }
+            float ratio = hitPoints / (float)hitPoints.Points.InitialValue;
+            var frontColor = shieldStrengthFrontGradient.Evaluate(ratio);
+            var backColor = shieldStrengthBackGradient.Evaluate(ratio);
+            shieldMaterial.SetColor("_FrontColor", frontColor);
+            shieldMaterial.SetColor("_BackColor", backColor);
         }
 
         private IEnumerator ActivateShield()
@@ -111,7 +113,7 @@ namespace SaloonSlingers.Unity
             PlayOneShotRandomPitch(shieldChargeClip, 1f, 2f);
             shieldMaterial.SetColor("_FresnelColor", fresnelDecayGradient.Evaluate(0f));
             shieldModel.SetActive(true);
-            sphereCollider.enabled = true;
+            shieldCollider.enabled = true;
             float elapsedTime = 0f;
 
             while (elapsedTime < activationTransitionSeconds)
@@ -129,10 +131,9 @@ namespace SaloonSlingers.Unity
         private IEnumerator DoShieldBreak()
         {
             hitRippleVFX.enabled = true;
-            sphereCollider.enabled = false;
-            UpdateShieldHitColor();
             hitRippleVFX.Play();
             PlayOneShotRandomPitch(shieldBrokenClip, 1f, 2f);
+            shieldCollider.enabled = false;
 
             float elapsedTime = 0f;
             while (elapsedTime < shieldBrokenClip.length)
@@ -149,7 +150,6 @@ namespace SaloonSlingers.Unity
 
         private IEnumerator DoShieldHit()
         {
-            UpdateShieldHitColor();
             hitRippleVFX.enabled = true;
             hitRippleVFX.Play();
             PlayOneShotRandomPitch(shieldHitClip, 1f, 2f);

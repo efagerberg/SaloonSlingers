@@ -3,63 +3,77 @@ using SaloonSlingers.Unity.Actor;
 
 using TMPro;
 
-using Unity.XR.CoreUtils;
-
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity
 {
     public class HealthUI : MonoBehaviour
     {
         [SerializeField]
-        private Image tempHealthBar;
-        [SerializeField]
-        private TextMeshProUGUI tempHealthPercentText;
-        [SerializeField]
         private Image healthBar;
         [SerializeField]
         private TextMeshProUGUI healthPercentText;
+        [SerializeField]
+        private CanvasGroup gazeUI;
+        [SerializeField]
+        private float fadeDuration = 0.5f;
 
-        private HitPoints shieldHitPoints;
         private HitPoints hitPoints;
+        private Transform gazer;
 
         private void Awake()
         {
-            var cam = LevelManager.Instance.Player.GetComponent<XROrigin>().Camera;
-            shieldHitPoints = cam.GetComponentInChildren<HitPoints>();
-            UpdateFill(tempHealthBar, shieldHitPoints.Points);
-            tempHealthPercentText.text = shieldHitPoints.Points.AsPercent().ToString("P0");
-            tempHealthPercentText.color = tempHealthBar.color;
-
             hitPoints = LevelManager.Instance.Player.GetComponent<HitPoints>();
+            hitPoints.Points.Increased += UpdateHealthBar;
+            hitPoints.Points.Decreased += UpdateHealthBar;
             UpdateFill(healthBar, hitPoints.Points);
             healthPercentText.text = hitPoints.Points.AsPercent().ToString("P0");
             healthPercentText.color = healthBar.color;
+            gazeUI.alpha = 0f;
         }
 
         private void OnEnable()
         {
-            shieldHitPoints.Points.Increased += UpdateTempHealthBar;
-            shieldHitPoints.Points.Decreased += UpdateTempHealthBar;
-
             hitPoints.Points.Increased += UpdateHealthBar;
             hitPoints.Points.Decreased += UpdateHealthBar;
         }
 
         private void OnDisable()
         {
-            shieldHitPoints.Points.Increased -= UpdateTempHealthBar;
-            shieldHitPoints.Points.Decreased -= UpdateTempHealthBar;
-
             hitPoints.Points.Increased -= UpdateHealthBar;
             hitPoints.Points.Decreased -= UpdateHealthBar;
         }
 
-        private void UpdateTempHealthBar(Points sender, ValueChangeEvent<uint> e)
+        public void OnGazeEnter(HoverEnterEventArgs args)
         {
-            UpdateFill(tempHealthBar, sender);
-            tempHealthPercentText.text = sender.AsPercent().ToString("P0");
+            gazer = args.interactorObject.transform;
+
+            if (!gameObject.activeInHierarchy) return;
+
+            StartCoroutine(Fader.FadeTo(gazeUI, 1, fadeDuration));
+        }
+
+        public void OnGazeExit()
+        {
+            gazer = null;
+
+            if (!gameObject.activeInHierarchy) return;
+
+            StartCoroutine(Fader.FadeTo(gazeUI, 0, fadeDuration));
+        }
+
+        private void Update()
+        {
+            if (gazer == null) return;
+
+            //gazeUI.transform.forward = gazer.forward;
+            //gazeUI.transform.right = gazer.right;
+            //gazeUI.transform.up = gazer.up;
+            var newRot = gazeUI.transform.rotation.eulerAngles;
+            newRot.z = gazer.rotation.z;
+            gazeUI.transform.rotation = Quaternion.Euler(newRot);
         }
 
         private void UpdateHealthBar(Points sender, ValueChangeEvent<uint> e)
