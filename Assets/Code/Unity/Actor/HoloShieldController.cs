@@ -15,6 +15,8 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private GameObject shieldModel;
         [SerializeField]
+        private GameObject shatteredShieldModel;
+        [SerializeField]
         private Collider shieldCollider;
         [SerializeField]
         private VisualEffect hitRippleVFX;
@@ -130,10 +132,16 @@ namespace SaloonSlingers.Unity
 
         private IEnumerator DoShieldBreak()
         {
+            shieldCollider.enabled = false;
+            shatteredShieldModel.SetActive(true);
+            var shardRenderer = shatteredShieldModel.GetComponentsInChildren<Renderer>();
+            foreach (var r in shardRenderer)
+                r.material = shieldMaterial;
+
+            shieldModel.SetActive(false);
             hitRippleVFX.enabled = true;
             hitRippleVFX.Play();
             PlayOneShotRandomPitch(shieldBrokenClip, 1f, 2f);
-            shieldCollider.enabled = false;
 
             float elapsedTime = 0f;
             while (elapsedTime < shieldBrokenClip.length)
@@ -141,11 +149,10 @@ namespace SaloonSlingers.Unity
                 elapsedTime += Time.deltaTime;
                 var decayColor = fresnelDecayGradient.Evaluate(elapsedTime / shieldBrokenClip.length);
                 shieldMaterial.SetColor("_FresnelColor", decayColor);
-
                 yield return null;
             }
 
-            shieldModel.SetActive(false);
+            shatteredShieldModel.SetActive(false);
         }
 
         private IEnumerator DoShieldHit()
