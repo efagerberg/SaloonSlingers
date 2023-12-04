@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
@@ -31,7 +33,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private AnimationCurve scaleCurve;
         [SerializeField]
-        private float transitionSeconds = 2;
+        private float transitionSeconds = 1;
         [SerializeField]
         [GradientUsage(true)]
         private Gradient shieldStrengthFrontGradient;
@@ -41,6 +43,8 @@ namespace SaloonSlingers.Unity
 
         private Vector3 localCollisionPoint;
         private Material shieldMaterial;
+        private IDictionary<string, Color> materialKeyToColor;
+        private Coroutine fadeOutCoroutine;
 
         private void OnEnable()
         {
@@ -63,6 +67,8 @@ namespace SaloonSlingers.Unity
         {
             shieldMaterial = shieldModel.GetComponent<MeshRenderer>().material;
             shieldMaterial.SetFloat("_BreathOffset", Random.Range(0f, 1f));
+            var zipped = (new string[] { "_FresnelColor", "_FrontColor", "_BackColor" }).Select(key => (key, shieldMaterial.GetColor(key)));
+            materialKeyToColor = zipped.ToDictionary(tuple => tuple.key, tuple => tuple.Item2);
         }
 
         private void Update()
@@ -84,7 +90,7 @@ namespace SaloonSlingers.Unity
 
         private void OnIncrease(Points sender, ValueChangeEvent<uint> e)
         {
-            UpdateShieldHitColor();
+            UpdateShieldStrengthColor();
             if (e.Before == 0) StartCoroutine(nameof(ActivateShield));
         }
 
@@ -92,22 +98,28 @@ namespace SaloonSlingers.Unity
         {
             if (sender.Value == sender.InitialValue) return;
 
-            UpdateShieldHitColor();
+            UpdateShieldStrengthColor();
             if (e.After > 0) StartCoroutine(nameof(DoShieldHit));
             else StartCoroutine(nameof(DoShieldBreak));
         }
 
-        private void UpdateShieldHitColor()
+        private void UpdateShieldStrengthColor()
         {
             float ratio = hitPoints / (float)hitPoints.Points.InitialValue;
             var frontColor = shieldStrengthFrontGradient.Evaluate(ratio);
+            materialKeyToColor["_FrontColor"] = frontColor;
             var backColor = shieldStrengthBackGradient.Evaluate(ratio);
+            materialKeyToColor["_BackColor"] = backColor;
             shieldMaterial.SetColor("_FrontColor", frontColor);
             shieldMaterial.SetColor("_BackColor", backColor);
         }
 
         private IEnumerator ActivateShield()
         {
+            if (fadeOutCoroutine != null) StopCoroutine(fadeOutCoroutine);
+            shatteredShieldModel.SetActive(false);
+
+            SetShieldMaterialAlpha(1);
             PlayOneShotRandomPitch(shieldChargeClip, 1f, 2f);
             shieldModel.SetActive(true);
             shieldCollider.enabled = true;
@@ -127,6 +139,7 @@ namespace SaloonSlingers.Unity
 
         private IEnumerator DoShieldBreak()
         {
+            if (fadeOutCoroutine != null) StopCoroutine(fadeOutCoroutine);
             shieldCollider.enabled = false;
             var shardRenderer = shatteredShieldModel.GetComponentsInChildren<Renderer>();
             foreach (var r in shardRenderer)
@@ -136,17 +149,18 @@ namespace SaloonSlingers.Unity
             shatteredShieldModel.SetActive(true);
             PlayOneShotRandomPitch(shieldBrokenClip, 1f, 2f);
 
-            yield return Fader.Fade(SetShieldMaterialAlpha, transitionSeconds);
+            fadeOutCoroutine = StartCoroutine(Fader.Fade(SetShieldMaterialAlpha, transitionSeconds));
+            yield return fadeOutCoroutine;
 
             shatteredShieldModel.SetActive(false);
-            SetShieldMaterialAlpha(1);
         }
 
         private void SetShieldMaterialAlpha(float alpha)
         {
-            foreach (var key in new string[] { "_FresnelColor", "_FrontColor", "_BackColor" })
+            foreach (var (key, color) in materialKeyToColor)
             {
-                var color = shieldMaterial.GetColor(key);
+                // We have multiple colors, so we need to scale the color
+                // and make sure we track the current colors
                 shieldMaterial.SetColor(key, color * alpha);
             }
         }

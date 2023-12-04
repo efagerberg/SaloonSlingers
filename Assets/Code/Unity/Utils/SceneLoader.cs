@@ -26,7 +26,11 @@ namespace SaloonSlingers.Unity
             {
                 TransitionCanvasGroup.alpha = 0;
                 TransitionCanvasGroup.gameObject.SetActive(true);
-                yield return Fader.Fade((alpha) => TransitionCanvasGroup.alpha = alpha, transitionDuration / 2f, endAlpha: 1);
+                yield return Fader.Fade(
+                    (alpha) => TransitionCanvasGroup.alpha = alpha,
+                    transitionDuration / 2f,
+                    startAlpha: TransitionCanvasGroup.alpha, endAlpha: 1
+                );
             }
             loadOperation = SceneManager.LoadSceneAsync(sceneName);
             loadOperation.allowSceneActivation = false;
@@ -44,8 +48,7 @@ namespace SaloonSlingers.Unity
                 TransitionCanvasGroup.gameObject.SetActive(true);
                 yield return Fader.Fade(
                     (alpha) => TransitionCanvasGroup.alpha = alpha,
-                    transitionDuration / 2f,
-                    startAlpha: TransitionCanvasGroup.alpha, endAlpha: 1
+                    transitionDuration / 2f
                 );
                 TransitionCanvasGroup.gameObject.SetActive(false);
                 TransitionCanvasGroup.alpha = 0;

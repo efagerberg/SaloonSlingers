@@ -1,3 +1,4 @@
+using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
 using Unity.XR.CoreUtils;
@@ -11,42 +12,85 @@ namespace SaloonSlingers.Unity
     {
         [SerializeField]
         private HandAbsorber absorber;
+        [SerializeField]
+        private XRBaseInteractor interactor;
+        [SerializeField]
+        private AudioClip errorClip;
+        [Range(0, 1)]
+        [SerializeField]
+        private float volumeScale;
 
         private HitPoints shieldHitPoints;
-        private Coroutine absorbCoroutine;
+        private XRBaseInteractable plugInteractable;
+
+        private void OnEnable()
+        {
+            if (absorber == null) return;
+
+            absorber.Stacks.Increased += CheckIfShouldPlug;
+            absorber.Stacks.Decreased += CheckIfShouldPlug;
+        }
+
+        private void OnDisable()
+        {
+            if (absorber == null) return;
+
+            absorber.Stacks.Increased -= CheckIfShouldPlug;
+            absorber.Stacks.Decreased -= CheckIfShouldPlug;
+        }
 
         private void Start()
         {
             var origin = LevelManager.Instance.Player.GetComponent<XROrigin>();
             shieldHitPoints = origin.Camera.transform.parent.GetComponentInChildren<HitPoints>();
+
+            var plugInstance = new GameObject();
+            plugInteractable = plugInstance.AddComponent<XRSimpleInteractable>();
+            plugInteractable.interactionLayers = InteractionLayerMask.GetMask("DirectInteract");
+            plugInteractable.transform.gameObject.SetActive(false);
+            plugInteractable.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         }
 
         public void OnHoverEnter(HoverEnterEventArgs args)
         {
-            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile)) return;
+            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile))
+                return;
 
+            if (!absorber.CanAbsorb && projectile.TryGetComponent<AudioSource>(out var audioSource))
+                audioSource.PlayOneShot(errorClip, volumeScale);
             projectile.Stack();
         }
 
         public void OnHoverExit(HoverExitEventArgs args)
         {
-            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile)) return;
+            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile))
+                return;
 
             projectile.Unstack();
         }
 
         public void OnSelectEnter(SelectEnterEventArgs args)
         {
-            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile)) return;
+            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile))
+                return;
 
-            absorbCoroutine = StartCoroutine(absorber.Absorb(shieldHitPoints, projectile));
+            absorber.Absorb(shieldHitPoints, projectile);
         }
 
-        public void OnSelectExit(SelectExitEventArgs _)
+        private void CheckIfShouldPlug(Points sender, ValueChangeEvent<uint> e)
         {
-            if (absorbCoroutine == null) return;
+            if (e.After > 0)
+            {
+                if (interactor.IsSelecting(plugInteractable))
+                {
+                    plugInteractable.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+                    plugInteractable.gameObject.SetActive(false);
+                }
+                return;
+            };
 
-            StopCoroutine(absorbCoroutine);
+            plugInteractable.gameObject.SetActive(true);
+            interactor.StartManualInteraction((IXRSelectInteractable)plugInteractable);
         }
     }
 }
