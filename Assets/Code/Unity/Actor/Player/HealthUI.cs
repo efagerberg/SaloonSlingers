@@ -52,7 +52,7 @@ namespace SaloonSlingers.Unity
 
             if (!gameObject.activeInHierarchy) return;
 
-            StartCoroutine(Fader.FadeTo(gazeUI, 1, fadeDuration));
+            StartCoroutine(Fader.Fade((alpha) => gazeUI.alpha = alpha, fadeDuration, 1));
         }
 
         public void OnGazeExit()
@@ -61,16 +61,13 @@ namespace SaloonSlingers.Unity
 
             if (!gameObject.activeInHierarchy) return;
 
-            StartCoroutine(Fader.FadeTo(gazeUI, 0, fadeDuration));
+            StartCoroutine(Fader.Fade((alpha) => gazeUI.alpha = alpha, fadeDuration, 0));
         }
 
         private void Update()
         {
             if (gazer == null) return;
 
-            //gazeUI.transform.forward = gazer.forward;
-            //gazeUI.transform.right = gazer.right;
-            //gazeUI.transform.up = gazer.up;
             var newRot = gazeUI.transform.rotation.eulerAngles;
             newRot.z = gazer.rotation.z;
             gazeUI.transform.rotation = Quaternion.Euler(newRot);

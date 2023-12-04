@@ -15,9 +15,9 @@ namespace SaloonSlingers.Unity.Tests
             var group = TestUtils.CreateComponent<CanvasGroup>();
             group.alpha = 0;
             float duration = 1f;
-            yield return Fader.FadeTo(group, 1, duration);
+            yield return Fader.Fade((alpha) => group.alpha = alpha, duration);
 
-            Assert.That(group.alpha, Is.EqualTo(1));
+            Assert.That(group.alpha, Is.EqualTo(0));
         }
     }
 }

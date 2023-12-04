@@ -28,13 +28,19 @@ namespace SaloonSlingers.Unity.Actor
                 CardGraphic graphic = element.GetComponent<CardGraphic>();
                 graphic.FaceMaterial.color = Color.white;
             }
-            StartCoroutine(Fader.FadeTo(handValueCanvasGroup, 0, fadeDuration));
+            var coroutine = Fader.Fade((alpha) => handValueCanvasGroup.alpha = alpha, fadeDuration, endAlpha: 0);
+            StartCoroutine(coroutine);
         }
 
         public override void Show()
         {
             base.Show();
-            StartCoroutine(Fader.FadeTo(handValueCanvasGroup, 1, fadeDuration));
+            var coroutine = Fader.Fade(
+                (alpha) => handValueCanvasGroup.alpha = alpha,
+                fadeDuration,
+                startAlpha: handValueCanvasGroup.alpha, endAlpha: 1
+            );
+            StartCoroutine(coroutine);
         }
 
         protected override void UpdateContents(HandEvaluation evaluation)

@@ -55,7 +55,7 @@ namespace SaloonSlingers.Unity.Actor
             }
 
             flashCanvasGroup.gameObject.SetActive(true);
-            yield return Fader.FadeTo(flashCanvasGroup, endAlpha, duration);
+            yield return Fader.Fade((alpha) => flashCanvasGroup.alpha = alpha, duration);
             flashCanvasGroup.gameObject.SetActive(false);
             flashCanvasGroup.alpha = startAlpha;
         }

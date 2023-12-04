@@ -31,10 +31,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private AnimationCurve scaleCurve;
         [SerializeField]
-        private float activationTransitionSeconds = 2;
-        [SerializeField]
-        [GradientUsage(true)]
-        private Gradient fresnelDecayGradient;
+        private float transitionSeconds = 2;
         [SerializeField]
         [GradientUsage(true)]
         private Gradient shieldStrengthFrontGradient;
@@ -59,7 +56,6 @@ namespace SaloonSlingers.Unity
             shieldModel.SetActive(false);
             hitRippleVFX.Stop();
             hitRippleVFX.Reinit();
-            hitRippleVFX.enabled = false;
             shieldAudioSource.pitch = 1;
         }
 
@@ -113,15 +109,14 @@ namespace SaloonSlingers.Unity
         private IEnumerator ActivateShield()
         {
             PlayOneShotRandomPitch(shieldChargeClip, 1f, 2f);
-            shieldMaterial.SetColor("_FresnelColor", fresnelDecayGradient.Evaluate(0f));
             shieldModel.SetActive(true);
             shieldCollider.enabled = true;
             float elapsedTime = 0f;
 
-            while (elapsedTime < activationTransitionSeconds)
+            while (elapsedTime < transitionSeconds)
             {
                 elapsedTime += Time.deltaTime;
-                float scaleValue = scaleCurve.Evaluate(elapsedTime / activationTransitionSeconds);
+                float scaleValue = scaleCurve.Evaluate(elapsedTime / transitionSeconds);
                 transform.localScale = Vector3.one * scaleValue;
 
                 yield return null;
@@ -133,31 +128,31 @@ namespace SaloonSlingers.Unity
         private IEnumerator DoShieldBreak()
         {
             shieldCollider.enabled = false;
-            shatteredShieldModel.SetActive(true);
             var shardRenderer = shatteredShieldModel.GetComponentsInChildren<Renderer>();
             foreach (var r in shardRenderer)
                 r.material = shieldMaterial;
 
             shieldModel.SetActive(false);
-            hitRippleVFX.enabled = true;
-            hitRippleVFX.Play();
+            shatteredShieldModel.SetActive(true);
             PlayOneShotRandomPitch(shieldBrokenClip, 1f, 2f);
 
-            float elapsedTime = 0f;
-            while (elapsedTime < shieldBrokenClip.length)
-            {
-                elapsedTime += Time.deltaTime;
-                var decayColor = fresnelDecayGradient.Evaluate(elapsedTime / shieldBrokenClip.length);
-                shieldMaterial.SetColor("_FresnelColor", decayColor);
-                yield return null;
-            }
+            yield return Fader.Fade(SetShieldMaterialAlpha, transitionSeconds);
 
             shatteredShieldModel.SetActive(false);
+            SetShieldMaterialAlpha(1);
+        }
+
+        private void SetShieldMaterialAlpha(float alpha)
+        {
+            foreach (var key in new string[] { "_FresnelColor", "_FrontColor", "_BackColor" })
+            {
+                var color = shieldMaterial.GetColor(key);
+                shieldMaterial.SetColor(key, color * alpha);
+            }
         }
 
         private IEnumerator DoShieldHit()
         {
-            hitRippleVFX.enabled = true;
             hitRippleVFX.Play();
             PlayOneShotRandomPitch(shieldHitClip, 1f, 2f);
             yield return new WaitForSeconds(shieldHitClip.length);
