@@ -12,14 +12,9 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 
         public override TaskStatus OnUpdate()
         {
-            if (Renderer == null)
+            if (Renderer == null || Color == null)
             {
-                Debug.LogWarning("Renderer is null");
-                return TaskStatus.Failure;
-            }
-            if (Color == null)
-            {
-                Debug.LogWarning("Color is null");
+                Debug.LogWarning("Missing shared values is null");
                 return TaskStatus.Failure;
             }
 
