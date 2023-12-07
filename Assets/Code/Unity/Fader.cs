@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 
 using SaloonSlingers.Core;
@@ -8,18 +9,18 @@ namespace SaloonSlingers.Unity
 {
     public static class Fader
     {
-        public static IEnumerator FadeTo(CanvasGroup group, float targetAlpha, float duration)
+        public static IEnumerator Fade(Action<float> callback, float duration, float startAlpha = 1, float endAlpha = 0)
         {
             FadeConfig config = new()
             {
-                Start = group.alpha,
-                End = targetAlpha,
+                Start = startAlpha,
+                End = endAlpha,
                 Duration = duration,
                 GetDeltaTime = () => Time.deltaTime,
             };
             foreach (var alpha in AnimationCalculator.CalculateFade(config))
             {
-                group.alpha = alpha;
+                callback(alpha);
                 yield return null;
             }
         }

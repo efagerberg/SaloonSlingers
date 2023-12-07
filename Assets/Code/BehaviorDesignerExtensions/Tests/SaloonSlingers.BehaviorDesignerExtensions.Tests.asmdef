@@ -1,0 +1,30 @@
+{
+    "name": "SaloonSlingers.BehaviorDesignerExtensions.Tests",
+    "rootNamespace": "",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "SaloonSlingers.BehaviorDesignerExtensions",
+        "SaloonSlingers.Unity",
+        "SaloonSlingers.Core",
+        "SaloonSlingers.Unity.Tests",
+        "BehaviorDesigner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "BehaviorDesigner.Runtime.dll",
+        "BehaviorDesigner.Editor.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

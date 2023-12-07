@@ -4,19 +4,19 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 {
     public class CheckHealthDamaged : Conditional
     {
-        public SharedHitPoints hitPoints;
+        public SharedHitPoints HitPoints;
         private uint currentPoints;
 
         public override void OnAwake()
         {
-            currentPoints = hitPoints.Value;
+            currentPoints = HitPoints.Value;
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (currentPoints > hitPoints.Value)
+            if (currentPoints > HitPoints.Value)
             {
-                currentPoints = hitPoints.Value;
+                currentPoints = HitPoints.Value;
                 return TaskStatus.Success;
             }
             return TaskStatus.Failure;

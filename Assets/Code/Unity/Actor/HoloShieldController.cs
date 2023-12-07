@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
@@ -15,6 +17,8 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private GameObject shieldModel;
         [SerializeField]
+        private GameObject shatteredShieldModel;
+        [SerializeField]
         private Collider shieldCollider;
         [SerializeField]
         private VisualEffect hitRippleVFX;
@@ -29,10 +33,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private AnimationCurve scaleCurve;
         [SerializeField]
-        private float activationTransitionSeconds = 2;
-        [SerializeField]
-        [GradientUsage(true)]
-        private Gradient fresnelDecayGradient;
+        private float transitionSeconds = 1;
         [SerializeField]
         [GradientUsage(true)]
         private Gradient shieldStrengthFrontGradient;
@@ -42,6 +43,8 @@ namespace SaloonSlingers.Unity
 
         private Vector3 localCollisionPoint;
         private Material shieldMaterial;
+        private IDictionary<string, Color> materialKeyToColor;
+        private Coroutine fadeOutCoroutine;
 
         private void OnEnable()
         {
@@ -57,7 +60,6 @@ namespace SaloonSlingers.Unity
             shieldModel.SetActive(false);
             hitRippleVFX.Stop();
             hitRippleVFX.Reinit();
-            hitRippleVFX.enabled = false;
             shieldAudioSource.pitch = 1;
         }
 
@@ -65,6 +67,8 @@ namespace SaloonSlingers.Unity
         {
             shieldMaterial = shieldModel.GetComponent<MeshRenderer>().material;
             shieldMaterial.SetFloat("_BreathOffset", Random.Range(0f, 1f));
+            var zipped = (new string[] { "_FresnelColor", "_FrontColor", "_BackColor" }).Select(key => (key, shieldMaterial.GetColor(key)));
+            materialKeyToColor = zipped.ToDictionary(tuple => tuple.key, tuple => tuple.Item2);
         }
 
         private void Update()
@@ -86,7 +90,7 @@ namespace SaloonSlingers.Unity
 
         private void OnIncrease(Points sender, ValueChangeEvent<uint> e)
         {
-            UpdateShieldHitColor();
+            UpdateShieldStrengthColor();
             if (e.Before == 0) StartCoroutine(nameof(ActivateShield));
         }
 
@@ -94,32 +98,37 @@ namespace SaloonSlingers.Unity
         {
             if (sender.Value == sender.InitialValue) return;
 
-            UpdateShieldHitColor();
+            UpdateShieldStrengthColor();
             if (e.After > 0) StartCoroutine(nameof(DoShieldHit));
             else StartCoroutine(nameof(DoShieldBreak));
         }
 
-        private void UpdateShieldHitColor()
+        private void UpdateShieldStrengthColor()
         {
             float ratio = hitPoints / (float)hitPoints.Points.InitialValue;
             var frontColor = shieldStrengthFrontGradient.Evaluate(ratio);
+            materialKeyToColor["_FrontColor"] = frontColor;
             var backColor = shieldStrengthBackGradient.Evaluate(ratio);
+            materialKeyToColor["_BackColor"] = backColor;
             shieldMaterial.SetColor("_FrontColor", frontColor);
             shieldMaterial.SetColor("_BackColor", backColor);
         }
 
         private IEnumerator ActivateShield()
         {
+            if (fadeOutCoroutine != null) StopCoroutine(fadeOutCoroutine);
+            shatteredShieldModel.SetActive(false);
+
+            SetShieldMaterialAlpha(1);
             PlayOneShotRandomPitch(shieldChargeClip, 1f, 2f);
-            shieldMaterial.SetColor("_FresnelColor", fresnelDecayGradient.Evaluate(0f));
             shieldModel.SetActive(true);
             shieldCollider.enabled = true;
             float elapsedTime = 0f;
 
-            while (elapsedTime < activationTransitionSeconds)
+            while (elapsedTime < transitionSeconds)
             {
                 elapsedTime += Time.deltaTime;
-                float scaleValue = scaleCurve.Evaluate(elapsedTime / activationTransitionSeconds);
+                float scaleValue = scaleCurve.Evaluate(elapsedTime / transitionSeconds);
                 transform.localScale = Vector3.one * scaleValue;
 
                 yield return null;
@@ -130,27 +139,34 @@ namespace SaloonSlingers.Unity
 
         private IEnumerator DoShieldBreak()
         {
-            hitRippleVFX.enabled = true;
-            hitRippleVFX.Play();
-            PlayOneShotRandomPitch(shieldBrokenClip, 1f, 2f);
+            if (fadeOutCoroutine != null) StopCoroutine(fadeOutCoroutine);
             shieldCollider.enabled = false;
-
-            float elapsedTime = 0f;
-            while (elapsedTime < shieldBrokenClip.length)
-            {
-                elapsedTime += Time.deltaTime;
-                var decayColor = fresnelDecayGradient.Evaluate(elapsedTime / shieldBrokenClip.length);
-                shieldMaterial.SetColor("_FresnelColor", decayColor);
-
-                yield return null;
-            }
+            var shardRenderer = shatteredShieldModel.GetComponentsInChildren<Renderer>();
+            foreach (var r in shardRenderer)
+                r.material = shieldMaterial;
 
             shieldModel.SetActive(false);
+            shatteredShieldModel.SetActive(true);
+            PlayOneShotRandomPitch(shieldBrokenClip, 1f, 2f);
+
+            fadeOutCoroutine = StartCoroutine(Fader.Fade(SetShieldMaterialAlpha, transitionSeconds));
+            yield return fadeOutCoroutine;
+
+            shatteredShieldModel.SetActive(false);
+        }
+
+        private void SetShieldMaterialAlpha(float alpha)
+        {
+            foreach (var (key, color) in materialKeyToColor)
+            {
+                // We have multiple colors, so we need to scale the color
+                // and make sure we track the current colors
+                shieldMaterial.SetColor(key, color * alpha);
+            }
         }
 
         private IEnumerator DoShieldHit()
         {
-            hitRippleVFX.enabled = true;
             hitRippleVFX.Play();
             PlayOneShotRandomPitch(shieldHitClip, 1f, 2f);
             yield return new WaitForSeconds(shieldHitClip.length);

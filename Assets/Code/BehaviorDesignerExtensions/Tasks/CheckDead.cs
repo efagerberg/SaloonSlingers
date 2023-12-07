@@ -4,11 +4,11 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 {
     public class CheckDead : Conditional
     {
-        public SharedHitPoints hitPoints;
+        public SharedHitPoints HitPoints;
 
         public override TaskStatus OnUpdate()
         {
-            return hitPoints.Value <= 0 ? TaskStatus.Success : TaskStatus.Failure;
+            return HitPoints.Value == 0 ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
 }

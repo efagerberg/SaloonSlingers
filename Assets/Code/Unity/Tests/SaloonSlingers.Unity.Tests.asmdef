@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "SaloonSlingers.Unity",
         "SaloonSlingers.Core",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "BehaviorDesigner"
     ],
     "includePlatforms": [
         "Editor"
