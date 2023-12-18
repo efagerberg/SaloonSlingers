@@ -8,7 +8,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 
         public override TaskStatus OnUpdate()
         {
-            return Enemy.Value.shieldHitPoints > 0 ? TaskStatus.Success : TaskStatus.Failure;
+            return Enemy.Value.ShieldHitPoints > 0 ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
 }

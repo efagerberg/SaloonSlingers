@@ -31,6 +31,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandlePeer(InputAction.CallbackContext _)
         {
+            if (peerable == null) peerable = GetComponent<Peerable>();
             peerable.CastPeer(visibilityDetector, handedness.EnemyPeerDisplay);
         }
 

@@ -8,10 +8,8 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Dashable : ActionPerformer
     {
-        public Points Points { get; private set; }
+        public float Speed { get; set; } = 6f;
 
-        [SerializeField]
-        private float dashSpeed = 6f;
         [SerializeField]
         private uint startingDashes = 3;
         [SerializeField]
@@ -21,24 +19,22 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float startingPointRecoveryPeriod = 1f;
 
-        private ActionMetaData metaData;
-
         public void Dash(CharacterController controller, Vector3 forward)
         {
             IEnumerator onStart()
             {
                 var originalMask = gameObject.layer;
                 gameObject.layer = LayerMask.NameToLayer("Invincible");
-                float currentDuration = metaData.Duration;
+                float currentDuration = MetaData.Duration;
                 while (currentDuration > 0)
                 {
-                    controller.Move(dashSpeed * Time.deltaTime * forward);
+                    controller.Move(Speed * Time.deltaTime * forward);
                     currentDuration -= Time.deltaTime;
                     yield return null;
                 }
                 gameObject.layer = originalMask;
             }
-            IEnumerator coroutine = GetActionCoroutine(Points, metaData, onStart);
+            IEnumerator coroutine = GetActionCoroutine(onStart);
             if (coroutine == null) return;
 
             StartCoroutine(coroutine);
@@ -47,7 +43,7 @@ namespace SaloonSlingers.Unity.Actor
         private void Start()
         {
             Points = new Points(startingDashes);
-            metaData = new(startingDashDuration,
+            MetaData = new(startingDashDuration,
                 startingDashCooldown,
                 startingPointRecoveryPeriod);
 

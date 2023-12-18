@@ -30,6 +30,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleDash(InputAction.CallbackContext context)
         {
+            if (dashable == null) dashable = GetComponent<Dashable>();
             dashable.Dash(controller, forwardReference.forward);
         }
     }

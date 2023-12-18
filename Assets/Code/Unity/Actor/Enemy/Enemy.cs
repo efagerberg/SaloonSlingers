@@ -12,7 +12,7 @@ namespace SaloonSlingers.Unity.Actor
         public event EventHandler Death;
         public Deck Deck { get; private set; }
         public HitPoints HitPoints { get; private set; }
-        public HitPoints shieldHitPoints { get; private set; }
+        public HitPoints ShieldHitPoints { get; private set; }
 
         [SerializeField]
         private GameObject shield;
@@ -20,14 +20,14 @@ namespace SaloonSlingers.Unity.Actor
         private void Awake()
         {
             HitPoints = GetComponent<HitPoints>();
-            shieldHitPoints = shield.GetComponent<HitPoints>();
+            ShieldHitPoints = shield.GetComponent<HitPoints>();
             Deck = new Deck().Shuffle();
         }
 
         public void Reset()
         {
             HitPoints.Points.Reset();
-            shieldHitPoints.Points.Reset(0);
+            ShieldHitPoints.Points.Reset(0);
             Deck = new Deck().Shuffle();
         }
 

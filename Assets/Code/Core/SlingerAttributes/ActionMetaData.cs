@@ -6,11 +6,11 @@ namespace SaloonSlingers.Core
         public float CoolDown { get; set; }
         public float RecoveryPeriod { get; set; }
 
-        public ActionMetaData(float duration, float coolDown, float pointRecoveryPeriod)
+        public ActionMetaData(float duration, float coolDown, float recoveryPeriod)
         {
             Duration = duration;
             CoolDown = coolDown;
-            RecoveryPeriod = pointRecoveryPeriod;
+            RecoveryPeriod = recoveryPeriod;
         }
     }
 }

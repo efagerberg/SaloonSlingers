@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Linq;
 
-using SaloonSlingers.Core;
-
 using UnityEngine;
 
 
@@ -10,7 +8,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Peerable : ActionPerformer
     {
-        public Points Points { get; private set; }
+        public float Interval { get; set; } = 0.2f;
 
         [SerializeField]
         private uint startingPeers = 3;
@@ -20,15 +18,11 @@ namespace SaloonSlingers.Unity.Actor
         private float startingDuration = 5f;
         [SerializeField]
         private float startingRecoveryPeriod = 1f;
-        [SerializeField]
-        private float peerInterval = 0.2f;
-
-        private ActionMetaData metaData;
 
         public void CastPeer(VisibilityDetector detector, EnemyHandDisplay display)
         {
 
-            IEnumerator coroutine = GetActionCoroutine(Points, metaData, () => DoPeer(detector, display));
+            IEnumerator coroutine = GetActionCoroutine(() => DoPeer(detector, display));
             if (coroutine == null) return;
 
             StartCoroutine(coroutine);
@@ -40,8 +34,8 @@ namespace SaloonSlingers.Unity.Actor
             Outline lastOutline = null;
             Enemy currentEnemy = null;
             Outline currentOutline = null;
-            float currentDuration = metaData.Duration;
-            var intervalWait = new WaitForSeconds(peerInterval);
+            float currentDuration = MetaData.Duration;
+            var intervalWait = new WaitForSeconds(Interval);
 
             while (currentDuration > 0)
             {
@@ -71,7 +65,7 @@ namespace SaloonSlingers.Unity.Actor
                 lastEnemy = currentEnemy;
                 lastOutline = currentOutline;
                 yield return intervalWait;
-                currentDuration -= peerInterval;
+                currentDuration -= Interval;
             };
             display.SetProjectile(null);
             display.Hide();
@@ -81,7 +75,7 @@ namespace SaloonSlingers.Unity.Actor
         private void Start()
         {
             Points = new(startingPeers);
-            metaData = new(startingDuration, startingCooldown, startingRecoveryPeriod);
+            MetaData = new(startingDuration, startingCooldown, startingRecoveryPeriod);
         }
     }
 }

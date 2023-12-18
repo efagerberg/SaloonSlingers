@@ -19,7 +19,7 @@ namespace SaloonSlingers.Unity.Actor
                 _points ??= new Points(startingPoints, maxPoints);
                 return _points;
             }
-            private set { _points = value; }
+            set { _points = value; }
         }
 
         public static implicit operator uint(HitPoints hp)
