@@ -34,8 +34,8 @@ namespace SaloonSlingers.Unity.Actor
 
             // Assumes the cooldown is always smaller than the recovery period
             // Game-wise this makes sense, why would the player be allowed to regen
-            // points faster than they can use them.
-            yield return new WaitForSeconds(metaData.PointRecoveryPeriod - metaData.CoolDown);
+            // points faster than they can use them?
+            yield return new WaitForSeconds(metaData.RecoveryPeriod - metaData.CoolDown);
             points.Increment();
             canPerformAction = true;
         }
