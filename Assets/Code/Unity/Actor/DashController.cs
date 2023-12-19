@@ -31,7 +31,9 @@ namespace SaloonSlingers.Unity.Actor
         private void HandleDash(InputAction.CallbackContext context)
         {
             if (dashable == null) dashable = GetComponent<Dashable>();
-            dashable.Dash(controller, forwardReference.forward);
+            dashable.Dash(Move, forwardReference.forward);
         }
+
+        private void Move(Vector3 v) => controller.Move(v);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 
 using SaloonSlingers.Core;
@@ -19,7 +20,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float startingPointRecoveryPeriod = 1f;
 
-        public void Dash(CharacterController controller, Vector3 forward)
+        public void Dash(Action<Vector3> moveFunc, Vector3 forward)
         {
             IEnumerator onStart()
             {
@@ -28,7 +29,7 @@ namespace SaloonSlingers.Unity.Actor
                 float currentDuration = MetaData.Duration;
                 while (currentDuration > 0)
                 {
-                    controller.Move(Speed * Time.deltaTime * forward);
+                    moveFunc(Speed * Time.deltaTime * forward);
                     currentDuration -= Time.deltaTime;
                     yield return null;
                 }

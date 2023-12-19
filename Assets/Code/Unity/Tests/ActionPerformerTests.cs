@@ -50,13 +50,13 @@ namespace SaloonSlingers.Unity.Actor.Tests
             var subject = TestUtils.CreateComponent<ActionPerformer>();
             subject.Initialize(points, metaData);
             var actionCoroutine = subject.GetActionCoroutine(testCoroutine);
-            subject.StartCoroutine(actionCoroutine);
+            var runningCoroutine = subject.StartCoroutine(actionCoroutine);
 
             Assert.That(actionCoroutine, Is.Not.Null);
-            yield return new WaitForSeconds(metaData.Duration / 2f);
+            yield return new WaitForSeconds(metaData.Duration);
             Assert.That(ranCoroutine, Is.True);
             Assert.That(points.Value, Is.EqualTo(originalPointCount - 1));
-            yield return new WaitForSeconds((metaData.Duration / 2f) + metaData.RecoveryPeriod);
+            yield return runningCoroutine;
             Assert.That(points.Value, Is.EqualTo(originalPointCount));
         }
 
