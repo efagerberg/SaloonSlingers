@@ -19,9 +19,13 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Awake()
         {
-            HitPoints = GetComponent<HitPoints>();
             ShieldHitPoints = shield.GetComponent<HitPoints>();
             Deck = new Deck().Shuffle();
+        }
+
+        private void Start()
+        {
+            HitPoints = GetComponent<HitPoints>();
         }
 
         public void Reset()

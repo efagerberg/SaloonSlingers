@@ -14,7 +14,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         {
             var hitPoints = TestUtils.CreateComponent<HitPoints>();
             var task = new CheckHealthDamaged();
-            task.HitPoints = hitPoints;
+            task.GameObject = hitPoints.gameObject;
             task.OnAwake();
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Failure));
@@ -25,7 +25,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         {
             var hitPoints = TestUtils.CreateComponent<HitPoints>();
             var task = new CheckHealthDamaged();
-            task.HitPoints = hitPoints;
+            task.GameObject = hitPoints.gameObject;
             task.OnAwake();
             hitPoints.Points.Decrement();
 
@@ -38,7 +38,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         {
             var hitPoints = TestUtils.CreateComponent<HitPoints>();
             var task = new CheckHealthDamaged();
-            task.HitPoints = hitPoints;
+            task.GameObject = hitPoints.gameObject;
             task.OnAwake();
             hitPoints.Points.Decrement();
             task.OnUpdate();

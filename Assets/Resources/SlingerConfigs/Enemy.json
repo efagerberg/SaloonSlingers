@@ -1,8 +1,6 @@
-{
-  "attributes": [
-    {
-      "name": "Health",
-      "value": 3
-    }
-  ]
-}
+[
+  {
+    "type": "health",
+    "value": 3
+  }
+]
