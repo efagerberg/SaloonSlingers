@@ -67,11 +67,12 @@ namespace SaloonSlingers.Unity
 
             else throw new InvalidAttributeError($"Unknown action type {type}");
 
-            ActionMetaData metaData = new(
-                config.Duration,
-                config.Cooldown,
-                config.RecoveryPeriod
-            );
+            ActionMetaData metaData = new()
+            {
+                Duration = config.Duration,
+                Cooldown = config.Cooldown,
+                RecoveryPeriod = config.RecoveryPeriod
+            };
             performer.Initialize(points, metaData);
         }
     }

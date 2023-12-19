@@ -43,9 +43,12 @@ namespace SaloonSlingers.Unity.Actor
         private void Start()
         {
             Points = new Points(startingDashes);
-            MetaData = new(startingDashDuration,
-                startingDashCooldown,
-                startingPointRecoveryPeriod);
+            MetaData = new()
+            {
+                Duration = startingDashDuration,
+                Cooldown = startingDashCooldown,
+                RecoveryPeriod = startingPointRecoveryPeriod
+            };
 
         }
     }

@@ -21,6 +21,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             Points = points;
             MetaData = metaData;
+            canPerformAction &= Points > 0;
         }
 
         public IEnumerator GetActionCoroutine(Func<IEnumerator> action)
@@ -37,13 +38,13 @@ namespace SaloonSlingers.Unity.Actor
             yield return StartCoroutine(action());
             IsPerforming = false;
 
-            yield return new WaitForSeconds(MetaData.CoolDown);
+            yield return new WaitForSeconds(MetaData.Cooldown);
             canPerformAction = Points.Value > 0;
 
             // Assumes the cooldown is always smaller than the recovery period
             // Game-wise this makes sense, why would the player be allowed to regen
             // points faster than they can use them?
-            yield return new WaitForSeconds(MetaData.RecoveryPeriod - MetaData.CoolDown);
+            yield return new WaitForSeconds(MetaData.RecoveryPeriod - MetaData.Cooldown);
             Points.Increment();
             canPerformAction = true;
         }

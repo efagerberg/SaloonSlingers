@@ -75,7 +75,12 @@ namespace SaloonSlingers.Unity.Actor
         private void Start()
         {
             Points = new(startingPeers);
-            MetaData = new(startingDuration, startingCooldown, startingRecoveryPeriod);
+            MetaData = new()
+            {
+                Duration = startingDuration,
+                Cooldown = startingCooldown,
+                RecoveryPeriod = startingRecoveryPeriod
+            };
         }
     }
 }
