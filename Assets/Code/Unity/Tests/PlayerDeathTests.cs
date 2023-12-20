@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 
 using NUnit.Framework;
@@ -19,13 +20,15 @@ namespace SaloonSlingers.Unity.Tests
 
     public class PlayerDeathTests
     {
-        [Test]
+        [UnityTest]
         [RequiresPlayMode]
-        public void DoesNothing_WhenHitPointsRemaining()
+        public IEnumerator DoesNothing_WhenHitPointsRemaining()
         {
             var hitPoints = TestUtils.CreateComponent<HitPoints>();
             var toDisable = TestUtils.CreateComponent<TestBehavior>();
             var subject = hitPoints.gameObject.AddComponent<PlayerDeath>();
+            yield return null;
+
             subject.ComponentsToDisable = new Behaviour[] { toDisable };
             subject.GameOverSceneName = "A fake scene";
             hitPoints.Points.Increase(3);
@@ -35,13 +38,15 @@ namespace SaloonSlingers.Unity.Tests
             Assert.That(EditorSceneManager.GetActiveScene().name, Is.Not.EqualTo(subject.GameOverSceneName));
         }
 
-        [Test]
+        [UnityTest]
         [RequiresPlayMode]
-        public void DoesNothing_WhenDisabled_ThenHitPointsReducedTo0()
+        public IEnumerator DoesNothing_WhenDisabled_ThenHitPointsReducedTo0()
         {
             var hitPoints = TestUtils.CreateComponent<HitPoints>();
             var toDisable = TestUtils.CreateComponent<TestBehavior>();
             var subject = hitPoints.gameObject.AddComponent<PlayerDeath>();
+            yield return null;
+
             subject.ComponentsToDisable = new Behaviour[] { toDisable };
             subject.GameOverSceneName = "A fake scene";
             hitPoints.Points.Increase(3);
@@ -53,13 +58,23 @@ namespace SaloonSlingers.Unity.Tests
             Assert.That(EditorSceneManager.GetActiveScene().name, Is.Not.EqualTo(subject.GameOverSceneName));
         }
 
-        [Test]
+        private static readonly bool[] deathTestInputs = { true, false };
+
+        [UnityTest]
         [RequiresPlayMode]
-        public void StopsLocomotionAndLoadsGameOverScene_WhenHPReaches0()
+        public IEnumerator StopsLocomotionAndLoadsGameOverScene_WhenHPReaches0([ValueSource(nameof(deathTestInputs))] bool checkWorksWhenComponentReset)
         {
             var hitPoints = TestUtils.CreateComponent<HitPoints>();
             var toDisable = TestUtils.CreateComponent<TestBehavior>();
             var subject = hitPoints.gameObject.AddComponent<PlayerDeath>();
+            yield return null;
+
+            if (checkWorksWhenComponentReset)
+            {
+                subject.enabled = false;
+                subject.enabled = true;
+            }
+
             subject.ComponentsToDisable = new Behaviour[] { toDisable };
             subject.GameOverSceneName = "A fake scene";
             hitPoints.Points.Increase(3);

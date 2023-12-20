@@ -24,19 +24,27 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Awake()
         {
-            if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
             if (audioSource == null) audioSource = GetComponent<AudioSource>();
             originalAlpha = hitFlashCanvasGroup.alpha;
         }
 
         private void OnEnable()
         {
+            if (hitPoints == null) return;
+
             hitPoints.Points.Decreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
             hitPoints.Points.Decreased -= OnHitPointsDecreased;
+        }
+
+        private void Start()
+        {
+            if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
+
+            hitPoints.Points.Decreased += OnHitPointsDecreased;
         }
 
         private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)

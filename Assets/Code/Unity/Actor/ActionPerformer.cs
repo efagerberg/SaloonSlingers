@@ -14,30 +14,46 @@ namespace SaloonSlingers.Unity.Actor
     {
         private bool canPerformAction = true;
         protected bool IsPerforming { get; set; }
+        protected Points Points { get; set; }
+        protected ActionMetaData MetaData { get; set; }
 
-        public IEnumerator GetActionCoroutine(Points points, ActionMetaData metaData, Func<IEnumerator> action)
+        private WaitForSeconds cooldownWait;
+        private WaitForSeconds recoveryMinusCooldownWait;
+
+        public void Initialize(Points points, ActionMetaData metaData)
         {
-            if (!canPerformAction) return null;
-            return DoAction(points, metaData, action);
+            Points = points;
+            MetaData = metaData;
+            canPerformAction &= Points > 0;
+            cooldownWait = new WaitForSeconds(metaData.Cooldown);
+            // Assumes the cooldown is always smaller than the recovery period
+            // Game-wise this makes sense, why would the player be allowed to regen
+            // points faster than they can use them?
+            recoveryMinusCooldownWait = new WaitForSeconds(metaData.RecoveryPeriod - metaData.Cooldown);
         }
 
-        private IEnumerator DoAction(Points points, ActionMetaData metaData, Func<IEnumerator> action)
+        public IEnumerator GetActionCoroutine(Func<IEnumerator> action)
         {
+            if (!canPerformAction) return null;
+            return DoAction(action);
+        }
+
+        private IEnumerator DoAction(Func<IEnumerator> action)
+        {
+            Debug.Log("Prod");
+            Debug.Log(MetaData.Duration + MetaData.RecoveryPeriod);
             canPerformAction = false;
-            points.Decrement();
+            Points.Decrement();
             IsPerforming = true;
             yield return StartCoroutine(action());
             IsPerforming = false;
 
-            yield return new WaitForSeconds(metaData.CoolDown);
-            canPerformAction = points.Value > 0;
+            yield return cooldownWait;
+            canPerformAction = Points > 0;
 
-            // Assumes the cooldown is always smaller than the recovery period
-            // Game-wise this makes sense, why would the player be allowed to regen
-            // points faster than they can use them.
-            yield return new WaitForSeconds(metaData.PointRecoveryPeriod - metaData.CoolDown);
-            points.Increment();
-            canPerformAction = true;
+            yield return recoveryMinusCooldownWait;
+            Points.Increment();
+            canPerformAction = Points > 0;
         }
     }
 }

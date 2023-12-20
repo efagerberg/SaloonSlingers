@@ -24,7 +24,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
         {
             if (absorber == null || projectile == null) return TaskStatus.Failure;
 
-            absorber.Absorb(Enemy.Value.shieldHitPoints, projectile);
+            absorber.Absorb(Enemy.Value.ShieldHitPoints, projectile);
             Controller.Value = null;
             return TaskStatus.Success;
         }

@@ -1,0 +1,22 @@
+[
+  {
+    "type": "health",
+    "value": 5
+  },
+  {
+    "type": "dash",
+    "speed": 6,
+    "value": 3,
+    "cooldown": 0.1,
+    "duration": 0.5,
+    "recoveryPeriod": 2
+  },
+  {
+    "type": "peer",
+    "interval": 0.2,
+    "value": 1,
+    "cooldown": 3,
+    "duration": 5,
+    "recoveryPeriod": 6
+  }
+]
