@@ -28,7 +28,7 @@ namespace SaloonSlingers.Core.Tests
         {
             var subject = new Points(1);
             bool eventHandled = false;
-            void handler(Points sender, ValueChangeEvent<uint> e)
+            void handler(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
             {
                 eventHandled = true;
                 Assert.AreEqual(e.Before, 1);
@@ -46,7 +46,7 @@ namespace SaloonSlingers.Core.Tests
         {
             var subject = new Points(1);
             bool eventHandled = false;
-            void handler(Points sender, ValueChangeEvent<uint> e)
+            void handler(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
             {
                 eventHandled = true;
                 Assert.AreEqual(e.Before, 1);
@@ -64,7 +64,7 @@ namespace SaloonSlingers.Core.Tests
         {
             var subject = new Points(0, 1);
             bool eventHandled = false;
-            void handler(Points sender, ValueChangeEvent<uint> e)
+            void handler(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
             {
                 eventHandled = true;
                 Assert.AreEqual(e.Before, 0);
@@ -108,7 +108,7 @@ namespace SaloonSlingers.Core.Tests
             Assert.That<uint>(subject, Is.EqualTo(subject.MaxValue));
         }
 
-        private void FailIfHandled(Points sender, ValueChangeEvent<uint> e)
+        private void FailIfHandled(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
             Assert.Fail($"Handled unexpected event {e}");
         }

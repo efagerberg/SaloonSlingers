@@ -32,7 +32,7 @@ namespace SaloonSlingers.Unity
             hitPoints.Points.Decreased += OnHitPointsDecreased;
         }
 
-        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
             if (e.After != 0) return;
 

@@ -30,7 +30,7 @@ namespace SaloonSlingers.Unity
             projectile.Kill();
         }
 
-        private void CheckStackRegained(Points sender, ValueChangeEvent<uint> e)
+        private void CheckStackRegained(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
             if (e.After != 0) return;
 

@@ -73,13 +73,13 @@ namespace SaloonSlingers.Unity
             gazeUI.transform.rotation = Quaternion.Euler(newRot);
         }
 
-        private void UpdateHealthBar(Points sender, ValueChangeEvent<uint> e)
+        private void UpdateHealthBar(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
             UpdateFill(healthBar, sender);
             healthPercentText.text = sender.AsPercent().ToString("P0");
         }
 
-        private static void UpdateFill(Image image, Points points)
+        private static void UpdateFill(Image image, IReadOnlyPoints points)
         {
             image.fillAmount = points.AsPercent();
         }

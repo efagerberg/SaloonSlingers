@@ -77,7 +77,7 @@ namespace SaloonSlingers.Unity
             absorber.Absorb(shieldHitPoints, projectile);
         }
 
-        private void CheckIfShouldPlug(Points sender, ValueChangeEvent<uint> e)
+        private void CheckIfShouldPlug(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
             if (e.After > 0)
             {

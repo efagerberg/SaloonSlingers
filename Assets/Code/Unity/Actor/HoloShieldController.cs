@@ -88,13 +88,13 @@ namespace SaloonSlingers.Unity
             localCollisionPoint = transform.InverseTransformPoint(collider.ClosestPoint(transform.position));
         }
 
-        private void OnIncrease(Points sender, ValueChangeEvent<uint> e)
+        private void OnIncrease(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
             UpdateShieldStrengthColor();
             if (e.Before == 0) StartCoroutine(nameof(ActivateShield));
         }
 
-        private void OnDecrease(Points sender, ValueChangeEvent<uint> e)
+        private void OnDecrease(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
             if (sender.Value == sender.InitialValue) return;
 
