@@ -2,11 +2,21 @@ using System;
 
 namespace SaloonSlingers.Core
 {
-    public delegate void PointsIncreasedHandler(Points sender, ValueChangeEvent<uint> e);
-    public delegate void PointsDecreasedHandler(Points sender, ValueChangeEvent<uint> e);
+    public delegate void PointsIncreasedHandler(IReadOnlyPoints sender, ValueChangeEvent<uint> e);
+    public delegate void PointsDecreasedHandler(IReadOnlyPoints sender, ValueChangeEvent<uint> e);
+
+    public interface IReadOnlyPoints
+    {
+        uint Value { get; }
+        uint MaxValue { get; }
+        uint InitialValue { get; }
+        event PointsIncreasedHandler Increased;
+        event PointsDecreasedHandler Decreased;
+        float AsPercent();
+    }
 
     [Serializable]
-    public class Points
+    public class Points : IReadOnlyPoints
     {
         public uint Value
         {
@@ -51,10 +61,7 @@ namespace SaloonSlingers.Core
             _value = initial;
         }
 
-        public void Decrement()
-        {
-            Decrease(1);
-        }
+        public void Decrement() => Decrease(1);
 
         public void Decrease(uint amount)
         {
@@ -70,15 +77,12 @@ namespace SaloonSlingers.Core
 
         public float AsPercent()
         {
-            if (_value == 0) return 0;
+            if (Value == 0) return 0;
 
-            return _value / (float)InitialValue;
+            return Value / (float)InitialValue;
         }
 
-        public static implicit operator uint(Points p)
-        {
-            return p.Value;
-        }
+        public static implicit operator uint(Points p) => p.Value;
 
         private uint _value;
     }

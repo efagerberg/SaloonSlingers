@@ -12,24 +12,29 @@ namespace SaloonSlingers.Unity.Actor
     /// </summary>
     public class ActionPerformer : MonoBehaviour
     {
-        private bool canPerformAction = true;
-        protected bool IsPerforming { get; set; }
-        protected Points Points { get; set; }
-        protected ActionMetaData MetaData { get; set; }
+        public ActionMetaData MetaData => metaData;
+        public IReadOnlyPoints Points => points;
 
+        protected bool IsPerforming { get; set; }
+        protected bool IsInitialized { get; private set; } = false;
+        protected Points points;
+        protected ActionMetaData metaData;
+
+        private bool canPerformAction = true;
         private WaitForSeconds cooldownWait;
         private WaitForSeconds recoveryMinusCooldownWait;
 
         public void Initialize(Points points, ActionMetaData metaData)
         {
-            Points = points;
-            MetaData = metaData;
-            canPerformAction &= Points > 0;
+            this.points = points;
+            this.metaData = metaData;
+            canPerformAction &= points > 0;
             cooldownWait = new WaitForSeconds(metaData.Cooldown);
             // Assumes the cooldown is always smaller than the recovery period
             // Game-wise this makes sense, why would the player be allowed to regen
             // points faster than they can use them?
             recoveryMinusCooldownWait = new WaitForSeconds(metaData.RecoveryPeriod - metaData.Cooldown);
+            IsInitialized = true;
         }
 
         public IEnumerator GetActionCoroutine(Func<IEnumerator> action)
@@ -40,20 +45,18 @@ namespace SaloonSlingers.Unity.Actor
 
         private IEnumerator DoAction(Func<IEnumerator> action)
         {
-            Debug.Log("Prod");
-            Debug.Log(MetaData.Duration + MetaData.RecoveryPeriod);
             canPerformAction = false;
-            Points.Decrement();
+            points.Decrement();
             IsPerforming = true;
             yield return StartCoroutine(action());
             IsPerforming = false;
 
             yield return cooldownWait;
-            canPerformAction = Points > 0;
+            canPerformAction = points > 0;
 
             yield return recoveryMinusCooldownWait;
-            Points.Increment();
-            canPerformAction = Points > 0;
+            points.Increment();
+            canPerformAction = points > 0;
         }
     }
 }

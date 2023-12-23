@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Linq;
 
+using SaloonSlingers.Core;
+
 using UnityEngine;
 
 
@@ -74,13 +76,16 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            Points = new(startingPeers);
-            MetaData = new()
+            if (IsInitialized) return;
+
+            Points points = new(startingPeers);
+            ActionMetaData metaData = new()
             {
                 Duration = startingDuration,
                 Cooldown = startingCooldown,
                 RecoveryPeriod = startingRecoveryPeriod
             };
+            Initialize(points, metaData);
         }
     }
 }

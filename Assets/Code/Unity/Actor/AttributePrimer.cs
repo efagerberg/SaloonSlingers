@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-
-using Newtonsoft.Json;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
@@ -11,73 +8,81 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
-    public class InvalidAttributeError : Exception
+    using RawTypeToTypeMeta = IReadOnlyDictionary<string, (bool isActive, int enumVal)>;
+
+    public static class AttributePrimer
     {
-        public InvalidAttributeError() { }
-
-        public InvalidAttributeError(string message) : base(message) { }
-    }
-
-
-    public class AttributePrimer : MonoBehaviour
-    {
-        [SerializeField]
-        private TextAsset slingerConfigAsset;
-
-        private void Awake() => LoadConfig();
-
-        private void LoadConfig()
+        public static void Prime(IEnumerable<AttributeConfig> configs, GameObject root)
         {
-            var configs = JsonConvert.DeserializeObject<List<Config>>(slingerConfigAsset.text);
-
             foreach (var config in configs)
             {
-                string type = config.Type;
+                string rawType = config.Type;
+                var found = RawTypeToTypeMeta.TryGetValue(rawType, out var typeMetaData);
+                if (!found) throw new InvalidAttributeError($"Unknown attribute type {rawType}");
+
                 uint value = config.Value;
                 Points points = new(value);
-                string[] actionTypes = { "dash", "peer" };
-
-                if (actionTypes.Contains(type))
-                    ParseAction(type, points, config);
-                else if (type == "health")
+                if (typeMetaData.isActive)
                 {
-                    var hp = gameObject.AddComponent<HitPoints>();
-                    hp.Points = points;
+                    ActiveAttributeType type = (ActiveAttributeType)typeMetaData.enumVal;
+                    var performer = ParseActionPerformer(type, config, root);
+                    ActionMetaData metaData = new()
+                    {
+                        Duration = config.Duration,
+                        Cooldown = config.Cooldown,
+                        RecoveryPeriod = config.RecoveryPeriod
+                    };
+                    performer.Initialize(points, metaData);
                 }
-                else throw new InvalidAttributeError($"Unknown attribute type {type}");
+                else
+                {
+                    PassiveAttributeType type = (PassiveAttributeType)typeMetaData.enumVal;
+                    if (type == PassiveAttributeType.Health)
+                    {
+                        var hp = root.AddComponent<HitPoints>();
+                        hp.Points = points;
+                    }
+                }
             }
-
         }
 
-        private void ParseAction(string type, Points points, Config config)
+        private static ActionPerformer ParseActionPerformer(ActiveAttributeType type, AttributeConfig config, GameObject root)
         {
-            ActionPerformer performer;
-            if (type == "dash")
+            ActionPerformer performer = null;
+            if (type == ActiveAttributeType.Dash)
             {
-                var dashable = gameObject.AddComponent<Dashable>();
+                var dashable = root.AddComponent<Dashable>();
                 dashable.Speed = config.Speed;
                 performer = dashable;
             }
-            else if (type == "peer")
+            else if (type == ActiveAttributeType.Peer)
             {
-                var peerable = gameObject.AddComponent<Peerable>();
+                var peerable = root.AddComponent<Peerable>();
                 peerable.Interval = config.Interval;
                 performer = peerable;
             }
-
-            else throw new InvalidAttributeError($"Unknown action type {type}");
-
-            ActionMetaData metaData = new()
-            {
-                Duration = config.Duration,
-                Cooldown = config.Cooldown,
-                RecoveryPeriod = config.RecoveryPeriod
-            };
-            performer.Initialize(points, metaData);
+            return performer;
         }
+
+        private static readonly RawTypeToTypeMeta RawTypeToTypeMeta = new Dictionary<string, (bool isActive, int enumValue)>() {
+            { "health", (false, (int)PassiveAttributeType.Health) },
+            { "dash", (true, (int)ActiveAttributeType.Dash) },
+            { "peer", (true, (int)ActiveAttributeType.Peer) },
+        };
     }
 
-    class Config
+    public enum PassiveAttributeType
+    {
+        Health,
+    };
+
+    public enum ActiveAttributeType
+    {
+        Peer,
+        Dash
+    }
+
+    public class AttributeConfig
     {
         public string Type { get; set; }
         public uint Value { get; set; }
@@ -86,5 +91,12 @@ namespace SaloonSlingers.Unity
         public float RecoveryPeriod { get; set; }
         public float Speed { get; set; }
         public float Interval { get; set; }
+    }
+
+    public class InvalidAttributeError : Exception
+    {
+        public InvalidAttributeError() { }
+
+        public InvalidAttributeError(string message) : base(message) { }
     }
 }

@@ -47,7 +47,7 @@ namespace SaloonSlingers.Unity.Actor
             hitPoints.Points.Decreased += OnHitPointsDecreased;
         }
 
-        private void OnHitPointsDecreased(Points sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
             flashCoroutine = Flash(hitFlashCanvasGroup, originalAlpha, 0, duration, flashCoroutine);
             audioSource.PlayOneShot(hitSoundFX);
