@@ -1,26 +1,26 @@
 using BehaviorDesigner.Runtime.Tasks;
 
-using SaloonSlingers.Unity.Actor;
+using SaloonSlingers.Core;
+using SaloonSlingers.Unity;
 
 namespace SaloonSlingers.BehaviorDesignerExtensions
 {
     public class CheckHealthDamaged : Conditional
     {
-        private HitPoints hitPoints;
+        public IReadOnlyPoints HitPoints { get; set; }
         private uint currentPoints;
 
         public override void OnAwake()
         {
-            if (hitPoints == null)
-                hitPoints = GetComponent<HitPoints>();
-            currentPoints = hitPoints;
+            HitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
+            currentPoints = HitPoints.Value;
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (currentPoints > hitPoints)
+            if (currentPoints > HitPoints.Value)
             {
-                currentPoints = hitPoints;
+                currentPoints = HitPoints.Value;
                 return TaskStatus.Success;
             }
             return TaskStatus.Failure;

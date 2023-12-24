@@ -8,23 +8,26 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity
 {
-    using RawTypeToTypeMeta = IReadOnlyDictionary<string, (bool isActive, int enumVal)>;
+    using RawTypeToTypeMeta = IReadOnlyDictionary<string, (bool forAction, AttributeType type)>;
 
     public static class AttributePrimer
     {
         public static void Prime(IEnumerable<AttributeConfig> configs, GameObject root)
         {
+            var attributes = root.AddComponent<Attributes>();
             foreach (var config in configs)
             {
                 string rawType = config.Type;
-                var found = RawTypeToTypeMeta.TryGetValue(rawType, out var typeMetaData);
-                if (!found) throw new InvalidAttributeError($"Unknown attribute type {rawType}");
+                var found = PointMetaDataLookup.TryGetValue(rawType, out var typeMetaData);
+                if (!found) throw new InvalidAttributeError($"Unknown point type {rawType}");
 
                 uint value = config.Value;
                 Points points = new(value);
-                if (typeMetaData.isActive)
+                attributes.Registry.Add(typeMetaData.type, points);
+
+                if (typeMetaData.forAction)
                 {
-                    ActiveAttributeType type = (ActiveAttributeType)typeMetaData.enumVal;
+                    AttributeType type = typeMetaData.type;
                     var performer = ParseActionPerformer(type, config, root);
                     ActionMetaData metaData = new()
                     {
@@ -34,28 +37,19 @@ namespace SaloonSlingers.Unity
                     };
                     performer.Initialize(points, metaData);
                 }
-                else
-                {
-                    PassiveAttributeType type = (PassiveAttributeType)typeMetaData.enumVal;
-                    if (type == PassiveAttributeType.Health)
-                    {
-                        var hp = root.AddComponent<HitPoints>();
-                        hp.Points = points;
-                    }
-                }
             }
         }
 
-        private static ActionPerformer ParseActionPerformer(ActiveAttributeType type, AttributeConfig config, GameObject root)
+        private static ActionPerformer ParseActionPerformer(AttributeType type, AttributeConfig config, GameObject root)
         {
             ActionPerformer performer = null;
-            if (type == ActiveAttributeType.Dash)
+            if (type == AttributeType.Dash)
             {
                 var dashable = root.AddComponent<Dashable>();
                 dashable.Speed = config.Speed;
                 performer = dashable;
             }
-            else if (type == ActiveAttributeType.Peer)
+            else if (type == AttributeType.Peer)
             {
                 var peerable = root.AddComponent<Peerable>();
                 peerable.Interval = config.Interval;
@@ -64,20 +58,18 @@ namespace SaloonSlingers.Unity
             return performer;
         }
 
-        private static readonly RawTypeToTypeMeta RawTypeToTypeMeta = new Dictionary<string, (bool isActive, int enumValue)>() {
-            { "health", (false, (int)PassiveAttributeType.Health) },
-            { "dash", (true, (int)ActiveAttributeType.Dash) },
-            { "peer", (true, (int)ActiveAttributeType.Peer) },
+        private static readonly RawTypeToTypeMeta PointMetaDataLookup = new Dictionary<string, (bool forAction, AttributeType type)>() {
+            { "health", (false, AttributeType.Health) },
+            { "money", (false, AttributeType.Money) },
+            { "dash", (true, AttributeType.Dash) },
+            { "peer", (true, AttributeType.Peer) },
         };
     }
 
-    public enum PassiveAttributeType
+    public enum AttributeType
     {
         Health,
-    };
-
-    public enum ActiveAttributeType
-    {
+        Money,
         Peer,
         Dash
     }

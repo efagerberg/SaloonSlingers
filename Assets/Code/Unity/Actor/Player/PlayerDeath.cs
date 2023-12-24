@@ -1,5 +1,4 @@
 using SaloonSlingers.Core;
-using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 
@@ -7,29 +6,27 @@ namespace SaloonSlingers.Unity
 {
     public class PlayerDeath : MonoBehaviour
     {
+        public IReadOnlyPoints HitPoints { get; set; }
+
         public string GameOverSceneName;
         public Behaviour[] ComponentsToDisable;
 
-        [SerializeField]
-        private HitPoints hitPoints;
-
         private void OnEnable()
         {
-            if (hitPoints == null) return;
+            if (HitPoints == null) return;
 
-            hitPoints.Points.Decreased += OnHitPointsDecreased;
+            HitPoints.Decreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
-            hitPoints.Points.Decreased -= OnHitPointsDecreased;
+            HitPoints.Decreased -= OnHitPointsDecreased;
         }
 
         private void Start()
         {
-            if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
-
-            hitPoints.Points.Decreased += OnHitPointsDecreased;
+            HitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
+            HitPoints.Decreased += OnHitPointsDecreased;
         }
 
         private void OnHitPointsDecreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)

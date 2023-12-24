@@ -11,27 +11,30 @@ namespace SaloonSlingers.Unity.Actor
     {
         public event EventHandler Death;
         public Deck Deck { get; private set; }
-        public HitPoints HitPoints { get; private set; }
-        public HitPoints ShieldHitPoints { get; private set; }
+        public Points ShieldHitPoints { get; private set; }
 
         [SerializeField]
         private GameObject shield;
+        [SerializeField]
+        private HoloShieldController holoShieldController;
+
+        private Points HitPoints { get; set; }
 
         private void Awake()
         {
-            ShieldHitPoints = shield.GetComponent<HitPoints>();
             Deck = new Deck().Shuffle();
         }
 
         private void Start()
         {
-            HitPoints = GetComponent<HitPoints>();
+            HitPoints = GetComponent<Attributes>().Registry[AttributeType.Health];
+            ShieldHitPoints = holoShieldController.HitPoints;
         }
 
         public void Reset()
         {
-            HitPoints.Points.Reset();
-            ShieldHitPoints.Points.Reset(0);
+            HitPoints.Reset();
+            ShieldHitPoints.Reset(0);
             Deck = new Deck().Shuffle();
         }
 

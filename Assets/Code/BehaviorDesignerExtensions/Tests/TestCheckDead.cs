@@ -2,8 +2,7 @@ using BehaviorDesigner.Runtime.Tasks;
 
 using NUnit.Framework;
 
-using SaloonSlingers.Unity.Actor;
-using SaloonSlingers.Unity.Tests;
+using SaloonSlingers.Core;
 
 namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
 {
@@ -12,8 +11,10 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         [Test]
         public void WhenHealthPointsSame_ReturnFailure()
         {
-            var task = new CheckDead();
-            task.HitPoints = TestUtils.CreateComponent<HitPoints>();
+            var task = new CheckDead
+            {
+                HitPoints = new Points(1)
+            };
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Failure));
         }
@@ -21,11 +22,12 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         [Test]
         public void WhenHealthPointsDecreasedButNot0_ReturnFailure()
         {
-            var task = new CheckDead();
-            var hitPoints = TestUtils.CreateComponent<HitPoints>();
-            hitPoints.Points.Reset(10);
-            task.HitPoints = hitPoints;
-            hitPoints.Points.Decrement();
+            var hitPoints = new Points(2);
+            var task = new CheckDead
+            {
+                HitPoints = hitPoints
+            };
+            hitPoints.Decrement();
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Failure));
         }
@@ -33,11 +35,12 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         [Test]
         public void WhenHealthPointsDecreasedTo0_ReturnsSuccess()
         {
-            var task = new CheckDead();
-            var hitPoints = TestUtils.CreateComponent<HitPoints>();
-            hitPoints.Points.Reset(1);
-            task.HitPoints = hitPoints;
-            hitPoints.Points.Decrement();
+            var hitPoints = new Points(2);
+            var task = new CheckDead()
+            {
+                HitPoints = hitPoints
+            };
+            hitPoints.Decrease(2);
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Success));
         }

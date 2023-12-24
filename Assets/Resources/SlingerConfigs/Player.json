@@ -4,6 +4,10 @@
     "value": 5
   },
   {
+    "type": "money",
+    "value": 1000,
+  },
+  {
     "type": "dash",
     "speed": 6,
     "value": 3,

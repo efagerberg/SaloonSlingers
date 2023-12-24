@@ -1,5 +1,4 @@
 using SaloonSlingers.Core;
-using SaloonSlingers.Unity.Actor;
 
 using TMPro;
 
@@ -20,30 +19,30 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private float fadeDuration = 0.5f;
 
-        private HitPoints hitPoints;
         private Transform gazer;
+        private Points hitPoints;
 
         private void Awake()
         {
-            hitPoints = LevelManager.Instance.Player.GetComponent<HitPoints>();
-            hitPoints.Points.Increased += UpdateHealthBar;
-            hitPoints.Points.Decreased += UpdateHealthBar;
-            UpdateFill(healthBar, hitPoints.Points);
-            healthPercentText.text = hitPoints.Points.AsPercent().ToString("P0");
+            hitPoints = LevelManager.Instance.Player.GetComponent<Attributes>().Registry[AttributeType.Health];
+            hitPoints.Increased += UpdateHealthBar;
+            hitPoints.Decreased += UpdateHealthBar;
+            UpdateFill(healthBar, hitPoints);
+            healthPercentText.text = hitPoints.AsPercent().ToString("P0");
             healthPercentText.color = healthBar.color;
             gazeUI.alpha = 0f;
         }
 
         private void OnEnable()
         {
-            hitPoints.Points.Increased += UpdateHealthBar;
-            hitPoints.Points.Decreased += UpdateHealthBar;
+            hitPoints.Increased += UpdateHealthBar;
+            hitPoints.Decreased += UpdateHealthBar;
         }
 
         private void OnDisable()
         {
-            hitPoints.Points.Increased -= UpdateHealthBar;
-            hitPoints.Points.Decreased -= UpdateHealthBar;
+            hitPoints.Increased -= UpdateHealthBar;
+            hitPoints.Decreased -= UpdateHealthBar;
         }
 
         public void OnGazeEnter(HoverEnterEventArgs args)
