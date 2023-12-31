@@ -44,7 +44,7 @@ namespace SaloonSlingers.Unity
             var origin = LevelManager.Instance.Player.GetComponent<XROrigin>();
             shieldHitPoints = origin.Camera.transform.parent.GetComponentInChildren<HoloShieldController>().HitPoints;
 
-            var plugInstance = new GameObject();
+            var plugInstance = new GameObject("Hand Absorber Plug");
             plugInteractable = plugInstance.AddComponent<XRSimpleInteractable>();
             plugInteractable.interactionLayers = InteractionLayerMask.GetMask("DirectInteract");
             plugInteractable.transform.gameObject.SetActive(false);
