@@ -74,7 +74,7 @@ namespace SaloonSlingers.Unity
         Dash
     }
 
-    public class AttributeConfig
+    public struct AttributeConfig
     {
         public string Type { get; set; }
         public uint Value { get; set; }

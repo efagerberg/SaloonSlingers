@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 using UnityEngine;
 
@@ -8,31 +7,34 @@ namespace SaloonSlingers.Unity.Actor
     public class HandInitializer : MonoBehaviour
     {
         [SerializeField]
-        private Transform leftDeckAttachTransform;
-        [SerializeField]
         private Transform rightDeckAttachTransform;
+        [SerializeField]
+        private Transform leftDeckAttachTransform;
         [SerializeField]
         private GameObject deckGraphicPrefab;
         [SerializeField]
-        private Transform leftAbsorberAttachTransform;
-        [SerializeField]
         private Transform rightAbsorberAttachTransform;
+        [SerializeField]
+        private Transform leftAbsorberAttachTransform;
         [SerializeField]
         private GameObject absorberPrefab;
         [SerializeField]
-        private Transform enemyPeerPanelAttachTransform;
+        private Transform rightEnemyPeerPanelAttachTransform;
+        [SerializeField]
+        private Transform leftEnemyPeerPanelAttachTransform;
         [SerializeField]
         private GameObject enemyPeerPanelPrefab;
         [SerializeField]
-        private Transform leftShieldAttachTransform;
-        [SerializeField]
         private Transform rightShieldAttachTransform;
+        [SerializeField]
+        private Transform leftShieldAttachTransform;
         [SerializeField]
         private GameObject shieldPrefab;
 
         private Transform deckAttachTransform;
         private Transform absorberAttachTransform;
         private Transform shieldAttachTransform;
+        private Transform enemyPeerPanelAttachTransform;
         private bool isPrimary = false;
 
         private void Start()
@@ -44,11 +46,13 @@ namespace SaloonSlingers.Unity.Actor
                     deckAttachTransform = leftDeckAttachTransform;
                     absorberAttachTransform = leftAbsorberAttachTransform;
                     shieldAttachTransform = leftShieldAttachTransform;
+                    enemyPeerPanelAttachTransform = leftEnemyPeerPanelAttachTransform;
                     break;
                 case Handedness.LEFT:
                     deckAttachTransform = rightDeckAttachTransform;
                     absorberAttachTransform = rightAbsorberAttachTransform;
                     shieldAttachTransform = rightShieldAttachTransform;
+                    enemyPeerPanelAttachTransform = rightEnemyPeerPanelAttachTransform;
                     break;
             }
 
@@ -56,22 +60,21 @@ namespace SaloonSlingers.Unity.Actor
                 handedness.Current.ToString(),
                 System.StringComparison.CurrentCultureIgnoreCase
             );
-            var instantiated = new List<GameObject>();
+            List<GameObject> instantiated = new();
             if (!isPrimary)
             {
-                GameObject deckGraphicGO = Instantiate(deckGraphicPrefab, deckAttachTransform);
-                handedness.DeckGraphic = deckGraphicGO.GetComponent<DeckGraphic>();
+                var deckGraphicGO = Instantiate(deckGraphicPrefab, deckAttachTransform);
                 var absorberGO = Instantiate(absorberPrefab, absorberAttachTransform);
                 var shieldGO = Instantiate(shieldPrefab, shieldAttachTransform);
-                instantiated.Append(absorberGO);
-                instantiated.Append(shieldGO);
-                instantiated.Append(deckGraphicGO);
-            }
-            else
-            {
-                GameObject clone = Instantiate(enemyPeerPanelPrefab, enemyPeerPanelAttachTransform);
-                handedness.EnemyPeerDisplay = clone.GetComponent<EnemyHandDisplay>();
-                instantiated.Append(clone);
+                var peerPanelGO = Instantiate(enemyPeerPanelPrefab, enemyPeerPanelAttachTransform);
+
+                handedness.DeckGraphic = deckGraphicGO.GetComponent<DeckGraphic>();
+                handedness.EnemyPeerDisplay = peerPanelGO.GetComponent<EnemyHandDisplay>();
+
+                instantiated.Add(absorberGO);
+                instantiated.Add(shieldGO);
+                instantiated.Add(deckGraphicGO);
+                instantiated.Add(peerPanelGO);
             }
 
             foreach (var instance in instantiated)

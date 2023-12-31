@@ -24,11 +24,8 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Update()
         {
-            if (!IsDisplaying || projectile == null ||
-                projectile.Cards.Count <= 0 || lastEvaluation.Equals(projectile.HandEvaluation))
+            if (!IsDisplaying || projectile == null || lastEvaluation.Equals(projectile.HandEvaluation))
                 return;
-
-            if (projectile.HandEvaluation.Name == HandNames.NONE) return;
 
             UpdateContents(projectile.HandEvaluation);
 

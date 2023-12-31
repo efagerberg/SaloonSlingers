@@ -5,7 +5,7 @@
   },
   {
     "type": "money",
-    "value": 1000,
+    "value": 1000
   },
   {
     "type": "dash",
@@ -20,7 +20,7 @@
     "interval": 0.2,
     "value": 1,
     "cooldown": 3,
-    "duration": 5,
+    "duration": 10,
     "recoveryPeriod": 6
   }
 ]

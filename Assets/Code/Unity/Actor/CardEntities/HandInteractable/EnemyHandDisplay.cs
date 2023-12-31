@@ -13,9 +13,10 @@ namespace SaloonSlingers.Unity.Actor
         private GameObject enemyPeerPanel;
         [SerializeField]
         private GameObject enemyPeerCardPrefab;
-
-        private TextMeshProUGUI handValueText;
+        [SerializeField]
         private LayoutGroup peerOtherCardLayoutGroup;
+        [SerializeField]
+        private TextMeshProUGUI handValueText;
 
         public void SetProjectile(HandProjectile projectile)
         {
@@ -26,6 +27,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             base.Hide();
             enemyPeerPanel.SetActive(false);
+            handValueText.text = "";
             projectile = null;
         }
 
@@ -38,8 +40,6 @@ namespace SaloonSlingers.Unity.Actor
         protected override void UpdateContents(HandEvaluation evaluation)
         {
             handValueText.text = evaluation.DisplayName();
-
-            LayoutGroup peerOtherCardLayoutGroup = enemyPeerPanel.GetComponentInChildren<LayoutGroup>();
 
             int nCards = projectile.Cards.Count;
             int delta = nCards - peerOtherCardLayoutGroup.transform.childCount;
@@ -68,8 +68,6 @@ namespace SaloonSlingers.Unity.Actor
         private void Start()
         {
             Hide();
-            handValueText = enemyPeerPanel.GetComponentInImmediateChildren<TextMeshProUGUI>();
-            peerOtherCardLayoutGroup = enemyPeerPanel.GetComponentInChildren<LayoutGroup>();
         }
     }
 }
