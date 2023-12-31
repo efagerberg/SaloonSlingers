@@ -36,14 +36,14 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnDisable()
         {
+            if (hitPoints == null) return;
+
             hitPoints.Decreased -= OnHitPointsDecreased;
         }
 
         private void Start()
         {
-            if (hitPoints == null)
-                hitPoints = GetComponent<Attributes>().Registry[AttributeType.Health];
-
+            hitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
             hitPoints.Decreased += OnHitPointsDecreased;
         }
 

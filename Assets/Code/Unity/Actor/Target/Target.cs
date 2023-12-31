@@ -15,7 +15,6 @@ namespace SaloonSlingers.Unity.Actor
         private float raycastDistance = 0.1f;
 
         private Points hitPoints;
-        private Rigidbody rb;
         private bool switchDirection = false;
 
         public void Reset()
@@ -23,20 +22,24 @@ namespace SaloonSlingers.Unity.Actor
             hitPoints.Reset();
         }
 
-        private void Awake()
-        {
-            hitPoints = GetComponent<Attributes>().Registry[AttributeType.Health];
-            rb = GetComponent<Rigidbody>();
-        }
-
         private void OnEnable()
         {
+            if (hitPoints == null) return;
+
             hitPoints.Decreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
+            if (hitPoints == null) return;
+
             hitPoints.Decreased -= OnHitPointsDecreased;
+        }
+
+        private void Start()
+        {
+            hitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
+            hitPoints.Decreased += OnHitPointsDecreased;
         }
 
         private void OnHitPointsDecreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
