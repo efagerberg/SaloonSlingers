@@ -21,29 +21,31 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float startingRecoveryPeriod = 1f;
 
-        public void CastPeer(VisibilityDetector detector, EnemyHandDisplay display)
+        private const float Y_OFFSET = 0.075f;
+        private const float UI_DISTANCE = 0.3f;
+
+        public void CastPeer(VisibilityDetector detector, EnemyHandDisplay display, Transform peererTransform)
         {
 
-            IEnumerator coroutine = GetActionCoroutine(() => DoPeer(detector, display));
+            IEnumerator coroutine = GetActionCoroutine(() => DoPeer(detector, display, peererTransform));
             if (coroutine == null) return;
 
             StartCoroutine(coroutine);
         }
 
-        private IEnumerator DoPeer(VisibilityDetector detector, EnemyHandDisplay display)
+        private IEnumerator DoPeer(VisibilityDetector detector, EnemyHandDisplay display, Transform peererTransform)
         {
             Enemy lastEnemy = null;
             Outline lastOutline = null;
-            Enemy currentEnemy = null;
             Outline currentOutline = null;
+            Enemy currentEnemy = null;
             float currentDuration = MetaData.Duration;
-            var intervalWait = new WaitForSeconds(Interval);
             display.Show();
 
             while (currentDuration > 0)
             {
-                var closest = detector.GetVisible(LayerMask.GetMask("Enemy"), xRay: true)
-                                                .FirstOrDefault();
+                var closest = (detector.GetVisible(LayerMask.GetMask("Enemy"), xRay: true)
+                                       .FirstOrDefault());
 
                 if (closest == null)
                 {
@@ -66,8 +68,16 @@ namespace SaloonSlingers.Unity.Actor
                 if (lastOutline != null && currentOutline != lastOutline) lastOutline.enabled = false;
                 lastEnemy = currentEnemy;
                 lastOutline = currentOutline;
-                yield return intervalWait;
-                currentDuration -= Interval;
+                var intervalDuration = 0f;
+                while (intervalDuration < Interval && currentEnemy != null)
+                {
+                    var directionToEnemy = currentEnemy.transform.position - peererTransform.position;
+                    var desiredPosition = peererTransform.position + directionToEnemy.normalized * UI_DISTANCE + new Vector3(0, Y_OFFSET, 0);
+                    display.transform.position = desiredPosition;
+                    intervalDuration += Time.deltaTime;
+                    yield return null;
+                }
+                currentDuration -= intervalDuration;
             };
             display.Hide();
             if (lastEnemy != null) lastOutline.enabled = false;

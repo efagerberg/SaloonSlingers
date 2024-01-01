@@ -15,7 +15,9 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private VisibilityDetector visibilityDetector;
         [SerializeField]
-        private ActorHandedness handedness;
+        private EnemyHandDisplay enemyHandDisplay;
+        [SerializeField]
+        private Transform peererTransform;
 
         private void OnEnable()
         {
@@ -32,7 +34,7 @@ namespace SaloonSlingers.Unity.Actor
         private void HandlePeer(InputAction.CallbackContext _)
         {
             if (peerable == null) peerable = GetComponent<Peerable>();
-            peerable.CastPeer(visibilityDetector, handedness.EnemyPeerDisplay);
+            peerable.CastPeer(visibilityDetector, enemyHandDisplay, peererTransform);
         }
 
         private void Awake()
