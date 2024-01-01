@@ -10,13 +10,13 @@ namespace SaloonSlingers.Unity.Actor
     public class EnemyHandDisplay : HandDisplay
     {
         [SerializeField]
-        private GameObject enemyPeerPanel;
-        [SerializeField]
         private GameObject enemyPeerCardPrefab;
         [SerializeField]
         private LayoutGroup peerOtherCardLayoutGroup;
         [SerializeField]
         private TextMeshProUGUI handValueText;
+
+        private Canvas canvas;
 
         public void SetProjectile(HandProjectile projectile)
         {
@@ -26,19 +26,22 @@ namespace SaloonSlingers.Unity.Actor
         public override void Hide()
         {
             base.Hide();
-            enemyPeerPanel.SetActive(false);
+            canvas.enabled = false;
             handValueText.text = "";
-            projectile = null;
         }
 
         public override void Show()
         {
-            enemyPeerPanel.SetActive(true);
+            canvas.enabled = true;
             base.Show();
         }
 
         protected override void UpdateContents(HandEvaluation evaluation)
         {
+            var hasValueToDisplay = evaluation.Name != HandNames.NONE;
+            canvas.enabled = hasValueToDisplay;
+            if (!hasValueToDisplay) return;
+
             handValueText.text = evaluation.DisplayName();
 
             int nCards = projectile.Cards.Count;
@@ -63,6 +66,11 @@ namespace SaloonSlingers.Unity.Actor
 
                 element.gameObject.SetActive(true);
             }
+        }
+
+        private void Awake()
+        {
+            canvas = GetComponentInChildren<Canvas>();
         }
 
         private void Start()

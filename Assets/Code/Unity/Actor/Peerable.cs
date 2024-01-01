@@ -38,6 +38,7 @@ namespace SaloonSlingers.Unity.Actor
             Outline currentOutline = null;
             float currentDuration = MetaData.Duration;
             var intervalWait = new WaitForSeconds(Interval);
+            display.Show();
 
             while (currentDuration > 0)
             {
@@ -61,7 +62,6 @@ namespace SaloonSlingers.Unity.Actor
                         currentOutline.enabled = true;
                     }
                 }
-                display.Show();
 
                 if (lastOutline != null && currentOutline != lastOutline) lastOutline.enabled = false;
                 lastEnemy = currentEnemy;
@@ -69,7 +69,6 @@ namespace SaloonSlingers.Unity.Actor
                 yield return intervalWait;
                 currentDuration -= Interval;
             };
-            display.SetProjectile(null);
             display.Hide();
             if (lastEnemy != null) lastOutline.enabled = false;
         }
