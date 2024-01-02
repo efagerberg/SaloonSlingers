@@ -3,6 +3,8 @@ using BehaviorDesigner.Runtime.Tasks;
 using NUnit.Framework;
 
 using SaloonSlingers.Core;
+using SaloonSlingers.Unity;
+using SaloonSlingers.Unity.Tests;
 
 namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
 {
@@ -43,6 +45,24 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
             hitPoints.Decrease(2);
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Success));
+        }
+
+        [Test]
+        public void WhenHasAttributes_OnAwake_UsesAttributeHealth()
+        {
+            var attributes = TestUtils.CreateComponent<Attributes>();
+            var points = new Points(1);
+            attributes.Registry[AttributeType.Health] = points;
+            var task = new CheckDead
+            {
+                GameObject = attributes.gameObject
+            };
+            task.OnAwake();
+
+            Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Failure));
+            points.Decrease(1);
+            Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Success));
+
         }
     }
 }
