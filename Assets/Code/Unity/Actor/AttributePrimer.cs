@@ -22,7 +22,7 @@ namespace SaloonSlingers.Unity
                 if (!found) throw new InvalidAttributeError($"Unknown point type {rawType}");
 
                 uint value = config.Value;
-                Points points = new(value);
+                Points points = new(value, uint.MaxValue);
                 attributes.Registry.Add(typeMetaData.type, points);
 
                 if (typeMetaData.forAction)

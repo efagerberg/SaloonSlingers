@@ -4,72 +4,55 @@ using TMPro;
 
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity
 {
-    public class HealthUI : MonoBehaviour
+    public class PlayerAttributeUI : MonoBehaviour
     {
         [SerializeField]
         private Image healthBar;
         [SerializeField]
         private TextMeshProUGUI healthPercentText;
         [SerializeField]
-        private CanvasGroup gazeUI;
-        [SerializeField]
-        private float fadeDuration = 0.5f;
+        private TextMeshProUGUI moneyText;
 
-        private Transform gazer;
         private Points hitPoints;
+        private Points money;
 
         private void Awake()
         {
-            hitPoints = LevelManager.Instance.Player.GetComponent<Attributes>().Registry[AttributeType.Health];
+            var attributes = LevelManager.Instance.Player.GetComponent<Attributes>();
+            hitPoints = attributes.Registry[AttributeType.Health];
             hitPoints.Increased += UpdateHealthBar;
             hitPoints.Decreased += UpdateHealthBar;
             UpdateFill(healthBar, hitPoints);
             healthPercentText.text = hitPoints.AsPercent().ToString("P0");
-            healthPercentText.color = healthBar.color;
-            gazeUI.alpha = 0f;
+
+            money = attributes.Registry[AttributeType.Money];
+            money.Increased += UpdateMoneyText;
+            money.Decreased += UpdateMoneyText;
+            moneyText.text = money.Value.ToString();
         }
 
         private void OnEnable()
         {
             hitPoints.Increased += UpdateHealthBar;
             hitPoints.Decreased += UpdateHealthBar;
+            money.Increased += UpdateMoneyText;
+            money.Decreased += UpdateMoneyText;
         }
 
         private void OnDisable()
         {
             hitPoints.Increased -= UpdateHealthBar;
             hitPoints.Decreased -= UpdateHealthBar;
+            money.Increased -= UpdateMoneyText;
+            money.Decreased -= UpdateMoneyText;
         }
 
-        public void OnGazeEnter(HoverEnterEventArgs args)
+        private void UpdateMoneyText(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
-            gazer = args.interactorObject.transform;
-
-            if (!gameObject.activeInHierarchy) return;
-
-            StartCoroutine(Fader.Fade((alpha) => gazeUI.alpha = alpha, fadeDuration, 1));
-        }
-
-        public void OnGazeExit()
-        {
-            gazer = null;
-
-            if (!gameObject.activeInHierarchy) return;
-
-            StartCoroutine(Fader.Fade((alpha) => gazeUI.alpha = alpha, fadeDuration, 0));
-        }
-
-        private void Update()
-        {
-            if (gazer == null) return;
-
-            var newRot = gazeUI.transform.rotation.eulerAngles;
-            newRot.z = gazer.rotation.z;
-            gazeUI.transform.rotation = Quaternion.Euler(newRot);
+            moneyText.text = e.After.ToString();
         }
 
         private void UpdateHealthBar(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
