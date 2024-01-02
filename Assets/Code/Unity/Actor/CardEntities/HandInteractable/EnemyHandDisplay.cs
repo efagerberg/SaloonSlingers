@@ -10,12 +10,13 @@ namespace SaloonSlingers.Unity.Actor
     public class EnemyHandDisplay : HandDisplay
     {
         [SerializeField]
-        private GameObject enemyPeerPanel;
-        [SerializeField]
         private GameObject enemyPeerCardPrefab;
-
-        private TextMeshProUGUI handValueText;
+        [SerializeField]
         private LayoutGroup peerOtherCardLayoutGroup;
+        [SerializeField]
+        private TextMeshProUGUI handValueText;
+
+        private Canvas canvas;
 
         public void SetProjectile(HandProjectile projectile)
         {
@@ -25,21 +26,23 @@ namespace SaloonSlingers.Unity.Actor
         public override void Hide()
         {
             base.Hide();
-            enemyPeerPanel.SetActive(false);
-            projectile = null;
+            canvas.enabled = false;
+            handValueText.text = "";
         }
 
         public override void Show()
         {
-            enemyPeerPanel.SetActive(true);
+            canvas.enabled = true;
             base.Show();
         }
 
         protected override void UpdateContents(HandEvaluation evaluation)
         {
-            handValueText.text = evaluation.DisplayName();
+            var hasValueToDisplay = evaluation.Name != HandNames.NONE;
+            canvas.enabled = hasValueToDisplay;
+            if (!hasValueToDisplay) return;
 
-            LayoutGroup peerOtherCardLayoutGroup = enemyPeerPanel.GetComponentInChildren<LayoutGroup>();
+            handValueText.text = evaluation.DisplayName();
 
             int nCards = projectile.Cards.Count;
             int delta = nCards - peerOtherCardLayoutGroup.transform.childCount;
@@ -65,11 +68,14 @@ namespace SaloonSlingers.Unity.Actor
             }
         }
 
+        private void Awake()
+        {
+            canvas = GetComponentInChildren<Canvas>();
+        }
+
         private void Start()
         {
             Hide();
-            handValueText = enemyPeerPanel.GetComponentInImmediateChildren<TextMeshProUGUI>();
-            peerOtherCardLayoutGroup = enemyPeerPanel.GetComponentInChildren<LayoutGroup>();
         }
     }
 }

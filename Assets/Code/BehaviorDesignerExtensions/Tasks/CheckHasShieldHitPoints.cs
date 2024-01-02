@@ -1,14 +1,22 @@
 ﻿using BehaviorDesigner.Runtime.Tasks;
 
+using SaloonSlingers.Core;
+using SaloonSlingers.Unity.Actor;
+
 namespace SaloonSlingers.BehaviorDesignerExtensions
 {
     public class CheckHasShieldHitPoints : Conditional
     {
-        public SharedEnemy Enemy;
+        public IReadOnlyPoints HitPoints { get; set; }
+
+        public override void OnStart()
+        {
+            HitPoints ??= GetComponent<Enemy>().ShieldHitPoints;
+        }
 
         public override TaskStatus OnUpdate()
         {
-            return Enemy.Value.ShieldHitPoints > 0 ? TaskStatus.Success : TaskStatus.Failure;
+            return HitPoints.Value > 0 ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
 }

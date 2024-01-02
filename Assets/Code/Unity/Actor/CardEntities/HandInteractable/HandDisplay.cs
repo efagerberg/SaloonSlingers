@@ -16,7 +16,11 @@ namespace SaloonSlingers.Unity.Actor
             UpdateContents(projectile.HandEvaluation);
         }
 
-        public virtual void Hide() => IsDisplaying = false;
+        public virtual void Hide()
+        {
+            IsDisplaying = false;
+            projectile = null;
+        }
 
         protected abstract void UpdateContents(HandEvaluation evaluation);
 
@@ -24,17 +28,15 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Update()
         {
-            if (!IsDisplaying || projectile == null ||
-                projectile.Cards.Count <= 0 || lastEvaluation.Equals(projectile.HandEvaluation))
-                return;
+            if (!IsDisplaying) return;
 
-            if (projectile.HandEvaluation.Name == HandNames.NONE) return;
-
-            UpdateContents(projectile.HandEvaluation);
-
-            lastEvaluation = projectile.HandEvaluation;
+            // Allows for hiding hand display even if it is set to be shown, but there is no projectile set yet.
+            var currentEvaluation = projectile != null ? projectile.HandEvaluation : new HandEvaluation(HandNames.NONE, 0);
+            if (!lastEvaluation.HasValue || !lastEvaluation.Value.Equals(currentEvaluation))
+                UpdateContents(currentEvaluation);
+            lastEvaluation = currentEvaluation;
         }
 
-        private HandEvaluation lastEvaluation;
+        private HandEvaluation? lastEvaluation;
     }
 }

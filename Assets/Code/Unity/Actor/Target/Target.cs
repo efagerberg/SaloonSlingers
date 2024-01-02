@@ -14,29 +14,32 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float raycastDistance = 0.1f;
 
-        private HitPoints hitPoints;
-        private Rigidbody rb;
+        private Points hitPoints;
         private bool switchDirection = false;
 
         public void Reset()
         {
-            hitPoints.Points.Reset();
-        }
-
-        private void Awake()
-        {
-            hitPoints = GetComponent<HitPoints>();
-            rb = GetComponent<Rigidbody>();
+            hitPoints.Reset();
         }
 
         private void OnEnable()
         {
-            hitPoints.Points.Decreased += OnHitPointsDecreased;
+            if (hitPoints == null) return;
+
+            hitPoints.Decreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
-            hitPoints.Points.Decreased -= OnHitPointsDecreased;
+            if (hitPoints == null) return;
+
+            hitPoints.Decreased -= OnHitPointsDecreased;
+        }
+
+        private void Start()
+        {
+            hitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
+            hitPoints.Decreased += OnHitPointsDecreased;
         }
 
         private void OnHitPointsDecreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)

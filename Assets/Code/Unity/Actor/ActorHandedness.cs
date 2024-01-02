@@ -16,7 +16,6 @@ namespace SaloonSlingers.Unity.Actor
         }
 
         public DeckGraphic DeckGraphic;
-        public EnemyHandDisplay EnemyPeerDisplay;
 
         [SerializeField]
         private Handedness _current = Handedness.NONE;

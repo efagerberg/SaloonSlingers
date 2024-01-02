@@ -1,0 +1,10 @@
+[
+  {
+    "type": "health",
+    "value": 1
+  },
+  {
+    "type": "money",
+    "value": 10
+  }
+]

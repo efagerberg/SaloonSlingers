@@ -2,5 +2,9 @@
   {
     "type": "health",
     "value": 3
+  },
+  {
+    "type": "money",
+    "value": 1000
   }
 ]

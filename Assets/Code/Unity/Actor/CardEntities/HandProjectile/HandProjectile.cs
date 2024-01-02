@@ -183,12 +183,17 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleCollision(GameObject collidingObject)
         {
-            bool targetHasHitPoints = collidingObject.TryGetComponent(out HitPoints targetHitPoints);
-            if (targetHasHitPoints)
+            Points targetHitPoints = null;
+            if (collidingObject.TryGetComponent(out Attributes targetAttributes) &&
+                targetAttributes.Registry.ContainsKey(AttributeType.Health))
+                targetHitPoints = targetAttributes.Registry[AttributeType.Health];
+            else if (collidingObject.TryGetComponent(out HoloShieldController controller))
+                targetHitPoints = controller.HitPoints;
+            if (targetHitPoints != null)
             {
                 if (collidingObject.CompareTag("HoloShield"))
-                    targetHitPoints.Points.Decrease(HandEvaluation.Score);
-                else targetHitPoints.Points.Decrement();
+                    targetHitPoints.Decrease(HandEvaluation.Score);
+                else targetHitPoints.Decrement();
             }
 
             if (state.IsThrown) Kill();

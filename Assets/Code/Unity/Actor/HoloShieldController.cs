@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using SaloonSlingers.Core;
-using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 using UnityEngine.VFX;
@@ -12,8 +11,8 @@ namespace SaloonSlingers.Unity
 {
     public class HoloShieldController : MonoBehaviour
     {
-        [SerializeField]
-        private HitPoints hitPoints;
+        public Points HitPoints { get; set; }
+
         [SerializeField]
         private GameObject shieldModel;
         [SerializeField]
@@ -48,15 +47,17 @@ namespace SaloonSlingers.Unity
 
         private void OnEnable()
         {
-            hitPoints.Points.Increased += OnIncrease;
-            hitPoints.Points.Decreased += OnDecrease;
-            if (hitPoints > 0) StartCoroutine(nameof(ActivateShield));
+            HitPoints.Increased += OnIncrease;
+            HitPoints.Decreased += OnDecrease;
+            if (HitPoints > 0) StartCoroutine(nameof(ActivateShield));
         }
 
         private void OnDisable()
         {
-            hitPoints.Points.Increased -= OnIncrease;
-            hitPoints.Points.Decreased -= OnDecrease;
+            if (HitPoints == null) return;
+
+            HitPoints.Increased -= OnIncrease;
+            HitPoints.Decreased -= OnDecrease;
             shieldModel.SetActive(false);
             hitRippleVFX.Stop();
             hitRippleVFX.Reinit();
@@ -65,6 +66,7 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
+            HitPoints ??= new(0, uint.MaxValue);
             shieldMaterial = shieldModel.GetComponent<MeshRenderer>().material;
             shieldMaterial.SetFloat("_BreathOffset", Random.Range(0f, 1f));
             var zipped = (new string[] { "_FresnelColor", "_FrontColor", "_BackColor" }).Select(key => (key, shieldMaterial.GetColor(key)));
@@ -105,7 +107,7 @@ namespace SaloonSlingers.Unity
 
         private void UpdateShieldStrengthColor()
         {
-            float ratio = hitPoints / (float)hitPoints.Points.InitialValue;
+            float ratio = HitPoints / (float)HitPoints.InitialValue;
             var frontColor = shieldStrengthFrontGradient.Evaluate(ratio);
             materialKeyToColor["_FrontColor"] = frontColor;
             var backColor = shieldStrengthBackGradient.Evaluate(ratio);

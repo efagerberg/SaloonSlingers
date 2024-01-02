@@ -20,7 +20,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private float volumeScale;
 
-        private HitPoints shieldHitPoints;
+        private Points shieldHitPoints;
         private XRBaseInteractable plugInteractable;
 
         private void OnEnable()
@@ -42,9 +42,9 @@ namespace SaloonSlingers.Unity
         private void Start()
         {
             var origin = LevelManager.Instance.Player.GetComponent<XROrigin>();
-            shieldHitPoints = origin.Camera.transform.parent.GetComponentInChildren<HitPoints>();
+            shieldHitPoints = origin.Camera.transform.parent.GetComponentInChildren<HoloShieldController>().HitPoints;
 
-            var plugInstance = new GameObject();
+            var plugInstance = new GameObject("Hand Absorber Plug");
             plugInteractable = plugInstance.AddComponent<XRSimpleInteractable>();
             plugInteractable.interactionLayers = InteractionLayerMask.GetMask("DirectInteract");
             plugInteractable.transform.gameObject.SetActive(false);

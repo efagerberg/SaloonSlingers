@@ -9,11 +9,11 @@ namespace SaloonSlingers.Unity
     public class AttributeReader : MonoBehaviour
     {
         [SerializeField]
-        private TextAsset slingerConfigAsset;
+        private TextAsset configAsset;
 
         private void Awake()
         {
-            var configs = JsonConvert.DeserializeObject<List<AttributeConfig>>(slingerConfigAsset.text);
+            var configs = JsonConvert.DeserializeObject<List<AttributeConfig>>(configAsset.text);
             AttributePrimer.Prime(configs, gameObject);
         }
     }

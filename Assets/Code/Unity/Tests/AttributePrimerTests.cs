@@ -31,8 +31,22 @@ namespace SaloonSlingers.Unity.Tests
             var root = new GameObject("Subject");
             AttributePrimer.Prime(configs, root);
 
-            Assert.That(root.TryGetComponent<HitPoints>(out var hitPoints));
-            Assert.That(hitPoints.Points.Value, Is.EqualTo(healthConfig.Value));
+            Assert.That(root.TryGetComponent<Attributes>(out var attributes));
+            Assert.That(attributes.Registry[AttributeType.Health].Value,
+                        Is.EqualTo(healthConfig.Value));
+        }
+
+        [Test]
+        public void AddsMoney_WhenTypeMoney()
+        {
+            AttributeConfig moneyConfig = new() { Type = "money", Value = 100 };
+            var configs = new AttributeConfig[] { moneyConfig };
+            var root = new GameObject("Subject");
+            AttributePrimer.Prime(configs, root);
+
+            Assert.That(root.TryGetComponent<Attributes>(out var attributes));
+            Assert.That(attributes.Registry[AttributeType.Money].Value,
+                        Is.EqualTo(moneyConfig.Value));
         }
 
         [Test]

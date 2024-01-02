@@ -45,7 +45,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (IsInitialized) return;
 
-            Points points = new Points(startingDashes);
+            Points points = new(startingDashes);
             ActionMetaData metaData = new()
             {
                 Duration = startingDashDuration,

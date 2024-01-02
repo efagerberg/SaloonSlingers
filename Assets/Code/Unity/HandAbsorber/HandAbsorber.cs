@@ -18,15 +18,15 @@ namespace SaloonSlingers.Unity
             Stacks = new Points(startingStacks);
         }
 
-        public void Absorb(HitPoints hitPoints, HandProjectile projectile)
+        public void Absorb(Points points, HandProjectile projectile)
         {
             if (!CanAbsorb) return;
 
-            hitPoints.Points.Decreased += CheckStackRegained;
+            points.Decreased += CheckStackRegained;
             Stacks.Decrement();
 
             projectile.Pause();
-            hitPoints.Points.Reset(hitPoints + projectile.HandEvaluation.Score);
+            points.Reset(points + projectile.HandEvaluation.Score);
             projectile.Kill();
         }
 

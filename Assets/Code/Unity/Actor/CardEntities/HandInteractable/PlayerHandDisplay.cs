@@ -45,6 +45,8 @@ namespace SaloonSlingers.Unity.Actor
 
         protected override void UpdateContents(HandEvaluation evaluation)
         {
+            if (projectile == null) return;
+
             handValueText.text = evaluation.DisplayName();
             for (int i = 0; i < projectile.Cards.Count; i++)
             {

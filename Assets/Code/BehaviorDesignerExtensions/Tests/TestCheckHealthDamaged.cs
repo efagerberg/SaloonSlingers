@@ -2,8 +2,7 @@ using BehaviorDesigner.Runtime.Tasks;
 
 using NUnit.Framework;
 
-using SaloonSlingers.Unity.Actor;
-using SaloonSlingers.Unity.Tests;
+using SaloonSlingers.Core;
 
 namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
 {
@@ -12,9 +11,10 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         [Test]
         public void WhenHitPointsSame_ReturnsFailure()
         {
-            var hitPoints = TestUtils.CreateComponent<HitPoints>();
-            var task = new CheckHealthDamaged();
-            task.GameObject = hitPoints.gameObject;
+            var task = new CheckHealthDamaged()
+            {
+                HitPoints = new Points(1)
+            };
             task.OnAwake();
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Failure));
@@ -23,11 +23,10 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         [Test]
         public void WhenHitPointsDecreased_ReturnsSuccess()
         {
-            var hitPoints = TestUtils.CreateComponent<HitPoints>();
-            var task = new CheckHealthDamaged();
-            task.GameObject = hitPoints.gameObject;
+            var hitPoints = new Points(2);
+            var task = new CheckHealthDamaged() { HitPoints = hitPoints };
             task.OnAwake();
-            hitPoints.Points.Decrement();
+            hitPoints.Decrement();
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Success));
         }
@@ -36,11 +35,10 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         [Test]
         public void WhenHitPointsDecreased_ThenUpdated_ReturnsFailure()
         {
-            var hitPoints = TestUtils.CreateComponent<HitPoints>();
-            var task = new CheckHealthDamaged();
-            task.GameObject = hitPoints.gameObject;
+            var hitPoints = new Points(2);
+            var task = new CheckHealthDamaged() { HitPoints = hitPoints };
             task.OnAwake();
-            hitPoints.Points.Decrement();
+            hitPoints.Decrement();
             task.OnUpdate();
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Failure));

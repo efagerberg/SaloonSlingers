@@ -9,8 +9,6 @@ namespace SaloonSlingers.Unity.Actor
     public class PlayerHitPointDamageEffect : MonoBehaviour
     {
         [SerializeField]
-        private HitPoints hitPoints;
-        [SerializeField]
         private CanvasGroup hitFlashCanvasGroup;
         [SerializeField]
         private float duration = 1f;
@@ -21,6 +19,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private IEnumerator flashCoroutine;
         private float originalAlpha;
+        private Points hitPoints;
 
         private void Awake()
         {
@@ -32,19 +31,20 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (hitPoints == null) return;
 
-            hitPoints.Points.Decreased += OnHitPointsDecreased;
+            hitPoints.Decreased += OnHitPointsDecreased;
         }
 
         private void OnDisable()
         {
-            hitPoints.Points.Decreased -= OnHitPointsDecreased;
+            if (hitPoints == null) return;
+
+            hitPoints.Decreased -= OnHitPointsDecreased;
         }
 
         private void Start()
         {
-            if (hitPoints == null) hitPoints = GetComponent<HitPoints>();
-
-            hitPoints.Points.Decreased += OnHitPointsDecreased;
+            hitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
+            hitPoints.Decreased += OnHitPointsDecreased;
         }
 
         private void OnHitPointsDecreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
