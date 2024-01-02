@@ -19,7 +19,6 @@ namespace SaloonSlingers.Unity.Actor
         public virtual void Hide()
         {
             IsDisplaying = false;
-            projectile = null;
         }
 
         protected abstract void UpdateContents(HandEvaluation evaluation);

@@ -21,7 +21,6 @@ namespace SaloonSlingers.Unity.Actor
         public override void Hide()
         {
             base.Hide();
-
             for (int i = 0; projectile != null && i < projectile.Cards.Count; i++)
             {
                 Transform element = cardsPanel.transform.GetChild(i);
