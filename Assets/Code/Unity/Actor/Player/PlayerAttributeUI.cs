@@ -46,15 +46,6 @@ namespace SaloonSlingers.Unity.Actor
             hitPoints.Decreased += OnHealthChanged;
             money.Increased += OnMoneyChanged;
             money.Decreased += OnMoneyChanged;
-
-            InvokeRepeating(nameof(f), 0, 2f);
-        }
-
-        private void f()
-        {
-            if (x) money.Increase(10);
-            else money.Decrease(10);
-            x = !x;
         }
 
         private void OnEnable()
