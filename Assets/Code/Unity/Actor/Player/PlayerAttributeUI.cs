@@ -104,12 +104,15 @@ namespace SaloonSlingers.Unity.Actor
             bool decreased = moneyChangedEvent.Before > moneyChangedEvent.After;
             uint delta = decreased ? moneyChangedEvent.Before - moneyChangedEvent.After : moneyChangedEvent.After - moneyChangedEvent.Before;
             char deltaChar = decreased ? '-' : '+';
-            if (decreased) data.AudioSource.PlayOneShot(data.MoneyLostSFX);
-            else data.AudioSource.PlayOneShot(data.MoneyGainedSFX);
+            if (decreased)
+                data.AudioSource.PlayOneShot(data.MoneyLostSFX);
+            else
+                data.AudioSource.PlayOneShot(data.MoneyGainedSFX);
 
             data.MoneyText.text = $"{deltaChar}{delta}";
             yield return deltaDelay;
 
+            data.AudioSource.clip = null;
             data.MoneyText.text = moneyChangedEvent.After.ToString();
         }
 

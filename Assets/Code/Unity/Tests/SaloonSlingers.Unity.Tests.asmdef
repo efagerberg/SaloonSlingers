@@ -7,7 +7,8 @@
         "SaloonSlingers.Unity",
         "SaloonSlingers.Core",
         "Unity.InputSystem",
-        "BehaviorDesigner"
+        "BehaviorDesigner",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [
         "Editor"
