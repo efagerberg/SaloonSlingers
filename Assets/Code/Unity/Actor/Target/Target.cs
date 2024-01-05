@@ -17,7 +17,7 @@ namespace SaloonSlingers.Unity.Actor
         private Points hitPoints;
         private bool switchDirection = false;
 
-        public void Reset()
+        public void ResetActor()
         {
             hitPoints.Reset();
         }

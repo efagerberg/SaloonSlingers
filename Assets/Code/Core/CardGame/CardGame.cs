@@ -18,7 +18,7 @@ namespace SaloonSlingers.Core
             if (!CanDraw(ctx)) return null;
 
             foreach (var rule in drawRules)
-                rule.DrawSideEffect(ctx);
+                rule.OnDraw(ctx);
             return ctx.Deck.Draw();
         }
 

@@ -43,7 +43,7 @@ namespace SaloonSlingers.Unity.Actor
                 throwOffsetCalculator = player.GetComponent<CharacterControllerThrowOffsetCalculator>();
                 visibilityDetector = player.GetComponent<VisibilityDetector>();
                 deckGraphic = handedness.DeckGraphic;
-                handProjectile.AssignDeck(deckGraphic.Deck);
+                handProjectile.Assign(deckGraphic.Deck, player.GetComponent<Attributes>().Registry);
             }
 
             handProjectile.Pickup(deckGraphic.Spawn);

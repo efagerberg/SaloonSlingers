@@ -188,12 +188,43 @@ namespace SaloonSlingers.Core.Tests
                     Evaluation = new HandEvaluation(HandNames.NONE, 100),
                     AttributeRegistry = new Dictionary<AttributeType, Points>()
                     {
-                        { AttributeType.Money, new Points(10) }
+                        { AttributeType.Money, new Points(10) },
+                        { AttributeType.Pot, new Points(0, uint.MaxValue) }
                     }
                 };
 
                 Assert.That(actual.Draw(ctx).HasValue == true);
                 Assert.That(ctx.AttributeRegistry[AttributeType.Money].Value, Is.EqualTo(3));
+                Assert.That(ctx.AttributeRegistry[AttributeType.Pot].Value, Is.EqualTo(7));
+            }
+
+            [Test]
+            public void WhenDrawCostsMoney_AndNotEnoughMoneyLeft_CantDraw()
+            {
+                CardGameConfig config = new()
+                {
+                    Name = "TestGame",
+                    HandEvaluator = "BlackJack",
+                    CostTable = new uint[] { 1, 3, 5000 }
+                };
+                CardGame actual = CardGame.Load(config);
+                Deck deck = new();
+                var hand = deck.Draw(2).ToList();
+                DrawContext ctx = new()
+                {
+                    Deck = deck,
+                    Hand = hand,
+                    Evaluation = new HandEvaluation(HandNames.NONE, 100),
+                    AttributeRegistry = new Dictionary<AttributeType, Points>()
+                    {
+                        { AttributeType.Money, new Points(10) },
+                        { AttributeType.Pot, new Points(0, uint.MaxValue) }
+                    }
+                };
+
+                Assert.That(actual.Draw(ctx).HasValue == false);
+                Assert.That(ctx.AttributeRegistry[AttributeType.Money].Value, Is.EqualTo(10));
+                Assert.That(ctx.AttributeRegistry[AttributeType.Pot].Value, Is.EqualTo(0));
             }
         }
     }

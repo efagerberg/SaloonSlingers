@@ -6,6 +6,7 @@ namespace SaloonSlingers.Core
     public class DrawCostRule : IDrawRule
     {
         private readonly uint[] costs;
+        private readonly AttributeType[] requiredAttributes = new[] { AttributeType.Money, AttributeType.Pot };
 
         public DrawCostRule(uint[] costs)
         {
@@ -14,19 +15,20 @@ namespace SaloonSlingers.Core
 
         public bool CanDraw(DrawContext ctx)
         {
-            bool hasMoneyAttribute = ctx.AttributeRegistry.ContainsKey(AttributeType.Money);
-            if (!hasMoneyAttribute) return false;
+            if (!requiredAttributes.All(ctx.AttributeRegistry.ContainsKey)) return false;
 
             var money = ctx.AttributeRegistry[AttributeType.Money];
             var nextPrice = GetNextCost(ctx.Hand);
             return money >= nextPrice;
         }
 
-        public void DrawSideEffect(DrawContext ctx)
+        public void OnDraw(DrawContext ctx)
         {
             var money = ctx.AttributeRegistry[AttributeType.Money];
+            var pot = ctx.AttributeRegistry[AttributeType.Pot];
             var nextPrice = GetNextCost(ctx.Hand);
             money.Decrease(nextPrice);
+            pot.Increase(nextPrice);
         }
 
         private uint GetNextCost(IList<Card> hand)

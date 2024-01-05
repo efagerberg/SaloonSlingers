@@ -12,8 +12,8 @@ namespace SaloonSlingers.Core
     {
         public const int NUMBER_OF_CARDS_IN_STANDARD_DECK = 52;
         private Random random;
-        public event DeckEmptyHandler OnDeckEmpty;
-        public event DeckRefilledHandler OnDeckRefilled;
+        public event DeckEmptyHandler Emptied;
+        public event DeckRefilledHandler Refilled;
 
         private readonly Queue<Card> cards = new();
 
@@ -58,7 +58,7 @@ namespace SaloonSlingers.Core
         public Card Draw()
         {
             Card c = cards.Dequeue();
-            if (cards.Count == 0) OnDeckEmpty?.Invoke(this, EventArgs.Empty);
+            if (cards.Count == 0) Emptied?.Invoke(this, EventArgs.Empty);
             return c;
         }
 
@@ -70,7 +70,7 @@ namespace SaloonSlingers.Core
 
         public void Return(Card card)
         {
-            if (cards.Count == 0) OnDeckRefilled?.Invoke(this, EventArgs.Empty);
+            if (cards.Count == 0) Refilled?.Invoke(this, EventArgs.Empty);
             cards.Enqueue(card);
         }
 
@@ -80,5 +80,4 @@ namespace SaloonSlingers.Core
                 cards.Enqueue(card);
         }
     }
-
 }

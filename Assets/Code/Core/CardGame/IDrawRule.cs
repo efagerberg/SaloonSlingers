@@ -5,7 +5,7 @@ namespace SaloonSlingers.Core
     public interface IDrawRule
     {
         public bool CanDraw(DrawContext ctx);
-        public void DrawSideEffect(DrawContext ctx) { }
+        public void OnDraw(DrawContext ctx) { }
     }
 
     public struct DrawContext

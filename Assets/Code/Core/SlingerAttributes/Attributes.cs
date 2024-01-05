@@ -5,6 +5,7 @@ namespace SaloonSlingers.Core
         Health,
         Money,
         Peer,
-        Dash
+        Dash,
+        Pot
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 using SaloonSlingers.Core;
 
@@ -12,13 +13,12 @@ namespace SaloonSlingers.Unity.Actor
         public event EventHandler Death;
         public Deck Deck { get; private set; }
         public Points ShieldHitPoints { get; set; }
+        public IDictionary<AttributeType, Points> AttributeRegistry { get; private set; }
 
         [SerializeField]
         private GameObject shield;
         [SerializeField]
         private HoloShieldController holoShieldController;
-
-        private Points HitPoints { get; set; }
 
         private void Awake()
         {
@@ -27,14 +27,14 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            HitPoints = GetComponent<Attributes>().Registry[AttributeType.Health];
+            AttributeRegistry = GetComponent<Attributes>().Registry;
             ShieldHitPoints ??= holoShieldController?.HitPoints;
         }
 
-        public void Reset()
+        public void ResetActor()
         {
-            HitPoints?.Reset();
-            ShieldHitPoints?.Reset(0);
+            AttributeRegistry[AttributeType.Health].Reset();
+            ShieldHitPoints.Reset(0);
             Deck = new Deck().Shuffle();
         }
 

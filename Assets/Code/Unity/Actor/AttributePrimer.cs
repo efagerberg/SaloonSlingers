@@ -24,11 +24,15 @@ namespace SaloonSlingers.Unity
                 uint value = config.Value;
                 Points points = new(value, uint.MaxValue);
                 attributes.Registry.Add(typeMetaData.type, points);
+                if (typeMetaData.type == AttributeType.Money)
+                {
+                    var potPoints = new Points(0, uint.MaxValue);
+                    attributes.Registry.Add(AttributeType.Pot, potPoints);
+                }
 
                 if (typeMetaData.forAction)
                 {
-                    AttributeType type = typeMetaData.type;
-                    var performer = ParseActionPerformer(type, config, root);
+                    var performer = ParseActionPerformer(typeMetaData.type, config, root);
                     ActionMetaData metaData = new()
                     {
                         Duration = config.Duration,
