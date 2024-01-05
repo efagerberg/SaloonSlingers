@@ -1,3 +1,5 @@
+using System.Collections;
+
 using SaloonSlingers.Core;
 
 using TMPro;
@@ -5,7 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     public class PlayerAttributeUI : MonoBehaviour
     {
@@ -15,55 +17,79 @@ namespace SaloonSlingers.Unity
         private TextMeshProUGUI healthPercentText;
         [SerializeField]
         private TextMeshProUGUI moneyText;
+        [SerializeField]
+        private AudioClip moneyLostSFX;
+        [SerializeField]
+        private AudioClip moneyGainedSFX;
+        [SerializeField]
+        private AudioSource audioSource;
+        [SerializeField]
+        private float moneyDeltaPresentationTime;
 
         private Points hitPoints;
         private Points money;
+        private WaitForSeconds deltaDelay;
+        private bool x = false;
+        private Coroutine moneyUICoroutine;
 
         private void Awake()
         {
             var attributes = LevelManager.Instance.Player.GetComponent<Attributes>();
             hitPoints = attributes.Registry[AttributeType.Health];
-            hitPoints.Increased += UpdateHealthBar;
-            hitPoints.Decreased += UpdateHealthBar;
-            UpdateFill(healthBar, hitPoints);
-            healthPercentText.text = hitPoints.AsPercent().ToString("P0");
-
             money = attributes.Registry[AttributeType.Money];
-            money.Increased += UpdateMoneyText;
-            money.Decreased += UpdateMoneyText;
-            moneyText.text = money.Value.ToString();
+            deltaDelay = new(moneyDeltaPresentationTime);
+
+            UpdateHealthBar(hitPoints);
+            moneyText.text = PlayerAttributeUIDataGenerator.GetMoneyUIData(money);
+
+            hitPoints.Increased += OnHealthChanged;
+            hitPoints.Decreased += OnHealthChanged;
+            money.Increased += OnMoneyChanged;
+            money.Decreased += OnMoneyChanged;
         }
 
         private void OnEnable()
         {
-            hitPoints.Increased += UpdateHealthBar;
-            hitPoints.Decreased += UpdateHealthBar;
-            money.Increased += UpdateMoneyText;
-            money.Decreased += UpdateMoneyText;
+            hitPoints.Increased += OnHealthChanged;
+            hitPoints.Decreased += OnHealthChanged;
+            money.Increased += OnMoneyChanged;
+            money.Decreased += OnMoneyChanged;
         }
 
         private void OnDisable()
         {
-            hitPoints.Increased -= UpdateHealthBar;
-            hitPoints.Decreased -= UpdateHealthBar;
-            money.Increased -= UpdateMoneyText;
-            money.Decreased -= UpdateMoneyText;
+            hitPoints.Increased -= OnHealthChanged;
+            hitPoints.Decreased -= OnHealthChanged;
+            money.Increased -= OnMoneyChanged;
+            money.Decreased -= OnMoneyChanged;
         }
 
-        private void UpdateMoneyText(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void OnMoneyChanged(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
-            moneyText.text = e.After.ToString();
+            if (moneyUICoroutine != null) StopCoroutine(moneyUICoroutine);
+
+            moneyUICoroutine = StartCoroutine(MoneyChangeEffect(e));
         }
 
-        private void UpdateHealthBar(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private IEnumerator MoneyChangeEffect(ValueChangeEvent<uint> e)
         {
-            UpdateFill(healthBar, sender);
-            healthPercentText.text = sender.AsPercent().ToString("P0");
+            var data = PlayerAttributeUIDataGenerator.GetMoneyUIData(e, moneyLostSFX, moneyGainedSFX);
+            audioSource.PlayOneShot((AudioClip)data.ClipToPlay);
+            moneyText.text = data.MoneyDeltaText;
+            yield return deltaDelay;
+            moneyText.text = data.TotalText;
         }
 
-        private static void UpdateFill(Image image, IReadOnlyPoints points)
+        private void OnHealthChanged(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
-            image.fillAmount = points.AsPercent();
+            UpdateHealthBar(sender);
+        }
+
+        private void UpdateHealthBar(IReadOnlyPoints hitPoints)
+        {
+            var healthUIData = PlayerAttributeUIDataGenerator.GetHealthUIData(hitPoints);
+            healthBar.fillAmount = healthUIData.FillAmount;
+            healthPercentText.text = healthUIData.HealthPercentText;
         }
     }
 }

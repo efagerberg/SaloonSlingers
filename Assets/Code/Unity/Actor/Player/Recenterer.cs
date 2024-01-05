@@ -2,7 +2,7 @@ using Unity.XR.CoreUtils;
 
 using UnityEngine;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
     public class Recenterer : MonoBehaviour
     {
