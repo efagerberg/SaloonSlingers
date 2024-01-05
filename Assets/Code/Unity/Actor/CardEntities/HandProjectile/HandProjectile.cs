@@ -72,15 +72,15 @@ namespace SaloonSlingers.Unity.Actor
             drawCtx.Deck = deck;
             drawCtx.Evaluation = HandEvaluation;
             drawCtx.Hand = Cards;
-            if (!gameManager.Saloon.HouseGame.CanDraw(drawCtx)) return;
+            Card? card = gameManager.Saloon.HouseGame.Draw(drawCtx);
+            if (card == null) return;
 
-            Card card = deck.Draw();
-            Cards.Add(card);
+            Cards.Add(card.Value);
             audioSource.clip = drawSFX;
             audioSource.Play();
             GameObject spawned = spawnCard();
             ICardGraphic cardGraphic = spawned.GetComponent<ICardGraphic>();
-            cardGraphic.Card = card;
+            cardGraphic.Card = card.Value;
             handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
             requiresEvaluation = true;
         }

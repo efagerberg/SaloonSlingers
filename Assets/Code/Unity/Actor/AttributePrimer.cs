@@ -66,14 +66,6 @@ namespace SaloonSlingers.Unity
         };
     }
 
-    public enum AttributeType
-    {
-        Health,
-        Money,
-        Peer,
-        Dash
-    }
-
     public struct AttributeConfig
     {
         public string Type { get; set; }

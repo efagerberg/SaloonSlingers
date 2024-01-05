@@ -29,7 +29,6 @@ namespace SaloonSlingers.Unity.Actor
         private Points hitPoints;
         private Points money;
         private WaitForSeconds deltaDelay;
-        private bool x = false;
         private Coroutine moneyUICoroutine;
 
         private void Awake()

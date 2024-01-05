@@ -5,11 +5,13 @@ namespace SaloonSlingers.Core
     public interface IDrawRule
     {
         public bool CanDraw(DrawContext ctx);
+        public void DrawSideEffect(DrawContext ctx) { }
     }
 
     public struct DrawContext
     {
-        public IEnumerable<Card> Hand;
+        public IList<Card> Hand;
+        public IDictionary<AttributeType, Points> AttributeRegistry;
         public HandEvaluation Evaluation;
         public Deck Deck;
     }
