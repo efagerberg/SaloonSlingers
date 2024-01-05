@@ -30,8 +30,7 @@ namespace SaloonSlingers.Unity.Actor
         private Points money;
         private WaitForSeconds deltaDelay;
         private bool x = false;
-
-        private UIData uiData;
+        private Coroutine moneyUICoroutine;
 
         private void Awake()
         {
@@ -40,17 +39,8 @@ namespace SaloonSlingers.Unity.Actor
             money = attributes.Registry[AttributeType.Money];
             deltaDelay = new(moneyDeltaPresentationTime);
 
-            uiData = new()
-            {
-                HealthBar = healthBar,
-                HealthPercentText = healthPercentText,
-                AudioSource = audioSource,
-                MoneyLostSFX = moneyLostSFX,
-                MoneyGainedSFX = moneyGainedSFX,
-                MoneyText = moneyText
-            };
-            PlayerAttributeUICoordinator.UpdateHealthBar(uiData, hitPoints);
-            moneyText.text = money.Value.ToString();
+            UpdateHealthBar(hitPoints);
+            moneyText.text = PlayerAttributeUIDataGenerator.GetMoneyUIData(money);
 
             hitPoints.Increased += OnHealthChanged;
             hitPoints.Decreased += OnHealthChanged;
@@ -85,51 +75,30 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnMoneyChanged(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
-            var coroutine = PlayerAttributeUICoordinator.MoneyChangeEffect(uiData, e, deltaDelay);
-            StartCoroutine(coroutine);
+            if (moneyUICoroutine != null) StopCoroutine(moneyUICoroutine);
+
+            moneyUICoroutine = StartCoroutine(MoneyChangeEffect(e));
+        }
+
+        private IEnumerator MoneyChangeEffect(ValueChangeEvent<uint> e)
+        {
+            var data = PlayerAttributeUIDataGenerator.GetMoneyUIData(e, moneyLostSFX, moneyGainedSFX);
+            audioSource.PlayOneShot((AudioClip)data.ClipToPlay);
+            moneyText.text = data.MoneyDeltaText;
+            yield return deltaDelay;
+            moneyText.text = data.TotalText;
         }
 
         private void OnHealthChanged(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
         {
-            PlayerAttributeUICoordinator.UpdateHealthBar(uiData, sender);
+            UpdateHealthBar(sender);
         }
-    }
 
-    public static class PlayerAttributeUICoordinator
-    {
-        public static IEnumerator MoneyChangeEffect(UIData data,
-                                                    ValueChangeEvent<uint> moneyChangedEvent,
-                                                    WaitForSeconds deltaDelay)
+        private void UpdateHealthBar(IReadOnlyPoints hitPoints)
         {
-            bool decreased = moneyChangedEvent.Before > moneyChangedEvent.After;
-            uint delta = decreased ? moneyChangedEvent.Before - moneyChangedEvent.After : moneyChangedEvent.After - moneyChangedEvent.Before;
-            char deltaChar = decreased ? '-' : '+';
-            if (decreased)
-                data.AudioSource.PlayOneShot(data.MoneyLostSFX);
-            else
-                data.AudioSource.PlayOneShot(data.MoneyGainedSFX);
-
-            data.MoneyText.text = $"{deltaChar}{delta}";
-            yield return deltaDelay;
-
-            data.AudioSource.clip = null;
-            data.MoneyText.text = moneyChangedEvent.After.ToString();
+            var healthUIData = PlayerAttributeUIDataGenerator.GetHealthUIData(hitPoints);
+            healthBar.fillAmount = healthUIData.FillAmount;
+            healthPercentText.text = healthUIData.HealthPercentText;
         }
-
-        public static void UpdateHealthBar(UIData data, IReadOnlyPoints hitPoints)
-        {
-            data.HealthBar.fillAmount = hitPoints.AsPercent();
-            data.HealthPercentText.text = hitPoints.AsPercent().ToString("P0");
-        }
-    }
-
-    public struct UIData
-    {
-        public Image HealthBar;
-        public TextMeshProUGUI HealthPercentText;
-        public AudioSource AudioSource;
-        public AudioClip MoneyLostSFX;
-        public AudioClip MoneyGainedSFX;
-        public TextMeshProUGUI MoneyText;
     }
 }
