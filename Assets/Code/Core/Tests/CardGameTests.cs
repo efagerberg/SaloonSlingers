@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 using NUnit.Framework;
 
@@ -61,7 +62,7 @@ namespace SaloonSlingers.Core.Tests
                     Evaluation = new BlackJackHandEvaluator().Evaluate(hand)
                 };
 
-                Assert.That(actual.CanDraw(ctx) == expected);
+                Assert.That(actual.Draw(ctx).HasValue == expected);
             }
 
             [TestCaseSource(nameof(MinScoreTestCases))]
@@ -83,7 +84,7 @@ namespace SaloonSlingers.Core.Tests
                     Evaluation = new HandEvaluation(HandNames.NONE, (uint)evaluationScore)
                 };
 
-                Assert.That(actual.CanDraw(ctx) == expected);
+                Assert.That(actual.Draw(ctx).HasValue == expected);
             }
 
             [TestCaseSource(nameof(MaxScoreTestCases))]
@@ -105,7 +106,7 @@ namespace SaloonSlingers.Core.Tests
                     Evaluation = new HandEvaluation(HandNames.NONE, (uint)evaluationScore)
                 };
 
-                Assert.That(actual.CanDraw(ctx) == expected);
+                Assert.That(actual.Draw(ctx).HasValue == expected);
             }
 
             [TestCaseSource(nameof(MinMaxScoreTestCases))]
@@ -128,7 +129,7 @@ namespace SaloonSlingers.Core.Tests
                     Evaluation = new HandEvaluation(HandNames.NONE, (uint)actualScore)
                 };
 
-                Assert.That(actual.CanDraw(ctx) == expected);
+                Assert.That(actual.Draw(ctx).HasValue == expected);
             }
 
             private static readonly object[][] StringEvaluatorTestCases = {
@@ -167,6 +168,64 @@ namespace SaloonSlingers.Core.Tests
                 new object[] { 1, 5, 5, false },
                 new object[] { 1, 5, 7, false },
             };
+
+            [Test]
+            public void WhenRuleHasSideEffect_AndCanDraw_AppliesSideEffect()
+            {
+                CardGameConfig config = new()
+                {
+                    Name = "TestGame",
+                    HandEvaluator = "BlackJack",
+                    CostTable = new uint[] { 1, 3, 5, 7 }
+                };
+                CardGame actual = CardGame.Load(config);
+                Deck deck = new();
+                var hand = deck.Draw(3).ToList();
+                DrawContext ctx = new()
+                {
+                    Deck = deck,
+                    Hand = hand,
+                    Evaluation = new HandEvaluation(HandNames.NONE, 100),
+                    AttributeRegistry = new Dictionary<AttributeType, Points>()
+                    {
+                        { AttributeType.Money, new Points(10) },
+                        { AttributeType.Pot, new Points(0, uint.MaxValue) }
+                    }
+                };
+
+                Assert.That(actual.Draw(ctx).HasValue == true);
+                Assert.That(ctx.AttributeRegistry[AttributeType.Money].Value, Is.EqualTo(3));
+                Assert.That(ctx.AttributeRegistry[AttributeType.Pot].Value, Is.EqualTo(7));
+            }
+
+            [Test]
+            public void WhenDrawCostsMoney_AndNotEnoughMoneyLeft_CantDraw()
+            {
+                CardGameConfig config = new()
+                {
+                    Name = "TestGame",
+                    HandEvaluator = "BlackJack",
+                    CostTable = new uint[] { 1, 3, 5000 }
+                };
+                CardGame actual = CardGame.Load(config);
+                Deck deck = new();
+                var hand = deck.Draw(2).ToList();
+                DrawContext ctx = new()
+                {
+                    Deck = deck,
+                    Hand = hand,
+                    Evaluation = new HandEvaluation(HandNames.NONE, 100),
+                    AttributeRegistry = new Dictionary<AttributeType, Points>()
+                    {
+                        { AttributeType.Money, new Points(10) },
+                        { AttributeType.Pot, new Points(0, uint.MaxValue) }
+                    }
+                };
+
+                Assert.That(actual.Draw(ctx).HasValue == false);
+                Assert.That(ctx.AttributeRegistry[AttributeType.Money].Value, Is.EqualTo(10));
+                Assert.That(ctx.AttributeRegistry[AttributeType.Pot].Value, Is.EqualTo(0));
+            }
         }
     }
 }

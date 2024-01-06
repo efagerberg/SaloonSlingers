@@ -28,7 +28,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
                 ReturnedObject.Value = clone.GetComponent<EnemyHandInteractableController>();
                 ReturnedObject.Value.transform.SetParent(AttachTransform.Value, false);
             }
-            ReturnedObject.Value.Draw(Enemy.Value.Deck, LevelManager.Instance.CardSpawner.Spawn);
+            ReturnedObject.Value.Draw(Enemy.Value.Deck, Enemy.Value.AttributeRegistry, LevelManager.Instance.CardSpawner.Spawn);
             return;
         }
 

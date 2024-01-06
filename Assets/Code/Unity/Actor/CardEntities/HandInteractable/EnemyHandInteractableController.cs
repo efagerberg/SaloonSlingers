@@ -14,11 +14,11 @@ namespace SaloonSlingers.Unity.Actor
         private HandProjectile handProjectile;
         private Rigidbody rb;
 
-        public void Draw(Deck deck, Func<GameObject> spawn)
+        public void Draw(Deck deck, IDictionary<AttributeType, Points> attributeRegistry, Func<GameObject> spawn)
         {
             if (Cards.Count == 0)
             {
-                handProjectile.AssignDeck(deck);
+                handProjectile.Assign(deck, attributeRegistry);
                 handProjectile.Pickup(spawn);
                 handProjectile.gameObject.layer = LayerMask.NameToLayer("EnemyProjectile");
             }

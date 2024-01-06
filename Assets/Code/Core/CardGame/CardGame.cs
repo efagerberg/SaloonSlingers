@@ -6,16 +6,20 @@ using System.Text.RegularExpressions;
 
 namespace SaloonSlingers.Core
 {
-    public struct CardGame : IDrawRule, IHandEvaluator
+    public struct CardGame : IHandEvaluator
     {
         public string Name { get; private set; }
 
         private IList<IDrawRule> drawRules;
         private IHandEvaluator handEvaluator;
 
-        public readonly bool CanDraw(DrawContext ctx)
+        public readonly Card? Draw(DrawContext ctx)
         {
-            return ctx.Deck.HasCards && drawRules.All(x => x.CanDraw(ctx));
+            if (!CanDraw(ctx)) return null;
+
+            foreach (var rule in drawRules)
+                rule.OnDraw(ctx);
+            return ctx.Deck.Draw();
         }
 
         public readonly HandEvaluation Evaluate(IEnumerable<Card> hand) => handEvaluator.Evaluate(hand);
@@ -29,6 +33,11 @@ namespace SaloonSlingers.Core
                 drawRules = GetDrawRulesFromConfig(config)
             };
             return rules;
+        }
+
+        private readonly bool CanDraw(DrawContext ctx)
+        {
+            return ctx.Deck.HasCards && drawRules.All(x => x.CanDraw(ctx));
         }
 
         private static IHandEvaluator GetHandEvaluatorFromString(string v)
@@ -51,6 +60,8 @@ namespace SaloonSlingers.Core
                 rules.Add(new MaxScoreDrawRule(config.MaxScore.Value));
             if (config.MinScore.HasValue)
                 rules.Add(new MinScoreDrawRule(config.MinScore.Value));
+            if (config.CostTable != null && config.CostTable.Length > 0)
+                rules.Add(new DrawCostRule(config.CostTable));
             return rules;
         }
     }
@@ -67,5 +78,6 @@ namespace SaloonSlingers.Core
         public int? MaxHandSize { get; set; }
         public uint? MaxScore { get; set; }
         public uint? MinScore { get; set; }
+        public uint[] CostTable { get; set; }
     }
 }

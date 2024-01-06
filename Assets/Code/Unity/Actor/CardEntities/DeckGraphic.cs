@@ -38,17 +38,17 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnDisable()
         {
-            Deck.OnDeckEmpty -= DeckEmptyHandler;
+            Deck.Emptied -= DeckEmptyHandler;
         }
 
         private void OnEnable()
         {
-            Deck.OnDeckEmpty += DeckEmptyHandler;
+            Deck.Emptied += DeckEmptyHandler;
         }
 
         private void Start()
         {
-            Deck.OnDeckEmpty += DeckEmptyHandler;
+            Deck.Emptied += DeckEmptyHandler;
             cardSpawner = LevelManager.Instance.CardSpawner;
             SpawnDeck();
         }

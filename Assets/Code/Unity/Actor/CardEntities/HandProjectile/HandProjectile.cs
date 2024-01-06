@@ -48,6 +48,7 @@ namespace SaloonSlingers.Unity.Actor
         private HandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private Deck deck;
+        private IDictionary<AttributeType, Points> attributeRegistry;
         private GameManager gameManager;
         private HandEvaluation handEvaluation;
         private bool requiresEvaluation = false;
@@ -72,15 +73,16 @@ namespace SaloonSlingers.Unity.Actor
             drawCtx.Deck = deck;
             drawCtx.Evaluation = HandEvaluation;
             drawCtx.Hand = Cards;
-            if (!gameManager.Saloon.HouseGame.CanDraw(drawCtx)) return;
+            drawCtx.AttributeRegistry = attributeRegistry;
+            Card? card = gameManager.Saloon.HouseGame.Draw(drawCtx);
+            if (card == null) return;
 
-            Card card = deck.Draw();
-            Cards.Add(card);
+            Cards.Add(card.Value);
             audioSource.clip = drawSFX;
             audioSource.Play();
             GameObject spawned = spawnCard();
             ICardGraphic cardGraphic = spawned.GetComponent<ICardGraphic>();
-            cardGraphic.Card = card;
+            cardGraphic.Card = card.Value;
             handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
             requiresEvaluation = true;
         }
@@ -102,10 +104,12 @@ namespace SaloonSlingers.Unity.Actor
             rigidBody.AddForce(offset, ForceMode.VelocityChange);
         }
 
-        public void AssignDeck(Deck newDeck)
+        public void Assign(Deck newDeck, IDictionary<AttributeType, Points> newAttributeRegistry)
         {
             if (deck != null || deck != newDeck)
                 deck = newDeck;
+            if (attributeRegistry != null || deck != newAttributeRegistry)
+                attributeRegistry = newAttributeRegistry;
         }
 
         public void Stack()
@@ -122,7 +126,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public bool IsThrown { get => state.IsThrown; }
 
-        public void Reset()
+        public void ResetActor()
         {
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;

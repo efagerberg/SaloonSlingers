@@ -37,7 +37,7 @@ namespace SaloonSlingers.Unity.Tests
         }
 
         [Test]
-        public void AddsMoney_WhenTypeMoney()
+        public void AddsMoneyAndPot_WhenTypeMoney()
         {
             AttributeConfig moneyConfig = new() { Type = "money", Value = 100 };
             var configs = new AttributeConfig[] { moneyConfig };
@@ -47,6 +47,8 @@ namespace SaloonSlingers.Unity.Tests
             Assert.That(root.TryGetComponent<Attributes>(out var attributes));
             Assert.That(attributes.Registry[AttributeType.Money].Value,
                         Is.EqualTo(moneyConfig.Value));
+            Assert.That(attributes.Registry[AttributeType.Pot].Value,
+                        Is.EqualTo(0));
         }
 
         [Test]

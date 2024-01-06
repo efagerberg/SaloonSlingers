@@ -80,7 +80,7 @@ namespace SaloonSlingers.Unity.Tests
             Death?.Invoke(gameObject, EventArgs.Empty);
         }
 
-        public void Reset()
+        public void ResetActor()
         {
             return;
         }

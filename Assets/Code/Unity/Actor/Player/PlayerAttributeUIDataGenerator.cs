@@ -38,8 +38,8 @@ namespace SaloonSlingers.Unity.Actor
     public struct MoneyChangedUIData
     {
         public string TotalText;
-        public string? MoneyDeltaText;
-        public AudioClip? ClipToPlay;
+        public string MoneyDeltaText;
+        public AudioClip ClipToPlay;
     }
 
     public struct HealthUIData

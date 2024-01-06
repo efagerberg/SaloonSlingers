@@ -34,7 +34,7 @@ namespace SaloonSlingers.Unity.Actor
             faceRenderer.material.mainTexture = Resources.Load<Texture>(GetTexturePath(card));
         }
 
-        public void Reset()
+        public void ResetActor()
         {
             faceRenderer.material.mainTexture = null;
         }
