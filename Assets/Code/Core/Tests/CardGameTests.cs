@@ -43,6 +43,19 @@ namespace SaloonSlingers.Core.Tests
                 Assert.Throws<InvalidGameRulesConfig>(() => CardGame.Load(config));
             }
 
+            private static readonly object[][] StringEvaluatorTestCases = {
+                new object[] { "Poker", new PokerHandEvaluator() },
+                new object[] { "poker", new PokerHandEvaluator() },
+                new object[] { "  pokeR  ", new PokerHandEvaluator() },
+                new object[] { "BLACKJACK", new BlackJackHandEvaluator() },
+                new object[] { "Black  Jack", new BlackJackHandEvaluator() },
+                new object[] { "wAR", new WarHandEvaluator() },
+                new object[] { "War", new WarHandEvaluator() },
+            };
+        }
+
+        class TestCanDraw
+        {
             [TestCaseSource(nameof(MaxHandSizeTestCases))]
             public void WhenHandsizeAtOrBelowMax_CanDraw(int maxHandSize, int handSize, bool expected)
             {
@@ -62,7 +75,7 @@ namespace SaloonSlingers.Core.Tests
                     Evaluation = new BlackJackHandEvaluator().Evaluate(hand)
                 };
 
-                Assert.That(actual.Draw(ctx).HasValue == expected);
+                Assert.That(actual.CanDraw(ctx) == expected);
             }
 
             [TestCaseSource(nameof(MinScoreTestCases))]
@@ -84,7 +97,7 @@ namespace SaloonSlingers.Core.Tests
                     Evaluation = new HandEvaluation(HandNames.NONE, (uint)evaluationScore)
                 };
 
-                Assert.That(actual.Draw(ctx).HasValue == expected);
+                Assert.That(actual.CanDraw(ctx) == expected);
             }
 
             [TestCaseSource(nameof(MaxScoreTestCases))]
@@ -106,7 +119,7 @@ namespace SaloonSlingers.Core.Tests
                     Evaluation = new HandEvaluation(HandNames.NONE, (uint)evaluationScore)
                 };
 
-                Assert.That(actual.Draw(ctx).HasValue == expected);
+                Assert.That(actual.CanDraw(ctx) == expected);
             }
 
             [TestCaseSource(nameof(MinMaxScoreTestCases))]
@@ -129,73 +142,7 @@ namespace SaloonSlingers.Core.Tests
                     Evaluation = new HandEvaluation(HandNames.NONE, (uint)actualScore)
                 };
 
-                Assert.That(actual.Draw(ctx).HasValue == expected);
-            }
-
-            private static readonly object[][] StringEvaluatorTestCases = {
-                new object[] { "Poker", new PokerHandEvaluator() },
-                new object[] { "poker", new PokerHandEvaluator() },
-                new object[] { "  pokeR  ", new PokerHandEvaluator() },
-                new object[] { "BLACKJACK", new BlackJackHandEvaluator() },
-                new object[] { "Black  Jack", new BlackJackHandEvaluator() },
-                new object[] { "wAR", new WarHandEvaluator() },
-                new object[] { "War", new WarHandEvaluator() },
-            };
-
-            private static readonly object[][] MinScoreTestCases = {
-                new object[] { 3, 2, false },
-                new object[] { 3, 3, true },
-                new object[] { 1, 5, true },
-            };
-
-            private static readonly object[][] MaxScoreTestCases = {
-                new object[] { 3, 2, true },
-                new object[] { 3, 3, false },
-                new object[] { 1, 5, false },
-            };
-
-            private static readonly object[][] MaxHandSizeTestCases = {
-                new object[] { 3, 2, true },
-                new object[] { 3, 3, false },
-                new object[] { 1, 5, false },
-            };
-
-            private static readonly object[][] MinMaxScoreTestCases =
-            {
-                new object[] { 1, 5, 3, true },
-                new object[] { 2, 5, 3, true },
-                new object[] { 3, 3, 3, false },
-                new object[] { 1, 5, 5, false },
-                new object[] { 1, 5, 7, false },
-            };
-
-            [Test]
-            public void WhenRuleHasSideEffect_AndCanDraw_AppliesSideEffect()
-            {
-                CardGameConfig config = new()
-                {
-                    Name = "TestGame",
-                    HandEvaluator = "BlackJack",
-                    CostTable = new uint[] { 1, 3, 5, 7 }
-                };
-                CardGame actual = CardGame.Load(config);
-                Deck deck = new();
-                var hand = deck.Draw(3).ToList();
-                DrawContext ctx = new()
-                {
-                    Deck = deck,
-                    Hand = hand,
-                    Evaluation = new HandEvaluation(HandNames.NONE, 100),
-                    AttributeRegistry = new Dictionary<AttributeType, Points>()
-                    {
-                        { AttributeType.Money, new Points(10) },
-                        { AttributeType.Pot, new Points(0, uint.MaxValue) }
-                    }
-                };
-
-                Assert.That(actual.Draw(ctx).HasValue == true);
-                Assert.That(ctx.AttributeRegistry[AttributeType.Money].Value, Is.EqualTo(3));
-                Assert.That(ctx.AttributeRegistry[AttributeType.Pot].Value, Is.EqualTo(7));
+                Assert.That(actual.CanDraw(ctx) == expected);
             }
 
             [Test]
@@ -225,6 +172,66 @@ namespace SaloonSlingers.Core.Tests
                 Assert.That(actual.Draw(ctx).HasValue == false);
                 Assert.That(ctx.AttributeRegistry[AttributeType.Money].Value, Is.EqualTo(10));
                 Assert.That(ctx.AttributeRegistry[AttributeType.Pot].Value, Is.EqualTo(0));
+            }
+
+            private static readonly object[][] MinScoreTestCases = {
+                new object[] { 3, 2, false },
+                new object[] { 3, 3, true },
+                new object[] { 1, 5, true },
+            };
+
+            private static readonly object[][] MaxScoreTestCases = {
+                new object[] { 3, 2, true },
+                new object[] { 3, 3, false },
+                new object[] { 1, 5, false },
+            };
+
+            private static readonly object[][] MaxHandSizeTestCases = {
+                new object[] { 3, 2, true },
+                new object[] { 3, 3, false },
+                new object[] { 1, 5, false },
+            };
+
+            private static readonly object[][] MinMaxScoreTestCases =
+            {
+                new object[] { 1, 5, 3, true },
+                new object[] { 2, 5, 3, true },
+                new object[] { 3, 3, 3, false },
+                new object[] { 1, 5, 5, false },
+                new object[] { 1, 5, 7, false },
+            };
+        }
+
+        class TestDraw
+        {
+
+            [Test]
+            public void WhenRuleHasOnDraw_AndCanDraw_RunsOnDraw()
+            {
+                CardGameConfig config = new()
+                {
+                    Name = "TestGame",
+                    HandEvaluator = "BlackJack",
+                    CostTable = new uint[] { 1, 3, 5, 7 }
+                };
+                CardGame actual = CardGame.Load(config);
+                Deck deck = new();
+                var hand = deck.Draw(3).ToList();
+                DrawContext ctx = new()
+                {
+                    Deck = deck,
+                    Hand = hand,
+                    Evaluation = new HandEvaluation(HandNames.NONE, 100),
+                    AttributeRegistry = new Dictionary<AttributeType, Points>()
+                    {
+                        { AttributeType.Money, new Points(10) },
+                        { AttributeType.Pot, new Points(0, uint.MaxValue) }
+                    }
+                };
+
+                Assert.That(actual.Draw(ctx).HasValue == true);
+                Assert.That(ctx.AttributeRegistry[AttributeType.Money].Value, Is.EqualTo(3));
+                Assert.That(ctx.AttributeRegistry[AttributeType.Pot].Value, Is.EqualTo(7));
             }
         }
     }

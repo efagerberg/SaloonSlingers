@@ -6,12 +6,17 @@ using System.Text.RegularExpressions;
 
 namespace SaloonSlingers.Core
 {
-    public struct CardGame : IHandEvaluator
+    public struct CardGame : IHandEvaluator, IDrawRule
     {
         public string Name { get; private set; }
 
         private IList<IDrawRule> drawRules;
         private IHandEvaluator handEvaluator;
+
+        public readonly bool CanDraw(DrawContext ctx)
+        {
+            return ctx.Deck.HasCards && drawRules.All(x => x.CanDraw(ctx));
+        }
 
         public readonly Card? Draw(DrawContext ctx)
         {
@@ -33,11 +38,6 @@ namespace SaloonSlingers.Core
                 drawRules = GetDrawRulesFromConfig(config)
             };
             return rules;
-        }
-
-        private readonly bool CanDraw(DrawContext ctx)
-        {
-            return ctx.Deck.HasCards && drawRules.All(x => x.CanDraw(ctx));
         }
 
         private static IHandEvaluator GetHandEvaluatorFromString(string v)

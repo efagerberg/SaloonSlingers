@@ -1,22 +1,18 @@
 ﻿using SaloonSlingers.Core;
 
-using UnityEngine;
-
 namespace SaloonSlingers.Unity.Actor
 {
     public static class PlayerAttributeUIDataGenerator
     {
-        public static MoneyChangedUIData GetMoneyUIData(ValueChangeEvent<uint> e, AudioClip lostSFX, AudioClip gainedSFX)
+        public static MoneyChangedUIData GetMoneyChangedUIData(ValueChangeEvent<uint> e)
         {
             bool decreased = e.Before > e.After;
             uint delta = decreased ? e.Before - e.After : e.After - e.Before;
             char deltaChar = decreased ? '-' : '+';
-            AudioClip clipToPlay = decreased ? lostSFX : gainedSFX;
             return new MoneyChangedUIData()
             {
                 TotalText = e.After.ToString(),
-                MoneyDeltaText = $"{deltaChar}{delta}",
-                ClipToPlay = clipToPlay,
+                DeltaText = $"{deltaChar}{delta}"
             };
         }
 
@@ -38,8 +34,7 @@ namespace SaloonSlingers.Unity.Actor
     public struct MoneyChangedUIData
     {
         public string TotalText;
-        public string MoneyDeltaText;
-        public AudioClip ClipToPlay;
+        public string DeltaText;
     }
 
     public struct HealthUIData

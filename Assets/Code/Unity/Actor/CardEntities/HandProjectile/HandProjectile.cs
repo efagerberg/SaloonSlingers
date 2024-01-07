@@ -14,6 +14,7 @@ namespace SaloonSlingers.Unity.Actor
         public event HandProjectileHeld HandProjectileHeld;
         public event EventHandler Death;
         public IList<Card> Cards { get; private set; } = new List<Card>();
+        public bool Drawn { get => Cards.Count > 0; }
         public HandEvaluation HandEvaluation
         {
             get
@@ -64,7 +65,7 @@ namespace SaloonSlingers.Unity.Actor
             state = state.Reset();
             if (stackedBefore != state.IsStacked)
                 handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
-            TryDrawCard(spawnCard);
+            if (!Drawn) TryDrawCard(spawnCard);
             HandProjectileHeld?.Invoke(this, EventArgs.Empty);
         }
 
@@ -106,10 +107,8 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Assign(Deck newDeck, IDictionary<AttributeType, Points> newAttributeRegistry)
         {
-            if (deck != null || deck != newDeck)
-                deck = newDeck;
-            if (attributeRegistry != null || deck != newAttributeRegistry)
-                attributeRegistry = newAttributeRegistry;
+            deck = newDeck;
+            attributeRegistry = newAttributeRegistry;
         }
 
         public void Stack()
