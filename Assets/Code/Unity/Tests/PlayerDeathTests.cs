@@ -4,7 +4,6 @@ using System.Linq;
 
 using NUnit.Framework;
 
-using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
 using UnityEditor.SceneManagement;
