@@ -28,9 +28,9 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float deltaPresentationTime;
 
-        private Points hitPoints;
-        private Points money;
-        private Points pot;
+        private Attribute hitPoints;
+        private Attribute money;
+        private Attribute pot;
         private WaitForSeconds deltaDelay;
         private Coroutine moneyChangedCoroutine;
         private Coroutine potIncreasedCoroutine;
@@ -71,17 +71,17 @@ namespace SaloonSlingers.Unity.Actor
             pot.Increased -= OnPotIncreased;
         }
 
-        private void OnMoneyIncreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void OnMoneyIncreased(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             ChangeEffect(e, moneyText, ref moneyChangedCoroutine, moneyGainedSFX);
         }
 
-        private void OnMoneyDecreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void OnMoneyDecreased(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             moneyText.text = e.After.ToString();
         }
 
-        private void OnPotIncreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void OnPotIncreased(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             ChangeEffect(e, potText, ref potIncreasedCoroutine, betPlacedSFX);
         }
@@ -102,12 +102,12 @@ namespace SaloonSlingers.Unity.Actor
             textElement.text = data.TotalText;
         }
 
-        private void OnHealthChanged(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void OnHealthChanged(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             UpdateHealthBar(sender);
         }
 
-        private void UpdateHealthBar(IReadOnlyPoints hitPoints)
+        private void UpdateHealthBar(IReadOnlyAttribute hitPoints)
         {
             var healthUIData = PlayerAttributeUIDataGenerator.GetHealthUIData(hitPoints);
             healthBar.fillAmount = healthUIData.FillAmount;

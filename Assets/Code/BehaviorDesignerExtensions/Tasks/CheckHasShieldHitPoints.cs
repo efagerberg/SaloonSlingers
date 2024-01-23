@@ -7,7 +7,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 {
     public class CheckHasShieldHitPoints : Conditional
     {
-        public IReadOnlyPoints HitPoints { get; set; }
+        public IReadOnlyAttribute HitPoints { get; set; }
 
         public override void OnStart()
         {

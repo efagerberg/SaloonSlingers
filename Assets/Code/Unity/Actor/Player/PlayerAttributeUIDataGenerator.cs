@@ -16,12 +16,12 @@ namespace SaloonSlingers.Unity.Actor
             };
         }
 
-        public static string GetMoneyUIData(IReadOnlyPoints points)
+        public static string GetMoneyUIData(IReadOnlyAttribute points)
         {
             return points.Value.ToString();
         }
 
-        public static HealthUIData GetHealthUIData(IReadOnlyPoints hitPoints)
+        public static HealthUIData GetHealthUIData(IReadOnlyAttribute hitPoints)
         {
             return new HealthUIData()
             {

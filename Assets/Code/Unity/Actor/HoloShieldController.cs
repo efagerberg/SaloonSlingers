@@ -11,7 +11,7 @@ namespace SaloonSlingers.Unity
 {
     public class HoloShieldController : MonoBehaviour
     {
-        public Points HitPoints { get; set; }
+        public Attribute HitPoints { get; set; }
 
         [SerializeField]
         private GameObject shieldModel;
@@ -90,13 +90,13 @@ namespace SaloonSlingers.Unity
             localCollisionPoint = transform.InverseTransformPoint(collider.ClosestPoint(transform.position));
         }
 
-        private void OnIncrease(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void OnIncrease(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             UpdateShieldStrengthColor();
             if (e.Before == 0) StartCoroutine(nameof(ActivateShield));
         }
 
-        private void OnDecrease(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void OnDecrease(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             if (sender.Value == sender.InitialValue) return;
 

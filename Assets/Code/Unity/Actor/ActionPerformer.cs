@@ -13,18 +13,18 @@ namespace SaloonSlingers.Unity.Actor
     public class ActionPerformer : MonoBehaviour
     {
         public ActionMetaData MetaData => metaData;
-        public IReadOnlyPoints Points => points;
+        public IReadOnlyAttribute Points => points;
 
         protected bool IsPerforming { get; set; }
         protected bool IsInitialized { get; private set; } = false;
-        protected Points points;
+        protected Core.Attribute points;
         protected ActionMetaData metaData;
 
         private bool canPerformAction = true;
         private WaitForSeconds cooldownWait;
         private WaitForSeconds recoveryMinusCooldownWait;
 
-        public void Initialize(Points points, ActionMetaData metaData)
+        public void Initialize(Core.Attribute points, ActionMetaData metaData)
         {
             this.points = points;
             this.metaData = metaData;

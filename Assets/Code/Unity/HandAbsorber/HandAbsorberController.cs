@@ -20,7 +20,7 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private float volumeScale;
 
-        private Points shieldHitPoints;
+        private Attribute shieldHitPoints;
         private XRBaseInteractable plugInteractable;
 
         private void OnEnable()
@@ -77,7 +77,7 @@ namespace SaloonSlingers.Unity
             absorber.Absorb(shieldHitPoints, projectile);
         }
 
-        private void CheckIfShouldPlug(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void CheckIfShouldPlug(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             if (e.After > 0)
             {

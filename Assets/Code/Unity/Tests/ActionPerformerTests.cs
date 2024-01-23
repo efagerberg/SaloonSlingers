@@ -22,7 +22,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
         [Test]
         public void WhenNoPoints_ReturnsNoCoroutine()
         {
-            Points points = new(0);
+            Attribute points = new(0);
 
             static IEnumerator testCoroutine()
             {
@@ -40,7 +40,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
         public IEnumerator WhenPoints_PerformsAction()
         {
             uint originalPointCount = 2;
-            Points points = new(originalPointCount);
+            Attribute points = new(originalPointCount);
             bool ranCoroutine = false;
             IEnumerator testCoroutine()
             {
@@ -64,7 +64,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
         public void WhenAlreadyRunning_ReturnsNoCoroutine()
         {
             uint originalPointCount = 2;
-            Points points = new(originalPointCount);
+            Attribute points = new(originalPointCount);
             static IEnumerator testCoroutine()
             {
                 yield return new WaitForSeconds(metaData.Duration);
@@ -84,7 +84,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
         public IEnumerator WhenRunTwice_BeforeCooldown_OnlyGeneratesOneCoroutine()
         {
             uint originalPointCount = 2;
-            Points points = new(originalPointCount);
+            Attribute points = new(originalPointCount);
             static IEnumerator testCoroutine()
             {
                 yield return new WaitForSeconds(metaData.Duration);

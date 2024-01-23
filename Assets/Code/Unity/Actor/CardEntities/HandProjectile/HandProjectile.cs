@@ -49,7 +49,7 @@ namespace SaloonSlingers.Unity.Actor
         private HandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private Deck deck;
-        private IDictionary<AttributeType, Points> attributeRegistry;
+        private IDictionary<AttributeType, Core.Attribute> attributeRegistry;
         private GameManager gameManager;
         private HandEvaluation handEvaluation;
         private bool requiresEvaluation = false;
@@ -105,7 +105,7 @@ namespace SaloonSlingers.Unity.Actor
             rigidBody.AddForce(offset, ForceMode.VelocityChange);
         }
 
-        public void Assign(Deck newDeck, IDictionary<AttributeType, Points> newAttributeRegistry)
+        public void Assign(Deck newDeck, IDictionary<AttributeType, Core.Attribute> newAttributeRegistry)
         {
             deck = newDeck;
             attributeRegistry = newAttributeRegistry;
@@ -186,7 +186,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleCollision(GameObject collidingObject)
         {
-            Points targetHitPoints = null;
+            Core.Attribute targetHitPoints = null;
             if (collidingObject.TryGetComponent(out Attributes targetAttributes) &&
                 targetAttributes.Registry.ContainsKey(AttributeType.Health))
                 targetHitPoints = targetAttributes.Registry[AttributeType.Health];

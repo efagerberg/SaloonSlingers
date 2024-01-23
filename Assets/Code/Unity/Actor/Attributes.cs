@@ -8,6 +8,6 @@ namespace SaloonSlingers.Unity
 {
     public class Attributes : MonoBehaviour
     {
-        public Dictionary<AttributeType, Points> Registry { get; private set; } = new();
+        public Dictionary<AttributeType, Attribute> Registry { get; private set; } = new();
     }
 }

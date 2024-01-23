@@ -22,12 +22,12 @@ namespace SaloonSlingers.Unity
                 if (!found) throw new InvalidAttributeError($"Unknown point type {rawType}");
 
                 uint value = config.Value;
-                Points points = new(value, uint.MaxValue);
-                attributes.Registry.Add(typeMetaData.type, points);
+                Core.Attribute attribute = new(value, uint.MaxValue);
+                attributes.Registry.Add(typeMetaData.type, attribute);
                 if (typeMetaData.type == AttributeType.Money)
                 {
-                    var potPoints = new Points(0, uint.MaxValue);
-                    attributes.Registry.Add(AttributeType.Pot, potPoints);
+                    var potAttribute = new Core.Attribute(0, uint.MaxValue);
+                    attributes.Registry.Add(AttributeType.Pot, potAttribute);
                 }
 
                 if (typeMetaData.forAction)
@@ -39,7 +39,7 @@ namespace SaloonSlingers.Unity
                         Cooldown = config.Cooldown,
                         RecoveryPeriod = config.RecoveryPeriod
                     };
-                    performer.Initialize(points, metaData);
+                    performer.Initialize(attribute, metaData);
                 }
             }
         }

@@ -10,7 +10,7 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void GetMoneyUIData_ReturnsTotal_WhenGivenPoints()
         {
-            var money = new Points(100);
+            var money = new Attribute(100);
             var data = PlayerAttributeUIDataGenerator.GetMoneyUIData(money);
 
             Assert.That(data, Is.EqualTo("100"));
@@ -39,7 +39,7 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void GetHealthUIData_ReturnsExpected_FillAndPercentText()
         {
-            var points = new Points(10);
+            var points = new Attribute(10);
             points.Decrease(2);
             var data = PlayerAttributeUIDataGenerator.GetHealthUIData(points);
 

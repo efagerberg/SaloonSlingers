@@ -162,10 +162,10 @@ namespace SaloonSlingers.Core.Tests
                     Deck = deck,
                     Hand = hand,
                     Evaluation = new HandEvaluation(HandNames.NONE, 100),
-                    AttributeRegistry = new Dictionary<AttributeType, Points>()
+                    AttributeRegistry = new Dictionary<AttributeType, Attribute>()
                     {
-                        { AttributeType.Money, new Points(10) },
-                        { AttributeType.Pot, new Points(0, uint.MaxValue) }
+                        { AttributeType.Money, new Attribute(10) },
+                        { AttributeType.Pot, new Attribute(0, uint.MaxValue) }
                     }
                 };
 
@@ -222,10 +222,10 @@ namespace SaloonSlingers.Core.Tests
                     Deck = deck,
                     Hand = hand,
                     Evaluation = new HandEvaluation(HandNames.NONE, 100),
-                    AttributeRegistry = new Dictionary<AttributeType, Points>()
+                    AttributeRegistry = new Dictionary<AttributeType, Attribute>()
                     {
-                        { AttributeType.Money, new Points(10) },
-                        { AttributeType.Pot, new Points(0, uint.MaxValue) }
+                        { AttributeType.Money, new Attribute(10) },
+                        { AttributeType.Pot, new Attribute(0, uint.MaxValue) }
                     }
                 };
 

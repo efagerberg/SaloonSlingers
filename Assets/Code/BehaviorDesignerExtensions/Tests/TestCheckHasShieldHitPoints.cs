@@ -16,7 +16,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         {
             var task = new CheckHasShieldHitPoints()
             {
-                HitPoints = new Points(0)
+                HitPoints = new Attribute(0)
             };
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Failure));
@@ -27,7 +27,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         {
             var task = new CheckHasShieldHitPoints()
             {
-                HitPoints = new Points(1)
+                HitPoints = new Attribute(1)
             };
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Success));
@@ -37,9 +37,9 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         public void WhenHasEnemy_OnStart_UsesShieldHitPoints()
         {
             var attributes = TestUtils.CreateComponent<Attributes>();
-            attributes.Registry[AttributeType.Health] = new Points(1);
+            attributes.Registry[AttributeType.Health] = new Attribute(1);
             var enemy = attributes.gameObject.AddComponent<Enemy>();
-            enemy.ShieldHitPoints = new Points(1);
+            enemy.ShieldHitPoints = new Attribute(1);
             var task = new CheckHasShieldHitPoints
             {
                 GameObject = enemy.gameObject

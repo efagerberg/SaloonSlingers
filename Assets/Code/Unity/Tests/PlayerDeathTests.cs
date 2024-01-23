@@ -25,7 +25,7 @@ namespace SaloonSlingers.Unity.Tests
         [RequiresPlayMode]
         public IEnumerator DoesNothing_WhenHitPointsRemaining()
         {
-            var hitPoints = new Points(10);
+            var hitPoints = new Core.Attribute(10);
             var toDisable = TestUtils.CreateComponent<TestBehavior>();
             var subject = TestUtils.CreateComponent<PlayerDeath>();
             subject.HitPoints = hitPoints;
@@ -44,7 +44,7 @@ namespace SaloonSlingers.Unity.Tests
         [RequiresPlayMode]
         public IEnumerator DoesNothing_WhenDisabled_ThenHitPointsReducedTo0()
         {
-            var hitPoints = new Points(2);
+            var hitPoints = new Core.Attribute(2);
             var toDisable = TestUtils.CreateComponent<TestBehavior>();
             var subject = TestUtils.CreateComponent<PlayerDeath>();
             subject.HitPoints = hitPoints;
@@ -65,7 +65,7 @@ namespace SaloonSlingers.Unity.Tests
         [RequiresPlayMode]
         public IEnumerator StopsLocomotionAndLoadsGameOverScene_WhenHPReaches0([ValueSource(nameof(deathTestInputs))] bool checkWorksWhenComponentReset)
         {
-            var hitPoints = new Points(1);
+            var hitPoints = new Core.Attribute(1);
             var toDisable = TestUtils.CreateComponent<TestBehavior>();
             var subject = TestUtils.CreateComponent<PlayerDeath>();
             subject.HitPoints = hitPoints;

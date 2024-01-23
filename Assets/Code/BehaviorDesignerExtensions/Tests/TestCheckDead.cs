@@ -15,7 +15,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         {
             var task = new CheckDead
             {
-                HitPoints = new Points(1)
+                HitPoints = new Attribute(1)
             };
 
             Assert.That(task.OnUpdate(), Is.EqualTo(TaskStatus.Failure));
@@ -24,7 +24,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         [Test]
         public void WhenHealthPointsDecreasedButNot0_ReturnFailure()
         {
-            var hitPoints = new Points(2);
+            var hitPoints = new Attribute(2);
             var task = new CheckDead
             {
                 HitPoints = hitPoints
@@ -37,7 +37,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         [Test]
         public void WhenHealthPointsDecreasedTo0_ReturnsSuccess()
         {
-            var hitPoints = new Points(2);
+            var hitPoints = new Attribute(2);
             var task = new CheckDead()
             {
                 HitPoints = hitPoints
@@ -51,7 +51,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         public void WhenHasAttributes_OnAwake_UsesAttributeHealth()
         {
             var attributes = TestUtils.CreateComponent<Attributes>();
-            var points = new Points(1);
+            var points = new Attribute(1);
             attributes.Registry[AttributeType.Health] = points;
             var task = new CheckDead
             {
