@@ -6,7 +6,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class PlayerDeath : MonoBehaviour
     {
-        public IReadOnlyPoints HitPoints { get; set; }
+        public IReadOnlyAttribute HitPoints { get; set; }
 
         public string GameOverSceneName;
         public Behaviour[] ComponentsToDisable;
@@ -29,7 +29,7 @@ namespace SaloonSlingers.Unity.Actor
             HitPoints.Decreased += OnHitPointsDecreased;
         }
 
-        private void OnHitPointsDecreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             if (e.After != 0) return;
 

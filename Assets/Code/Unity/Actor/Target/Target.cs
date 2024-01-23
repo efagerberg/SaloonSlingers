@@ -14,7 +14,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float raycastDistance = 0.1f;
 
-        private Points hitPoints;
+        private Core.Attribute hitPoints;
         private bool switchDirection = false;
 
         public void ResetActor()
@@ -42,7 +42,7 @@ namespace SaloonSlingers.Unity.Actor
             hitPoints.Decreased += OnHitPointsDecreased;
         }
 
-        private void OnHitPointsDecreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             if (e.After == 0)
                 Death?.Invoke(gameObject, EventArgs.Empty);

@@ -19,7 +19,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private IEnumerator flashCoroutine;
         private float originalAlpha;
-        private Points hitPoints;
+        private Attribute hitPoints;
 
         private void Awake()
         {
@@ -47,7 +47,7 @@ namespace SaloonSlingers.Unity.Actor
             hitPoints.Decreased += OnHitPointsDecreased;
         }
 
-        private void OnHitPointsDecreased(IReadOnlyPoints sender, ValueChangeEvent<uint> e)
+        private void OnHitPointsDecreased(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             flashCoroutine = Flash(hitFlashCanvasGroup, originalAlpha, 0, duration, flashCoroutine);
             audioSource.PlayOneShot(hitSoundFX);

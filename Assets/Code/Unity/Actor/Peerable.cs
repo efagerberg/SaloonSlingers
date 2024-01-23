@@ -87,7 +87,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (IsInitialized) return;
 
-            Points points = new(startingPeers);
+            Attribute points = new(startingPeers);
             ActionMetaData metaData = new()
             {
                 Duration = startingDuration,

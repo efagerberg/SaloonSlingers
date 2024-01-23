@@ -7,7 +7,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 {
     public class CheckHealthDamaged : Conditional
     {
-        public IReadOnlyPoints HitPoints { get; set; }
+        public IReadOnlyAttribute HitPoints { get; set; }
         private uint currentPoints;
 
         public override void OnAwake()

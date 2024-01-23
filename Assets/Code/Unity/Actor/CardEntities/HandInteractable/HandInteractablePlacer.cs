@@ -1,5 +1,7 @@
 using System;
 
+using SaloonSlingers.Core;
+
 using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
@@ -9,17 +11,27 @@ namespace SaloonSlingers.Unity.Actor
         private DeckGraphic deckGraphic;
         private ISpawner<GameObject> handInteractableSpawner;
         private GameObject placed;
+        private DrawContext firstDrawContext;
 
         private void Awake()
         {
             deckGraphic = GetComponent<DeckGraphic>();
+            var emptyHand = new Card[] { };
+            firstDrawContext = new()
+            {
+                AttributeRegistry = LevelManager.Instance.Player.GetComponent<Attributes>().Registry,
+                Deck = deckGraphic.Deck,
+                Hand = emptyHand,
+                Evaluation = GameManager.Instance.Saloon.HouseGame.Evaluate(emptyHand)
+            };
         }
 
         private void Start()
         {
             handInteractableSpawner = LevelManager.Instance.HandInteractableSpawner;
 
-            if (!deckGraphic.CanDraw) return;
+            if (!deckGraphic.CanDraw ||
+                !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext)) return;
 
             PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
         }
@@ -46,7 +58,9 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (sender.gameObject == placed) placed = null;
 
-            if (!deckGraphic.CanDraw || placed != null) return;
+            if (!deckGraphic.CanDraw ||
+                !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext) ||
+                placed != null) return;
 
             PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
         }

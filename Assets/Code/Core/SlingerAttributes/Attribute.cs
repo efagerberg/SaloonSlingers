@@ -2,21 +2,21 @@ using System;
 
 namespace SaloonSlingers.Core
 {
-    public delegate void PointsIncreasedHandler(IReadOnlyPoints sender, ValueChangeEvent<uint> e);
-    public delegate void PointsDecreasedHandler(IReadOnlyPoints sender, ValueChangeEvent<uint> e);
+    public delegate void IncreasedHandler(IReadOnlyAttribute sender, ValueChangeEvent<uint> e);
+    public delegate void DecreasedHandler(IReadOnlyAttribute sender, ValueChangeEvent<uint> e);
 
-    public interface IReadOnlyPoints
+    public interface IReadOnlyAttribute
     {
         uint Value { get; }
         uint MaxValue { get; }
         uint InitialValue { get; }
-        event PointsIncreasedHandler Increased;
-        event PointsDecreasedHandler Decreased;
+        event IncreasedHandler Increased;
+        event DecreasedHandler Decreased;
         float AsPercent();
     }
 
     [Serializable]
-    public class Points : IReadOnlyPoints
+    public class Attribute : IReadOnlyAttribute
     {
         public uint Value
         {
@@ -37,8 +37,8 @@ namespace SaloonSlingers.Core
         }
         public uint MaxValue { get; }
         public uint InitialValue { get; private set; }
-        public event PointsIncreasedHandler Increased;
-        public event PointsDecreasedHandler Decreased;
+        public event IncreasedHandler Increased;
+        public event DecreasedHandler Decreased;
 
         public void Reset()
         {
@@ -51,10 +51,10 @@ namespace SaloonSlingers.Core
             Value = newValue;
         }
 
-        public Points(uint initial) : this(initial, initial)
+        public Attribute(uint initial) : this(initial, initial)
         { }
 
-        public Points(uint initial, uint max)
+        public Attribute(uint initial, uint max)
         {
             InitialValue = initial;
             MaxValue = max;
@@ -82,7 +82,7 @@ namespace SaloonSlingers.Core
             return Value / (float)InitialValue;
         }
 
-        public static implicit operator uint(Points p) => p.Value;
+        public static implicit operator uint(Attribute p) => p.Value;
 
         private uint _value;
     }

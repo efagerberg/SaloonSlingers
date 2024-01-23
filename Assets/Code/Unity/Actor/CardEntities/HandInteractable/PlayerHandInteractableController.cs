@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
@@ -20,41 +19,48 @@ namespace SaloonSlingers.Unity.Actor
         private HandProjectile handProjectile;
         private DeckGraphic deckGraphic;
         private Homable homable;
-        private int? slingerId;
 
         private Rigidbody rb;
         private HomingStrength homingStrengthComponent;
         private CharacterControllerThrowOffsetCalculator throwOffsetCalculator;
         private VisibilityDetector visibilityDetector;
-        private readonly HashSet<int> registeredProjectileIds = new();
+        private bool initialized = false;
+        private bool eventsRegistered = false;
 
         public void OnSelectEnter(SelectEnterEventArgs args)
         {
-            if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
+            if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor)))
+                return;
 
             var player = LevelManager.Instance.Player;
             int newSlingerId = player.transform.GetInstanceID();
-            bool sameSlinger = newSlingerId == slingerId;
-            if (slingerId == null || !sameSlinger)
-            {
-                slingerId = newSlingerId;
-                ActorHandedness handedness = player.GetComponent<ActorHandedness>();
-                homingStrengthComponent = player.GetComponent<HomingStrength>();
-                throwOffsetCalculator = player.GetComponent<CharacterControllerThrowOffsetCalculator>();
-                visibilityDetector = player.GetComponent<VisibilityDetector>();
-                deckGraphic = handedness.DeckGraphic;
-                handProjectile.Assign(deckGraphic.Deck, player.GetComponent<Attributes>().Registry);
-            }
+            if (!initialized) Initialize(player);
 
             handProjectile.Pickup(deckGraphic.Spawn);
+            handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
             peerInteractable.enabled = true;
             homable.enabled = true;
-            if (!registeredProjectileIds.Contains(handProjectile.GetInstanceID()))
+            if (!eventsRegistered)
             {
                 handProjectile.Death += OnHandProjectileDied;
-                handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
-                registeredProjectileIds.Add(handProjectile.GetInstanceID());
+                eventsRegistered = true;
             }
+        }
+
+        /// <summary>
+        /// Sets up the expensive to initialize state once for an object even if it is disabled and renabled (pooling).
+        /// </summary>
+        /// <param name="player"></param>
+        private void Initialize(GameObject player)
+        {
+            initialized = true;
+            ActorHandedness handedness = player.GetComponent<ActorHandedness>();
+            homingStrengthComponent = player.GetComponent<HomingStrength>();
+            throwOffsetCalculator = player.GetComponent<CharacterControllerThrowOffsetCalculator>();
+            visibilityDetector = player.GetComponent<VisibilityDetector>();
+            deckGraphic = handedness.DeckGraphic;
+            var attributes = player.GetComponent<Attributes>();
+            handProjectile.Assign(deckGraphic.Deck, attributes.Registry);
         }
 
         public void OnSelectExit(SelectExitEventArgs args)
@@ -72,15 +78,14 @@ namespace SaloonSlingers.Unity.Actor
             homingStrengthComponent.Calculator.StartNewThrow();
         }
 
-
         private void OnHandProjectileDied(object sender, EventArgs e)
         {
             homable.Target = null;
             homable.Strength = 0;
             homable.enabled = false;
+            eventsRegistered = false;
             var instance = sender as GameObject;
             var projectile = instance.GetComponent<HandProjectile>();
-            registeredProjectileIds.Remove(projectile.GetInstanceID());
             projectile.Death -= OnHandProjectileDied;
         }
 

@@ -13,7 +13,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         {
             var task = new CheckHealthDamaged()
             {
-                HitPoints = new Points(1)
+                HitPoints = new Attribute(1)
             };
             task.OnAwake();
 
@@ -23,7 +23,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         [Test]
         public void WhenHitPointsDecreased_ReturnsSuccess()
         {
-            var hitPoints = new Points(2);
+            var hitPoints = new Attribute(2);
             var task = new CheckHealthDamaged() { HitPoints = hitPoints };
             task.OnAwake();
             hitPoints.Decrement();
@@ -35,7 +35,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions.Tests
         [Test]
         public void WhenHitPointsDecreased_ThenUpdated_ReturnsFailure()
         {
-            var hitPoints = new Points(2);
+            var hitPoints = new Attribute(2);
             var task = new CheckHealthDamaged() { HitPoints = hitPoints };
             task.OnAwake();
             hitPoints.Decrement();

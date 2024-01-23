@@ -12,8 +12,8 @@ namespace SaloonSlingers.Unity.Actor
     {
         public event EventHandler Death;
         public Deck Deck { get; private set; }
-        public Points ShieldHitPoints { get; set; }
-        public IDictionary<AttributeType, Points> AttributeRegistry { get; private set; }
+        public Core.Attribute ShieldHitPoints { get; set; }
+        public IDictionary<AttributeType, Core.Attribute> AttributeRegistry { get; private set; }
 
         [SerializeField]
         private GameObject shield;

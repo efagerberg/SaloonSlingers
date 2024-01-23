@@ -14,6 +14,7 @@ namespace SaloonSlingers.Unity.Actor
         public event HandProjectileHeld HandProjectileHeld;
         public event EventHandler Death;
         public IList<Card> Cards { get; private set; } = new List<Card>();
+        public bool Drawn { get => Cards.Count > 0; }
         public HandEvaluation HandEvaluation
         {
             get
@@ -48,7 +49,7 @@ namespace SaloonSlingers.Unity.Actor
         private HandLayoutMediator handLayoutMediator;
         private Func<int, IEnumerable<float>> cardRotationCalculator;
         private Deck deck;
-        private IDictionary<AttributeType, Points> attributeRegistry;
+        private IDictionary<AttributeType, Core.Attribute> attributeRegistry;
         private GameManager gameManager;
         private HandEvaluation handEvaluation;
         private bool requiresEvaluation = false;
@@ -64,7 +65,7 @@ namespace SaloonSlingers.Unity.Actor
             state = state.Reset();
             if (stackedBefore != state.IsStacked)
                 handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
-            TryDrawCard(spawnCard);
+            if (!Drawn) TryDrawCard(spawnCard);
             HandProjectileHeld?.Invoke(this, EventArgs.Empty);
         }
 
@@ -104,12 +105,10 @@ namespace SaloonSlingers.Unity.Actor
             rigidBody.AddForce(offset, ForceMode.VelocityChange);
         }
 
-        public void Assign(Deck newDeck, IDictionary<AttributeType, Points> newAttributeRegistry)
+        public void Assign(Deck newDeck, IDictionary<AttributeType, Core.Attribute> newAttributeRegistry)
         {
-            if (deck != null || deck != newDeck)
-                deck = newDeck;
-            if (attributeRegistry != null || deck != newAttributeRegistry)
-                attributeRegistry = newAttributeRegistry;
+            deck = newDeck;
+            attributeRegistry = newAttributeRegistry;
         }
 
         public void Stack()
@@ -187,7 +186,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleCollision(GameObject collidingObject)
         {
-            Points targetHitPoints = null;
+            Core.Attribute targetHitPoints = null;
             if (collidingObject.TryGetComponent(out Attributes targetAttributes) &&
                 targetAttributes.Registry.ContainsKey(AttributeType.Health))
                 targetHitPoints = targetAttributes.Registry[AttributeType.Health];
@@ -200,7 +199,8 @@ namespace SaloonSlingers.Unity.Actor
                 else targetHitPoints.Decrement();
             }
 
-            if (state.IsThrown) Kill();
+            if (state.IsThrown && collidingObject.layer != LayerMask.NameToLayer("Hand"))
+                Kill();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace SaloonSlingers.Core
     public struct DrawContext
     {
         public IList<Card> Hand;
-        public IDictionary<AttributeType, Points> AttributeRegistry;
+        public IDictionary<AttributeType, Attribute> AttributeRegistry;
         public HandEvaluation Evaluation;
         public Deck Deck;
     }
