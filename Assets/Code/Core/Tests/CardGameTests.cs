@@ -233,6 +233,35 @@ namespace SaloonSlingers.Core.Tests
                 Assert.That(ctx.AttributeRegistry[AttributeType.Money].Value, Is.EqualTo(3));
                 Assert.That(ctx.AttributeRegistry[AttributeType.Pot].Value, Is.EqualTo(7));
             }
+
+            [Test]
+            public void WhenRuleHasNoOnDraw_AndCanDraw_DoesNothingExtra()
+            {
+                CardGameConfig config = new()
+                {
+                    Name = "TestGame",
+                    HandEvaluator = "BlackJack",
+                    MaxHandSize = 4
+                };
+                CardGame actual = CardGame.Load(config);
+                Deck deck = new();
+                var hand = deck.Draw(3).ToList();
+                DrawContext ctx = new()
+                {
+                    Deck = deck,
+                    Hand = hand,
+                    Evaluation = new HandEvaluation(HandNames.NONE, 100),
+                    AttributeRegistry = new Dictionary<AttributeType, Attribute>()
+                    {
+                        { AttributeType.Money, new Attribute(10) },
+                        { AttributeType.Pot, new Attribute(0, uint.MaxValue) }
+                    }
+                };
+
+                Assert.That(actual.Draw(ctx).HasValue == true);
+                Assert.That(ctx.AttributeRegistry[AttributeType.Money].Value, Is.EqualTo(10));
+                Assert.That(ctx.AttributeRegistry[AttributeType.Pot].Value, Is.EqualTo(0));
+            }
         }
     }
 }
