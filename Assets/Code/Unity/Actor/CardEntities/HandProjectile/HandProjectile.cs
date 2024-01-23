@@ -199,7 +199,8 @@ namespace SaloonSlingers.Unity.Actor
                 else targetHitPoints.Decrement();
             }
 
-            if (state.IsThrown) Kill();
+            if (state.IsThrown && collidingObject.layer != LayerMask.NameToLayer("Hand"))
+                Kill();
         }
     }
 }

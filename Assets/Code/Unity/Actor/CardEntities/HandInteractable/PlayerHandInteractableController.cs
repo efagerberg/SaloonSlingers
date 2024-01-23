@@ -29,7 +29,8 @@ namespace SaloonSlingers.Unity.Actor
 
         public void OnSelectEnter(SelectEnterEventArgs args)
         {
-            if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
+            if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor)))
+                return;
 
             var player = LevelManager.Instance.Player;
             int newSlingerId = player.transform.GetInstanceID();
