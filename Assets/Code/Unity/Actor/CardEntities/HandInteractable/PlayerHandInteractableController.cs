@@ -119,6 +119,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             mainInteractable.enabled = false;
             peerInteractable.enabled = false;
+            initialized = false;
         }
 
         private void FixedUpdate()

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using SaloonSlingers.Core;
@@ -7,6 +8,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
+
     public delegate void HandProjectileHeld(HandProjectile sender, EventArgs e);
 
     public class HandProjectile : MonoBehaviour, IActor
@@ -184,23 +186,20 @@ namespace SaloonSlingers.Unity.Actor
             HandleCollision(collider.gameObject);
         }
 
+        /// <summary>
+        /// Defers killing entity until the next frame. Useful in cases of collision where you want
+        /// the entities colliding with this object to do some process before removing the actor.
+        /// </summary>
+        private IEnumerator KillNextFrame()
+        {
+            yield return null;
+            Kill();
+        }
+
         private void HandleCollision(GameObject collidingObject)
         {
-            Core.Attribute targetHitPoints = null;
-            if (collidingObject.TryGetComponent(out Attributes targetAttributes) &&
-                targetAttributes.Registry.ContainsKey(AttributeType.Health))
-                targetHitPoints = targetAttributes.Registry[AttributeType.Health];
-            else if (collidingObject.TryGetComponent(out HoloShieldController controller))
-                targetHitPoints = controller.HitPoints;
-            if (targetHitPoints != null)
-            {
-                if (collidingObject.CompareTag("HoloShield"))
-                    targetHitPoints.Decrease(HandEvaluation.Score);
-                else targetHitPoints.Decrement();
-            }
-
             if (state.IsThrown && collidingObject.layer != LayerMask.NameToLayer("Hand"))
-                Kill();
+                StartCoroutine(KillNextFrame());
         }
     }
 }

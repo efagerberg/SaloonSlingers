@@ -66,7 +66,9 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
-            HitPoints ??= new(0, uint.MaxValue);
+            HitPoints ??= new Attribute(0, uint.MaxValue);
+            var damageTarget = GetComponent<HandProjectileDamageTarget>();
+            damageTarget.HitPoints = HitPoints;
             shieldMaterial = shieldModel.GetComponent<MeshRenderer>().material;
             shieldMaterial.SetFloat("_BreathOffset", Random.Range(0f, 1f));
             var zipped = (new string[] { "_FresnelColor", "_FrontColor", "_BackColor" }).Select(key => (key, shieldMaterial.GetColor(key)));
