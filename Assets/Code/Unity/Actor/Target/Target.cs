@@ -26,26 +26,25 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (hitPoints == null) return;
 
-            hitPoints.Decreased += OnHitPointsDecreased;
+            hitPoints.Depleted += OnDeath;
         }
 
         private void OnDisable()
         {
             if (hitPoints == null) return;
 
-            hitPoints.Decreased -= OnHitPointsDecreased;
+            hitPoints.Depleted -= OnDeath;
         }
 
         private void Start()
         {
             hitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
-            hitPoints.Decreased += OnHitPointsDecreased;
+            hitPoints.Depleted += OnDeath;
         }
 
-        private void OnHitPointsDecreased(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
+        private void OnDeath(IReadOnlyAttribute sender, EventArgs e)
         {
-            if (e.After == 0)
-                Death?.Invoke(gameObject, EventArgs.Empty);
+            Death?.Invoke(gameObject, EventArgs.Empty);
         }
 
         private void FixedUpdate()

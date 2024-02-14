@@ -1,3 +1,5 @@
+using System;
+
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
@@ -7,7 +9,7 @@ namespace SaloonSlingers.Unity
 {
     public class HandAbsorber : MonoBehaviour
     {
-        public Attribute Stacks { get; private set; }
+        public Core.Attribute Stacks { get; private set; }
         public bool CanAbsorb { get => Stacks > 0; }
 
         [SerializeField]
@@ -15,27 +17,25 @@ namespace SaloonSlingers.Unity
 
         private void Awake()
         {
-            Stacks = new Attribute(startingStacks);
+            Stacks = new Core.Attribute(startingStacks);
         }
 
-        public void Absorb(Attribute points, HandProjectile projectile)
+        public void Absorb(Core.Attribute shieldPoints, HandProjectile projectile)
         {
             if (!CanAbsorb) return;
 
-            points.Decreased += CheckStackRegained;
+            shieldPoints.Depleted += OnShieldBroken;
             Stacks.Decrement();
 
             projectile.Pause();
-            points.Reset(points + projectile.HandEvaluation.Score);
+            shieldPoints.Reset(shieldPoints + projectile.HandEvaluation.Score);
             projectile.Kill();
         }
 
-        private void CheckStackRegained(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
+        private void OnShieldBroken(IReadOnlyAttribute sender, EventArgs e)
         {
-            if (e.After != 0) return;
-
             Stacks.Increment();
-            sender.Decreased -= CheckStackRegained;
+            sender.Depleted -= OnShieldBroken;
         }
     }
 }

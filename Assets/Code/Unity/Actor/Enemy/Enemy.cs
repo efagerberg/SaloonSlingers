@@ -19,15 +19,37 @@ namespace SaloonSlingers.Unity.Actor
         private GameObject shield;
         [SerializeField]
         private HoloShieldController holoShieldController;
+        [SerializeField]
+        private Collider _collider;
+
+        private void OnEnable()
+        {
+            if (AttributeRegistry == null || !AttributeRegistry.TryGetValue(AttributeType.Health, out var hp))
+                return;
+
+            hp.Depleted += OnHealthDepleted;
+        }
+
+        private void OnDisable()
+        {
+            if (AttributeRegistry == null || !AttributeRegistry.TryGetValue(AttributeType.Health, out var hp))
+                return;
+
+            hp.Depleted -= OnHealthDepleted;
+        }
 
         private void Awake()
         {
             Deck = new Deck().Shuffle();
+            _collider ??= GetComponent<Collider>();
         }
 
         private void Start()
         {
             AttributeRegistry = GetComponent<Attributes>().Registry;
+            if (AttributeRegistry.TryGetValue(AttributeType.Health, out var hp))
+                hp.Depleted += OnHealthDepleted;
+
             ShieldHitPoints ??= holoShieldController?.HitPoints;
         }
 
@@ -35,6 +57,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             AttributeRegistry[AttributeType.Health].Reset();
             ShieldHitPoints.Reset(0);
+            _collider.enabled = true;
             Deck = new Deck().Shuffle();
         }
 
@@ -45,8 +68,11 @@ namespace SaloonSlingers.Unity.Actor
 
         private IEnumerator DoDeath()
         {
+            _collider.enabled = false;
             yield return new WaitForSeconds(1f);
             Death?.Invoke(gameObject, EventArgs.Empty);
         }
+
+        private void OnHealthDepleted(IReadOnlyAttribute sender, EventArgs e) => Kill();
     }
 }

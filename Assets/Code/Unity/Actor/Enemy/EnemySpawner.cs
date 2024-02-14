@@ -82,8 +82,6 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (pools.Values.Sum(p => p.CountSpanwed) == maxActiveEnemies || gameManager.Saloon.EnemyInventory.Completed) return;
 
-            if (gameManager.Saloon.EnemyInventory.Completed) return;
-
             var enemyStr = gameManager.Saloon.EnemyInventory.GetRandomEnemy();
             if (enemyStr == null)
             {
