@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.TestTools.Utils;
 
-public class CentererTests
+public class XROriginRecentererTests
 {
     [Test]
     public void CentersXROrigin_OnReference()
@@ -28,10 +28,10 @@ public class CentererTests
             new Vector3(1, 2, 3),
             Quaternion.Euler(90, 1, 123)
         );
-        var subject = subjectGO.AddComponent<Centerer>();
+        var subject = subjectGO.AddComponent<XROriginRecenter>();
         subject.OrientationReference = referenceGO.transform;
         subject.Origin = origin;
-        subject.Center();
+        subject.Recenter();
 
         var comparer = new Vector3EqualityComparer(10e-6f);
         Assert.That(origin.transform.up, Is.EqualTo(referenceGO.transform.up).Using(comparer));
@@ -56,7 +56,7 @@ public class CentererTests
             new Vector3(1, 2, 3),
             Quaternion.Euler(90, 1, 123)
         );
-        var subject = subjectGO.AddComponent<Centerer>();
+        var subject = subjectGO.AddComponent<XROriginRecenter>();
         subject.OrientationReference = referenceGO.transform;
         yield return null;
 

@@ -2,42 +2,45 @@ using System.Linq;
 
 using UnityEngine;
 
-public class SpherecastVisualizer : MonoBehaviour
+namespace SaloonSlingers.Unity
 {
-    [SerializeField]
-    private float maxDistance = 10f;
-    [SerializeField]
-    private float radius = 0.25f;
-    [SerializeField]
-    private LayerMask mask;
-
-    private void OnDrawGizmosSelected()
+    public class SpherecastVisualizer : MonoBehaviour
     {
-        DrawSpherecast(transform, radius, maxDistance, mask);
-    }
+        [SerializeField]
+        private float maxDistance = 10f;
+        [SerializeField]
+        private float radius = 0.25f;
+        [SerializeField]
+        private LayerMask mask;
 
-    public static void DrawSpherecast(Transform transform, float radius, float maxDistance, LayerMask mask)
-    {
-        bool isHit = Physics.SphereCast(transform.position, radius, transform.forward, out RaycastHit hit, maxDistance, mask);
-        Gizmos.color = Color.green;
-        Gizmos.DrawRay(transform.position, transform.forward * maxDistance);
-        if (isHit)
+        private void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(hit.point, radius);
+            DrawSpherecast(transform, radius, maxDistance, mask);
         }
-    }
 
-    public static void DrawSphereCastAll(Transform transform, float radius, float maxDistance, LayerMask mask, int n = 5)
-    {
-        var hits = new RaycastHit[n];
-        int nHits = Physics.SphereCastNonAlloc(transform.position, radius, transform.forward, hits, maxDistance, mask);
-        Gizmos.color = Color.green;
-        Gizmos.DrawRay(transform.position, transform.forward * maxDistance);
-        foreach (var hit in hits.Take(nHits))
+        public static void DrawSpherecast(Transform transform, float radius, float maxDistance, LayerMask mask)
         {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(hit.point, radius);
+            bool isHit = Physics.SphereCast(transform.position, radius, transform.forward, out RaycastHit hit, maxDistance, mask);
+            Gizmos.color = Color.green;
+            Gizmos.DrawRay(transform.position, transform.forward * maxDistance);
+            if (isHit)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawSphere(hit.point, radius);
+            }
+        }
+
+        public static void DrawSphereCastAll(Transform transform, float radius, float maxDistance, LayerMask mask, int n = 5)
+        {
+            var hits = new RaycastHit[n];
+            int nHits = Physics.SphereCastNonAlloc(transform.position, radius, transform.forward, hits, maxDistance, mask);
+            Gizmos.color = Color.green;
+            Gizmos.DrawRay(transform.position, transform.forward * maxDistance);
+            foreach (var hit in hits.Take(nHits))
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(hit.point, radius);
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.Actor
 {
@@ -9,39 +9,40 @@ namespace SaloonSlingers.Unity.Actor
     /// When throwing objects as the player it can become important to ignore the character's velocity which gets added to the rigidbody being thrown.
     /// This component calculates the throw offset based on the character controller average velocity.
     /// </summary>
-    [RequireComponent(typeof(CharacterController))]
-    public class CharacterControllerThrowOffsetCalculator : MonoBehaviour
+    public class CharacterControllerThrowOffsetCalculator
     {
-        [SerializeField]
-        private int nFramesToTrack = 32;
-
-
-        private CharacterController characterController;
-        private Vector3[] characterControllerVelocityFrames;
+        private readonly int nFramesToTrack;
         private int currentCharacterControllerVelocityIndex = 0;
+        private readonly IList<Vector3> characterControllerVelocityFrames;
+
+        public CharacterControllerThrowOffsetCalculator(int nFramesToTrack = 32)
+        {
+            this.nFramesToTrack = nFramesToTrack;
+            characterControllerVelocityFrames = new List<Vector3>();
+        }
 
         /// <summary>
         /// Do not add player velocity to throw to make things more
         /// predictable for the player.
         /// </summary>
-        public Vector3 Calculate(XRGrabInteractable grabInteractable)
+        public Vector3 Calculate(float throwVelocityScale)
         {
+            int nFramesTracked = characterControllerVelocityFrames.Count;
+            if (nFramesTracked == 0) return Vector3.zero;
+
             var velocitySum = characterControllerVelocityFrames.Aggregate(Vector3.zero, (acc, v) => v == null ? acc : acc += v);
-            var averageCCVelocity = velocitySum / characterControllerVelocityFrames.Length;
-            var offset = -averageCCVelocity * grabInteractable.throwVelocityScale;
+            var averageCCVelocity = velocitySum / nFramesTracked;
+            var offset = -averageCCVelocity * throwVelocityScale;
             return offset;
         }
 
-        public void RecordVelocity()
+        public void RecordVelocity(Vector3 velocity)
         {
             currentCharacterControllerVelocityIndex = (currentCharacterControllerVelocityIndex + 1) % nFramesToTrack;
-            characterControllerVelocityFrames[currentCharacterControllerVelocityIndex] = characterController.velocity;
-        }
-
-        private void Awake()
-        {
-            characterControllerVelocityFrames = new Vector3[nFramesToTrack];
-            characterController = GetComponent<CharacterController>();
+            if (currentCharacterControllerVelocityIndex > characterControllerVelocityFrames.Count - 1)
+                characterControllerVelocityFrames.Add(velocity);
+            else
+                characterControllerVelocityFrames[currentCharacterControllerVelocityIndex] = velocity;
         }
     }
 }
