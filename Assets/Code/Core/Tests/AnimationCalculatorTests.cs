@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 
 using NUnit.Framework;
@@ -45,10 +44,10 @@ namespace SaloonSlingers.Core.Tests
             };
             var steps = AnimationCalculator.CalculateFade(config).ToList();
 
-            var previousChange = Math.Abs(steps[1] - steps[0]);
+            var previousChange = System.Math.Abs(steps[1] - steps[0]);
             for (int i = 2; i < steps.Count - 1; i++)
             {
-                var currentChange = Math.Abs(steps[i + 1] - steps[i]);
+                var currentChange = System.Math.Abs(steps[i + 1] - steps[i]);
                 Assert.AreEqual(currentChange, previousChange, 0.0001f);
                 previousChange = currentChange;
             }

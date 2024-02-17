@@ -95,12 +95,12 @@ namespace SaloonSlingers.Core
         public static Card Decode(byte encodedCard)
         {
             Values value = (Values)(GetValueMask(encodedCard));
-            Suits suit = (Suits)(-Math.Log(GetSuitMask(encodedCard), 2) + 3);
+            Suits suit = (Suits)(-System.Math.Log(GetSuitMask(encodedCard), 2) + 3);
             return new Card(value, suit);
         }
 
         public static byte GetSuitMask(byte encodedCard) => (byte)(encodedCard & 0x0F);
-        public static byte GetSuitMask(Card card) => (byte)Math.Pow(2, 3 - ((int)card.Suit));
+        public static byte GetSuitMask(Card card) => (byte)System.Math.Pow(2, 3 - ((int)card.Suit));
         public static byte GetValueMask(byte encodedCard) => (byte)(encodedCard >> 4);
         public static byte GetValueMask(Card card) => (byte)((byte)card.Value << 4);
     }

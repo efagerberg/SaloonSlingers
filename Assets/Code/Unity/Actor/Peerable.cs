@@ -69,11 +69,14 @@ namespace SaloonSlingers.Unity.Actor
                 lastEnemy = currentEnemy;
                 lastOutline = currentOutline;
                 var intervalDuration = 0f;
-                while (intervalDuration < Interval && currentEnemy != null)
+                while (intervalDuration < Interval)
                 {
-                    var directionToEnemy = currentEnemy.transform.position - peererTransform.position;
-                    var desiredPosition = peererTransform.position + directionToEnemy.normalized * UI_DISTANCE + new Vector3(0, Y_OFFSET, 0);
-                    display.transform.position = desiredPosition;
+                    if (currentEnemy)
+                    {
+                        var directionToEnemy = currentEnemy.transform.position - peererTransform.position;
+                        var desiredPosition = peererTransform.position + directionToEnemy.normalized * UI_DISTANCE + new Vector3(0, Y_OFFSET, 0);
+                        display.transform.position = desiredPosition;
+                    }
                     intervalDuration += Time.deltaTime;
                     yield return null;
                 }

@@ -14,6 +14,7 @@ namespace SaloonSlingers.Unity
         public ISpawner<GameObject> CardSpawner { get => cardSpawner; }
         public ISpawner<GameObject> HandInteractableSpawner { get => handInteractableSpawner; }
         public EnemySpawner EnemySpawner { get => enemySpawner; }
+        public PickupSpawner PickupSpawner { get => pickupSpawner; }
         public GameObject Player { get => player; }
 
         [SerializeField]
@@ -22,6 +23,8 @@ namespace SaloonSlingers.Unity
         private HandInteractableSpawner handInteractableSpawner;
         [SerializeField]
         private EnemySpawner enemySpawner;
+        [SerializeField]
+        private PickupSpawner pickupSpawner;
         [SerializeField]
         private GameObject player;
 

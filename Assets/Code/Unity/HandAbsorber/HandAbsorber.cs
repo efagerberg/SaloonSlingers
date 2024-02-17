@@ -7,35 +7,26 @@ namespace SaloonSlingers.Unity
 {
     public class HandAbsorber : MonoBehaviour
     {
-        public Attribute Stacks { get; private set; }
-        public bool CanAbsorb { get => Stacks > 0; }
+        public IReadOnlyAttribute Stacks { get => stacker.Stacks; }
+        public bool CanAbsorb { get => stacker.CanStack; }
 
         [SerializeField]
         private uint startingStacks = 3;
 
+        private AttributeStacker stacker;
+
         private void Awake()
         {
-            Stacks = new Attribute(startingStacks);
+            stacker = new AttributeStacker(startingStacks);
         }
 
-        public void Absorb(Attribute points, HandProjectile projectile)
+        public void Absorb(Core.Attribute shieldPoints, HandProjectile projectile)
         {
             if (!CanAbsorb) return;
 
-            points.Decreased += CheckStackRegained;
-            Stacks.Decrement();
-
             projectile.Pause();
-            points.Reset(points + projectile.HandEvaluation.Score);
+            stacker.Stack(shieldPoints, projectile.HandEvaluation.Score);
             projectile.Kill();
-        }
-
-        private void CheckStackRegained(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
-        {
-            if (e.After != 0) return;
-
-            Stacks.Increment();
-            sender.Decreased -= CheckStackRegained;
         }
     }
 }

@@ -16,6 +16,8 @@ namespace SaloonSlingers.Unity
         public Attribute HitPoints { get; set; }
         public DamageMode DamageMode = DamageMode.DECREMENT;
 
+        private Attributes attributes;
+
         private void OnCollisionEnter(Collision collision)
         {
             HandleCollision(collision.gameObject);
@@ -36,7 +38,11 @@ namespace SaloonSlingers.Unity
                 DamageMode.HAND_VALUE => collidingObject.GetComponent<HandProjectile>().HandEvaluation.Score,
                 _ => 0
             };
-            HitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
+            attributes ??= GetComponent<Attributes>();
+            HitPoints ??= attributes?.Registry[AttributeType.Health];
+
+            if (HitPoints == null) return;
+
             HitPoints.Decrease(damage);
         }
     }

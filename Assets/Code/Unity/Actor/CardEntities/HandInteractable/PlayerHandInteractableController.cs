@@ -7,6 +7,10 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.Actor
 {
+    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(Homable))]
+    [RequireComponent(typeof(HandProjectile))]
     public class PlayerHandInteractableController : MonoBehaviour
     {
         [SerializeField]
@@ -21,8 +25,9 @@ namespace SaloonSlingers.Unity.Actor
         private Homable homable;
 
         private Rigidbody rb;
-        private HomingStrength homingStrengthComponent;
+        private HomingStrength homingStrength;
         private CharacterControllerThrowOffsetCalculator throwOffsetCalculator;
+        private CharacterController characterController;
         private VisibilityDetector visibilityDetector;
         private bool initialized = false;
         private bool eventsRegistered = false;
@@ -55,19 +60,24 @@ namespace SaloonSlingers.Unity.Actor
         {
             initialized = true;
             ActorHandedness handedness = player.GetComponent<ActorHandedness>();
-            homingStrengthComponent = player.GetComponent<HomingStrength>();
-            throwOffsetCalculator = player.GetComponent<CharacterControllerThrowOffsetCalculator>();
+            homingStrength = player.GetComponent<HomingStrength>();
+            throwOffsetCalculator = new(); ;
+            characterController = GetComponent<CharacterController>();
             visibilityDetector = player.GetComponent<VisibilityDetector>();
             deckGraphic = handedness.DeckGraphic;
             var attributes = player.GetComponent<Attributes>();
+            handProjectile = GetComponent<HandProjectile>();
             handProjectile.Assign(deckGraphic.Deck, attributes.Registry);
+            rb = GetComponent<Rigidbody>();
+            homable = GetComponent<Homable>();
         }
 
         public void OnSelectExit(SelectExitEventArgs args)
         {
             if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
 
-            Vector3 offset = throwOffsetCalculator.Calculate((XRGrabInteractable)args.interactableObject);
+            var asGrabbable = (XRGrabInteractable)args.interactableObject;
+            Vector3 offset = throwOffsetCalculator.Calculate(asGrabbable.throwVelocityScale);
             handProjectile.Throw(offset);
             peerInteractable.enabled = false;
 
@@ -75,7 +85,7 @@ namespace SaloonSlingers.Unity.Actor
                                            .FirstOrDefault();
             if (target != null) homable.Target = target;
 
-            homingStrengthComponent.Calculator.StartNewThrow();
+            homingStrength.Calculator.StartNewThrow();
         }
 
         private void OnHandProjectileDied(object sender, EventArgs e)
@@ -84,9 +94,7 @@ namespace SaloonSlingers.Unity.Actor
             homable.Strength = 0;
             homable.enabled = false;
             eventsRegistered = false;
-            var instance = sender as GameObject;
-            var projectile = instance.GetComponent<HandProjectile>();
-            projectile.Death -= OnHandProjectileDied;
+            handProjectile.Death -= OnHandProjectileDied;
         }
 
         public void OnActivate()
@@ -102,17 +110,11 @@ namespace SaloonSlingers.Unity.Actor
             return dist <= maxDeckDistance;
         }
 
-        private void Awake()
-        {
-            handProjectile = GetComponent<HandProjectile>();
-            rb = GetComponent<Rigidbody>();
-            homable = GetComponent<Homable>();
-        }
-
         private void OnEnable()
         {
             mainInteractable.enabled = true;
             peerInteractable.enabled = false;
+
         }
 
         private void OnDisable()
@@ -124,10 +126,10 @@ namespace SaloonSlingers.Unity.Actor
 
         private void FixedUpdate()
         {
-            if (homable.Target && homingStrengthComponent != null)
-                homable.Strength = homingStrengthComponent.Calculator.Calculate(rb.angularVelocity.y);
+            if (homable != null && homable.Target && homingStrength != null)
+                homable.Strength = homingStrength.Calculator.Calculate(rb.angularVelocity.y);
 
-            if (throwOffsetCalculator) throwOffsetCalculator.RecordVelocity();
+            if (throwOffsetCalculator != null) throwOffsetCalculator.RecordVelocity(characterController.velocity);
         }
     }
 }

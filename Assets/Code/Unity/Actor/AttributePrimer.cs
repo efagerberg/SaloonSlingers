@@ -18,7 +18,7 @@ namespace SaloonSlingers.Unity
             foreach (var config in configs)
             {
                 string rawType = config.Type;
-                var found = PointMetaDataLookup.TryGetValue(rawType, out var typeMetaData);
+                var found = AttributeMetaDataLookup.TryGetValue(rawType, out var typeMetaData);
                 if (!found) throw new InvalidAttributeError($"Unknown point type {rawType}");
 
                 uint value = config.Value;
@@ -62,7 +62,7 @@ namespace SaloonSlingers.Unity
             return performer;
         }
 
-        private static readonly RawTypeToTypeMeta PointMetaDataLookup = new Dictionary<string, (bool forAction, AttributeType type)>() {
+        private static readonly RawTypeToTypeMeta AttributeMetaDataLookup = new Dictionary<string, (bool forAction, AttributeType type)>() {
             { "health", (false, AttributeType.Health) },
             { "money", (false, AttributeType.Money) },
             { "dash", (true, AttributeType.Dash) },

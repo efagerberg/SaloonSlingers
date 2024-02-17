@@ -4,6 +4,7 @@ namespace SaloonSlingers.Core
 {
     public delegate void IncreasedHandler(IReadOnlyAttribute sender, ValueChangeEvent<uint> e);
     public delegate void DecreasedHandler(IReadOnlyAttribute sender, ValueChangeEvent<uint> e);
+    public delegate void DepletedHandler(IReadOnlyAttribute sender, EventArgs e);
 
     public interface IReadOnlyAttribute
     {
@@ -12,6 +13,7 @@ namespace SaloonSlingers.Core
         uint InitialValue { get; }
         event IncreasedHandler Increased;
         event DecreasedHandler Decreased;
+        event DepletedHandler Depleted;
         float AsPercent();
     }
 
@@ -26,12 +28,16 @@ namespace SaloonSlingers.Core
                 uint before = _value;
 
                 if (value == uint.MaxValue && before == 0) _value = 0;
-                else _value = Math.Clamp(value, 0, MaxValue);
+                else _value = System.Math.Clamp(value, 0, MaxValue);
 
                 var e = new ValueChangeEvent<uint>(before, _value);
                 if (e.Before == e.After) return;
 
-                if (e.Before > e.After) Decreased?.Invoke(this, e);
+                if (e.Before > e.After)
+                {
+                    Decreased?.Invoke(this, e);
+                    if (e.After == 0) Depleted?.Invoke(this, EventArgs.Empty);
+                }
                 else Increased?.Invoke(this, e);
             }
         }
@@ -39,6 +45,7 @@ namespace SaloonSlingers.Core
         public uint InitialValue { get; private set; }
         public event IncreasedHandler Increased;
         public event DecreasedHandler Decreased;
+        public event DepletedHandler Depleted;
 
         public void Reset()
         {

@@ -1,3 +1,5 @@
+using System;
+
 using NUnit.Framework;
 
 namespace SaloonSlingers.Core.Tests
@@ -24,7 +26,7 @@ namespace SaloonSlingers.Core.Tests
         }
 
         [Test]
-        public void Decrease_EmitsEvent()
+        public void Decrease_EmitsDecreaseEvent()
         {
             var subject = new Attribute(1);
             bool eventHandled = false;
@@ -42,7 +44,7 @@ namespace SaloonSlingers.Core.Tests
         }
 
         [Test]
-        public void Decrement_EmitsEvent()
+        public void Decrement_EmitsDecreaseEvent()
         {
             var subject = new Attribute(1);
             bool eventHandled = false;
@@ -60,7 +62,7 @@ namespace SaloonSlingers.Core.Tests
         }
 
         [Test]
-        public void Increase_EmitsEvent()
+        public void Increase_EmitsIncreaseEvent()
         {
             var subject = new Attribute(0, 1);
             bool eventHandled = false;
@@ -73,6 +75,22 @@ namespace SaloonSlingers.Core.Tests
             subject.Increased += handler;
             subject.Decreased += FailIfHandled;
             subject.Increment();
+
+            Assert.That(eventHandled);
+        }
+
+        [Test]
+        public void DecreaseTo0_EmitsDepleteEvent()
+        {
+            var subject = new Attribute(1, 1);
+            bool eventHandled = false;
+            void handler(IReadOnlyAttribute sender, EventArgs e)
+            {
+                eventHandled = true;
+                Assert.AreEqual(sender.Value, 0);
+            }
+            subject.Depleted += handler;
+            subject.Decrease(10);
 
             Assert.That(eventHandled);
         }

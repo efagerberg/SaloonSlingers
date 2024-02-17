@@ -10,7 +10,7 @@
     "com.unity.probuilder": "5.1.1",
     "com.unity.recorder": "4.0.2",
     "com.unity.render-pipelines.universal": "14.0.9",
-    "com.unity.test-framework": "2.0.1-pre.18",
+    "com.unity.test-framework": "2.0.1-exp.2",
     "com.unity.testtools.codecoverage": "1.2.5",
     "com.unity.textmeshpro": "3.0.7",
     "com.unity.ugui": "1.0.0",
