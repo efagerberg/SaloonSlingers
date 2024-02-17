@@ -50,7 +50,7 @@ namespace SaloonSlingers.Core.Tests
         {
             var deck = new Deck(numberOfCards);
 
-            Assert.AreEqual(deck.Count, Math.Max(0, numberOfCards));
+            Assert.AreEqual(deck.Count, System.Math.Max(0, numberOfCards));
         }
 
         [Test]

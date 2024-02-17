@@ -1,5 +1,3 @@
-using System;
-
 namespace SaloonSlingers.Core.HomingStrengthCalculator
 {
     public struct Config
@@ -30,11 +28,11 @@ namespace SaloonSlingers.Core.HomingStrengthCalculator
 
         public float Calculate(float yAngularVelocity)
         {
-            float absYAngVel = Math.Abs(yAngularVelocity);
+            float absYAngVel = System.Math.Abs(yAngularVelocity);
             float scaled = (absYAngVel - currentEffectivenessThreshold) / config.SigmoidSlope;
-            float strength = config.Limit * Sigmoid(config.SigmoidSlope * scaled);
+            float strength = config.Limit * Math.Sigmoid(config.SigmoidSlope * scaled);
 
-            maxes[currentIndex] = Math.Max(maxes[currentIndex], absYAngVel);
+            maxes[currentIndex] = System.Math.Max(maxes[currentIndex], absYAngVel);
             var newThreshold = CalculateEffectivenessThreshold(maxes, config.PercentOfAverage);
             if (newThreshold >= 0)
                 currentEffectivenessThreshold = CalculateEffectivenessThreshold(maxes, config.PercentOfAverage);
@@ -62,11 +60,6 @@ namespace SaloonSlingers.Core.HomingStrengthCalculator
         public void StartNewThrow()
         {
             currentIndex = (currentIndex + 1) % config.NMaxes;
-        }
-
-        private static float Sigmoid(float x)
-        {
-            return (float)(1.0f / (1.0f + Math.Exp(-x)));
         }
     }
 }

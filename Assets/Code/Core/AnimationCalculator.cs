@@ -18,14 +18,14 @@ namespace SaloonSlingers.Core
             while (elapsedTime < config.Duration)
             {
                 elapsedTime += config.GetDeltaTime();
-                float t = Math.Clamp(elapsedTime / config.Duration, 0, 1);
+                float t = System.Math.Clamp(elapsedTime / config.Duration, 0, 1);
                 yield return Lerp(config.Start, config.End, t);
             }
         }
 
         public static float Lerp(float a, float b, float t)
         {
-            return a + (b - a) * Math.Clamp(t, 0, 1);
+            return a + (b - a) * System.Math.Clamp(t, 0, 1);
         }
     }
 }
