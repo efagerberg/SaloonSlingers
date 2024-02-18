@@ -37,8 +37,14 @@ namespace SaloonSlingers.Unity.Actor
         {
             foreach (var component in ComponentsToDisable)
                 component.enabled = false;
-            Death?.Invoke(this, EventArgs.Empty);
+            Death?.Invoke(gameObject, EventArgs.Empty);
             GameManager.Instance.SceneLoader.LoadScene(GameOverSceneName);
+        }
+
+        public void ResetActor()
+        {
+            foreach (var component in ComponentsToDisable)
+                component.enabled = true;
         }
     }
 }

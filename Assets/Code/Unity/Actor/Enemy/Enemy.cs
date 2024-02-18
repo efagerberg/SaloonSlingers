@@ -20,7 +20,10 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private HoloShieldController holoShieldController;
         [SerializeField]
-        private Collider _collider;
+        private Collider[] collidersToDisable;
+        [SerializeField]
+        private Behaviour[] behavioursToDisable;
+
 
         private void OnEnable()
         {
@@ -41,7 +44,6 @@ namespace SaloonSlingers.Unity.Actor
         private void Awake()
         {
             Deck = new Deck().Shuffle();
-            _collider ??= GetComponent<Collider>();
         }
 
         private void Start()
@@ -57,8 +59,11 @@ namespace SaloonSlingers.Unity.Actor
         {
             AttributeRegistry[AttributeType.Health].Reset();
             ShieldHitPoints.Reset(0);
-            _collider.enabled = true;
             Deck = new Deck().Shuffle();
+            foreach (var collider in collidersToDisable)
+                collider.enabled = true;
+            foreach (var component in collidersToDisable)
+                component.enabled = true;
         }
 
         public void Kill()
@@ -68,7 +73,10 @@ namespace SaloonSlingers.Unity.Actor
 
         private IEnumerator DoDeath()
         {
-            _collider.enabled = false;
+            foreach (var collider in collidersToDisable)
+                collider.enabled = false;
+            foreach (var component in collidersToDisable)
+                component.enabled = false;
             yield return new WaitForSeconds(1f);
             Death?.Invoke(gameObject, EventArgs.Empty);
         }
