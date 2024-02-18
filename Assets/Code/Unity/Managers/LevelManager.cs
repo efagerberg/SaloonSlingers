@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
@@ -50,6 +51,21 @@ namespace SaloonSlingers.Unity
             {
                 yield return Load(configTextAsset.text);
             }
+        }
+
+        private void OnEnable()
+        {
+            EnemySpawner.AllEnemiesKilled += OnAllEnemiesKilled;
+        }
+
+        private void OnDisable()
+        {
+            EnemySpawner.AllEnemiesKilled -= OnAllEnemiesKilled;
+        }
+
+        private void OnAllEnemiesKilled(object sender, EventArgs args)
+        {
+            GameManager.Instance.SceneLoader.LoadScene("StartingScene");
         }
     }
 

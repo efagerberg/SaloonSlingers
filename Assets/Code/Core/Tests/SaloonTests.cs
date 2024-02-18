@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using NUnit.Framework;
@@ -37,18 +38,18 @@ namespace SaloonSlingers.Core.Tests
     public class EnemyInventoryTests
     {
         [Test]
-        public void WhenEnemyInventoryEmpty_IsComplete()
+        public void WhenEnemyInventoryEmpty_EmptyIsTrue()
         {
             var manifest = new Dictionary<string, int>
             {
             };
             var subject = new EnemyInventory(manifest);
 
-            Assert.That(subject.Completed, Is.True);
+            Assert.That(subject.Empty, Is.True);
         }
 
         [Test]
-        public void WhenNonRemaining_IsComplete()
+        public void WhenNonRemaining_EmptyIsTrue()
         {
             var enemyManifest = new Dictionary<string, int>
             {
@@ -56,10 +57,31 @@ namespace SaloonSlingers.Core.Tests
                 { "enemy2", 1 }
             };
             var subject = new EnemyInventory(enemyManifest);
-            subject.RecordDeath(subject.GetRandomEnemy());
-            subject.RecordDeath(subject.GetRandomEnemy());
+            subject.GetRandomEnemy();
+            subject.GetRandomEnemy();
 
-            Assert.That(subject.Completed, Is.True);
+            Assert.That(subject.Empty, Is.True);
+        }
+
+        [Test]
+        public void WhenNonRemaining_EmitsEmptiedEvent()
+        {
+            var enemyManifest = new Dictionary<string, int>
+            {
+                { "enemy1", 1 },
+                { "enemy2", 1 }
+            };
+            var subject = new EnemyInventory(enemyManifest);
+            var eventEmitted = false;
+            void OnEmptied(object sender, EventArgs e)
+            {
+                eventEmitted = true;
+            }
+            subject.Emptied += OnEmptied;
+            subject.GetRandomEnemy();
+            subject.GetRandomEnemy();
+
+            Assert.That(eventEmitted);
         }
 
         [Test]
@@ -75,22 +97,6 @@ namespace SaloonSlingers.Core.Tests
             var enemy2 = subject.GetRandomEnemy();
 
             Assert.That(enemy1, Is.Not.EqualTo(enemy2));
-        }
-
-        [Test]
-        public void Reset_ResetsCompletedInventoryToIncomplete()
-        {
-            var enemyManifest = new Dictionary<string, int>
-            {
-                { "enemy1", 1 },
-                { "enemy2", 1 }
-            };
-            var subject = new EnemyInventory(enemyManifest);
-            subject.RecordDeath(subject.GetRandomEnemy());
-            subject.RecordDeath(subject.GetRandomEnemy());
-            subject.Reset();
-
-            Assert.That(subject.Completed, Is.False);
         }
     }
 }
