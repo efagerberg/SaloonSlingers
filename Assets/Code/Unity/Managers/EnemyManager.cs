@@ -43,6 +43,8 @@ namespace SaloonSlingers.Unity
         {
             enemiesSpawned--;
             EnemyKilled?.Invoke(sender, args);
+            var actor = ((GameObject)sender).GetComponent<IActor>();
+            actor.Killed -= OnEnemyKilled;
         }
 
         private void OnInventoryEmptied(object sender, EventArgs e)

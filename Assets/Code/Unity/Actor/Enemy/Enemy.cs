@@ -24,7 +24,6 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private Behaviour[] behavioursToDisable;
 
-
         private void OnEnable()
         {
             if (AttributeRegistry == null || !AttributeRegistry.TryGetValue(AttributeType.Health, out var hp))
@@ -68,15 +67,15 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
+            foreach (var collider in collidersToDisable)
+                collider.enabled = false;
+            foreach (var component in collidersToDisable)
+                component.enabled = false;
             StartCoroutine(nameof(DoDeath));
         }
 
         private IEnumerator DoDeath()
         {
-            foreach (var collider in collidersToDisable)
-                collider.enabled = false;
-            foreach (var component in collidersToDisable)
-                component.enabled = false;
             yield return new WaitForSeconds(1f);
             Killed?.Invoke(gameObject, EventArgs.Empty);
         }
