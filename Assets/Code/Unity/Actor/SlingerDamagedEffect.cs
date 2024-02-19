@@ -6,10 +6,8 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class PlayerHitPointDamageEffect : MonoBehaviour
+    public class SlingerDamagedEffect : MonoBehaviour
     {
-        [SerializeField]
-        private CanvasGroup hitFlashCanvasGroup;
         [SerializeField]
         private float duration = 1f;
         [SerializeField]
@@ -18,13 +16,13 @@ namespace SaloonSlingers.Unity.Actor
         private AudioClip hitSoundFX;
 
         private IEnumerator flashCoroutine;
-        private float originalAlpha;
         private Attribute hitPoints;
+        private IHitFlasher hitFlasher;
 
         private void Awake()
         {
             if (audioSource == null) audioSource = GetComponent<AudioSource>();
-            originalAlpha = hitFlashCanvasGroup.alpha;
+            hitFlasher = GetComponent<IHitFlasher>();
         }
 
         private void OnEnable()
@@ -49,23 +47,12 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnHitPointsDecreased(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
-            flashCoroutine = Flash(hitFlashCanvasGroup, originalAlpha, 0, duration, flashCoroutine);
+            if (flashCoroutine != null)
+                StopCoroutine(flashCoroutine);
+
+            flashCoroutine = hitFlasher.Flash(duration);
             audioSource.PlayOneShot(hitSoundFX);
             StartCoroutine(flashCoroutine);
-        }
-
-        public IEnumerator Flash(CanvasGroup flashCanvasGroup, float startAlpha, float endAlpha, float duration, IEnumerator previousCoroutine)
-        {
-            if (previousCoroutine != null)
-            {
-                StopCoroutine(previousCoroutine);
-                hitFlashCanvasGroup.alpha = startAlpha;
-            }
-
-            flashCanvasGroup.gameObject.SetActive(true);
-            yield return Fader.Fade((alpha) => flashCanvasGroup.alpha = alpha, duration);
-            flashCanvasGroup.gameObject.SetActive(false);
-            flashCanvasGroup.alpha = startAlpha;
         }
     }
 }
