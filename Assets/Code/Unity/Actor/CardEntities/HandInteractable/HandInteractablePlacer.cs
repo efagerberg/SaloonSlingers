@@ -70,7 +70,7 @@ namespace SaloonSlingers.Unity.Actor
             var instance = sender as GameObject;
             var projectile = instance.GetComponent<HandProjectile>();
             projectile.HandProjectileHeld -= HandInteractableHeldHandler;
-            projectile.Death -= HandleInteractableDeath;
+            projectile.Killed -= HandleInteractableDeath;
         }
 
         private GameObject SpawnInteractable()
@@ -78,7 +78,7 @@ namespace SaloonSlingers.Unity.Actor
             GameObject spawned = handInteractableSpawner.Spawn();
             HandProjectile projectile = spawned.GetComponent<HandProjectile>();
             projectile.HandProjectileHeld += HandInteractableHeldHandler;
-            projectile.Death += HandleInteractableDeath;
+            projectile.Killed += HandleInteractableDeath;
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();
             swapper.SetController(ControllerTypes.PLAYER);
             return spawned;

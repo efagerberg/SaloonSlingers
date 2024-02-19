@@ -8,7 +8,7 @@ namespace SaloonSlingers.Unity
 {
     public static class PickupDropper
     {
-        public static void Drop(IDictionary<AttributeType, Core.Attribute> registry,
+        public static void Drop(IDictionary<AttributeType, Attribute> registry,
                                 ISpawner<GameObject> pickupSpawner,
                                 int layerToAssign,
                                 Vector3 dropPosition)
@@ -18,6 +18,7 @@ namespace SaloonSlingers.Unity
 
             var spawnedPickup = pickupSpawner.Spawn();
             spawnedPickup.transform.position = dropPosition;
+            spawnedPickup.layer = layerToAssign;
             float scaleFactor = 1 + (float)pot.Value / money.InitialValue;
             spawnedPickup.transform.localScale = Vector3.one * scaleFactor;
             var pickup = spawnedPickup.GetComponent<Pickup>();

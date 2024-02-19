@@ -1,20 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class EnemySpawner : MonoBehaviour
+    public class EnemySpawner : MonoBehaviour, ISpawner<GameObject>
     {
         public List<Transform> SpawnPoints;
-        public EventHandler AllEnemiesKilled;
 
-        [SerializeField]
-        private float spawnPerSecond = 4f;
-        [SerializeField]
-        private int maxActiveEnemies = 3;
         [SerializeField]
         private bool visibleSpawnPointsOnRun = false;
         [SerializeField]
@@ -31,33 +24,26 @@ namespace SaloonSlingers.Unity.Actor
         private bool currentlyVisible = false;
         private GameManager gameManager;
         private readonly IDictionary<string, ActorPool> pools = new Dictionary<string, ActorPool>();
-        private IDictionary<string, int> enemiesLeft;
 
-        public GameObject Spawn(string enemyStr) => pools[enemyStr].Get(false);
-
-        public GameObject Spawn(Vector3 position, Quaternion rotation, string enemyStr)
+        public GameObject Spawn()
         {
-            GameObject go = Spawn(enemyStr);
-            go.transform.SetPositionAndRotation(position, rotation);
-            go.name = enemyStr;
-            var actor = go.GetComponent<IActor>();
-            actor.Death += RecordDeath;
-            return go;
-        }
-
-        private void RecordDeath(object sender, EventArgs e)
-        {
-            var go = (GameObject)sender;
-            enemiesLeft[go.name]--;
-            if (enemiesLeft[go.name] == 0)
+            var enemyStr = gameManager.Saloon.EnemyInventory.GetRandomEnemy();
+            if (enemyStr == null)
             {
-                enemiesLeft.Remove(go.name);
-                if (enemiesLeft.Count == 0)
-                    AllEnemiesKilled?.Invoke(gameObject, EventArgs.Empty);
+                Debug.LogError("No enemies left to spawn despite inventory not being marked complete");
+                return null;
             }
 
-            var actor = go.GetComponent<IActor>();
-            actor.Death -= RecordDeath;
+            int randomSpawnpointIndex = Random.Range(0, SpawnPoints.Count - 1);
+            Transform spawnPoint = SpawnPoints[randomSpawnpointIndex];
+            Vector3 positionNoise = new(Random.Range(minPositionNoise, maxPositionNoise),
+                                        Random.Range(minPositionNoise, maxPositionNoise),
+                                        0f);
+            Vector3 spawnPosition = spawnPoint.position + positionNoise;
+            Quaternion rotation = Quaternion.Euler(0, Random.Range(minRotationNoise, maxRotationNoise), 0f);
+            GameObject go = SetupSpawned(spawnPosition, rotation, enemyStr);
+            go.SetActive(true);
+            return go;
         }
 
         private void Start()
@@ -68,10 +54,7 @@ namespace SaloonSlingers.Unity.Actor
                 var prefab = Resources.Load<GameObject>($"prefabs/{enemyStr}");
                 pools[enemyStr] = new ActorPool(poolSize, prefab, transform);
             }
-            InvokeRepeating(nameof(SpawnEnemy), 1, spawnPerSecond);
             currentlyVisible = true;
-            gameManager.Saloon.EnemyInventory.Emptied += OnInventoryEmptied;
-            enemiesLeft = new Dictionary<string, int>(gameManager.Saloon.EnemyInventory.Manifest);
         }
 
         private void Update()
@@ -89,31 +72,12 @@ namespace SaloonSlingers.Unity.Actor
             }
         }
 
-        private void OnInventoryEmptied(object sender, System.EventArgs e)
+        private GameObject SetupSpawned(Vector3 position, Quaternion rotation, string enemyStr)
         {
-            CancelInvoke(nameof(SpawnEnemy));
-        }
-
-        private void SpawnEnemy()
-        {
-            if (pools.Values.Sum(p => p.CountSpanwed) == maxActiveEnemies) return;
-
-            var enemyStr = gameManager.Saloon.EnemyInventory.GetRandomEnemy();
-            if (enemyStr == null)
-            {
-                Debug.LogError("No enemies left to spawn despite inventory not being marked complete");
-                return;
-            }
-
-            int randomSpawnpointIndex = UnityEngine.Random.Range(0, SpawnPoints.Count - 1);
-            Transform spawnPoint = SpawnPoints[randomSpawnpointIndex];
-            Vector3 positionNoise = new(UnityEngine.Random.Range(minPositionNoise, maxPositionNoise),
-                                        UnityEngine.Random.Range(minPositionNoise, maxPositionNoise),
-                                        0f);
-            Vector3 spawnPosition = spawnPoint.position + positionNoise;
-            Quaternion rotation = Quaternion.Euler(0, UnityEngine.Random.Range(minRotationNoise, maxRotationNoise), 0f);
-            GameObject go = Spawn(spawnPosition, rotation, enemyStr);
-            go.SetActive(true);
+            GameObject go = pools[enemyStr].Get(false);
+            go.transform.SetPositionAndRotation(position, rotation);
+            go.name = enemyStr;
+            return go;
         }
     }
 }

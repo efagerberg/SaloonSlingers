@@ -15,7 +15,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private Renderer faceRenderer;
 
-        public event EventHandler Death;
+        public event EventHandler Killed;
 
         public Card Card
         {
@@ -41,7 +41,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
-            Death?.Invoke(gameObject, EventArgs.Empty);
+            Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 
         private static string GetTexturePath(Card card) => string.Format("Textures/{0}", card.ToString());

@@ -19,7 +19,7 @@ namespace SaloonSlingers.Unity.Tests
             {
                 eventEmitted = true;
             }
-            subject.Death += OnDeath;
+            subject.Killed += OnDeath;
             subject.Kill();
 
             Assert.That(eventEmitted);

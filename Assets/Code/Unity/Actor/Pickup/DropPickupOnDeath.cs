@@ -16,7 +16,7 @@ namespace SaloonSlingers.Unity
         private void OnEnable()
         {
             actor = GetComponent<IActor>();
-            actor.Death += OnDeath;
+            actor.Killed += OnDeath;
         }
 
         private void Start()
@@ -27,7 +27,7 @@ namespace SaloonSlingers.Unity
 
         private void OnDisable()
         {
-            actor.Death -= OnDeath;
+            actor.Killed -= OnDeath;
         }
 
         private void OnDeath(object sender, EventArgs e)

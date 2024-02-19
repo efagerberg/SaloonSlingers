@@ -10,7 +10,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Enemy : MonoBehaviour, IActor
     {
-        public event EventHandler Death;
+        public event EventHandler Killed;
         public Deck Deck { get; private set; }
         public Core.Attribute ShieldHitPoints { get; set; }
         public IDictionary<AttributeType, Core.Attribute> AttributeRegistry { get; private set; }
@@ -78,7 +78,7 @@ namespace SaloonSlingers.Unity.Actor
             foreach (var component in collidersToDisable)
                 component.enabled = false;
             yield return new WaitForSeconds(1f);
-            Death?.Invoke(gameObject, EventArgs.Empty);
+            Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 
         private void OnHealthDepleted(IReadOnlyAttribute sender, EventArgs e) => Kill();

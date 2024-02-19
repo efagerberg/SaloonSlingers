@@ -13,7 +13,7 @@ namespace SaloonSlingers.Unity.Actor
         public string GameOverSceneName;
         public Behaviour[] ComponentsToDisable;
 
-        public event EventHandler Death;
+        public event EventHandler Killed;
 
         private void OnEnable()
         {
@@ -37,7 +37,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             foreach (var component in ComponentsToDisable)
                 component.enabled = false;
-            Death?.Invoke(gameObject, EventArgs.Empty);
+            Killed?.Invoke(gameObject, EventArgs.Empty);
             GameManager.Instance.SceneLoader.LoadScene(GameOverSceneName);
         }
 

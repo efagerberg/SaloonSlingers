@@ -8,7 +8,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Target : MonoBehaviour, IActor
     {
-        public event EventHandler Death;
+        public event EventHandler Killed;
         [SerializeField]
         private float speed = 1.0f;
         [SerializeField]
@@ -44,7 +44,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnDeath(IReadOnlyAttribute sender, EventArgs e)
         {
-            Death?.Invoke(gameObject, EventArgs.Empty);
+            Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 
         private void FixedUpdate()

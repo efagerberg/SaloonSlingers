@@ -184,7 +184,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
         {
             private Card card;
 
-            public event EventHandler Death;
+            public event EventHandler Killed;
 
             public Card Card { get => card; set => card = value; }
             public void SetGraphics(Card card) { }

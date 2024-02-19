@@ -9,7 +9,7 @@ namespace SaloonSlingers.Unity
     public class Pickup : MonoBehaviour, IActor
     {
         public uint Value;
-        public event EventHandler Death;
+        public event EventHandler Killed;
 
         public void ResetActor()
         {
@@ -18,7 +18,7 @@ namespace SaloonSlingers.Unity
 
         public void Kill()
         {
-            Death?.Invoke(gameObject, EventArgs.Empty);
+            Killed?.Invoke(gameObject, EventArgs.Empty);
         }
     }
 }
