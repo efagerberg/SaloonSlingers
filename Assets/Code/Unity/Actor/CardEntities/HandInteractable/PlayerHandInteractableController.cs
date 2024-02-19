@@ -47,7 +47,7 @@ namespace SaloonSlingers.Unity.Actor
             homable.enabled = true;
             if (!eventsRegistered)
             {
-                handProjectile.Death += OnHandProjectileDied;
+                handProjectile.Killed += OnHandProjectileDied;
                 eventsRegistered = true;
             }
         }
@@ -94,7 +94,7 @@ namespace SaloonSlingers.Unity.Actor
             homable.Strength = 0;
             homable.enabled = false;
             eventsRegistered = false;
-            handProjectile.Death -= OnHandProjectileDied;
+            handProjectile.Killed -= OnHandProjectileDied;
         }
 
         public void OnActivate()

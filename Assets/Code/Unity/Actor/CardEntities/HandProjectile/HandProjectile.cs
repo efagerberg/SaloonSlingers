@@ -14,7 +14,7 @@ namespace SaloonSlingers.Unity.Actor
     public class HandProjectile : MonoBehaviour, IActor
     {
         public event HandProjectileHeld HandProjectileHeld;
-        public event EventHandler Death;
+        public event EventHandler Killed;
         public IList<Card> Cards { get; private set; } = new List<Card>();
         public bool Drawn { get => Cards.Count > 0; }
         public HandEvaluation HandEvaluation
@@ -141,7 +141,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
-            Death?.Invoke(gameObject, EventArgs.Empty);
+            Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 
         public void Pause()

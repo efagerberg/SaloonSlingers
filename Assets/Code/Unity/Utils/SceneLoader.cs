@@ -10,7 +10,7 @@ namespace SaloonSlingers.Unity
         public CanvasGroup TransitionCanvasGroup;
 
         [SerializeField]
-        private float transitionDuration = 1f;
+        private float transitionDuration = 2f;
 
         private AsyncOperation loadOperation;
 
@@ -22,16 +22,8 @@ namespace SaloonSlingers.Unity
 
         public IEnumerator PerformSceneTransition(string sceneName)
         {
-            if (TransitionCanvasGroup != null)
-            {
-                TransitionCanvasGroup.alpha = 0;
-                TransitionCanvasGroup.gameObject.SetActive(true);
-                yield return Fader.Fade(
-                    (alpha) => TransitionCanvasGroup.alpha = alpha,
-                    transitionDuration / 2f,
-                    startAlpha: TransitionCanvasGroup.alpha, endAlpha: 1
-                );
-            }
+            yield return Fade(0, 1);
+
             loadOperation = SceneManager.LoadSceneAsync(sceneName);
             loadOperation.allowSceneActivation = false;
 
@@ -42,18 +34,22 @@ namespace SaloonSlingers.Unity
                 yield return null;
             }
 
+            yield return Fade(1, 0);
+            loadOperation = null;
+        }
+
+        private IEnumerator Fade(float startAlpha, float endAlpha)
+        {
             if (TransitionCanvasGroup != null)
             {
-                TransitionCanvasGroup.alpha = 1;
+                TransitionCanvasGroup.alpha = startAlpha;
                 TransitionCanvasGroup.gameObject.SetActive(true);
                 yield return Fader.Fade(
                     (alpha) => TransitionCanvasGroup.alpha = alpha,
-                    transitionDuration / 2f
+                    transitionDuration / 2f,
+                    startAlpha: TransitionCanvasGroup.alpha, endAlpha: endAlpha
                 );
-                TransitionCanvasGroup.gameObject.SetActive(false);
-                TransitionCanvasGroup.alpha = 0;
             }
-            loadOperation = null;
         }
     }
 }

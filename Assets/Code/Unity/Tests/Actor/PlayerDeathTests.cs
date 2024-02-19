@@ -83,5 +83,18 @@ namespace SaloonSlingers.Unity.Tests
             Assert.Throws<NullReferenceException>(() => hitPoints.Decrease(hitPoints));
             Assert.That(subject.ComponentsToDisable.All(x => !x.enabled), Is.True);
         }
+
+        [Test]
+        public void EnablesBehaviors_WhenActorReset()
+        {
+            var hitPoints = new Core.Attribute(10);
+            var disabled = TestUtils.CreateComponent<TestBehavior>();
+            disabled.enabled = false;
+            var subject = TestUtils.CreateComponent<PlayerDeath>();
+            subject.ComponentsToDisable = new Behaviour[] { disabled };
+            subject.ResetActor();
+
+            Assert.That(subject.ComponentsToDisable.All(x => x.enabled), Is.True);
+        }
     }
 }

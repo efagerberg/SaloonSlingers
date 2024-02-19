@@ -1,18 +1,13 @@
 using System.Collections.Generic;
-using System.Linq;
 
 using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class EnemySpawner : MonoBehaviour
+    public class EnemySpawner : MonoBehaviour, ISpawner<GameObject>
     {
         public List<Transform> SpawnPoints;
 
-        [SerializeField]
-        private float spawnPerSecond = 4f;
-        [SerializeField]
-        private int maxActiveEnemies = 3;
         [SerializeField]
         private bool visibleSpawnPointsOnRun = false;
         [SerializeField]
@@ -30,25 +25,25 @@ namespace SaloonSlingers.Unity.Actor
         private GameManager gameManager;
         private readonly IDictionary<string, ActorPool> pools = new Dictionary<string, ActorPool>();
 
-        public GameObject Spawn(string enemyStr) => pools[enemyStr].Get(false);
-
-        public GameObject Spawn(Vector3 position, Quaternion rotation, string enemyStr)
+        public GameObject Spawn()
         {
-            GameObject go = Spawn(enemyStr);
-            go.transform.SetPositionAndRotation(position, rotation);
-            go.name = enemyStr;
-            var actor = go.GetComponent<IActor>();
-            actor.Death += RecordDeath;
+            var enemyStr = gameManager.Saloon.EnemyInventory.GetRandomEnemy();
+            if (enemyStr == null)
+            {
+                Debug.LogError("No enemies left to spawn despite inventory not being marked complete");
+                return null;
+            }
+
+            int randomSpawnpointIndex = Random.Range(0, SpawnPoints.Count - 1);
+            Transform spawnPoint = SpawnPoints[randomSpawnpointIndex];
+            Vector3 positionNoise = new(Random.Range(minPositionNoise, maxPositionNoise),
+                                        Random.Range(minPositionNoise, maxPositionNoise),
+                                        0f);
+            Vector3 spawnPosition = spawnPoint.position + positionNoise;
+            Quaternion rotation = Quaternion.Euler(0, Random.Range(minRotationNoise, maxRotationNoise), 0f);
+            GameObject go = SetupSpawned(spawnPosition, rotation, enemyStr);
+            go.SetActive(true);
             return go;
-        }
-
-        private void RecordDeath(object sender, System.EventArgs e)
-        {
-            var go = (GameObject)sender;
-            gameManager.Saloon.EnemyInventory.RecordDeath(go.name);
-
-            var actor = go.GetComponent<IActor>();
-            actor.Death -= RecordDeath;
         }
 
         private void Start()
@@ -59,7 +54,6 @@ namespace SaloonSlingers.Unity.Actor
                 var prefab = Resources.Load<GameObject>($"prefabs/{enemyStr}");
                 pools[enemyStr] = new ActorPool(poolSize, prefab, transform);
             }
-            InvokeRepeating(nameof(SpawnEnemy), 1, spawnPerSecond);
             currentlyVisible = true;
         }
 
@@ -78,26 +72,12 @@ namespace SaloonSlingers.Unity.Actor
             }
         }
 
-        private void SpawnEnemy()
+        private GameObject SetupSpawned(Vector3 position, Quaternion rotation, string enemyStr)
         {
-            if (pools.Values.Sum(p => p.CountSpanwed) == maxActiveEnemies || gameManager.Saloon.EnemyInventory.Completed) return;
-
-            var enemyStr = gameManager.Saloon.EnemyInventory.GetRandomEnemy();
-            if (enemyStr == null)
-            {
-                Debug.LogError("No enemies left to spawn despite inventory not being marked complete");
-                return;
-            }
-
-            int randomSpawnpointIndex = Random.Range(0, SpawnPoints.Count - 1);
-            Transform spawnPoint = SpawnPoints[randomSpawnpointIndex];
-            Vector3 positionNoise = new(Random.Range(minPositionNoise, maxPositionNoise),
-                                        Random.Range(minPositionNoise, maxPositionNoise),
-                                        0f);
-            Vector3 spawnPosition = spawnPoint.position + positionNoise;
-            Quaternion rotation = Quaternion.Euler(0, Random.Range(minRotationNoise, maxRotationNoise), 0f);
-            GameObject go = Spawn(spawnPosition, rotation, enemyStr);
-            go.SetActive(true);
+            GameObject go = pools[enemyStr].Get(false);
+            go.transform.SetPositionAndRotation(position, rotation);
+            go.name = enemyStr;
+            return go;
         }
     }
 }

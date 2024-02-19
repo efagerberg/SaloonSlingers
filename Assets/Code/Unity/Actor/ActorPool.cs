@@ -39,14 +39,14 @@ namespace SaloonSlingers.Unity.Actor
         {
             instance.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             var actor = instance.GetComponent<IActor>();
-            actor.Death += HandleDeath;
+            actor.Killed += HandleDeath;
             CountSpanwed++;
         }
 
         private void OnRelease(GameObject instance)
         {
             var actor = instance.GetComponent<IActor>();
-            actor.Death -= HandleDeath;
+            actor.Killed -= HandleDeath;
             instance.SetActive(false);
             actor.ResetActor();
             instance.transform.SetParent(root);

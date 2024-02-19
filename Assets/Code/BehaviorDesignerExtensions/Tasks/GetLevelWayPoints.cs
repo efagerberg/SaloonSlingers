@@ -11,9 +11,9 @@ public class GetLevelWayPoints : Action
 
     public override TaskStatus OnUpdate()
     {
-        if (LevelManager.Instance.EnemySpawner.SpawnPoints.Count == 0)
-            return TaskStatus.Failure;
-        WayPoints.Value = LevelManager.Instance.EnemySpawner.SpawnPoints.Select(sp => sp.gameObject).ToList();
+        var wayPoints = LevelManager.Instance.EnemyManager.EnemyWayPoints;
+        if (wayPoints.Count == 0) return TaskStatus.Failure;
+        WayPoints.Value = wayPoints.Select(sp => sp.gameObject).ToList();
         return TaskStatus.Success;
     }
 }

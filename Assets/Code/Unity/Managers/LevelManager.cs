@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
@@ -13,20 +14,20 @@ namespace SaloonSlingers.Unity
     {
         public ISpawner<GameObject> CardSpawner { get => cardSpawner; }
         public ISpawner<GameObject> HandInteractableSpawner { get => handInteractableSpawner; }
-        public EnemySpawner EnemySpawner { get => enemySpawner; }
-        public PickupSpawner PickupSpawner { get => pickupSpawner; }
+        public ISpawner<GameObject> PickupSpawner { get => pickupSpawner; }
+        public EnemyManager EnemyManager;
         public GameObject Player { get => player; }
 
         [SerializeField]
-        private CardSpawner cardSpawner;
+        private ActorSpawner cardSpawner;
         [SerializeField]
-        private HandInteractableSpawner handInteractableSpawner;
+        private ActorSpawner handInteractableSpawner;
         [SerializeField]
-        private EnemySpawner enemySpawner;
-        [SerializeField]
-        private PickupSpawner pickupSpawner;
+        private ActorSpawner pickupSpawner;
         [SerializeField]
         private GameObject player;
+
+        private LevelCompleteNotifier levelCompleteNotifier;
 
         public static Saloon Load(string configFileContents)
         {
@@ -50,6 +51,29 @@ namespace SaloonSlingers.Unity
             {
                 yield return Load(configTextAsset.text);
             }
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            levelCompleteNotifier = new(GameManager.Instance.Saloon.EnemyInventory.Manifest);
+        }
+
+        private void OnEnable()
+        {
+            levelCompleteNotifier.LevelComplete += OnLevelComplete;
+            EnemyManager.EnemyKilled += levelCompleteNotifier.OnEnemyKilled;
+        }
+
+        private void OnDisable()
+        {
+            levelCompleteNotifier.LevelComplete -= OnLevelComplete;
+            EnemyManager.EnemyKilled -= levelCompleteNotifier.OnEnemyKilled;
+        }
+
+        private void OnLevelComplete(object sender, EventArgs args)
+        {
+            GameManager.Instance.SceneLoader.LoadScene("StartingScene");
         }
     }
 

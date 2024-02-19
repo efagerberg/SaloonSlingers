@@ -4,7 +4,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public interface IActor
     {
-        public event EventHandler Death;
+        public event EventHandler Killed;
         public void ResetActor() { }
     }
 }

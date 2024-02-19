@@ -1,10 +1,8 @@
-using SaloonSlingers.Unity.Actor;
-
 using UnityEngine;
 
-namespace SaloonSlingers.Unity
+namespace SaloonSlingers.Unity.Actor
 {
-    public class PickupSpawner : MonoBehaviour, ISpawner<GameObject>
+    public class ActorSpawner : MonoBehaviour, ISpawner<GameObject>
     {
         [SerializeField]
         private int poolSize = 10;

@@ -73,11 +73,11 @@ namespace SaloonSlingers.Unity.Tests
 
     class TestActor : MonoBehaviour, IActor
     {
-        public event EventHandler Death;
+        public event EventHandler Killed;
 
         public void Kill()
         {
-            Death?.Invoke(gameObject, EventArgs.Empty);
+            Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 
         public void ResetActor()
