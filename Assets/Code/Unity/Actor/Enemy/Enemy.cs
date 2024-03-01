@@ -76,7 +76,16 @@ namespace SaloonSlingers.Unity.Actor
 
         private IEnumerator DoDeath()
         {
+            var projectiles = GetComponentsInChildren<HandProjectile>();
             yield return new WaitForSeconds(1f);
+            foreach (var projectile in projectiles)
+            {
+                projectile.Throw();
+                projectile.transform.parent = null;
+                var swapper = projectile.GetComponent<ControllerSwapper>();
+                projectile.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
+                swapper.SetController(ControllerTypes.PLAYER);
+            }
             Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 

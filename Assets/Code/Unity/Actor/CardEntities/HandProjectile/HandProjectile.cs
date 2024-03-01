@@ -44,6 +44,10 @@ namespace SaloonSlingers.Unity.Actor
         private AudioClip drawSFX;
         [SerializeField]
         private AudioClip throwSFX;
+        [SerializeField]
+        private GameObject pickupLine;
+        [SerializeField]
+        private float isGroundedDistance = 0.2f;
 
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
@@ -63,6 +67,7 @@ namespace SaloonSlingers.Unity.Actor
             trailRenderer.enabled = false;
             rigidBody.isKinematic = true;
             _collider.isTrigger = true;
+            pickupLine.SetActive(false);
             bool stackedBefore = state.IsStacked;
             state = state.Reset();
             if (stackedBefore != state.IsStacked)
@@ -137,6 +142,7 @@ namespace SaloonSlingers.Unity.Actor
             Cards.Clear();
             requiresEvaluation = true;
             gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
+            pickupLine.SetActive(false);
         }
 
         public void Kill()
@@ -198,8 +204,16 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleCollision(GameObject collidingObject)
         {
-            if (state.IsThrown && collidingObject.layer != LayerMask.NameToLayer("Hand"))
-                StartCoroutine(KillNextFrame());
+            if (!state.IsThrown) return;
+
+            if (collidingObject.layer == LayerMask.NameToLayer("Environment"))
+            {
+                var ray = new Ray(transform.position, Vector3.down);
+                if (Physics.Raycast(ray, isGroundedDistance, LayerMask.GetMask("Environment"))) pickupLine.SetActive(true);
+                return;
+            }
+            //if (state.IsThrown && collidingObject.layer != LayerMask.NameToLayer("Hand"))
+            //    StartCoroutine(KillNextFrame());
         }
     }
 }
