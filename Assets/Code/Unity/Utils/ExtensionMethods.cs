@@ -16,6 +16,11 @@ namespace SaloonSlingers.Unity
             }
             return null;
         }
+
+        public static bool IsInLayerMask(this GameObject go, LayerMask mask)
+        {
+            return (mask & (1 << go.layer)) != 0;
+        }
     }
 
     public static class TransformExtensions

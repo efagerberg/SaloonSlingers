@@ -31,7 +31,22 @@ namespace SaloonSlingers.Unity.Tests
 
             var found = subject.GetComponentInImmediateChildren<LineRenderer>();
             Assert.That(found, Is.Null);
+        }
 
+        [TestCase("Environment", new string[] { "Environment" }, true)]
+        [TestCase("Player", new string[] { "Player", "Enemy" }, true)]
+        [TestCase("Player", new string[] { "Enemy" }, false)]
+        [TestCase("Environment", new string[] { "Enemy", "Player" }, false)]
+        public void IsInLayerMask_ReturnsIfLayerOverlapsWithMask(string layerName, string[] maskLayers, bool expected)
+        {
+            var mask = LayerMask.GetMask(maskLayers);
+            var layer = LayerMask.NameToLayer(layerName);
+            var go = new GameObject
+            {
+                layer = layer
+            };
+
+            Assert.AreEqual(go.IsInLayerMask(mask), expected);
         }
     }
 

@@ -35,7 +35,7 @@ namespace SaloonSlingers.Unity.Tests
             toDespawn.Kill();
 
 
-            Assert.That(subject.CountSpanwed, Is.EqualTo(1));
+            Assert.That(subject.SpawnedActorCount, Is.EqualTo(1));
         }
 
         [Test]
