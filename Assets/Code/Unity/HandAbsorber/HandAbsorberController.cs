@@ -46,7 +46,7 @@ namespace SaloonSlingers.Unity
 
             var plugInstance = new GameObject("Hand Absorber Plug");
             plugInteractable = plugInstance.AddComponent<XRSimpleInteractable>();
-            plugInteractable.interactionLayers = InteractionLayerMask.GetMask("DirectInteract");
+            plugInteractable.interactionLayers = InteractionLayerMask.GetMask("HandInteractable");
             plugInteractable.transform.gameObject.SetActive(false);
             plugInteractable.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         }

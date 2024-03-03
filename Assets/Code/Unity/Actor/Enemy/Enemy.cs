@@ -11,6 +11,7 @@ namespace SaloonSlingers.Unity.Actor
     public class Enemy : MonoBehaviour, IActor
     {
         public event EventHandler Killed;
+        [field: SerializeField]
         public Deck Deck { get; private set; }
         public Core.Attribute ShieldHitPoints { get; set; }
         public IDictionary<AttributeType, Core.Attribute> AttributeRegistry { get; private set; }
@@ -23,6 +24,8 @@ namespace SaloonSlingers.Unity.Actor
         private Collider[] collidersToDisable;
         [SerializeField]
         private Behaviour[] behavioursToDisable;
+        [SerializeField]
+        public List<Card> cs = new List<Card> { new Card(Values.TWO, Suits.DIAMONDS) };
 
         private void OnEnable()
         {

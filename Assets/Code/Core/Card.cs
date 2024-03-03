@@ -10,6 +10,7 @@ namespace SaloonSlingers.Core
         ACE = 1, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING
     }
 
+    [Serializable]
     public struct Card
     {
         public Suits Suit { get; private set; }

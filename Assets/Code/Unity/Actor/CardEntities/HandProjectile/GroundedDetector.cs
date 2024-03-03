@@ -5,34 +5,48 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class GroundedDetector : MonoBehaviour
     {
-        public bool IsGrounded { get; private set; } = false;
+        public bool IsGrounded
+        {
+            get => isGrounded;
+            private set
+            {
+                isGrounded = value;
+                if (isGrounded) OnGroundedEnter.Invoke();
+                else OnGroundedExit.Invoke();
+            }
+        }
 
-        public UnityEvent<Collision> OnGroundedEnter;
-        public UnityEvent<Collision> OnGroundedExit;
+        public UnityEvent OnGroundedEnter;
+        public UnityEvent OnGroundedExit;
 
-        [SerializeField]
-        private Rigidbody rigidBody;
         [SerializeField]
         private LayerMask groundLayerMask;
         [SerializeField]
         private float maxSpeed = 0.8f;
 
+        private Rigidbody rigidBody;
+        private bool isGrounded = false;
+
+        private void Awake()
+        {
+            rigidBody = GetComponent<Rigidbody>();
+        }
+
+        private void OnEnable()
+        {
+            IsGrounded = false;
+        }
+
         private void OnCollisionEnter(Collision collision)
         {
             if (!IsGrounded && collision.gameObject.IsInLayerMask(groundLayerMask) && rigidBody.velocity.y < maxSpeed)
-            {
-                OnGroundedEnter.Invoke(collision);
                 IsGrounded = true;
-            }
         }
 
         private void OnCollisionExit(Collision collision)
         {
             if (IsGrounded && collision.gameObject.IsInLayerMask(groundLayerMask))
-            {
-                OnGroundedExit.Invoke(collision);
                 IsGrounded = false;
-            }
         }
     }
 }

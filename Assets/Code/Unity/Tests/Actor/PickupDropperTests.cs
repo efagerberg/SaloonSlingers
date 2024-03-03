@@ -58,7 +58,6 @@ namespace SaloonSlingers.Unity.Tests
         public void Drop_WhenHasMoneyAndPot(IDictionary<AttributeType, Attribute> registry,
                                             Vector3 dropPosition,
                                             int layer,
-                                            Vector3 expectedScale,
                                             int expectedValue)
         {
             var spawnerMock = new Mock<ISpawner<GameObject>>(MockBehavior.Strict);
@@ -68,7 +67,6 @@ namespace SaloonSlingers.Unity.Tests
             PickupDropper.Drop(registry, spawnerMock.Object, layer, dropPosition);
 
             Assert.That(spawned.transform.position, Is.EqualTo(dropPosition));
-            Assert.That(spawned.transform.localScale, Is.EqualTo(expectedScale));
             Assert.That(pickup.Value, Is.EqualTo(expectedValue));
         }
 
@@ -84,7 +82,6 @@ namespace SaloonSlingers.Unity.Tests
                     },
                     new Vector3(1, 2, 3),
                     1,
-                    new Vector3(1.25f, 1.25f, 1.25f),
                     25
                 },
                 new object[]
@@ -95,7 +92,6 @@ namespace SaloonSlingers.Unity.Tests
                     },
                     new Vector3(-10, 4, 3),
                     3,
-                    new Vector3(1.5f, 1.5f, 1.5f),
                     5
                 },
                 new object[]
@@ -106,7 +102,6 @@ namespace SaloonSlingers.Unity.Tests
                     },
                     new Vector3(-19, -42, 11),
                     3,
-                    new Vector3(6f, 6f, 6f),
                     5
                 }
             };

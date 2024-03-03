@@ -10,6 +10,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Peerable : ActionPerformer
     {
+        [field: SerializeField]
         public float Interval { get; set; } = 0.2f;
 
         [SerializeField]
