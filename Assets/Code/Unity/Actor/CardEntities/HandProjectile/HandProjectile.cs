@@ -44,10 +44,6 @@ namespace SaloonSlingers.Unity.Actor
         private AudioClip drawSFX;
         [SerializeField]
         private AudioClip throwSFX;
-        [SerializeField]
-        private GameObject pickupLine;
-        [SerializeField]
-        private float isGroundedDistance = 0.2f;
 
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
