@@ -13,8 +13,8 @@ namespace SaloonSlingers.Core
     [Serializable]
     public struct Card
     {
-        public Suits Suit { get; private set; }
-        public Values Value { get; private set; }
+        public Suits Suit;
+        public Values Value;
 
         private static readonly Dictionary<char, Values> CharToValue = Enum.GetValues(typeof(Values))
                                                           .Cast<Values>()
@@ -42,13 +42,13 @@ namespace SaloonSlingers.Core
             Suit = CharToSuit[cardString[1]];
         }
 
-        public bool IsFaceCard()
+        public readonly bool IsFaceCard()
         {
             int valAsInt = (int)Value;
             return valAsInt > FACE_VALUE_THRESHOLD && Value != Values.ACE;
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             int value_as_int = (int)Value;
             string template = "{0}_of_{1}";
@@ -59,7 +59,7 @@ namespace SaloonSlingers.Core
             return string.Format(template, (value_as_int), Suit.ToString().ToLower());
         }
 
-        public string ToUnicode()
+        public readonly string ToUnicode()
         {
             int value_as_int = (int)Value;
             char suitUnicode = GetSuitUnicode(Suit);
@@ -69,7 +69,7 @@ namespace SaloonSlingers.Core
             return $"{value_as_int}{suitUnicode}";
         }
 
-        private char GetSuitUnicode(Suits suit)
+        private static char GetSuitUnicode(Suits suit)
         {
             Dictionary<Suits, char> suitToChar = new() {
                 { Suits.DIAMONDS, '\u2666' },
@@ -80,7 +80,7 @@ namespace SaloonSlingers.Core
             return suitToChar[suit];
         }
 
-        public override int GetHashCode() => Encode(this);
+        public override readonly int GetHashCode() => Encode(this);
 
         /// <summary>
         /// Encodes a Card object into a byte

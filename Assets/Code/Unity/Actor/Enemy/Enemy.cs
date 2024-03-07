@@ -24,8 +24,6 @@ namespace SaloonSlingers.Unity.Actor
         private Collider[] collidersToDisable;
         [SerializeField]
         private Behaviour[] behavioursToDisable;
-        [SerializeField]
-        public List<Card> cs = new List<Card> { new Card(Values.TWO, Suits.DIAMONDS) };
 
         private void OnEnable()
         {

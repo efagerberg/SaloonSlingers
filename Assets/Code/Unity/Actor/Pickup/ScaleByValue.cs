@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    [Description(@"Determines the scale of an object given some value and some denomination")]
+    [Description(@"Determines the scale of an object given a value and some denomination")]
     public class ScaleByValue : MonoBehaviour
     {
         [SerializeField]
@@ -16,9 +16,9 @@ namespace SaloonSlingers.Unity.Actor
                        want to scale when the value reaches some multiple of the denomination.")]
         private bool intScaleFactorsOnly = false;
 
-        public void Scale(float value)
+        public void Scale(Transform t, uint value)
         {
-            transform.localScale = ScaleByValueCalculator.Calculate(value, denomination, intScaleFactorsOnly);
+            t.localScale = ScaleByValueCalculator.Calculate(value, denomination, intScaleFactorsOnly);
         }
     }
 

@@ -187,7 +187,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
             public event EventHandler Killed;
 
             public Card Card { get => card; set => card = value; }
-            public void SetGraphics(Card card) { }
+            public void SetColor(Color color) { }
             public void Kill() { }
             public void ResetActor() { }
         }

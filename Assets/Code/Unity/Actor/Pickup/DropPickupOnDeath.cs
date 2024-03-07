@@ -32,7 +32,10 @@ namespace SaloonSlingers.Unity
 
         private void OnDeath(object sender, EventArgs e)
         {
-            PickupDropper.Drop(attributes.Registry,
+            if (!attributes.Registry.TryGetValue(Core.AttributeType.Pot, out var pot))
+                return;
+
+            PickupDropper.Drop(pot,
                                LevelManager.Instance.PickupSpawner,
                                gameObject.layer,
                                DropPositionReference.position);

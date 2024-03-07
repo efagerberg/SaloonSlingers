@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
@@ -8,24 +8,20 @@ using UnityEngine.Animations;
 
 namespace SaloonSlingers.Unity
 {
-    [ExecuteAlways]
-    public class Pickup : MonoBehaviour, IActor
+    [RequireComponent(typeof(ScaleByValue))]
+    public class Pickup : MonoBehaviour, IActor, IPickup
     {
-        public uint Value;
         public event EventHandler Killed;
+
+        [field: SerializeField]
+        public uint Value { get; set; }
 
         [SerializeField]
         private Rigidbody rigidBody;
         [SerializeField]
         private PositionConstraint pickupLineConstraint;
-
+        [SerializeField]
         private ScaleByValue scaleByValue;
-
-        private void Awake()
-        {
-            scaleByValue = GetComponent<ScaleByValue>();
-            scaleByValue.Scale(Value);
-        }
 
         public void ResetActor()
         {
@@ -52,6 +48,15 @@ namespace SaloonSlingers.Unity
         public void PlayerPickup()
         {
             TryPickup(LevelManager.Instance.Player);
+        }
+
+
+        private void OnValidate()
+        {
+            if (scaleByValue == null) return;
+
+
+            scaleByValue.Scale(transform, Value);
         }
     }
 }

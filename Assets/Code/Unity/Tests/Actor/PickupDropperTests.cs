@@ -13,98 +13,49 @@ namespace SaloonSlingers.Unity.Tests
     public class PickupDropperTests
     {
         [Test]
-        [TestCaseSource(nameof(MissingAttributesCases))]
-        public void DoesNotDrop_WhenMisingRequiredAttributes(IDictionary<AttributeType, Attribute> registry)
-        {
-            var spawnerMock = new Mock<ISpawner<GameObject>>(MockBehavior.Strict);
-            var dropPosition = Vector3.zero;
-            var layer = 0;
-            PickupDropper.Drop(registry, spawnerMock.Object, layer, dropPosition);
-
-            spawnerMock.Verify(s => s.Spawn(), Times.Never);
-        }
-
-        static IEnumerable<object[]> MissingAttributesCases()
-        {
-            return new[]
-            {
-                new object[]
-                {
-                    new Dictionary<AttributeType, Attribute> { }
-                },
-                new object[]
-                {
-                    new Dictionary<AttributeType, Attribute> {
-                        { AttributeType.Health, new Attribute(1) }
-                    }
-                },
-                new object[]
-                {
-                    new Dictionary<AttributeType, Attribute> {
-                        { AttributeType.Money, new Attribute(1) }
-                    }
-                },
-                new object[]
-                {
-                    new Dictionary<AttributeType, Attribute> {
-                        { AttributeType.Pot, new Attribute(1) }
-                    }
-                },
-            };
-        }
-
-        [Test]
-        [TestCaseSource(nameof(AllAttributesCases))]
-        public void Drop_WhenHasMoneyAndPot(IDictionary<AttributeType, Attribute> registry,
+        [TestCaseSource(nameof(DropCases))]
+        public void Drop_WhenHasMoneyAndPot(Attribute attribute,
                                             Vector3 dropPosition,
-                                            int layer,
-                                            int expectedValue)
+                                            int layer)
         {
             var spawnerMock = new Mock<ISpawner<GameObject>>(MockBehavior.Strict);
             var spawned = new GameObject();
-            var pickup = spawned.AddComponent<Pickup>();
+            var pickup = spawned.AddComponent<TestPickup>();
             spawnerMock.Setup(s => s.Spawn()).Returns(spawned);
-            PickupDropper.Drop(registry, spawnerMock.Object, layer, dropPosition);
+            PickupDropper.Drop(attribute, spawnerMock.Object, layer, dropPosition);
 
             Assert.That(spawned.transform.position, Is.EqualTo(dropPosition));
-            Assert.That(pickup.Value, Is.EqualTo(expectedValue));
+            Assert.That(pickup.Value, Is.EqualTo(attribute.Value));
         }
 
-        static IEnumerable<object[]> AllAttributesCases()
+        static IEnumerable<object[]> DropCases()
         {
             return new[]
             {
                 new object[]
                 {
-                    new Dictionary<AttributeType, Attribute> {
-                        { AttributeType.Pot, new Attribute(25) },
-                        { AttributeType.Money, new Attribute(100) },
-                    },
+                    new Attribute(25),
                     new Vector3(1, 2, 3),
-                    1,
-                    25
+                    1
                 },
                 new object[]
                 {
-                    new Dictionary<AttributeType, Attribute> {
-                        { AttributeType.Pot, new Attribute(5) },
-                        { AttributeType.Money, new Attribute(10) },
-                    },
+                    new Attribute(5),
                     new Vector3(-10, 4, 3),
                     3,
-                    5
                 },
                 new object[]
                 {
-                    new Dictionary<AttributeType, Attribute> {
-                        { AttributeType.Pot, new Attribute(5) },
-                        { AttributeType.Money, new Attribute(1) },
-                    },
+                    new Attribute(1),
                     new Vector3(-19, -42, 11),
-                    3,
-                    5
+                    3
                 }
             };
+        }
+
+        class TestPickup : MonoBehaviour, IPickup
+        {
+            public uint Value { get; set; }
         }
     }
 }
