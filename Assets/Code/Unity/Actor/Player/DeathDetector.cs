@@ -1,19 +1,27 @@
 using System;
+using System.Collections;
 
 using SaloonSlingers.Core;
 
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class PlayerDeath : MonoBehaviour, IActor
+    public class DeathDetector : MonoBehaviour, IActor
     {
         public IReadOnlyAttribute HitPoints { get; set; }
-
-        public string GameOverSceneName;
-        public Behaviour[] ComponentsToDisable;
-
+        public UnityEvent OnKilled;
+        public UnityEvent OnReset;
         public event EventHandler Killed;
+
+        [SerializeField]
+        private float deathDelaySeconds = 0.5f;
+
+        public void ResetActor()
+        {
+            OnReset?.Invoke();
+        }
 
         private void OnEnable()
         {
@@ -24,6 +32,8 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnDisable()
         {
+            if (HitPoints == null) return;
+
             HitPoints.Depleted -= OnHealthDepleted;
         }
 
@@ -35,16 +45,14 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnHealthDepleted(IReadOnlyAttribute sender, EventArgs e)
         {
-            foreach (var component in ComponentsToDisable)
-                component.enabled = false;
-            Killed?.Invoke(gameObject, EventArgs.Empty);
-            GameManager.Instance.SceneLoader.LoadScene(GameOverSceneName);
+            OnKilled?.Invoke();
+            StartCoroutine(nameof(DelayDeath));
         }
 
-        public void ResetActor()
+        private IEnumerator DelayDeath()
         {
-            foreach (var component in ComponentsToDisable)
-                component.enabled = true;
+            yield return new WaitForSeconds(deathDelaySeconds);
+            Killed?.Invoke(gameObject, EventArgs.Empty);
         }
     }
 }

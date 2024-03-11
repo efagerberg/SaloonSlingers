@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 
 using SaloonSlingers.Core;
@@ -8,38 +6,15 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class Enemy : MonoBehaviour, IActor
+    public class Enemy : MonoBehaviour
     {
-        public event EventHandler Killed;
         [field: SerializeField]
         public Deck Deck { get; private set; }
-        public Core.Attribute ShieldHitPoints { get; set; }
-        public IDictionary<AttributeType, Core.Attribute> AttributeRegistry { get; private set; }
+        public Attribute ShieldHitPoints { get; set; }
+        public IDictionary<AttributeType, Attribute> AttributeRegistry { get; private set; }
 
-        [SerializeField]
-        private GameObject shield;
         [SerializeField]
         private HoloShieldController holoShieldController;
-        [SerializeField]
-        private Collider[] collidersToDisable;
-        [SerializeField]
-        private Behaviour[] behavioursToDisable;
-
-        private void OnEnable()
-        {
-            if (AttributeRegistry == null || !AttributeRegistry.TryGetValue(AttributeType.Health, out var hp))
-                return;
-
-            hp.Depleted += OnHealthDepleted;
-        }
-
-        private void OnDisable()
-        {
-            if (AttributeRegistry == null || !AttributeRegistry.TryGetValue(AttributeType.Health, out var hp))
-                return;
-
-            hp.Depleted -= OnHealthDepleted;
-        }
 
         private void Awake()
         {
@@ -49,47 +24,14 @@ namespace SaloonSlingers.Unity.Actor
         private void Start()
         {
             AttributeRegistry = GetComponent<Attributes>().Registry;
-            if (AttributeRegistry.TryGetValue(AttributeType.Health, out var hp))
-                hp.Depleted += OnHealthDepleted;
-
             ShieldHitPoints ??= holoShieldController?.HitPoints;
         }
 
-        public void ResetActor()
+        public void ResetAttributes()
         {
             AttributeRegistry[AttributeType.Health].Reset();
             ShieldHitPoints.Reset(0);
             Deck = new Deck().Shuffle();
-            foreach (var collider in collidersToDisable)
-                collider.enabled = true;
-            foreach (var component in collidersToDisable)
-                component.enabled = true;
         }
-
-        public void Kill()
-        {
-            foreach (var collider in collidersToDisable)
-                collider.enabled = false;
-            foreach (var component in collidersToDisable)
-                component.enabled = false;
-            StartCoroutine(nameof(DoDeath));
-        }
-
-        private IEnumerator DoDeath()
-        {
-            var projectiles = GetComponentsInChildren<HandProjectile>();
-            yield return new WaitForSeconds(1f);
-            foreach (var projectile in projectiles)
-            {
-                projectile.Throw();
-                projectile.transform.parent = null;
-                var swapper = projectile.GetComponent<ControllerSwapper>();
-                projectile.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
-                swapper.SetController(ControllerTypes.PLAYER);
-            }
-            Killed?.Invoke(gameObject, EventArgs.Empty);
-        }
-
-        private void OnHealthDepleted(IReadOnlyAttribute sender, EventArgs e) => Kill();
     }
 }
