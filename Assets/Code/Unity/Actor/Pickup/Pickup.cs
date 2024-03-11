@@ -13,8 +13,16 @@ namespace SaloonSlingers.Unity
     {
         public event EventHandler Killed;
 
-        [field: SerializeField]
-        public uint Value { get; set; }
+        public uint Value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                scaleByValue ??= GetComponent<ScaleByValue>();
+                scaleByValue.Scale(transform, value);
+            }
+        }
 
         [SerializeField]
         private Rigidbody rigidBody;
@@ -22,10 +30,14 @@ namespace SaloonSlingers.Unity
         private PositionConstraint pickupLineConstraint;
         [SerializeField]
         private ScaleByValue scaleByValue;
+        [field: SerializeField]
+        private uint _value;
 
         public void ResetActor()
         {
             Value = 0;
+            rigidBody ??= GetComponent<Rigidbody>();
+            pickupLineConstraint ??= GetComponent<PositionConstraint>();
             rigidBody.isKinematic = false;
             transform.localScale = Vector3.one;
             transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
@@ -35,14 +47,14 @@ namespace SaloonSlingers.Unity
             pickupLineConstraint.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         }
 
-        public void TryPickup(GameObject target)
+        public void TryPickup(GameObject grabber)
         {
-            if (target.TryGetComponent<Attributes>(out var attributes) &&
-                attributes.Registry.TryGetValue(AttributeType.Money, out var money))
-            {
-                money.Increase(Value);
-                Killed?.Invoke(gameObject, EventArgs.Empty);
-            }
+            if (!grabber.TryGetComponent<Attributes>(out var attributes) ||
+                !attributes.Registry.TryGetValue(AttributeType.Money, out var money))
+                return;
+
+            money.Increase(Value);
+            Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 
         public void PlayerPickup()
@@ -53,10 +65,7 @@ namespace SaloonSlingers.Unity
 
         private void OnValidate()
         {
-            if (scaleByValue == null) return;
-
-
-            scaleByValue.Scale(transform, Value);
+            Value = _value;
         }
     }
 }
