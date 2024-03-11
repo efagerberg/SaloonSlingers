@@ -10,13 +10,14 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class DeathDetector : MonoBehaviour, IActor
     {
-        public IReadOnlyAttribute HitPoints { get; set; }
-        public UnityEvent OnKilled;
-        public UnityEvent OnReset;
+        public UnityEvent OnKilled = new();
+        public UnityEvent OnReset = new();
         public event EventHandler Killed;
 
         [SerializeField]
-        private float deathDelaySeconds = 0.5f;
+        private float deathDelaySeconds = 0f;
+
+        private IReadOnlyAttribute hitPoints;
 
         public void ResetActor()
         {
@@ -25,22 +26,22 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnEnable()
         {
-            if (HitPoints == null) return;
+            if (hitPoints == null) return;
 
-            HitPoints.Depleted += OnHealthDepleted;
+            hitPoints.Depleted += OnHealthDepleted;
         }
 
         private void OnDisable()
         {
-            if (HitPoints == null) return;
+            if (hitPoints == null) return;
 
-            HitPoints.Depleted -= OnHealthDepleted;
+            hitPoints.Depleted -= OnHealthDepleted;
         }
 
         private void Start()
         {
-            HitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
-            HitPoints.Depleted += OnHealthDepleted;
+            hitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
+            hitPoints.Depleted += OnHealthDepleted;
         }
 
         private void OnHealthDepleted(IReadOnlyAttribute sender, EventArgs e)

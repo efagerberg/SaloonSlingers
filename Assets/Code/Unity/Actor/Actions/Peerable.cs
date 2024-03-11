@@ -38,11 +38,11 @@ namespace SaloonSlingers.Unity.Actor
         {
             Enemy lastEnemy = null;
             Outline lastOutline = null;
+            display.Show();
+
             Outline currentOutline = null;
             Enemy currentEnemy = null;
             float currentDuration = MetaData.Duration;
-            display.Show();
-
             while (currentDuration > 0)
             {
                 var closest = (detector.GetVisible(LayerMask.GetMask("Enemy"), xRay: true)
@@ -83,6 +83,7 @@ namespace SaloonSlingers.Unity.Actor
                 }
                 currentDuration -= intervalDuration;
             };
+
             display.Hide();
             if (lastEnemy != null) lastOutline.enabled = false;
         }
