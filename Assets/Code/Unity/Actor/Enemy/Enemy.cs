@@ -19,18 +19,19 @@ namespace SaloonSlingers.Unity.Actor
         private void Awake()
         {
             Deck = new Deck().Shuffle();
+            holoShieldController ??= GetComponent<HoloShieldController>();
+            ShieldHitPoints ??= holoShieldController?.HitPoints;
         }
 
         private void Start()
         {
-            AttributeRegistry = GetComponent<Attributes>().Registry;
-            ShieldHitPoints ??= holoShieldController?.HitPoints;
+            AttributeRegistry ??= GetComponent<Attributes>().Registry;
         }
 
         public void ResetAttributes()
         {
             AttributeRegistry[AttributeType.Health].Reset();
-            ShieldHitPoints.Reset(0);
+            ShieldHitPoints?.Reset(0);
             Deck = new Deck().Shuffle();
         }
     }
