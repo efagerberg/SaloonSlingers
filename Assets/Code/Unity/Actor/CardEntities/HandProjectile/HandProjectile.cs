@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using SaloonSlingers.Core;
 
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity.Actor
 {
@@ -29,6 +30,8 @@ namespace SaloonSlingers.Unity.Actor
                 return handEvaluation;
             }
         }
+        public UnityEvent<Card> OnDraw;
+        public UnityEvent OnThrow;
 
         [SerializeField]
         private RectTransform handPanelRectTransform;
@@ -38,12 +41,6 @@ namespace SaloonSlingers.Unity.Actor
         private float lifespanInSeconds = 1f;
         [SerializeField]
         private int maxAngularVelocity = 100;
-        [SerializeField]
-        private AudioSource audioSource;
-        [SerializeField]
-        private AudioClip drawSFX;
-        [SerializeField]
-        private AudioClip throwSFX;
 
         private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
@@ -80,9 +77,9 @@ namespace SaloonSlingers.Unity.Actor
             Card? card = gameManager.Saloon.HouseGame.Draw(drawCtx);
             if (card == null) return;
 
+            OnDraw.Invoke(card.Value);
+
             Cards.Add(card.Value);
-            audioSource.clip = drawSFX;
-            audioSource.Play();
             GameObject spawned = spawnCard();
             ICardGraphic cardGraphic = spawned.GetComponent<ICardGraphic>();
             cardGraphic.Card = card.Value;
@@ -97,8 +94,7 @@ namespace SaloonSlingers.Unity.Actor
             _collider.isTrigger = false;
             Stack();
             state = state.Throw();
-            audioSource.clip = throwSFX;
-            audioSource.Play();
+            OnThrow.Invoke();
         }
 
         public void Throw(Vector3 offset)
@@ -198,6 +194,9 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleCollision(GameObject collidingObject)
         {
+            if (!state.IsThrown || collidingObject.layer == LayerMask.NameToLayer("Environment"))
+                return;
+
             if (state.IsThrown && collidingObject.layer != LayerMask.NameToLayer("Hand"))
                 StartCoroutine(KillNextFrame());
         }

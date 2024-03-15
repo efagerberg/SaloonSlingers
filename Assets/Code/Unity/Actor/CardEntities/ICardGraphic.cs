@@ -15,7 +15,8 @@ namespace SaloonSlingers.Unity.Actor
         public Transform transform { get; }
         public GameObject gameObject { get; }
         public T GetComponent<T>();
-        public void SetGraphics(Card card);
         public void Kill();
+
+        public void SetColor(Color color);
     }
 }

@@ -7,7 +7,6 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Homable))]
     [RequireComponent(typeof(HandProjectile))]
@@ -62,7 +61,7 @@ namespace SaloonSlingers.Unity.Actor
             ActorHandedness handedness = player.GetComponent<ActorHandedness>();
             homingStrength = player.GetComponent<HomingStrength>();
             throwOffsetCalculator = new(); ;
-            characterController = GetComponent<CharacterController>();
+            characterController = player.GetComponent<CharacterController>();
             visibilityDetector = player.GetComponent<VisibilityDetector>();
             deckGraphic = handedness.DeckGraphic;
             var attributes = player.GetComponent<Attributes>();

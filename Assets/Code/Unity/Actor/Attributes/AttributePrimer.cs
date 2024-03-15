@@ -83,8 +83,6 @@ namespace SaloonSlingers.Unity
 
     public class InvalidAttributeError : Exception
     {
-        public InvalidAttributeError() { }
-
         public InvalidAttributeError(string message) : base(message) { }
     }
 }

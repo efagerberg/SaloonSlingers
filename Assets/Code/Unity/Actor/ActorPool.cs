@@ -8,14 +8,14 @@ namespace SaloonSlingers.Unity.Actor
         private readonly GameObject prefab;
         private readonly Transform root;
 
-        private IObjectPool<GameObject> _pool;
+        private readonly IObjectPool<GameObject> _pool;
 
         public ActorPool(int poolSize, GameObject prefab, Transform root)
         {
             this.root = root;
             this.prefab = prefab;
             _pool = new ObjectPool<GameObject>(CreateInstance, OnGet, OnRelease, defaultCapacity: poolSize);
-            CountSpanwed = 0;
+            SpawnedActorCount = 0;
         }
 
         public GameObject Get(bool active = true)
@@ -24,7 +24,8 @@ namespace SaloonSlingers.Unity.Actor
             if (active) instance.SetActive(true);
             return instance;
         }
-        public int CountSpanwed { get; private set; } = 0;
+
+        public int SpawnedActorCount { get; private set; } = 0;
 
         private GameObject CreateInstance()
         {
@@ -39,21 +40,21 @@ namespace SaloonSlingers.Unity.Actor
         {
             instance.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             var actor = instance.GetComponent<IActor>();
-            actor.Killed += HandleDeath;
-            CountSpanwed++;
+            actor.Killed += OnDeath;
+            SpawnedActorCount++;
         }
 
         private void OnRelease(GameObject instance)
         {
             var actor = instance.GetComponent<IActor>();
-            actor.Killed -= HandleDeath;
+            actor.Killed -= OnDeath;
             instance.SetActive(false);
             actor.ResetActor();
             instance.transform.SetParent(root);
-            CountSpanwed--;
+            SpawnedActorCount--;
         }
 
-        private void HandleDeath(object sender, System.EventArgs e)
+        private void OnDeath(object sender, System.EventArgs e)
         {
             var instance = sender as GameObject;
             _pool.Release(instance);

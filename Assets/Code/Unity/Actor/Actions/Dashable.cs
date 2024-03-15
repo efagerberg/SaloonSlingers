@@ -9,6 +9,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class Dashable : ActionPerformer
     {
+        [field: SerializeField]
         public float Speed { get; set; } = 6f;
 
         [SerializeField]

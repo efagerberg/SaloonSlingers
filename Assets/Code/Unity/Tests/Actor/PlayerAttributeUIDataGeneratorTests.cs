@@ -5,6 +5,7 @@ using SaloonSlingers.Unity.Actor;
 
 namespace SaloonSlingers.Unity.Tests
 {
+
     public class PlayerAttributeUIDataGeneratorTests
     {
         [Test]
