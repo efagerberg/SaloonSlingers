@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Linq;
 
 using NUnit.Framework;
 
@@ -34,11 +33,9 @@ namespace SaloonSlingers.Unity.Tests
             subject.runInEditMode = true;
             yield return null;
             var deckBefore = subject.Deck;
-            attributes.Registry[AttributeType.Health].Decrease(1);
-            subject.ResetAttributes();
+            subject.ResetEnemy();
 
             Assert.That(deckBefore, Is.Not.EqualTo(subject.Deck));
-            Assert.That(subject.AttributeRegistry.Values.Select(a => a.Value), Is.EqualTo(subject.AttributeRegistry.Values.Select(x => x.InitialValue)));
         }
     }
 }

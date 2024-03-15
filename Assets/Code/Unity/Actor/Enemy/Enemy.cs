@@ -28,9 +28,8 @@ namespace SaloonSlingers.Unity.Actor
             AttributeRegistry ??= GetComponent<Attributes>().Registry;
         }
 
-        public void ResetAttributes()
+        public void ResetEnemy()
         {
-            AttributeRegistry[AttributeType.Health].Reset();
             ShieldHitPoints?.Reset(0);
             Deck = new Deck().Shuffle();
         }

@@ -17,31 +17,33 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float deathDelaySeconds = 0f;
 
-        private IReadOnlyAttribute hitPoints;
+        private Attributes attributes;
 
         public void ResetActor()
         {
+            foreach (var attribute in attributes.Registry.Values)
+                attribute.Reset();
             OnReset?.Invoke();
         }
 
         private void OnEnable()
         {
-            if (hitPoints == null) return;
+            if (attributes == null) return;
 
-            hitPoints.Depleted += OnHealthDepleted;
+            attributes.Registry[AttributeType.Health].Depleted += OnHealthDepleted;
         }
 
         private void OnDisable()
         {
-            if (hitPoints == null) return;
+            if (attributes == null) return;
 
-            hitPoints.Depleted -= OnHealthDepleted;
+            attributes.Registry[AttributeType.Health].Depleted -= OnHealthDepleted;
         }
 
         private void Start()
         {
-            hitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
-            hitPoints.Depleted += OnHealthDepleted;
+            attributes ??= GetComponent<Attributes>();
+            attributes.Registry[AttributeType.Health].Depleted += OnHealthDepleted;
         }
 
         private void OnHealthDepleted(IReadOnlyAttribute sender, EventArgs e)
