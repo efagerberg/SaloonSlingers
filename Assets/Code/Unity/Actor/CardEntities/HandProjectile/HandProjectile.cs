@@ -33,6 +33,9 @@ namespace SaloonSlingers.Unity.Actor
         public UnityEvent<Card> OnDraw;
         public UnityEvent OnThrow;
         public UnityEvent OnKill;
+        public UnityEvent OnReset;
+        public UnityEvent OnPause;
+        public UnityEvent OnPickup;
 
         [SerializeField]
         private RectTransform handPanelRectTransform;
@@ -43,7 +46,6 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private int maxAngularVelocity = 100;
 
-        private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
         private HandProjectileState state;
         private HandLayoutMediator handLayoutMediator;
@@ -54,13 +56,9 @@ namespace SaloonSlingers.Unity.Actor
         private HandEvaluation handEvaluation;
         private bool requiresEvaluation = false;
         private DrawContext drawCtx;
-        private Collider _collider;
 
         public void Pickup(Func<GameObject> spawnCard)
         {
-            trailRenderer.enabled = false;
-            rigidBody.isKinematic = true;
-            _collider.isTrigger = true;
             bool stackedBefore = state.IsStacked;
             state = state.Reset();
             if (stackedBefore != state.IsStacked)
@@ -90,10 +88,6 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Throw()
         {
-            trailRenderer.enabled = true;
-            rigidBody.isKinematic = false;
-            _collider.isTrigger = false;
-            Stack();
             state = state.Throw();
             OnThrow.Invoke();
         }
@@ -126,9 +120,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void ResetActor()
         {
-            trailRenderer.enabled = false;
-            rigidBody.isKinematic = true;
-            _collider.isTrigger = true;
+            OnReset.Invoke();
             state = state.Reset();
             handLayoutMediator.Reset();
             Cards.Clear();
@@ -144,10 +136,8 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Pause()
         {
+            OnPause.Invoke();
             state = state.Pause();
-            trailRenderer.enabled = false;
-            rigidBody.isKinematic = true;
-            _collider.isTrigger = true;
         }
 
         private void OnEnable()
@@ -159,11 +149,9 @@ namespace SaloonSlingers.Unity.Actor
         private void Awake()
         {
             gameManager = GameManager.Instance;
-            trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
             handLayoutMediator = new(handPanelRectTransform);
-            _collider = GetComponent<Collider>();
         }
 
         private void FixedUpdate()
