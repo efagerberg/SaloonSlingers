@@ -27,40 +27,6 @@ namespace SaloonSlingers.Core.Tests
             }
         }
 
-        public class TestStack
-        {
-            [Test]
-            public void WhenNotStacked_IsStacked()
-            {
-                HandProjectileState x = new HandProjectileState(1f);
-                Assert.IsTrue(x.Stack().IsStacked);
-            }
-
-            [Test]
-            public void WhenStacked_IsStillStacked()
-            {
-                HandProjectileState x = new(1f);
-                Assert.IsTrue(x.Stack().Stack().IsStacked);
-            }
-        }
-
-        public class TestUnstack
-        {
-            [Test]
-            public void WhenNotStacked_StillNotStacked()
-            {
-                HandProjectileState x = new HandProjectileState(1f);
-                Assert.IsFalse(x.Unstack().IsStacked);
-            }
-
-            [Test]
-            public void WhenStacked_IsUnstacked()
-            {
-                HandProjectileState x = new(1f);
-                Assert.IsFalse(x.Stack().Unstack().IsStacked);
-            }
-        }
-
         public class TestPause
         {
             [Test]

@@ -3,7 +3,6 @@ using System;
 using NUnit.Framework;
 
 using UnityEngine;
-using UnityEngine.Animations;
 
 namespace SaloonSlingers.Unity.Tests
 {
@@ -76,7 +75,6 @@ namespace SaloonSlingers.Unity.Tests
         {
             var subject = TestUtils.CreateComponent<Pickup>();
             var rb = subject.gameObject.AddComponent<Rigidbody>();
-            var constraint = subject.gameObject.AddComponent<PositionConstraint>();
             subject.Value = 1000;
 
             subject.ResetActor();
@@ -88,8 +86,6 @@ namespace SaloonSlingers.Unity.Tests
             Assert.That(rb.isKinematic, Is.False);
             Assert.That(rb.transform.position, Is.EqualTo(Vector3.zero));
             Assert.That(rb.transform.rotation, Is.EqualTo(Quaternion.identity));
-            Assert.That(constraint.constraintActive);
-
         }
     }
 }

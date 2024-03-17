@@ -12,7 +12,7 @@ namespace SaloonSlingers.Unity
     public class Pickup : MonoBehaviour, IActor, IPickup
     {
         public event EventHandler Killed;
-        public UnityEvent OnKill;
+        public UnityEvent OnKill = new();
 
         public uint Value
         {

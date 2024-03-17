@@ -15,7 +15,6 @@ namespace SaloonSlingers.Core
         public HandProjectileState(float lifespanInSeconds)
         {
             IsThrown = false;
-            IsStacked = false;
             this.lifespanInSeconds = lifespanInSeconds;
             originalLifeSpanInSeconds = lifespanInSeconds;
         }
@@ -32,22 +31,9 @@ namespace SaloonSlingers.Core
             return this;
         }
 
-        public HandProjectileState Stack()
-        {
-            IsStacked = true;
-            return this;
-        }
-
-        public HandProjectileState Unstack()
-        {
-            IsStacked = false;
-            return this;
-        }
-
         public HandProjectileState Reset()
         {
             IsThrown = false;
-            IsStacked = false;
             lifespanInSeconds = originalLifeSpanInSeconds;
             return this;
         }

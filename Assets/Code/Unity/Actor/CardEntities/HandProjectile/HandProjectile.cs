@@ -9,12 +9,8 @@ using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity.Actor
 {
-
-    public delegate void HandProjectileHeld(HandProjectile sender, EventArgs e);
-
     public class HandProjectile : MonoBehaviour, IActor
     {
-        public event HandProjectileHeld HandProjectileHeld;
         public event EventHandler Killed;
         public IList<Card> Cards { get; private set; } = new List<Card>();
         public bool Drawn { get => Cards.Count > 0; }
@@ -30,17 +26,13 @@ namespace SaloonSlingers.Unity.Actor
                 return handEvaluation;
             }
         }
-        public UnityEvent<Card> OnDraw;
-        public UnityEvent OnThrow;
-        public UnityEvent OnKill;
-        public UnityEvent OnReset;
-        public UnityEvent OnPause;
-        public UnityEvent OnPickup;
+        public UnityEvent<ICardGraphic> OnDraw;
+        public UnityEvent OnThrow = new();
+        public UnityEvent<GameObject> OnKill = new();
+        public UnityEvent OnReset = new();
+        public UnityEvent OnPause = new();
+        public UnityEvent<HandProjectile> OnPickup = new();
 
-        [SerializeField]
-        private RectTransform handPanelRectTransform;
-        [SerializeField]
-        private float totalCardDegrees = 30f;
         [SerializeField]
         private float lifespanInSeconds = 1f;
         [SerializeField]
@@ -48,8 +40,6 @@ namespace SaloonSlingers.Unity.Actor
 
         private Rigidbody rigidBody;
         private HandProjectileState state;
-        private HandLayoutMediator handLayoutMediator;
-        private Func<int, IEnumerable<float>> cardRotationCalculator;
         private Deck deck;
         private IDictionary<AttributeType, Core.Attribute> attributeRegistry;
         private GameManager gameManager;
@@ -61,10 +51,8 @@ namespace SaloonSlingers.Unity.Actor
         {
             bool stackedBefore = state.IsStacked;
             state = state.Reset();
-            if (stackedBefore != state.IsStacked)
-                handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
             if (!Drawn) TryDrawCard(spawnCard);
-            HandProjectileHeld?.Invoke(this, EventArgs.Empty);
+            OnPickup.Invoke(this);
         }
 
         public void TryDrawCard(Func<GameObject> spawnCard)
@@ -76,14 +64,12 @@ namespace SaloonSlingers.Unity.Actor
             Card? card = gameManager.Saloon.HouseGame.Draw(drawCtx);
             if (card == null) return;
 
-            OnDraw.Invoke(card.Value);
-
             Cards.Add(card.Value);
             GameObject spawned = spawnCard();
             ICardGraphic cardGraphic = spawned.GetComponent<ICardGraphic>();
             cardGraphic.Card = card.Value;
-            handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
             requiresEvaluation = true;
+            OnDraw.Invoke(cardGraphic);
         }
 
         public void Throw()
@@ -104,25 +90,12 @@ namespace SaloonSlingers.Unity.Actor
             attributeRegistry = newAttributeRegistry;
         }
 
-        public void Stack()
-        {
-            state = state.Stack();
-            handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
-        }
-
-        public void Unstack()
-        {
-            state = state.Unstack();
-            handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
-        }
-
         public bool IsThrown { get => state.IsThrown; }
 
         public void ResetActor()
         {
             OnReset.Invoke();
             state = state.Reset();
-            handLayoutMediator.Reset();
             Cards.Clear();
             requiresEvaluation = true;
             gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
@@ -130,7 +103,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
-            OnKill.Invoke();
+            OnKill.Invoke(gameObject);
             Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 
@@ -142,7 +115,6 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnEnable()
         {
-            cardRotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
             state = new(lifespanInSeconds);
         }
 
@@ -151,7 +123,6 @@ namespace SaloonSlingers.Unity.Actor
             gameManager = GameManager.Instance;
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
-            handLayoutMediator = new(handPanelRectTransform);
         }
 
         private void FixedUpdate()
@@ -159,7 +130,7 @@ namespace SaloonSlingers.Unity.Actor
             state.Update(Time.fixedDeltaTime);
             if (state.IsAlive) return;
 
-            Kill();
+            StartCoroutine(nameof(KillNextFrame));
         }
 
         private void OnCollisionEnter(Collision collision)
