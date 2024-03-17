@@ -32,6 +32,7 @@ namespace SaloonSlingers.Unity.Actor
         }
         public UnityEvent<Card> OnDraw;
         public UnityEvent OnThrow;
+        public UnityEvent OnKill;
 
         [SerializeField]
         private RectTransform handPanelRectTransform;
@@ -137,6 +138,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
+            OnKill.Invoke();
             Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 

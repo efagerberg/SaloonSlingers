@@ -4,7 +4,7 @@ using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
-using UnityEngine.Animations;
+using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity
 {
@@ -12,6 +12,7 @@ namespace SaloonSlingers.Unity
     public class Pickup : MonoBehaviour, IActor, IPickup
     {
         public event EventHandler Killed;
+        public UnityEvent OnKill;
 
         public uint Value
         {
@@ -27,8 +28,6 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private Rigidbody rigidBody;
         [SerializeField]
-        private PositionConstraint pickupLineConstraint;
-        [SerializeField]
         private ScaleByValue scaleByValue;
         [field: SerializeField]
         private uint _value;
@@ -37,14 +36,12 @@ namespace SaloonSlingers.Unity
         {
             Value = 0;
             rigidBody ??= GetComponent<Rigidbody>();
-            pickupLineConstraint ??= GetComponent<PositionConstraint>();
             rigidBody.isKinematic = false;
             transform.localScale = Vector3.one;
             transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             // Pickups have a nested object that moves
             rigidBody.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-            pickupLineConstraint.constraintActive = true;
-            pickupLineConstraint.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            gameObject.layer = LayerMask.NameToLayer("Pickup");
         }
 
         public void TryPickup(GameObject grabber)
@@ -54,6 +51,7 @@ namespace SaloonSlingers.Unity
                 return;
 
             money.Increase(Value);
+            OnKill.Invoke();
             Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 
@@ -61,7 +59,6 @@ namespace SaloonSlingers.Unity
         {
             TryPickup(LevelManager.Instance.Player);
         }
-
 
         private void OnValidate()
         {
