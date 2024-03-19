@@ -14,8 +14,8 @@ namespace SaloonSlingers.Unity.Actor
     {
         public ActionMetaData MetaData => metaData;
         public IReadOnlyAttribute Points => points;
+        public bool IsPerforming { get; protected set; }
 
-        protected bool IsPerforming { get; set; }
         protected bool IsInitialized { get; private set; } = false;
         protected Core.Attribute points;
         protected ActionMetaData metaData;

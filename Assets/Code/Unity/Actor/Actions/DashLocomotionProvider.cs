@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -11,11 +12,11 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private List<InputActionProperty> dashInputProperties;
         [SerializeField]
-        private CharacterController controller;
-        [SerializeField]
         private Dashable dashable;
         [SerializeField]
         private Transform forwardReference;
+
+        private CharacterController characterController;
 
         private void OnEnable()
         {
@@ -31,7 +32,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleDash(InputAction.CallbackContext context)
         {
-            if (dashable == null) dashable = controller.GetComponent<Dashable>();
+            if (dashable == null) dashable = system.xrOrigin.Origin.GetComponent<Dashable>();
             if (!CanBeginLocomotion()) return;
 
             BeginLocomotion();
@@ -39,6 +40,34 @@ namespace SaloonSlingers.Unity.Actor
             EndLocomotion();
         }
 
-        private void Move(Vector3 v) => controller.Move(v);
+        private void Move(Vector3 v)
+        {
+            if (characterController == null) characterController = system.xrOrigin.Origin.GetComponent<CharacterController>();
+            characterController.Move(v);
+        }
+
+        private void Update()
+        {
+            if (dashable == null) return;
+
+            switch (locomotionPhase)
+            {
+                case LocomotionPhase.Idle:
+                case LocomotionPhase.Started:
+                    if (dashable.IsPerforming)
+                        locomotionPhase = LocomotionPhase.Moving;
+                    break;
+                case LocomotionPhase.Moving:
+                    if (!dashable.IsPerforming)
+                        locomotionPhase = LocomotionPhase.Done;
+                    break;
+                case LocomotionPhase.Done:
+                    locomotionPhase = dashable.IsPerforming ? LocomotionPhase.Moving : LocomotionPhase.Idle;
+                    break;
+                default:
+                    Assert.IsTrue(false, $"Unhandled {nameof(LocomotionPhase)}={locomotionPhase}");
+                    break;
+            }
+        }
     }
 }
