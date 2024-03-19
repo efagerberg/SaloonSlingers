@@ -1,5 +1,3 @@
-using System;
-
 using NUnit.Framework;
 
 using SaloonSlingers.Unity.Actor;
@@ -33,7 +31,6 @@ namespace SaloonSlingers.Unity.Tests
             subject.Get();
             var toDespawn = subject.Get().GetComponent<TestActor>();
             toDespawn.Kill();
-
 
             Assert.That(subject.SpawnedActorCount, Is.EqualTo(1));
         }
@@ -71,18 +68,11 @@ namespace SaloonSlingers.Unity.Tests
         }
     }
 
-    class TestActor : MonoBehaviour, IActor
+    class TestActor : Actor.Actor
     {
-        public event EventHandler Killed;
-
         public void Kill()
         {
-            Killed?.Invoke(gameObject, EventArgs.Empty);
-        }
-
-        public void ResetActor()
-        {
-            return;
+            OnKilled?.Invoke(gameObject);
         }
     }
 }

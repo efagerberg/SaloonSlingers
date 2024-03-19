@@ -12,8 +12,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 
         public override void OnAwake()
         {
-            if (HitPoints == null)
-                HitPoints = GetComponent<Attributes>().Registry[AttributeType.Health];
+            HitPoints ??= GetComponent<Attributes>().Registry[AttributeType.Health];
             currentPoints = HitPoints.Value;
         }
 

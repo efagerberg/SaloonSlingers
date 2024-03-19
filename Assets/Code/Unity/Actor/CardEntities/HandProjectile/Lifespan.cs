@@ -13,7 +13,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private float originalLifespanInSeconds;
 
-        private void Awake()
+        private void OnEnable()
         {
             originalLifespanInSeconds = lifespanInSeconds;
         }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
@@ -64,17 +63,17 @@ namespace SaloonSlingers.Unity
 
         private void OnEnable()
         {
-            levelCompleteNotifier.LevelComplete += OnLevelComplete;
-            EnemyManager.EnemyKilled += levelCompleteNotifier.OnEnemyKilled;
+            levelCompleteNotifier.LevelCompleted.AddListener(OnLevelComplete);
+            EnemyManager.OnEnemyKilled.AddListener(levelCompleteNotifier.OnEnemyKilled);
         }
 
         private void OnDisable()
         {
-            levelCompleteNotifier.LevelComplete -= OnLevelComplete;
-            EnemyManager.EnemyKilled -= levelCompleteNotifier.OnEnemyKilled;
+            levelCompleteNotifier.LevelCompleted.AddListener(OnLevelComplete);
+            EnemyManager.OnEnemyKilled.RemoveListener(levelCompleteNotifier.OnEnemyKilled);
         }
 
-        private void OnLevelComplete(object sender, EventArgs args)
+        private void OnLevelComplete()
         {
             GameManager.Instance.SceneLoader.LoadScene("StartingScene");
         }

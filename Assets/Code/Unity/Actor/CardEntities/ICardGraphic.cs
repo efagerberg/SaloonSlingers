@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public interface ICardGraphic : IActor
+    public interface ICardGraphic
     {
         public Card Card
         {
@@ -15,8 +15,8 @@ namespace SaloonSlingers.Unity.Actor
         public Transform transform { get; }
         public GameObject gameObject { get; }
         public T GetComponent<T>();
-        public void Kill();
 
         public void SetColor(Color color);
+        public void Kill();
     }
 }

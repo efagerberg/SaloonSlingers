@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 using NUnit.Framework;
@@ -30,16 +29,13 @@ namespace SaloonSlingers.Unity.Tests
             {
                 { enemies[0].name, nEnemies }
             };
-            void OnComplete(object sender, EventArgs args)
-            {
-                eventEmitted = true;
-            }
+            void CompleteHandler() => eventEmitted = true;
 
             var subject = new LevelCompleteNotifier(manifest);
-            subject.LevelComplete += OnComplete;
+            subject.LevelCompleted.AddListener(CompleteHandler);
             for (int i = 0; i < nEnemies; i++)
             {
-                actors[i].Killed += subject.OnEnemyKilled;
+                actors[i].OnKilled.AddListener(subject.OnEnemyKilled);
                 actors[i].Kill();
             }
 
@@ -56,14 +52,11 @@ namespace SaloonSlingers.Unity.Tests
             {
                 { enemy.name, 2 }
             };
-            void OnComplete(object sender, EventArgs args)
-            {
-                eventEmitted = true;
-            }
+            void CompleeHandler() => eventEmitted = true;
 
             var subject = new LevelCompleteNotifier(manifest);
-            actor.Killed += subject.OnEnemyKilled;
-            subject.LevelComplete += OnComplete;
+            actor.OnKilled.AddListener(subject.OnEnemyKilled);
+            subject.LevelCompleted.AddListener(CompleeHandler);
             actor.Kill();
             actor.Kill();
 

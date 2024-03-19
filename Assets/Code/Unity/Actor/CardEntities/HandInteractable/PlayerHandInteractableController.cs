@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -46,7 +45,7 @@ namespace SaloonSlingers.Unity.Actor
             homable.enabled = true;
             if (!eventsRegistered)
             {
-                handProjectile.Killed += OnHandProjectileDied;
+                handProjectile.OnKilled.AddListener(OnHandProjectileDied);
                 eventsRegistered = true;
             }
         }
@@ -60,7 +59,7 @@ namespace SaloonSlingers.Unity.Actor
             initialized = true;
             ActorHandedness handedness = player.GetComponent<ActorHandedness>();
             homingStrength = player.GetComponent<HomingStrength>();
-            throwOffsetCalculator = new(); ;
+            throwOffsetCalculator = new();
             characterController = player.GetComponent<CharacterController>();
             visibilityDetector = player.GetComponent<VisibilityDetector>();
             deckGraphic = handedness.DeckGraphic;
@@ -87,13 +86,13 @@ namespace SaloonSlingers.Unity.Actor
             homingStrength.Calculator.StartNewThrow();
         }
 
-        private void OnHandProjectileDied(object sender, EventArgs e)
+        private void OnHandProjectileDied(GameObject sender)
         {
             homable.Target = null;
             homable.Strength = 0;
             homable.enabled = false;
             eventsRegistered = false;
-            handProjectile.Killed -= OnHandProjectileDied;
+            handProjectile.OnKilled.RemoveListener(OnHandProjectileDied);
         }
 
         public void OnActivate()
@@ -113,7 +112,6 @@ namespace SaloonSlingers.Unity.Actor
         {
             mainInteractable.enabled = true;
             peerInteractable.enabled = false;
-
         }
 
         private void OnDisable()

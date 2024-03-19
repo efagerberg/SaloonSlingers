@@ -2,10 +2,11 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class DashController : MonoBehaviour
+    public class DashLocomotionProvider : LocomotionProvider
     {
         [SerializeField]
         private List<InputActionProperty> dashInputProperties;
@@ -30,8 +31,12 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleDash(InputAction.CallbackContext context)
         {
-            if (dashable == null) dashable = GetComponent<Dashable>();
+            if (dashable == null) dashable = controller.GetComponent<Dashable>();
+            if (!CanBeginLocomotion()) return;
+
+            BeginLocomotion();
             dashable.Dash(Move, forwardReference.forward);
+            EndLocomotion();
         }
 
         private void Move(Vector3 v) => controller.Move(v);

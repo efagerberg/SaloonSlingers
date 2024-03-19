@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 
 using UnityEngine;
@@ -7,7 +6,7 @@ using UnityEngine.Animations;
 namespace SaloonSlingers.Unity.Actor
 {
 
-    public class PickupElevator : MonoBehaviour, IActor
+    public class PickupElevator : Actor
     {
         [SerializeField]
         private GameObject interactable;
@@ -32,8 +31,6 @@ namespace SaloonSlingers.Unity.Actor
         private Collider interactableCollider;
         private Transform interactableTransform;
 
-        public event EventHandler Killed;
-
         public void Associate(GameObject interactable)
         {
             this.interactable = interactable;
@@ -46,7 +43,7 @@ namespace SaloonSlingers.Unity.Actor
             lineRenderer.enabled = true;
         }
 
-        public void ResetActor()
+        public override void ResetActor()
         {
             lineRenderer.enabled = false;
             constraint.constraintActive = false;
@@ -60,7 +57,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
-            Killed?.Invoke(gameObject, EventArgs.Empty);
+            OnKilled?.Invoke(gameObject);
         }
 
         private void Awake()

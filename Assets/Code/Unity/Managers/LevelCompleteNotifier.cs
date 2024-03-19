@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-
-using SaloonSlingers.Unity.Actor;
+﻿using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity
 {
     public class LevelCompleteNotifier
     {
-        public EventHandler LevelComplete;
+        public UnityEvent LevelCompleted = new();
         private readonly IDictionary<string, int> enemiesLeft;
 
         public LevelCompleteNotifier(IReadOnlyDictionary<string, int> enemyManifest)
@@ -17,19 +15,18 @@ namespace SaloonSlingers.Unity
             enemiesLeft = new Dictionary<string, int>(enemyManifest);
         }
 
-        public void OnEnemyKilled(object sender, EventArgs args)
+        public void OnEnemyKilled(GameObject sender)
         {
-            var go = (GameObject)sender;
-            enemiesLeft[go.name]--;
-            if (enemiesLeft[go.name] == 0)
+            enemiesLeft[sender.name]--;
+            if (enemiesLeft[sender.name] == 0)
             {
-                enemiesLeft.Remove(go.name);
+                enemiesLeft.Remove(sender.name);
                 if (enemiesLeft.Count == 0)
-                    LevelComplete?.Invoke(this, EventArgs.Empty);
+                    LevelCompleted?.Invoke();
             }
 
-            var actor = go.GetComponent<IActor>();
-            actor.Killed -= OnEnemyKilled;
+            var actor = sender.GetComponent<Actor.Actor>();
+            actor.OnKilled.RemoveListener(OnEnemyKilled);
         }
     }
 }

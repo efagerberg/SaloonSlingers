@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 using SaloonSlingers.Core;
@@ -10,9 +9,8 @@ using UnityEngine.Events;
 namespace SaloonSlingers.Unity.Actor
 {
 
-    public class HandProjectile : MonoBehaviour, IActor
+    public class HandProjectile : Actor
     {
-        public event EventHandler Killed;
         public IList<Card> Cards { get; private set; } = new List<Card>();
         public HandEvaluation HandEvaluation
         {
@@ -26,12 +24,10 @@ namespace SaloonSlingers.Unity.Actor
                 return handEvaluation;
             }
         }
-        public UnityEvent<ICardGraphic> OnDraw;
-        public UnityEvent OnThrow = new();
-        public UnityEvent<GameObject> OnKill = new();
-        public UnityEvent OnReset = new();
-        public UnityEvent OnPause = new();
-        public UnityEvent<HandProjectile> OnPickup = new();
+        public UnityEvent<GameObject, ICardGraphic> OnDraw;
+        public UnityEvent<GameObject> OnThrow = new();
+        public UnityEvent<GameObject> OnPause = new();
+        public UnityEvent<GameObject> OnPickup = new();
 
         [SerializeField]
         private int maxAngularVelocity = 100;
@@ -49,7 +45,7 @@ namespace SaloonSlingers.Unity.Actor
         public void Pickup(Func<GameObject> spawnCard)
         {
             if (!Drawn) TryDrawCard(spawnCard);
-            OnPickup.Invoke(this);
+            OnPickup.Invoke(gameObject);
         }
 
         public void TryDrawCard(Func<GameObject> spawnCard)
@@ -66,13 +62,13 @@ namespace SaloonSlingers.Unity.Actor
             ICardGraphic cardGraphic = spawned.GetComponent<ICardGraphic>();
             cardGraphic.Card = card.Value;
             requiresEvaluation = true;
-            OnDraw.Invoke(cardGraphic);
+            OnDraw.Invoke(gameObject, cardGraphic);
         }
 
         public void Throw()
         {
             isThrown = true;
-            OnThrow.Invoke();
+            OnThrow.Invoke(gameObject);
         }
 
         public void Throw(Vector3 offset)
@@ -87,9 +83,9 @@ namespace SaloonSlingers.Unity.Actor
             attributeRegistry = newAttributeRegistry;
         }
 
-        public void ResetActor()
+        public override void ResetActor()
         {
-            OnReset.Invoke();
+            OnReset.Invoke(gameObject);
             Cards.Clear();
             requiresEvaluation = false;
             isThrown = false;
@@ -98,14 +94,12 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
-            OnKill.Invoke(gameObject);
-            StartCoroutine(nameof(WaitUntilNextFrame));
-            Killed?.Invoke(gameObject, EventArgs.Empty);
+            OnKilled.Invoke(gameObject);
         }
 
         public void Pause()
         {
-            OnPause.Invoke();
+            OnPause.Invoke(gameObject);
             isThrown = false;
         }
 
@@ -124,11 +118,6 @@ namespace SaloonSlingers.Unity.Actor
         private void OnTriggerEnter(Collider collider)
         {
             HandleCollision(collider.gameObject);
-        }
-
-        private IEnumerator WaitUntilNextFrame()
-        {
-            yield return null;
         }
 
         private void HandleCollision(GameObject collidingObject)

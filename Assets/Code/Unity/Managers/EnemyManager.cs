@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity
 {
     public class EnemyManager : MonoBehaviour, ISpawner<GameObject>
     {
-        public EventHandler EnemyKilled;
+        public UnityEvent<GameObject> OnEnemyKilled;
 
         [SerializeField]
         private int maxActiveEnemies = 3;
@@ -26,8 +27,8 @@ namespace SaloonSlingers.Unity
 
             var go = enemySpawner.Spawn();
             enemiesSpawned++;
-            var actor = go.GetComponent<IActor>();
-            actor.Killed += OnEnemyKilled;
+            var actor = go.GetComponent<Actor.Actor>();
+            actor.OnKilled.AddListener(EnemyKilledHandler);
             return go;
         }
 
@@ -39,12 +40,12 @@ namespace SaloonSlingers.Unity
             GameManager.Instance.Saloon.EnemyInventory.Emptied += OnInventoryEmptied;
         }
 
-        private void OnEnemyKilled(object sender, EventArgs args)
+        private void EnemyKilledHandler(GameObject sender)
         {
             enemiesSpawned--;
-            EnemyKilled?.Invoke(sender, args);
-            var actor = ((GameObject)sender).GetComponent<IActor>();
-            actor.Killed -= OnEnemyKilled;
+            OnEnemyKilled?.Invoke(sender);
+            var actor = sender.GetComponent<Actor.Actor>();
+            actor.OnKilled.RemoveListener(EnemyKilledHandler);
         }
 
         private void OnInventoryEmptied(object sender, EventArgs e)

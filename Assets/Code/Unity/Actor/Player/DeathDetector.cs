@@ -4,26 +4,21 @@ using System.Collections;
 using SaloonSlingers.Core;
 
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class DeathDetector : MonoBehaviour, IActor
+    public class DeathDetector : Actor
     {
-        public UnityEvent OnKilled = new();
-        public UnityEvent OnReset = new();
-        public event EventHandler Killed;
-
         [SerializeField]
         private float deathDelaySeconds = 0f;
 
         private Attributes attributes;
 
-        public void ResetActor()
+        public override void ResetActor()
         {
             foreach (var attribute in attributes.Registry.Values)
                 attribute.Reset();
-            OnReset?.Invoke();
+            OnReset?.Invoke(gameObject);
         }
 
         private void OnEnable()
@@ -48,14 +43,13 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnHealthDepleted(IReadOnlyAttribute sender, EventArgs e)
         {
-            OnKilled?.Invoke();
             StartCoroutine(nameof(DelayDeath));
         }
 
         private IEnumerator DelayDeath()
         {
             yield return new WaitForSeconds(deathDelaySeconds);
-            Killed?.Invoke(gameObject, EventArgs.Empty);
+            OnKilled?.Invoke(gameObject);
         }
     }
 }

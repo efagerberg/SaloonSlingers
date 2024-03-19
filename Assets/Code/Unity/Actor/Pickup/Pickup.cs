@@ -1,19 +1,13 @@
-﻿using System;
-
-using SaloonSlingers.Core;
+﻿using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity
 {
     [RequireComponent(typeof(ScaleByValue))]
-    public class Pickup : MonoBehaviour, IActor, IPickup
+    public class Pickup : Actor.Actor, IPickup
     {
-        public event EventHandler Killed;
-        public UnityEvent OnKill = new();
-
         public uint Value
         {
             get => _value;
@@ -32,7 +26,7 @@ namespace SaloonSlingers.Unity
         [field: SerializeField]
         private uint _value;
 
-        public void ResetActor()
+        public override void ResetActor()
         {
             Value = 0;
             rigidBody ??= GetComponent<Rigidbody>();
@@ -51,8 +45,7 @@ namespace SaloonSlingers.Unity
                 return;
 
             money.Increase(Value);
-            OnKill.Invoke();
-            Killed?.Invoke(gameObject, EventArgs.Empty);
+            OnKilled?.Invoke(gameObject);
         }
 
         public void PlayerPickup()

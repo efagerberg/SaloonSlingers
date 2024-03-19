@@ -1,15 +1,11 @@
-using System;
-
 using SaloonSlingers.Core;
 
 using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class CardGraphic : MonoBehaviour, ICardGraphic
+    public class CardGraphic : Actor, ICardGraphic
     {
-        public event EventHandler Killed;
-
         public Card Card
         {
             get => card;
@@ -28,14 +24,14 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private Material faceMaterial;
 
-        public void ResetActor()
+        public override void ResetActor()
         {
             SetColor(Color.white);
         }
 
         public void Kill()
         {
-            Killed?.Invoke(gameObject, EventArgs.Empty);
+            OnKilled.Invoke(gameObject);
         }
 
         public void SetColor(Color color) => faceRenderer.material.color = color;
