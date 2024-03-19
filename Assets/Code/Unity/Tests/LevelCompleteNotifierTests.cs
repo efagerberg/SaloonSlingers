@@ -11,9 +11,9 @@ namespace SaloonSlingers.Unity.Tests
         [TestCase(1)]
         [TestCase(2)]
         [TestCase(10)]
-        public void EmitsEven_WhenAllEnemiesKilled(int nEnemies)
+        public void Emits_WhenAllEnemiesKilled(int nEnemies)
         {
-            var eventEmitted = false;
+            LevelResult levelResult = LevelResult.UNDEFINED;
             GameObject[] enemies = new GameObject[nEnemies];
             TestActor[] actors = new TestActor[nEnemies];
 
@@ -29,38 +29,57 @@ namespace SaloonSlingers.Unity.Tests
             {
                 { enemies[0].name, nEnemies }
             };
-            void CompleteHandler() => eventEmitted = true;
+            void CompletedHandler(LevelResult r) => levelResult = r;
 
             var subject = new LevelCompleteNotifier(manifest);
-            subject.LevelCompleted.AddListener(CompleteHandler);
+            subject.LevelCompleted.AddListener(CompletedHandler);
             for (int i = 0; i < nEnemies; i++)
             {
                 actors[i].OnKilled.AddListener(subject.OnEnemyKilled);
                 actors[i].Kill();
             }
 
-            Assert.That(eventEmitted);
+            Assert.That(levelResult, Is.EqualTo(LevelResult.ALL_ENEMIES_KILLED));
         }
 
         [Test]
         public void DoesNotEmitKillEventTwice_WhenEnemyKilled()
         {
-            var eventEmitted = false;
+            LevelResult levelResult = LevelResult.UNDEFINED;
             var enemy = new GameObject("TestEnemy");
             var actor = enemy.AddComponent<TestActor>();
             var manifest = new Dictionary<string, int>
             {
                 { enemy.name, 2 }
             };
-            void CompleeHandler() => eventEmitted = true;
+            void CompletedHandler(LevelResult r) => levelResult = r;
 
             var subject = new LevelCompleteNotifier(manifest);
             actor.OnKilled.AddListener(subject.OnEnemyKilled);
-            subject.LevelCompleted.AddListener(CompleeHandler);
+            subject.LevelCompleted.AddListener(CompletedHandler);
             actor.Kill();
             actor.Kill();
 
-            Assert.That(eventEmitted, Is.False);
+            Assert.That(levelResult, Is.EqualTo(LevelResult.UNDEFINED));
+        }
+
+        [Test]
+        public void Emits_WhenPlayerKilled()
+        {
+            LevelResult levelResult = LevelResult.UNDEFINED;
+
+            var player = new GameObject("TestPlayer");
+            var actor = player.AddComponent<TestActor>();
+            var manifest = new Dictionary<string, int> { };
+
+            void CompletedHandler(LevelResult r) => levelResult = r;
+
+            var subject = new LevelCompleteNotifier(manifest);
+            actor.OnKilled.AddListener(subject.OnPlayerKilled);
+            subject.LevelCompleted.AddListener(CompletedHandler);
+            actor.Kill();
+
+            Assert.That(levelResult, Is.EqualTo(LevelResult.PLAYER_KILLED));
         }
     }
 }

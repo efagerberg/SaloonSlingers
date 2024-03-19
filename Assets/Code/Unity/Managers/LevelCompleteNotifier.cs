@@ -5,9 +5,14 @@ using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity
 {
+    public enum LevelResult
+    {
+        UNDEFINED, PLAYER_KILLED, ALL_ENEMIES_KILLED
+    }
+
     public class LevelCompleteNotifier
     {
-        public UnityEvent LevelCompleted = new();
+        public UnityEvent<LevelResult> LevelCompleted = new();
         private readonly IDictionary<string, int> enemiesLeft;
 
         public LevelCompleteNotifier(IReadOnlyDictionary<string, int> enemyManifest)
@@ -22,11 +27,16 @@ namespace SaloonSlingers.Unity
             {
                 enemiesLeft.Remove(sender.name);
                 if (enemiesLeft.Count == 0)
-                    LevelCompleted?.Invoke();
+                    LevelCompleted?.Invoke(LevelResult.ALL_ENEMIES_KILLED);
             }
 
             var actor = sender.GetComponent<Actor.Actor>();
             actor.OnKilled.RemoveListener(OnEnemyKilled);
+        }
+
+        public void OnPlayerKilled(GameObject sender)
+        {
+            LevelCompleted?.Invoke(LevelResult.PLAYER_KILLED);
         }
     }
 }

@@ -30,6 +30,7 @@ namespace SaloonSlingers.Unity
         private GameObject player;
 
         private LevelCompleteNotifier levelCompleteNotifier;
+        private Actor.Actor playerActor;
 
         public static Saloon Load(string configFileContents)
         {
@@ -59,23 +60,35 @@ namespace SaloonSlingers.Unity
         {
             base.Awake();
             levelCompleteNotifier = new(GameManager.Instance.Saloon.EnemyInventory.Manifest);
+            playerActor = Player.GetComponent<Actor.Actor>();
+
         }
 
         private void OnEnable()
         {
-            levelCompleteNotifier.LevelCompleted.AddListener(OnLevelComplete);
+            levelCompleteNotifier.LevelCompleted.AddListener(LevelCompletedHandler);
             EnemyManager.OnEnemyKilled.AddListener(levelCompleteNotifier.OnEnemyKilled);
+            playerActor.OnKilled.AddListener(levelCompleteNotifier.OnPlayerKilled);
         }
 
         private void OnDisable()
         {
-            levelCompleteNotifier.LevelCompleted.AddListener(OnLevelComplete);
+            levelCompleteNotifier.LevelCompleted.AddListener(LevelCompletedHandler);
             EnemyManager.OnEnemyKilled.RemoveListener(levelCompleteNotifier.OnEnemyKilled);
+            playerActor.OnKilled.RemoveListener(levelCompleteNotifier.OnPlayerKilled);
         }
 
-        private void OnLevelComplete()
+        private void LevelCompletedHandler(LevelResult result)
         {
-            GameManager.Instance.SceneLoader.LoadScene("StartingScene");
+            string nextScene = result switch
+            {
+                LevelResult.ALL_ENEMIES_KILLED => "StartingScene",
+                LevelResult.PLAYER_KILLED => "GameOver",
+                _ => ""
+            };
+            if (nextScene == "") return;
+
+            GameManager.Instance.SceneLoader.LoadScene(nextScene);
         }
     }
 
