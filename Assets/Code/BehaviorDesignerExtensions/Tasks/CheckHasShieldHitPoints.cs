@@ -11,7 +11,8 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 
         public override void OnStart()
         {
-            HitPoints ??= GetComponent<Enemy>().ShieldHitPoints;
+            if (HitPoints == null)
+                HitPoints = GetComponent<Enemy>().ShieldHitPoints;
         }
 
         public override TaskStatus OnUpdate()

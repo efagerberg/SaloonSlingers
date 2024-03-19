@@ -53,20 +53,21 @@ namespace SaloonSlingers.Unity
 
         public void OnHoverEnter(HoverEnterEventArgs args)
         {
-            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandLayout>(out var layout))
+            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile))
                 return;
 
-            if (!absorber.CanAbsorb && layout.TryGetComponent<AudioSource>(out var audioSource))
+            if (!absorber.CanAbsorb && projectile.TryGetComponent<AudioSource>(out var audioSource))
                 audioSource.PlayOneShot(errorClip, volumeScale);
-            layout.Stack();
+
+            projectile.gameObject.GetComponentInImmediateChildren<HandLayout>().Stack();
         }
 
         public void OnHoverExit(HoverExitEventArgs args)
         {
-            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandLayout>(out var layout))
+            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile))
                 return;
 
-            layout.Unstack();
+            projectile.gameObject.GetComponentInImmediateChildren<HandLayout>().Unstack();
         }
 
         public void OnSelectEnter(SelectEnterEventArgs args)

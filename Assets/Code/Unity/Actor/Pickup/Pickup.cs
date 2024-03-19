@@ -60,9 +60,11 @@ namespace SaloonSlingers.Unity
             TryPickup(LevelManager.Instance.Player);
         }
 
+#if UNITY_EDITOR
         private void OnValidate()
         {
             Value = _value;
         }
+# endif
     }
 }

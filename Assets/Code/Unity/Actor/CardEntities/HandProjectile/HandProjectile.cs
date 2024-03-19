@@ -9,11 +9,11 @@ using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity.Actor
 {
+
     public class HandProjectile : MonoBehaviour, IActor
     {
         public event EventHandler Killed;
         public IList<Card> Cards { get; private set; } = new List<Card>();
-        public bool Drawn { get => Cards.Count > 0; }
         public HandEvaluation HandEvaluation
         {
             get
@@ -34,23 +34,20 @@ namespace SaloonSlingers.Unity.Actor
         public UnityEvent<HandProjectile> OnPickup = new();
 
         [SerializeField]
-        private float lifespanInSeconds = 1f;
-        [SerializeField]
         private int maxAngularVelocity = 100;
 
         private Rigidbody rigidBody;
-        private HandProjectileState state;
+        private bool isThrown = false;
         private Deck deck;
         private IDictionary<AttributeType, Core.Attribute> attributeRegistry;
         private GameManager gameManager;
         private HandEvaluation handEvaluation;
-        private bool requiresEvaluation = false;
+        private bool requiresEvaluation = true;
         private DrawContext drawCtx;
+        private bool Drawn { get => Cards.Count > 0; }
 
         public void Pickup(Func<GameObject> spawnCard)
         {
-            bool stackedBefore = state.IsStacked;
-            state = state.Reset();
             if (!Drawn) TryDrawCard(spawnCard);
             OnPickup.Invoke(this);
         }
@@ -74,7 +71,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Throw()
         {
-            state = state.Throw();
+            isThrown = true;
             OnThrow.Invoke();
         }
 
@@ -90,32 +87,26 @@ namespace SaloonSlingers.Unity.Actor
             attributeRegistry = newAttributeRegistry;
         }
 
-        public bool IsThrown { get => state.IsThrown; }
-
         public void ResetActor()
         {
             OnReset.Invoke();
-            state = state.Reset();
             Cards.Clear();
-            requiresEvaluation = true;
+            requiresEvaluation = false;
+            isThrown = false;
             gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
         }
 
         public void Kill()
         {
             OnKill.Invoke(gameObject);
+            StartCoroutine(nameof(WaitUntilNextFrame));
             Killed?.Invoke(gameObject, EventArgs.Empty);
         }
 
         public void Pause()
         {
             OnPause.Invoke();
-            state = state.Pause();
-        }
-
-        private void OnEnable()
-        {
-            state = new(lifespanInSeconds);
+            isThrown = false;
         }
 
         private void Awake()
@@ -123,14 +114,6 @@ namespace SaloonSlingers.Unity.Actor
             gameManager = GameManager.Instance;
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
-        }
-
-        private void FixedUpdate()
-        {
-            state.Update(Time.fixedDeltaTime);
-            if (state.IsAlive) return;
-
-            StartCoroutine(nameof(KillNextFrame));
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -143,23 +126,18 @@ namespace SaloonSlingers.Unity.Actor
             HandleCollision(collider.gameObject);
         }
 
-        /// <summary>
-        /// Defers killing entity until the next frame. Useful in cases of collision where you want
-        /// the entities colliding with this object to do some process before removing the actor.
-        /// </summary>
-        private IEnumerator KillNextFrame()
+        private IEnumerator WaitUntilNextFrame()
         {
             yield return null;
-            Kill();
         }
 
         private void HandleCollision(GameObject collidingObject)
         {
-            if (!state.IsThrown || collidingObject.layer == LayerMask.NameToLayer("Environment"))
+            if (!isThrown || collidingObject.layer == LayerMask.NameToLayer("Environment"))
                 return;
 
-            if (state.IsThrown && collidingObject.layer != LayerMask.NameToLayer("Hand"))
-                StartCoroutine(KillNextFrame());
+            if (isThrown && collidingObject.layer != LayerMask.NameToLayer("Hand"))
+                Kill();
         }
     }
 }
