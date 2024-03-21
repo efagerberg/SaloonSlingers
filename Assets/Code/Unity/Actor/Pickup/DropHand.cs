@@ -8,7 +8,7 @@ namespace SaloonSlingers.Unity
     {
         public void Drop()
         {
-            var projectiles = GetComponentsInChildren<HandProjectileActor>();
+            var projectiles = GetComponentsInChildren<HandProjectile>();
             foreach (var projectile in projectiles)
             {
                 projectile.Throw();

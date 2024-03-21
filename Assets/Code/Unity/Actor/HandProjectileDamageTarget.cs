@@ -35,7 +35,7 @@ namespace SaloonSlingers.Unity
             uint damage = DamageMode switch
             {
                 DamageMode.DECREMENT => 1,
-                DamageMode.HAND_VALUE => collidingObject.GetComponent<HandProjectileActor>().HandEvaluation.Score,
+                DamageMode.HAND_VALUE => collidingObject.GetComponent<HandProjectile>().HandEvaluation.Score,
                 _ => 0
             };
             attributes ??= GetComponent<Attributes>();

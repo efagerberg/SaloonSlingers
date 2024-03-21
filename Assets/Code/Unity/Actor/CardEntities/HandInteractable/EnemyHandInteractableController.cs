@@ -9,9 +9,9 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class EnemyHandInteractableController : MonoBehaviour
     {
-        public IList<Card> Cards { get => handProjectile.Cards; }
+        public IReadOnlyCollection<Card> Cards { get => handProjectile.Cards; }
 
-        private HandProjectileActor handProjectile;
+        private HandProjectile handProjectile;
         private Rigidbody rb;
 
         public void Draw(Deck deck, IDictionary<AttributeType, Core.Attribute> attributeRegistry, Func<GameObject> spawn)
@@ -36,7 +36,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Awake()
         {
-            handProjectile = GetComponent<HandProjectileActor>();
+            handProjectile = GetComponent<HandProjectile>();
             rb = GetComponent<Rigidbody>();
         }
     }

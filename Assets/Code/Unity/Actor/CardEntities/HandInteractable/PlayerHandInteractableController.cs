@@ -8,7 +8,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Homable))]
-    [RequireComponent(typeof(HandProjectileActor))]
+    [RequireComponent(typeof(HandProjectile))]
     public class PlayerHandInteractableController : MonoBehaviour
     {
         [SerializeField]
@@ -18,7 +18,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private XRBaseInteractable peerInteractable;
 
-        private HandProjectileActor handProjectile;
+        private HandProjectile handProjectile;
         private DeckGraphic deckGraphic;
         private Homable homable;
 
@@ -64,7 +64,7 @@ namespace SaloonSlingers.Unity.Actor
             visibilityDetector = player.GetComponent<VisibilityDetector>();
             deckGraphic = handedness.DeckGraphic;
             var attributes = player.GetComponent<Attributes>();
-            handProjectile = GetComponent<HandProjectileActor>();
+            handProjectile = GetComponent<HandProjectile>();
             handProjectile.Assign(deckGraphic.Deck, attributes.Registry);
             rb = GetComponent<Rigidbody>();
             homable = GetComponent<Homable>();

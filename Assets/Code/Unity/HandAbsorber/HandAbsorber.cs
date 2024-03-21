@@ -20,7 +20,7 @@ namespace SaloonSlingers.Unity
             stacker = new AttributeStacker(startingStacks);
         }
 
-        public void Absorb(Attribute shieldPoints, HandProjectileActor projectile)
+        public void Absorb(Attribute shieldPoints, HandProjectile projectile)
         {
             if (!CanAbsorb) return;
 

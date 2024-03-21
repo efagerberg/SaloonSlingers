@@ -31,7 +31,7 @@ namespace SaloonSlingers.Core
             pot.Increase(nextPrice);
         }
 
-        private uint GetNextCost(IList<Card> hand)
+        private uint GetNextCost(IReadOnlyCollection<Card> hand)
         {
             int handMaxI = hand.Count() - 1;
             int costMaxI = costs.Count() - 1;

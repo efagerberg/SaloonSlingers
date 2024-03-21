@@ -23,7 +23,7 @@ namespace SaloonSlingers.Unity.Actor
 
         protected abstract void UpdateContents(HandEvaluation evaluation);
 
-        protected HandProjectileActor projectile;
+        protected HandProjectile projectile;
 
         private void Update()
         {

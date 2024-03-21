@@ -1,3 +1,5 @@
+using System.Linq;
+
 using SaloonSlingers.Core;
 
 using TMPro;
@@ -18,7 +20,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private Canvas canvas;
 
-        public void SetProjectile(HandProjectileActor projectile)
+        public void SetProjectile(HandProjectile projectile)
         {
             this.projectile = projectile;
         }
@@ -58,7 +60,7 @@ namespace SaloonSlingers.Unity.Actor
                 Transform element = peerOtherCardLayoutGroup.transform.GetChild(i);
 
                 TextMeshProUGUI text = element.GetComponentInChildren<TextMeshProUGUI>();
-                text.text = projectile.Cards[i].ToUnicode();
+                text.text = projectile.Cards.ElementAt(i).ToUnicode();
 
                 Image background = element.GetComponentInChildren<Image>();
                 Color color = evaluation.KeyIndexes.Contains(i) ? Color.yellow : Color.white;

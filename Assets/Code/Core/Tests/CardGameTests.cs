@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace SaloonSlingers.Core.Tests
 {
-    class GameRulesTests
+    class CardGameTests
     {
         class TestLoad
         {

@@ -1,84 +1,110 @@
+using System;
 using System.Collections.Generic;
 
 using SaloonSlingers.Core;
 
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public struct HandProjectile
-
+    public class HandProjectile : Actor
     {
-        public IList<Card> Cards
-        {
-            get
-            {
-                cards ??= new List<Card>();
-                return cards;
-            }
-        }
-        public HandEvaluation HandEvaluation
-        {
-            get; private set;
-        }
+        public IReadOnlyCollection<Card> Cards { get => harndCoordinator.Cards; }
+        public HandEvaluation HandEvaluation { get => harndCoordinator.HandEvaluation; }
+        public UnityEvent<GameObject, ICardGraphic> OnDraw;
+        public UnityEvent<GameObject> OnThrow = new();
+        public UnityEvent<GameObject> OnPause = new();
+        public UnityEvent<GameObject> OnPickup = new();
 
-        private bool isThrown;
-        private Deck deck;
-        private IDictionary<AttributeType, Attribute> attributeRegistry;
-        private DrawContext drawCtx;
-        private readonly bool Drawn { get => cards.Count > 0; }
-        private List<Card> cards;
+        [SerializeField]
+        private int maxAngularVelocity = 100;
 
+        private Rigidbody rigidBody;
+        private HandCoordinator harndCoordinator = new();
 
-        public readonly bool CheckShouldDie(GameObject collidingObject)
+        public void Pickup(Func<GameObject> spawnCard, CardGame game)
         {
-            return (isThrown &&
-                    collidingObject.layer != LayerMask.NameToLayer("Environment") &&
-                    collidingObject.layer != LayerMask.NameToLayer("Hand"));
+            var card = harndCoordinator.Pickup(game);
+            if (card != null) Draw(spawnCard, card.Value);
+            OnPickup.Invoke(gameObject);
         }
 
-        public Card? Pickup(CardGame game)
+        public void TryDrawCard(Func<GameObject> spawnCard, CardGame game)
         {
-            if (Drawn) return null;
+            var card = harndCoordinator.TryDrawCard(game);
+            if (card == null) return;
 
-            return TryDrawCard(game);
-        }
-
-        public Card? TryDrawCard(CardGame game)
-        {
-            drawCtx.Deck = deck;
-            drawCtx.Evaluation = HandEvaluation;
-            drawCtx.Hand = Cards;
-            drawCtx.AttributeRegistry = attributeRegistry;
-            Card? card = game.Draw(drawCtx);
-            if (card == null) return null;
-
-            Cards.Add(card.Value);
-            HandEvaluation = game.Evaluate(Cards);
-            return card;
+            Draw(spawnCard, card.Value);
         }
 
         public void Throw()
         {
-            isThrown = true;
+            OnThrow.Invoke(gameObject);
         }
 
-        public void Assign(Deck newDeck, IDictionary<AttributeType, Attribute> newAttributeRegistry)
+        public void Throw(Vector3 offset)
         {
-            deck = newDeck;
-            attributeRegistry = newAttributeRegistry;
+            rigidBody.AddForce(offset, ForceMode.VelocityChange);
+            OnThrow.Invoke(gameObject);
         }
 
-        public void ResetProjectile()
+        public void Assign(Deck newDeck, IDictionary<AttributeType, Core.Attribute> newAttributeRegistry)
         {
-            Cards.Clear();
-            HandEvaluation = new(HandNames.NONE, 0);
-            isThrown = false;
+            harndCoordinator.Assign(newDeck, newAttributeRegistry);
+        }
+
+        public override void ResetActor()
+        {
+            harndCoordinator.Reset();
+            rigidBody.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
+            OnReset.Invoke(gameObject);
+        }
+
+        public void Kill()
+        {
+            OnKilled.Invoke(gameObject);
         }
 
         public void Pause()
         {
-            isThrown = false;
+            OnPause.Invoke(gameObject);
+        }
+
+        private void Awake()
+        {
+            rigidBody = GetComponent<Rigidbody>();
+            rigidBody.maxAngularVelocity = maxAngularVelocity;
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            HandleCollision(collision.gameObject);
+        }
+
+        private void OnTriggerEnter(Collider collider)
+        {
+            HandleCollision(collider.gameObject);
+        }
+
+        private void HandleCollision(GameObject collidingObject)
+        {
+            var isSelfLethal = (
+                !rigidBody.isKinematic &&
+                collidingObject.layer != LayerMask.NameToLayer("Environment") &&
+                collidingObject.layer != LayerMask.NameToLayer("Hand")
+            );
+            if (!isSelfLethal) return;
+
+            Kill();
+        }
+
+        private void Draw(Func<GameObject> spawnCard, Card card)
+        {
+            var spawned = spawnCard();
+            var cardGraphic = spawned.GetComponent<ICardGraphic>();
+            cardGraphic.Card = card;
+            OnDraw.Invoke(gameObject, cardGraphic);
         }
     }
 }

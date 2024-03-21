@@ -56,7 +56,7 @@ namespace SaloonSlingers.Unity.Actor
                 else
                 {
                     currentEnemy = closest.GetComponentInParent<Enemy>();
-                    var projectile = currentEnemy.GetComponentInChildren<HandProjectileActor>();
+                    var projectile = currentEnemy.GetComponentInChildren<HandProjectile>();
                     display.SetProjectile(projectile);
 
                     if (currentEnemy != null && currentEnemy != lastEnemy)
