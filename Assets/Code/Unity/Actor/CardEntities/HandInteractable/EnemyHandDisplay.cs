@@ -18,7 +18,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private Canvas canvas;
 
-        public void SetProjectile(HandProjectile projectile)
+        public void SetProjectile(HandProjectileActor projectile)
         {
             this.projectile = projectile;
         }

@@ -11,13 +11,13 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
         public SharedEnemyHandInteractableController Controller;
 
         private HandAbsorber absorber;
-        private HandProjectile projectile;
+        private HandProjectileActor projectile;
 
         public override void OnStart()
         {
             absorber = Enemy.Value.GetComponent<HandAbsorber>();
             if (Controller.Value == null) return;
-            projectile = Controller.Value.GetComponent<HandProjectile>();
+            projectile = Controller.Value.GetComponent<HandProjectileActor>();
         }
 
         public override TaskStatus OnUpdate()

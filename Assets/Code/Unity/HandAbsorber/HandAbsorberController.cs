@@ -53,7 +53,7 @@ namespace SaloonSlingers.Unity
 
         public void OnHoverEnter(HoverEnterEventArgs args)
         {
-            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile))
+            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectileActor>(out var projectile))
                 return;
 
             if (!absorber.CanAbsorb && projectile.TryGetComponent<AudioSource>(out var audioSource))
@@ -64,7 +64,7 @@ namespace SaloonSlingers.Unity
 
         public void OnHoverExit(HoverExitEventArgs args)
         {
-            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile))
+            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectileActor>(out var projectile))
                 return;
 
             projectile.gameObject.GetComponentInImmediateChildren<HandLayout>().Unstack();
@@ -72,7 +72,7 @@ namespace SaloonSlingers.Unity
 
         public void OnSelectEnter(SelectEnterEventArgs args)
         {
-            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile))
+            if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectileActor>(out var projectile))
                 return;
 
             absorber.Absorb(shieldHitPoints, projectile);

@@ -8,7 +8,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Homable))]
-    [RequireComponent(typeof(HandProjectile))]
+    [RequireComponent(typeof(HandProjectileActor))]
     public class PlayerHandInteractableController : MonoBehaviour
     {
         [SerializeField]
@@ -18,7 +18,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private XRBaseInteractable peerInteractable;
 
-        private HandProjectile handProjectile;
+        private HandProjectileActor handProjectile;
         private DeckGraphic deckGraphic;
         private Homable homable;
 
@@ -39,7 +39,7 @@ namespace SaloonSlingers.Unity.Actor
             int newSlingerId = player.transform.GetInstanceID();
             if (!initialized) Initialize(player);
 
-            handProjectile.Pickup(deckGraphic.Spawn);
+            handProjectile.Pickup(deckGraphic.Spawn, GameManager.Instance.Saloon.HouseGame);
             handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
             peerInteractable.enabled = true;
             homable.enabled = true;
@@ -64,7 +64,7 @@ namespace SaloonSlingers.Unity.Actor
             visibilityDetector = player.GetComponent<VisibilityDetector>();
             deckGraphic = handedness.DeckGraphic;
             var attributes = player.GetComponent<Attributes>();
-            handProjectile = GetComponent<HandProjectile>();
+            handProjectile = GetComponent<HandProjectileActor>();
             handProjectile.Assign(deckGraphic.Deck, attributes.Registry);
             rb = GetComponent<Rigidbody>();
             homable = GetComponent<Homable>();
@@ -99,7 +99,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (!deckGraphic.CanDraw || !IsTouchingDeck()) return;
 
-            handProjectile.TryDrawCard(deckGraphic.Spawn);
+            handProjectile.TryDrawCard(deckGraphic.Spawn, GameManager.Instance.Saloon.HouseGame);
         }
 
         private bool IsTouchingDeck()

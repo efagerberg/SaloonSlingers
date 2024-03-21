@@ -11,7 +11,7 @@ namespace SaloonSlingers.Unity.Actor
     {
         public IList<Card> Cards { get => handProjectile.Cards; }
 
-        private HandProjectile handProjectile;
+        private HandProjectileActor handProjectile;
         private Rigidbody rb;
 
         public void Draw(Deck deck, IDictionary<AttributeType, Core.Attribute> attributeRegistry, Func<GameObject> spawn)
@@ -19,11 +19,11 @@ namespace SaloonSlingers.Unity.Actor
             if (Cards.Count == 0)
             {
                 handProjectile.Assign(deck, attributeRegistry);
-                handProjectile.Pickup(spawn);
+                handProjectile.Pickup(spawn, GameManager.Instance.Saloon.HouseGame);
                 handProjectile.gameObject.layer = LayerMask.NameToLayer("EnemyProjectile");
             }
             else
-                handProjectile.TryDrawCard(spawn);
+                handProjectile.TryDrawCard(spawn, GameManager.Instance.Saloon.HouseGame);
         }
 
         public void Throw(Vector3 velocity)
@@ -36,7 +36,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Awake()
         {
-            handProjectile = GetComponent<HandProjectile>();
+            handProjectile = GetComponent<HandProjectileActor>();
             rb = GetComponent<Rigidbody>();
         }
     }

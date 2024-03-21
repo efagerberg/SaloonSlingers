@@ -56,7 +56,7 @@ namespace SaloonSlingers.Unity.Actor
             }
         }
 
-        private void Start() => projectile = transform.parent.GetComponent<HandProjectile>();
+        private void Start() => projectile = transform.parent.GetComponent<HandProjectileActor>();
         private void OnDisable()
         {
             // Sometimes the hand interactable can be released before the hide coroutine finishes

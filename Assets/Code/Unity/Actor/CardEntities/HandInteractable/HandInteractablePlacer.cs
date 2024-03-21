@@ -38,7 +38,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (!deckGraphic.CanDraw && placed != null)
             {
-                var unusableProjectile = placed.GetComponent<HandProjectile>();
+                var unusableProjectile = placed.GetComponent<HandProjectileActor>();
                 unusableProjectile.Kill();
             }
         }
@@ -66,7 +66,7 @@ namespace SaloonSlingers.Unity.Actor
         private void HandleInteractableDeath(GameObject sender)
         {
             var instance = sender as GameObject;
-            var projectile = instance.GetComponent<HandProjectile>();
+            var projectile = instance.GetComponent<HandProjectileActor>();
             projectile.OnPickup.RemoveListener(HandInteractableHeldHandler);
             projectile.OnKilled.RemoveListener(HandleInteractableDeath);
         }
@@ -74,7 +74,7 @@ namespace SaloonSlingers.Unity.Actor
         private GameObject SpawnInteractable()
         {
             GameObject spawned = handInteractableSpawner.Spawn();
-            HandProjectile projectile = spawned.GetComponent<HandProjectile>();
+            HandProjectileActor projectile = spawned.GetComponent<HandProjectileActor>();
             projectile.OnPickup.AddListener(HandInteractableHeldHandler);
             projectile.OnKilled.AddListener(HandleInteractableDeath);
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();
