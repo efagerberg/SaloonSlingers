@@ -18,9 +18,7 @@ namespace SaloonSlingers.Core
         public bool CheckPassed(float deltaTime)
         {
             DurationInSeconds = MathF.Max(0, DurationInSeconds - deltaTime);
-            if (DurationInSeconds > 0) return false;
-
-            return true;
+            return (DurationInSeconds <= 0);
         }
 
         public void Reset(float? newDuration = null)

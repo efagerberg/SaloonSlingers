@@ -22,7 +22,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Update()
         {
-            if (timer.CheckPassed(Time.deltaTime)) return;
+            if (!timer.CheckPassed(Time.deltaTime)) return;
 
             OnLifespanEnded.Invoke();
             enabled = false;
