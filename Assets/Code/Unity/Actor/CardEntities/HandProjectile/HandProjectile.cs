@@ -12,7 +12,7 @@ namespace SaloonSlingers.Unity.Actor
     {
         public IReadOnlyCollection<Card> Cards { get => harndCoordinator.Cards; }
         public HandEvaluation HandEvaluation { get => harndCoordinator.HandEvaluation; }
-        public UnityEvent<GameObject, ICardGraphic> OnDraw;
+        public UnityEvent<GameObject, ICardGraphic> OnDraw = new();
         public UnityEvent<GameObject> OnThrow = new();
         public UnityEvent<GameObject> OnPause = new();
         public UnityEvent<GameObject> OnPickup = new();
