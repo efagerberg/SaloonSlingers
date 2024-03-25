@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using SaloonSlingers.Core;
+
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity.Actor
@@ -11,17 +13,16 @@ namespace SaloonSlingers.Unity.Actor
         [Range(0f, 1000f)]
         private float lifespanInSeconds = 1f;
 
-        private float originalLifespanInSeconds;
+        private Timer timer;
 
         private void OnEnable()
         {
-            originalLifespanInSeconds = lifespanInSeconds;
+            timer = new Timer(lifespanInSeconds);
         }
 
         private void Update()
         {
-            lifespanInSeconds = Mathf.Max(0, lifespanInSeconds - Time.deltaTime);
-            if (lifespanInSeconds > 0) return;
+            if (timer.CheckPassed(Time.deltaTime)) return;
 
             OnLifespanEnded.Invoke();
             enabled = false;
@@ -30,13 +31,13 @@ namespace SaloonSlingers.Unity.Actor
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            originalLifespanInSeconds = lifespanInSeconds;
+            timer.Reset(lifespanInSeconds);
         }
 #endif
 
         private void OnDisable()
         {
-            lifespanInSeconds = originalLifespanInSeconds;
+            timer.Reset(lifespanInSeconds);
         }
     }
 }
