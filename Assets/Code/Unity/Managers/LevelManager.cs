@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
@@ -15,6 +14,7 @@ namespace SaloonSlingers.Unity
         public ISpawner<GameObject> CardSpawner { get => cardSpawner; }
         public ISpawner<GameObject> HandInteractableSpawner { get => handInteractableSpawner; }
         public ISpawner<GameObject> PickupSpawner { get => pickupSpawner; }
+        public ISpawner<GameObject> PickupElevatorSpawner { get => pickupElevatorSpawner; }
         public EnemyManager EnemyManager;
         public GameObject Player { get => player; }
 
@@ -25,9 +25,12 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private ActorSpawner pickupSpawner;
         [SerializeField]
+        private ActorSpawner pickupElevatorSpawner;
+        [SerializeField]
         private GameObject player;
 
         private LevelCompleteNotifier levelCompleteNotifier;
+        private Actor.Actor playerActor;
 
         public static Saloon Load(string configFileContents)
         {
@@ -57,23 +60,35 @@ namespace SaloonSlingers.Unity
         {
             base.Awake();
             levelCompleteNotifier = new(GameManager.Instance.Saloon.EnemyInventory.Manifest);
+            playerActor = Player.GetComponent<Actor.Actor>();
+
         }
 
         private void OnEnable()
         {
-            levelCompleteNotifier.LevelComplete += OnLevelComplete;
-            EnemyManager.EnemyKilled += levelCompleteNotifier.OnEnemyKilled;
+            levelCompleteNotifier.LevelCompleted.AddListener(LevelCompletedHandler);
+            EnemyManager.OnEnemyKilled.AddListener(levelCompleteNotifier.OnEnemyKilled);
+            playerActor.OnKilled.AddListener(levelCompleteNotifier.OnPlayerKilled);
         }
 
         private void OnDisable()
         {
-            levelCompleteNotifier.LevelComplete -= OnLevelComplete;
-            EnemyManager.EnemyKilled -= levelCompleteNotifier.OnEnemyKilled;
+            levelCompleteNotifier.LevelCompleted.AddListener(LevelCompletedHandler);
+            EnemyManager.OnEnemyKilled.RemoveListener(levelCompleteNotifier.OnEnemyKilled);
+            playerActor.OnKilled.RemoveListener(levelCompleteNotifier.OnPlayerKilled);
         }
 
-        private void OnLevelComplete(object sender, EventArgs args)
+        private void LevelCompletedHandler(LevelResult result)
         {
-            GameManager.Instance.SceneLoader.LoadScene("StartingScene");
+            string nextScene = result switch
+            {
+                LevelResult.ALL_ENEMIES_KILLED => "StartingScene",
+                LevelResult.PLAYER_KILLED => "GameOver",
+                _ => ""
+            };
+            if (nextScene == "") return;
+
+            GameManager.Instance.SceneLoader.LoadScene(nextScene);
         }
     }
 

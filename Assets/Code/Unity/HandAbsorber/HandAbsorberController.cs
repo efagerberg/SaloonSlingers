@@ -58,7 +58,8 @@ namespace SaloonSlingers.Unity
 
             if (!absorber.CanAbsorb && projectile.TryGetComponent<AudioSource>(out var audioSource))
                 audioSource.PlayOneShot(errorClip, volumeScale);
-            projectile.Stack();
+
+            projectile.gameObject.GetComponentInImmediateChildren<HandLayout>().Stack();
         }
 
         public void OnHoverExit(HoverExitEventArgs args)
@@ -66,7 +67,7 @@ namespace SaloonSlingers.Unity
             if (!args.interactableObject.transform.gameObject.TryGetComponent<HandProjectile>(out var projectile))
                 return;
 
-            projectile.Unstack();
+            projectile.gameObject.GetComponentInImmediateChildren<HandLayout>().Unstack();
         }
 
         public void OnSelectEnter(SelectEnterEventArgs args)

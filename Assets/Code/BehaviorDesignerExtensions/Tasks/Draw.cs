@@ -20,6 +20,12 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
             return TaskStatus.Success;
         }
 
+        public override void OnBehaviorComplete()
+        {
+            base.OnBehaviorComplete();
+            ReturnedObject.Value = null;
+        }
+
         private void DoDraw()
         {
             if (ReturnedObject.Value == null && AttachTransform.Value != null)

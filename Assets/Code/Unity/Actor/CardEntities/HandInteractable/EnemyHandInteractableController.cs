@@ -9,7 +9,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class EnemyHandInteractableController : MonoBehaviour
     {
-        public IList<Card> Cards { get => handProjectile.Cards; }
+        public IReadOnlyCollection<Card> Cards { get => handProjectile.Cards; }
 
         private HandProjectile handProjectile;
         private Rigidbody rb;
@@ -19,11 +19,11 @@ namespace SaloonSlingers.Unity.Actor
             if (Cards.Count == 0)
             {
                 handProjectile.Assign(deck, attributeRegistry);
-                handProjectile.Pickup(spawn);
+                handProjectile.Pickup(spawn, GameManager.Instance.Saloon.HouseGame);
                 handProjectile.gameObject.layer = LayerMask.NameToLayer("EnemyProjectile");
             }
             else
-                handProjectile.TryDrawCard(spawn);
+                handProjectile.TryDrawCard(spawn, GameManager.Instance.Saloon.HouseGame);
         }
 
         public void Throw(Vector3 velocity)

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 using SaloonSlingers.Core;
@@ -9,167 +8,73 @@ using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity.Actor
 {
-
-    public delegate void HandProjectileHeld(HandProjectile sender, EventArgs e);
-
-    public class HandProjectile : MonoBehaviour, IActor
+    public class HandProjectile : Actor
     {
-        public event HandProjectileHeld HandProjectileHeld;
-        public event EventHandler Killed;
-        public IList<Card> Cards { get; private set; } = new List<Card>();
-        public bool Drawn { get => Cards.Count > 0; }
-        public HandEvaluation HandEvaluation
-        {
-            get
-            {
-                if (requiresEvaluation)
-                {
-                    handEvaluation = gameManager.Saloon.HouseGame.Evaluate(Cards);
-                    requiresEvaluation = false;
-                }
-                return handEvaluation;
-            }
-        }
-        public UnityEvent<Card> OnDraw;
-        public UnityEvent OnThrow;
+        public IReadOnlyCollection<Card> Cards { get => harndCoordinator.Cards; }
+        public HandEvaluation HandEvaluation { get => harndCoordinator.HandEvaluation; }
+        public UnityEvent<GameObject, ICardGraphic> OnDraw = new();
+        public UnityEvent<GameObject> OnThrow = new();
+        public UnityEvent<GameObject> OnPause = new();
+        public UnityEvent<GameObject> OnPickup = new();
 
-        [SerializeField]
-        private RectTransform handPanelRectTransform;
-        [SerializeField]
-        private float totalCardDegrees = 30f;
-        [SerializeField]
-        private float lifespanInSeconds = 1f;
         [SerializeField]
         private int maxAngularVelocity = 100;
 
-        private TrailRenderer trailRenderer;
         private Rigidbody rigidBody;
-        private HandProjectileState state;
-        private HandLayoutMediator handLayoutMediator;
-        private Func<int, IEnumerable<float>> cardRotationCalculator;
-        private Deck deck;
-        private IDictionary<AttributeType, Core.Attribute> attributeRegistry;
-        private GameManager gameManager;
-        private HandEvaluation handEvaluation;
-        private bool requiresEvaluation = false;
-        private DrawContext drawCtx;
-        private Collider _collider;
+        private HandCoordinator harndCoordinator = new();
 
-        public void Pickup(Func<GameObject> spawnCard)
+        public void Pickup(Func<GameObject> spawnCard, CardGame game)
         {
-            trailRenderer.enabled = false;
-            rigidBody.isKinematic = true;
-            _collider.isTrigger = true;
-            bool stackedBefore = state.IsStacked;
-            state = state.Reset();
-            if (stackedBefore != state.IsStacked)
-                handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
-            if (!Drawn) TryDrawCard(spawnCard);
-            HandProjectileHeld?.Invoke(this, EventArgs.Empty);
+            var card = harndCoordinator.Pickup(game);
+            if (card != null) Draw(spawnCard, card.Value);
+            OnPickup.Invoke(gameObject);
         }
 
-        public void TryDrawCard(Func<GameObject> spawnCard)
+        public void TryDrawCard(Func<GameObject> spawnCard, CardGame game)
         {
-            drawCtx.Deck = deck;
-            drawCtx.Evaluation = HandEvaluation;
-            drawCtx.Hand = Cards;
-            drawCtx.AttributeRegistry = attributeRegistry;
-            Card? card = gameManager.Saloon.HouseGame.Draw(drawCtx);
+            var card = harndCoordinator.TryDrawCard(game);
             if (card == null) return;
 
-            OnDraw.Invoke(card.Value);
-
-            Cards.Add(card.Value);
-            GameObject spawned = spawnCard();
-            ICardGraphic cardGraphic = spawned.GetComponent<ICardGraphic>();
-            cardGraphic.Card = card.Value;
-            handLayoutMediator.AddCardToLayout(cardGraphic, cardRotationCalculator);
-            requiresEvaluation = true;
+            Draw(spawnCard, card.Value);
         }
 
         public void Throw()
         {
-            trailRenderer.enabled = true;
-            rigidBody.isKinematic = false;
-            _collider.isTrigger = false;
-            Stack();
-            state = state.Throw();
-            OnThrow.Invoke();
+            OnThrow.Invoke(gameObject);
         }
 
         public void Throw(Vector3 offset)
         {
-            Throw();
             rigidBody.AddForce(offset, ForceMode.VelocityChange);
+            OnThrow.Invoke(gameObject);
         }
 
         public void Assign(Deck newDeck, IDictionary<AttributeType, Core.Attribute> newAttributeRegistry)
         {
-            deck = newDeck;
-            attributeRegistry = newAttributeRegistry;
+            harndCoordinator.Assign(newDeck, newAttributeRegistry);
         }
 
-        public void Stack()
+        public override void ResetActor()
         {
-            state = state.Stack();
-            handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
-        }
-
-        public void Unstack()
-        {
-            state = state.Unstack();
-            handLayoutMediator.ApplyLayout(state.IsStacked, cardRotationCalculator);
-        }
-
-        public bool IsThrown { get => state.IsThrown; }
-
-        public void ResetActor()
-        {
-            trailRenderer.enabled = false;
-            rigidBody.isKinematic = true;
-            _collider.isTrigger = true;
-            state = state.Reset();
-            handLayoutMediator.Reset();
-            Cards.Clear();
-            requiresEvaluation = true;
-            gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
+            harndCoordinator.Reset();
+            rigidBody.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
+            OnReset.Invoke(gameObject);
         }
 
         public void Kill()
         {
-            Killed?.Invoke(gameObject, EventArgs.Empty);
+            OnKilled.Invoke(gameObject);
         }
 
         public void Pause()
         {
-            state = state.Pause();
-            trailRenderer.enabled = false;
-            rigidBody.isKinematic = true;
-            _collider.isTrigger = true;
-        }
-
-        private void OnEnable()
-        {
-            cardRotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
-            state = new(lifespanInSeconds);
+            OnPause.Invoke(gameObject);
         }
 
         private void Awake()
         {
-            gameManager = GameManager.Instance;
-            trailRenderer = GetComponent<TrailRenderer>();
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
-            handLayoutMediator = new(handPanelRectTransform);
-            _collider = GetComponent<Collider>();
-        }
-
-        private void FixedUpdate()
-        {
-            state.Update(Time.fixedDeltaTime);
-            if (state.IsAlive) return;
-
-            Kill();
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -182,23 +87,24 @@ namespace SaloonSlingers.Unity.Actor
             HandleCollision(collider.gameObject);
         }
 
-        /// <summary>
-        /// Defers killing entity until the next frame. Useful in cases of collision where you want
-        /// the entities colliding with this object to do some process before removing the actor.
-        /// </summary>
-        private IEnumerator KillNextFrame()
+        private void HandleCollision(GameObject collidingObject)
         {
-            yield return null;
+            var isSelfLethal = (
+                !rigidBody.isKinematic &&
+                collidingObject.layer != LayerMask.NameToLayer("Environment") &&
+                collidingObject.layer != LayerMask.NameToLayer("Hand")
+            );
+            if (!isSelfLethal) return;
+
             Kill();
         }
 
-        private void HandleCollision(GameObject collidingObject)
+        private void Draw(Func<GameObject> spawnCard, Card card)
         {
-            if (!state.IsThrown || collidingObject.layer == LayerMask.NameToLayer("Environment"))
-                return;
-
-            if (state.IsThrown && collidingObject.layer != LayerMask.NameToLayer("Hand"))
-                StartCoroutine(KillNextFrame());
+            var spawned = spawnCard();
+            var cardGraphic = spawned.GetComponent<ICardGraphic>();
+            cardGraphic.Card = card;
+            OnDraw.Invoke(gameObject, cardGraphic);
         }
     }
 }

@@ -5,7 +5,8 @@ using UnityEngine.Animations;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class PickupElevator : MonoBehaviour
+
+    public class PickupElevator : Actor
     {
         [SerializeField]
         private GameObject interactable;
@@ -21,6 +22,8 @@ namespace SaloonSlingers.Unity.Actor
         private float peakPauseSeconds = 0.5f;
         [SerializeField]
         private PositionConstraint constraint;
+        [SerializeField]
+        private LineRenderer lineRenderer;
 
         private bool isPerforming = false;
         private RaycastHit hit;
@@ -28,11 +31,40 @@ namespace SaloonSlingers.Unity.Actor
         private Collider interactableCollider;
         private Transform interactableTransform;
 
-        private void Awake()
+        public void Associate(GameObject interactable)
         {
+            this.interactable = interactable;
             interactableRigidBody = interactable.GetComponent<Rigidbody>();
             interactableCollider = interactable.GetComponent<Collider>();
             interactableTransform = interactable.transform;
+            var source = new ConstraintSource { sourceTransform = interactable.transform, weight = 1 };
+            constraint.AddSource(source);
+            constraint.constraintActive = true;
+            lineRenderer.enabled = true;
+        }
+
+        public override void ResetActor()
+        {
+            lineRenderer.enabled = false;
+            constraint.constraintActive = false;
+            constraint.RemoveSource(0);
+            interactableTransform = null;
+            interactableCollider = null;
+            interactableRigidBody = null;
+            interactable = null;
+            isPerforming = false;
+        }
+
+        public void Kill()
+        {
+            OnKilled?.Invoke(gameObject);
+        }
+
+        private void Awake()
+        {
+            if (interactable == null) return;
+
+            Associate(interactable);
         }
 
         private void OnEnable()
@@ -74,7 +106,6 @@ namespace SaloonSlingers.Unity.Actor
             yield return new WaitForSeconds(peakPauseSeconds);
             isPerforming = false;
             interactableRigidBody.isKinematic = false;
-            constraint.constraintActive = true;
         }
 
     }

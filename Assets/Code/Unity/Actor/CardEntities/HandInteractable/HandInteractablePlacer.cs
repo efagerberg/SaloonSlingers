@@ -1,5 +1,3 @@
-using System;
-
 using SaloonSlingers.Core;
 
 using UnityEngine;
@@ -54,9 +52,9 @@ namespace SaloonSlingers.Unity.Actor
             placed = cardHandGO;
         }
 
-        private void HandInteractableHeldHandler(HandProjectile sender, EventArgs _)
+        private void HandInteractableHeldHandler(GameObject sender)
         {
-            if (sender.gameObject == placed) placed = null;
+            if (sender == placed) placed = null;
 
             if (!deckGraphic.CanDraw ||
                 !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext) ||
@@ -65,20 +63,20 @@ namespace SaloonSlingers.Unity.Actor
             PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
         }
 
-        private void HandleInteractableDeath(object sender, EventArgs _)
+        private void HandleInteractableDeath(GameObject sender)
         {
             var instance = sender as GameObject;
             var projectile = instance.GetComponent<HandProjectile>();
-            projectile.HandProjectileHeld -= HandInteractableHeldHandler;
-            projectile.Killed -= HandleInteractableDeath;
+            projectile.OnPickup.RemoveListener(HandInteractableHeldHandler);
+            projectile.OnKilled.RemoveListener(HandleInteractableDeath);
         }
 
         private GameObject SpawnInteractable()
         {
             GameObject spawned = handInteractableSpawner.Spawn();
             HandProjectile projectile = spawned.GetComponent<HandProjectile>();
-            projectile.HandProjectileHeld += HandInteractableHeldHandler;
-            projectile.Killed += HandleInteractableDeath;
+            projectile.OnPickup.AddListener(HandInteractableHeldHandler);
+            projectile.OnKilled.AddListener(HandleInteractableDeath);
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();
             swapper.SetController(ControllerTypes.PLAYER);
             return spawned;

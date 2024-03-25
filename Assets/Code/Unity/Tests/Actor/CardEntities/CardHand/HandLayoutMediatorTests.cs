@@ -184,12 +184,9 @@ namespace SaloonSlingers.Unity.Actor.Tests
         {
             private Card card;
 
-            public event EventHandler Killed;
-
             public Card Card { get => card; set => card = value; }
             public void SetColor(Color color) { }
             public void Kill() { }
-            public void ResetActor() { }
         }
 
         private static (Func<Card, ICardGraphic> spawner, IList<ICardGraphic> spawned) GetSpawnerWithExpectedSpawned()

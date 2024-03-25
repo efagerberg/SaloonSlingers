@@ -1,15 +1,11 @@
-using System;
-
 using SaloonSlingers.Core;
 
 using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class CardGraphic : MonoBehaviour, ICardGraphic
+    public class CardGraphic : Actor, ICardGraphic
     {
-        public event EventHandler Killed;
-
         public Card Card
         {
             get => card;
@@ -17,7 +13,7 @@ namespace SaloonSlingers.Unity.Actor
             {
                 card = value;
                 name = card.ToUnicode();
-                faceMaterialManager.SetTexture(card);
+                faceRenderer.material.mainTexture = Resources.Load<Texture>(GetTexturePath(card));
             }
         }
 
@@ -28,30 +24,23 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private Material faceMaterial;
 
-        private CardFaceManager faceMaterialManager;
-
-        public void ResetActor()
+        public override void ResetActor()
         {
-            faceMaterialManager.SetColor(Color.white);
+            SetColor(Color.white);
         }
 
         public void Kill()
         {
-            Killed?.Invoke(gameObject, EventArgs.Empty);
+            OnKilled.Invoke(gameObject);
         }
 
-        public void SetColor(Color color) => faceMaterialManager.SetColor(color);
+        public void SetColor(Color color) => faceRenderer.material.color = color;
 
-        private void Awake()
+        public void SetTexture(Card card)
         {
-            faceMaterialManager ??= new(faceRenderer);
+            faceRenderer.material.mainTexture = Resources.Load<Texture>(GetTexturePath(card));
         }
 
-        private void OnValidate()
-        {
-            faceRenderer.sharedMaterial ??= faceMaterial;
-            faceMaterialManager ??= new(faceRenderer);
-            faceMaterialManager.SetTexture(card);
-        }
+        private static string GetTexturePath(Card card) => string.Format("Textures/{0}", card.ToString());
     }
 }

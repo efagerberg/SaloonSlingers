@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +7,7 @@ using NUnit.Framework;
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
+using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace SaloonSlingers.Unity.Tests
@@ -23,7 +23,7 @@ namespace SaloonSlingers.Unity.Tests
 
             var eventsEmitted = new List<string>(2);
             bool eventEmitted = false;
-            subject.OnReset.AddListener(() => eventEmitted = true);
+            subject.OnReset.AddListener((subject) => eventEmitted = true);
             subject.ResetActor();
 
             Assert.That(eventEmitted);
@@ -33,19 +33,18 @@ namespace SaloonSlingers.Unity.Tests
 
         [UnityTest]
         [RequiresPlayMode]
-        public IEnumerator EmitsKilledEvents_InCorrectOrder_WhenHealthDepleted()
+        public IEnumerator EmitsKilledEvents_WhenHealthDepleted()
         {
             CreateSubject(out var subject, out var attributes);
             yield return null;
 
-            var eventsEmitted = new List<string>(2);
-            subject.Killed += (object sender, EventArgs args) => eventsEmitted.Add("Killed");
-            subject.OnKilled.AddListener(() => eventsEmitted.Add("OnKilled"));
+            bool eventEmitted = false;
+            subject.OnKilled.AddListener((GameObject sender) => eventEmitted = true);
             attributes.Registry[AttributeType.Health].Decrease(3);
             yield return null;
             var expected = new List<string> { "OnKilled", "Killed" };
 
-            Assert.That(eventsEmitted, Is.EqualTo(expected));
+            Assert.That(eventEmitted);
         }
 
         [UnityTest]
@@ -56,14 +55,13 @@ namespace SaloonSlingers.Unity.Tests
             yield return null;
             subject.enabled = false;
 
-            var eventsEmitted = new List<string>(2);
-            subject.Killed += (object sender, EventArgs args) => eventsEmitted.Add("Killed");
-            subject.OnKilled.AddListener(() => eventsEmitted.Add("OnKilled"));
+            var eventsEmitted = 0;
+            subject.OnKilled.AddListener((GameObject sender) => eventsEmitted++);
             attributes.Registry[AttributeType.Health].Decrease(3);
             yield return null;
-            var expected = new List<string> { "OnKilled", "Killed" };
+            var expected = 1;
 
-            Assert.That(eventsEmitted, Is.Empty);
+            Assert.That(eventsEmitted, Is.EqualTo(0));
             attributes.Registry[AttributeType.Health].Reset();
             subject.enabled = true;
             attributes.Registry[AttributeType.Health].Decrease(3);

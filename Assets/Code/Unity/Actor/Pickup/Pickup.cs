@@ -1,18 +1,13 @@
-﻿using System;
-
-using SaloonSlingers.Core;
+﻿using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
-using UnityEngine.Animations;
 
 namespace SaloonSlingers.Unity
 {
     [RequireComponent(typeof(ScaleByValue))]
-    public class Pickup : MonoBehaviour, IActor, IPickup
+    public class Pickup : Actor.Actor, IPickup
     {
-        public event EventHandler Killed;
-
         public uint Value
         {
             get => _value;
@@ -27,24 +22,20 @@ namespace SaloonSlingers.Unity
         [SerializeField]
         private Rigidbody rigidBody;
         [SerializeField]
-        private PositionConstraint pickupLineConstraint;
-        [SerializeField]
         private ScaleByValue scaleByValue;
         [field: SerializeField]
         private uint _value;
 
-        public void ResetActor()
+        public override void ResetActor()
         {
             Value = 0;
             rigidBody ??= GetComponent<Rigidbody>();
-            pickupLineConstraint ??= GetComponent<PositionConstraint>();
             rigidBody.isKinematic = false;
             transform.localScale = Vector3.one;
             transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             // Pickups have a nested object that moves
             rigidBody.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-            pickupLineConstraint.constraintActive = true;
-            pickupLineConstraint.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            gameObject.layer = LayerMask.NameToLayer("Pickup");
         }
 
         public void TryPickup(GameObject grabber)
@@ -54,7 +45,7 @@ namespace SaloonSlingers.Unity
                 return;
 
             money.Increase(Value);
-            Killed?.Invoke(gameObject, EventArgs.Empty);
+            OnKilled?.Invoke(gameObject);
         }
 
         public void PlayerPickup()
@@ -62,10 +53,11 @@ namespace SaloonSlingers.Unity
             TryPickup(LevelManager.Instance.Player);
         }
 
-
+#if UNITY_EDITOR
         private void OnValidate()
         {
             Value = _value;
         }
+# endif
     }
 }

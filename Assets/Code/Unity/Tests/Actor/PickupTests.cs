@@ -1,9 +1,6 @@
-using System;
-
 using NUnit.Framework;
 
 using UnityEngine;
-using UnityEngine.Animations;
 
 namespace SaloonSlingers.Unity.Tests
 {
@@ -15,11 +12,8 @@ namespace SaloonSlingers.Unity.Tests
             var subject = TestUtils.CreateComponent<Pickup>();
             subject.Value = 5;
             var pickupKilled = false;
-            void OnKilled(object sender, EventArgs e)
-            {
-                pickupKilled = true;
-            }
-            subject.Killed += OnKilled;
+            void KilledHandler(GameObject sender) => pickupKilled = true;
+            subject.OnKilled.AddListener(KilledHandler);
             var grabber = new GameObject();
             subject.TryPickup(grabber);
 
@@ -32,11 +26,8 @@ namespace SaloonSlingers.Unity.Tests
             var subject = TestUtils.CreateComponent<Pickup>();
             subject.Value = 5;
             var pickupKilled = false;
-            void OnKilled(object sender, EventArgs e)
-            {
-                pickupKilled = true;
-            }
-            subject.Killed += OnKilled;
+            void KilledHandler(GameObject sender) => pickupKilled = true;
+            subject.OnKilled.AddListener(KilledHandler);
             var attributes = TestUtils.CreateComponent<Attributes>();
             subject.TryPickup(attributes.gameObject);
 
@@ -49,11 +40,8 @@ namespace SaloonSlingers.Unity.Tests
             var subject = TestUtils.CreateComponent<Pickup>();
             subject.Value = 5;
             var pickupKilled = false;
-            void OnKilled(object sender, EventArgs e)
-            {
-                pickupKilled = true;
-            }
-            subject.Killed += OnKilled;
+            void KilledHandler(GameObject sender) => pickupKilled = true;
+            subject.OnKilled.AddListener(KilledHandler);
             var attributes = TestUtils.CreateComponent<Attributes>();
             attributes.Registry[Core.AttributeType.Money] = new Core.Attribute(10, uint.MaxValue);
             subject.TryPickup(attributes.gameObject);
@@ -76,7 +64,6 @@ namespace SaloonSlingers.Unity.Tests
         {
             var subject = TestUtils.CreateComponent<Pickup>();
             var rb = subject.gameObject.AddComponent<Rigidbody>();
-            var constraint = subject.gameObject.AddComponent<PositionConstraint>();
             subject.Value = 1000;
 
             subject.ResetActor();
@@ -88,8 +75,6 @@ namespace SaloonSlingers.Unity.Tests
             Assert.That(rb.isKinematic, Is.False);
             Assert.That(rb.transform.position, Is.EqualTo(Vector3.zero));
             Assert.That(rb.transform.rotation, Is.EqualTo(Quaternion.identity));
-            Assert.That(constraint.constraintActive);
-
         }
     }
 }
