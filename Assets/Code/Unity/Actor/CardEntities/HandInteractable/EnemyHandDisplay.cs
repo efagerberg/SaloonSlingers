@@ -22,7 +22,14 @@ namespace SaloonSlingers.Unity.Actor
 
         public void SetProjectile(HandProjectile projectile)
         {
+            if (this.projectile != null)
+                this.projectile.OnDraw.RemoveListener(DrawHandler);
+
             this.projectile = projectile;
+
+            if (this.projectile != null)
+                this.projectile.OnDraw.AddListener(DrawHandler);
+            UpdateContents();
         }
 
         public override void Hide()
@@ -38,15 +45,12 @@ namespace SaloonSlingers.Unity.Actor
             base.Show();
         }
 
-        protected override void UpdateContents(HandEvaluation evaluation)
+        protected override void UpdateContents()
         {
-            var hasValueToDisplay = evaluation.Name != HandNames.NONE;
-            canvas.enabled = hasValueToDisplay;
-            if (!hasValueToDisplay) return;
-
+            var evaluation = projectile == null ? HandEvaluation.EMPTY : projectile.HandEvaluation;
             handValueText.text = evaluation.DisplayName();
 
-            int nCards = projectile.Cards.Count;
+            int nCards = projectile == null ? 0 : projectile.Cards.Count;
             int delta = nCards - peerOtherCardLayoutGroup.transform.childCount;
 
             for (; delta > 0; delta--)
@@ -75,9 +79,28 @@ namespace SaloonSlingers.Unity.Actor
             canvas = GetComponentInChildren<Canvas>();
         }
 
+        private void OnEnable()
+        {
+            if (projectile == null) return;
+
+            projectile.OnDraw.AddListener(DrawHandler);
+        }
+
+        private void OnDisable()
+        {
+            if (projectile == null) return;
+
+            projectile.OnDraw.RemoveListener(DrawHandler);
+        }
+
         private void Start()
         {
             Hide();
+        }
+
+        private void DrawHandler(GameObject sender, ICardGraphic drawn)
+        {
+            UpdateContents();
         }
     }
 }

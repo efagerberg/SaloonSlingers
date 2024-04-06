@@ -54,7 +54,7 @@ namespace SaloonSlingers.Core.Tests
 
             Assert.That(subject.Cards.Count, Is.EqualTo(0));
             Assert.That(subject.HandEvaluation,
-                        Is.EqualTo(new HandEvaluation(HandNames.NONE, 0)));
+                        Is.EqualTo(HandEvaluation.EMPTY));
         }
     }
 }

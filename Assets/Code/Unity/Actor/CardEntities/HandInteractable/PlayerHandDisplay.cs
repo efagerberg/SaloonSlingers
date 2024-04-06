@@ -1,5 +1,3 @@
-using SaloonSlingers.Core;
-
 using TMPro;
 
 using UnityEngine;
@@ -42,25 +40,46 @@ namespace SaloonSlingers.Unity.Actor
             StartCoroutine(coroutine);
         }
 
-        protected override void UpdateContents(HandEvaluation evaluation)
+        protected override void UpdateContents()
         {
             if (projectile == null) return;
 
-            handValueText.text = evaluation.DisplayName();
+            handValueText.text = projectile.HandEvaluation.DisplayName();
             for (int i = 0; i < projectile.Cards.Count; i++)
             {
                 Transform element = cardsPanel.transform.GetChild(i);
-                Color color = evaluation.KeyIndexes.Contains(i) ? Color.yellow : Color.white;
+                Color color = projectile.HandEvaluation.KeyIndexes.Contains(i) ? Color.yellow : Color.white;
                 ICardGraphic graphic = element.GetComponent<ICardGraphic>();
                 graphic.Color = color;
             }
         }
 
-        private void Start() => projectile = transform.parent.GetComponent<HandProjectile>();
+        private void OnEnable()
+        {
+            if (projectile == null) return;
+
+            projectile.OnDraw.AddListener(DrawHandler);
+        }
+
+        private void Start()
+        {
+            projectile = transform.parent.GetComponent<HandProjectile>();
+            projectile.OnDraw.AddListener(DrawHandler);
+        }
+
+        private void DrawHandler(GameObject sender, ICardGraphic drawn)
+        {
+            UpdateContents();
+        }
+
         private void OnDisable()
         {
             // Sometimes the hand interactable can be released before the hide coroutine finishes
             handValueCanvasGroup.alpha = 0;
+
+            if (projectile == null) return;
+
+            projectile.OnDraw.RemoveListener(DrawHandler);
         }
     }
 }
