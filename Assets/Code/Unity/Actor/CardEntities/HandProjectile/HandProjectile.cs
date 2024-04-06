@@ -11,7 +11,7 @@ namespace SaloonSlingers.Unity.Actor
     public enum HandProjectileMode
     {
         Damage = 0,
-        Mark = 1
+        Curse = 1
     }
 
     public class HandProjectile : Actor
@@ -25,15 +25,15 @@ namespace SaloonSlingers.Unity.Actor
             {
                 if (value == mode) return;
 
-                var canMark = value == HandProjectileMode.Mark && Cards.Count == 1;
-                if (!canMark && value == HandProjectileMode.Mark)
+                var canCurse = value == HandProjectileMode.Curse && Cards.Count == 1;
+                if (!canCurse && value == HandProjectileMode.Curse)
                     return;
 
                 mode = value;
                 UnityEvent<GameObject> eventToInvoke = mode switch
                 {
                     HandProjectileMode.Damage => OnDamageMode,
-                    HandProjectileMode.Mark => OnMarkMode,
+                    HandProjectileMode.Curse => OnMarkMode,
                     _ => throw new NotImplementedException(),
                 };
                 eventToInvoke.Invoke(gameObject);

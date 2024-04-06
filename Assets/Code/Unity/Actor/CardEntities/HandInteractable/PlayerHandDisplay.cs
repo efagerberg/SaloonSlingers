@@ -29,7 +29,7 @@ namespace SaloonSlingers.Unity.Actor
                 return projectile.Mode switch
                 {
                     HandProjectileMode.Damage => damageCardColor,
-                    HandProjectileMode.Mark => markCardColor,
+                    HandProjectileMode.Curse => markCardColor,
                     _ => throw new System.NotImplementedException(),
                 };
             }

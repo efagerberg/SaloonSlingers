@@ -38,7 +38,6 @@ namespace SaloonSlingers.Unity.Actor
         {
             Enemy lastEnemy = null;
             Outline lastOutline = null;
-            display.Show();
 
             Outline currentOutline = null;
             Enemy currentEnemy = null;
@@ -50,14 +49,17 @@ namespace SaloonSlingers.Unity.Actor
 
                 if (closest == null)
                 {
-                    display.SetProjectile(null);
+                    display.Hide();
+                    display.SetProjectiles(null, null);
                     if (lastOutline != null) lastOutline.enabled = false;
                 }
                 else
                 {
+                    display.Show();
                     currentEnemy = closest.GetComponentInParent<Enemy>();
                     var projectile = currentEnemy.GetComponentInChildren<HandProjectile>();
-                    display.SetProjectile(projectile);
+                    var target = currentEnemy.GetComponent<HandProjectileDamageTarget>();
+                    display.SetProjectiles(projectile, target.Cursed);
 
                     if (currentEnemy != null && currentEnemy != lastEnemy)
                     {
