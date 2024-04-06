@@ -10,8 +10,8 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class HandProjectile : Actor
     {
-        public IReadOnlyCollection<Card> Cards { get => harndCoordinator.Cards; }
-        public HandEvaluation HandEvaluation { get => harndCoordinator.HandEvaluation; }
+        public IReadOnlyCollection<Card> Cards { get => handCoordinator.Cards; }
+        public HandEvaluation HandEvaluation { get => handCoordinator.HandEvaluation; }
         public UnityEvent<GameObject, ICardGraphic> OnDraw = new();
         public UnityEvent<GameObject> OnThrow = new();
         public UnityEvent<GameObject> OnPause = new();
@@ -21,18 +21,18 @@ namespace SaloonSlingers.Unity.Actor
         private int maxAngularVelocity = 100;
 
         private Rigidbody rigidBody;
-        private HandCoordinator harndCoordinator = new();
+        private HandCoordinator handCoordinator = new();
 
         public void Pickup(Func<GameObject> spawnCard, CardGame game)
         {
-            var card = harndCoordinator.Pickup(game);
+            var card = handCoordinator.Pickup(game);
             if (card != null) Draw(spawnCard, card.Value);
             OnPickup.Invoke(gameObject);
         }
 
         public void TryDrawCard(Func<GameObject> spawnCard, CardGame game)
         {
-            var card = harndCoordinator.TryDrawCard(game);
+            var card = handCoordinator.TryDrawCard(game);
             if (card == null) return;
 
             Draw(spawnCard, card.Value);
@@ -51,12 +51,12 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Assign(Deck newDeck, IDictionary<AttributeType, Core.Attribute> newAttributeRegistry)
         {
-            harndCoordinator.Assign(newDeck, newAttributeRegistry);
+            handCoordinator.Assign(newDeck, newAttributeRegistry);
         }
 
         public override void ResetActor()
         {
-            harndCoordinator.Reset();
+            handCoordinator.Reset();
             rigidBody.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
             OnReset.Invoke(gameObject);
         }
