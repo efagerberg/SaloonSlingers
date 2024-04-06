@@ -24,8 +24,8 @@ namespace SaloonSlingers.Unity.Actor
             for (int i = 0; projectile != null && i < projectile.Cards.Count; i++)
             {
                 Transform element = cardsPanel.transform.GetChild(i);
-                CardGraphic graphic = element.GetComponent<CardGraphic>();
-                graphic.SetColor(Color.white);
+                ICardGraphic graphic = element.GetComponent<ICardGraphic>();
+                graphic.Color = Color.white;
             }
             var coroutine = Fader.Fade((alpha) => handValueCanvasGroup.alpha = alpha, fadeDuration, endAlpha: 0);
             StartCoroutine(coroutine);
@@ -51,8 +51,8 @@ namespace SaloonSlingers.Unity.Actor
             {
                 Transform element = cardsPanel.transform.GetChild(i);
                 Color color = evaluation.KeyIndexes.Contains(i) ? Color.yellow : Color.white;
-                CardGraphic graphic = element.GetComponent<CardGraphic>();
-                graphic.SetColor(color);
+                ICardGraphic graphic = element.GetComponent<ICardGraphic>();
+                graphic.Color = color;
             }
         }
 

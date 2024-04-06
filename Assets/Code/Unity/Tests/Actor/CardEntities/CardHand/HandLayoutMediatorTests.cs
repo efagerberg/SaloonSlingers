@@ -185,7 +185,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
             private Card card;
 
             public Card Card { get => card; set => card = value; }
-            public void SetColor(Color color) { }
+            public Color Color { get; set; }
             public void Kill() { }
         }
 

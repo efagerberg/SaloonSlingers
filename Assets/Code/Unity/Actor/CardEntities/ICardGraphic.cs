@@ -12,11 +12,12 @@ namespace SaloonSlingers.Unity.Actor
             set;
         }
 
+        public Color Color { get; set; }
+
         public Transform transform { get; }
         public GameObject gameObject { get; }
         public T GetComponent<T>();
 
-        public void SetColor(Color color);
         public void Kill();
     }
 }

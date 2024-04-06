@@ -17,6 +17,8 @@ namespace SaloonSlingers.Unity.Actor
             }
         }
 
+        public Color Color { get => faceRenderer.material.color; set => faceRenderer.material.color = value; }
+
         [SerializeField]
         private Card card;
         [SerializeField]
@@ -26,15 +28,13 @@ namespace SaloonSlingers.Unity.Actor
 
         public override void ResetActor()
         {
-            SetColor(Color.white);
+            Color = Color.white;
         }
 
         public void Kill()
         {
             OnKilled.Invoke(gameObject);
         }
-
-        public void SetColor(Color color) => faceRenderer.material.color = color;
 
         public void SetTexture(Card card)
         {
