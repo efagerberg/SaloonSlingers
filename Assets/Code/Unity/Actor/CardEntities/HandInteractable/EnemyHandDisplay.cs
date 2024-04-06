@@ -45,7 +45,7 @@ namespace SaloonSlingers.Unity.Actor
             base.Show();
         }
 
-        protected override void UpdateContents()
+        public override void UpdateContents()
         {
             var evaluation = projectile == null ? HandEvaluation.EMPTY : projectile.HandEvaluation;
             handValueText.text = evaluation.DisplayName();

@@ -19,7 +19,7 @@ namespace SaloonSlingers.Unity.Actor
             IsDisplaying = false;
         }
 
-        protected abstract void UpdateContents();
+        public abstract void UpdateContents();
 
         protected HandProjectile projectile;
     }
