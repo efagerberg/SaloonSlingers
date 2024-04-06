@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -97,9 +98,15 @@ namespace SaloonSlingers.Unity.Actor
 
         public void OnActivate()
         {
-            if (!deckGraphic.CanDraw || !IsTouchingDeck()) return;
+            if (deckGraphic.CanDraw && IsTouchingDeck())
+            {
+                handProjectile.TryDrawCard(deckGraphic.Spawn, GameManager.Instance.Saloon.HouseGame);
+                return;
+            }
 
-            handProjectile.TryDrawCard(deckGraphic.Spawn, GameManager.Instance.Saloon.HouseGame);
+            int enumCount = Enum.GetValues(typeof(HandProjectileMode)).Length;
+            int nextEnumValue = ((int)handProjectile.Mode + 1) % enumCount;
+            handProjectile.Mode = (HandProjectileMode)nextEnumValue;
         }
 
         private bool IsTouchingDeck()
