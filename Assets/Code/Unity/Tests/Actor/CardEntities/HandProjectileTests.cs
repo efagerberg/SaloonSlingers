@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using NUnit.Framework;
 
@@ -69,6 +70,43 @@ namespace SaloonSlingers.Unity.Tests
                 subject.Mode = (HandProjectileMode)100;
             });
         }
+    }
+
+    public class ProjectileTryDrawTests
+    {
+        [Test]
+        public void AddsCard_ToProjectile()
+        {
+            var subject = ProjectileTestHelpers.BuildProjectile();
+            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+
+            Assert.That(subject.Cards.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ChangesModeBackToDamage_WhenDrawResultsInMoreThanOneCard()
+        {
+            var subject = ProjectileTestHelpers.BuildProjectile();
+            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            subject.Mode = HandProjectileMode.Curse;
+            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+
+            Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
+        }
+
+        [Test]
+        public void EmitsDrawEvent()
+        {
+            var subject = ProjectileTestHelpers.BuildProjectile();
+            ICardGraphic cardDrawn = null;
+            void drawHandler(GameObject sender, ICardGraphic c) => cardDrawn = c;
+            subject.OnDraw.AddListener(drawHandler);
+            subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+
+            Assert.IsNotNull(cardDrawn);
+            Assert.That(cardDrawn.Card, Is.EqualTo(subject.Cards.ElementAt(0)));
+        }
+
     }
 
     public class ProjectilePickupTests
