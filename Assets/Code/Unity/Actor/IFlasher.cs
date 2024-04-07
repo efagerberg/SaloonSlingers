@@ -2,6 +2,6 @@
 {
     public interface IFlasher
     {
-        public void Flash(float duration);
+        public void Flash();
     }
 }

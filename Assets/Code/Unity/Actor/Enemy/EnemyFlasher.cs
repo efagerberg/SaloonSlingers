@@ -4,24 +4,25 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class Flasher : MonoBehaviour, IFlasher
+
+    public class EnemyFlasher : MonoBehaviour, IFlasher
     {
         public Color FlashColor;
 
         [SerializeField]
         private Renderer _renderer;
+        [SerializeField]
+        private float duration;
 
-        private IEnumerator flashCoroutine;
+        private CoroutineTask task;
 
-        public void Flash(float duration)
+        public void Flash()
         {
-            if (flashCoroutine != null) return;
-
-            flashCoroutine = DoFlash(duration);
-            StartCoroutine(flashCoroutine);
+            task ??= new(this, () => DoFlash(duration));
+            task.Run();
         }
 
-        protected virtual IEnumerator DoFlash(float duration)
+        private IEnumerator DoFlash(float duration)
         {
             float timer = 0;
             var originalColor = _renderer.material.color;
