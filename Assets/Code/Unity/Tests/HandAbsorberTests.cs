@@ -66,6 +66,6 @@ namespace SaloonSlingers.Unity
     {
         public Card Card { get; set; }
         public void Kill() { }
-        public void SetColor(Color color) { }
+        public Color Color { get; set; }
     }
 }

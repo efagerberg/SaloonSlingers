@@ -54,7 +54,7 @@ namespace SaloonSlingers.Core
         public void Reset()
         {
             cards?.Clear();
-            HandEvaluation = new(HandNames.NONE, 0);
+            HandEvaluation = HandEvaluation.EMPTY;
         }
     }
 }

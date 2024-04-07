@@ -13,7 +13,7 @@ namespace SaloonSlingers.Core.Tests
             }
 
             private static readonly object[][] DisplayNameTestCases = {
-                new object[] { new HandEvaluation(HandNames.NONE, 0), "" },
+                new object[] { HandEvaluation.EMPTY, "" },
                 new object[] { new HandEvaluation(HandNames.HIGH_CARD, 10), "High Card" },
                 new object[] { new HandEvaluation(HandNames.BUST, 1), "Bust"},
                 new object[] { new HandEvaluation(HandNames.FOUR_OF_A_KIND, 4), "Four Of A Kind"}
