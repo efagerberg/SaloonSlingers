@@ -2,6 +2,7 @@ using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity
 {
@@ -15,16 +16,16 @@ namespace SaloonSlingers.Unity
     {
         public Attribute HitPoints { get; set; }
         public DamageMode DamageMode = DamageMode.DECREMENT;
-        public HandProjectile Cursed { get; private set; }
+        public UnityEvent<GameObject, Attribute> OnDamaged = new();
 
         private Attributes attributes;
 
-        private void OnCollisionEnter(Collision collision)
+        public void HandleCollision(Collision collision)
         {
             HandleCollision(collision.gameObject);
         }
 
-        private void OnTriggerEnter(Collider collider)
+        public void HandleCollision(Collider collider)
         {
             HandleCollision(collider.gameObject);
         }
@@ -34,38 +35,21 @@ namespace SaloonSlingers.Unity
             if (!collidingObject.CompareTag("HandInteractable")) return;
 
             HandProjectile handProjectile = collidingObject.GetComponent<HandProjectile>();
-            switch (handProjectile.Mode)
+            if (handProjectile.Mode != HandProjectileMode.Damage) return;
+
+            uint damage = DamageMode switch
             {
-                case HandProjectileMode.Damage:
-                    uint damage = DamageMode switch
-                    {
-                        DamageMode.DECREMENT => 1,
-                        DamageMode.HAND_VALUE => handProjectile.HandEvaluation.Score,
-                        _ => 0
-                    };
-                    attributes ??= GetComponent<Attributes>();
-                    HitPoints ??= attributes?.Registry[AttributeType.Health];
+                DamageMode.DECREMENT => 1,
+                DamageMode.HAND_VALUE => handProjectile.HandEvaluation.Score,
+                _ => 0
+            };
+            attributes ??= GetComponent<Attributes>();
+            HitPoints ??= attributes?.Registry[AttributeType.Health];
 
-                    if (HitPoints == null) return;
+            if (HitPoints == null) return;
 
-                    HitPoints.Decrease(damage);
-                    break;
-                case HandProjectileMode.Curse:
-                    Cursed = handProjectile;
-                    // Melee cards can still change their mode, this ensures we do not keep cursed the target
-                    // if the player changes to damage mode or comes out of it because of some restriction like
-                    // only 1 card hands can be cursed cards for example.
-                    Cursed.OnDamageMode.AddListener(RemoveCurse);
-                    break;
-            }
-        }
-
-        private void RemoveCurse(GameObject sender)
-        {
-            if (Cursed == null) return;
-
-            Cursed.OnDamageMode.RemoveListener(RemoveCurse);
-            Cursed = null;
+            HitPoints.Decrease(damage);
+            OnDamaged.Invoke(gameObject, HitPoints);
         }
     }
 }

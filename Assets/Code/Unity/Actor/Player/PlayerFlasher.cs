@@ -1,15 +1,18 @@
 ﻿using System.Collections;
 
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class PlayerHitFlasher : MonoBehaviour, IHitFlasher
+    public class PlayerFlasher : Flasher
     {
         [SerializeField]
         private CanvasGroup flashCanvasGroup;
+        [SerializeField]
+        private Image flashImage;
 
-        public IEnumerator Flash(float duration)
+        protected override IEnumerator DoFlash(float duration)
         {
             flashCanvasGroup.gameObject.SetActive(true);
             yield return Fader.Fade((alpha) => flashCanvasGroup.alpha = alpha, duration, 1, 0);
