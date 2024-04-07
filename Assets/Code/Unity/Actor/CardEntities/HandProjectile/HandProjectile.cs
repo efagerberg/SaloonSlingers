@@ -56,8 +56,8 @@ namespace SaloonSlingers.Unity.Actor
         public void Pickup(Func<GameObject> spawnCard, CardGame game)
         {
             var card = handCoordinator.Pickup(game);
-            if (card != null) Draw(spawnCard, card.Value);
             OnPickup.Invoke(gameObject);
+            if (card != null) Draw(spawnCard, card.Value);
         }
 
         public void TryDrawCard(Func<GameObject> spawnCard, CardGame game)
@@ -102,32 +102,32 @@ namespace SaloonSlingers.Unity.Actor
             OnPause.Invoke(gameObject);
         }
 
-        private void Awake()
-        {
-            rigidBody = GetComponent<Rigidbody>();
-            rigidBody.maxAngularVelocity = maxAngularVelocity;
-        }
-
-        private void OnCollisionEnter(Collision collision)
-        {
-            HandleCollision(collision.gameObject);
-        }
-
-        private void OnTriggerEnter(Collider collider)
-        {
-            HandleCollision(collider.gameObject);
-        }
-
-        private void HandleCollision(GameObject collidingObject)
+        public void HandleCollision(GameObject contactingObject)
         {
             var isSelfLethal = (
                 !rigidBody.isKinematic &&
-                collidingObject.layer != LayerMask.NameToLayer("Environment") &&
-                collidingObject.layer != LayerMask.NameToLayer("Hand")
+                contactingObject.layer != LayerMask.NameToLayer("Environment") &&
+                contactingObject.layer != LayerMask.NameToLayer("Hand")
             );
             if (!isSelfLethal) return;
 
             Kill();
+        }
+
+        public void HandleCollision(Collision other)
+        {
+            HandleCollision(other.gameObject);
+        }
+
+        public void HandleCollision(Collider other)
+        {
+            HandleCollision(other.gameObject);
+        }
+
+        private void Awake()
+        {
+            rigidBody = GetComponent<Rigidbody>();
+            rigidBody.maxAngularVelocity = maxAngularVelocity;
         }
 
         private void Draw(Func<GameObject> spawnCard, Card card)
