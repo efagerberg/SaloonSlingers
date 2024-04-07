@@ -45,10 +45,29 @@ namespace SaloonSlingers.Unity
         private IDictionary<string, Color> materialKeyToColor;
         private Coroutine fadeOutCoroutine;
 
+        public void DecreaseHandler(GameObject sender, IReadOnlyAttribute attribute)
+        {
+            if (attribute.Value == attribute.InitialValue) return;
+
+            UpdateShieldStrengthColor();
+            if (attribute.Value > 0) StartCoroutine(nameof(DoShieldHit));
+            else StartCoroutine(nameof(DoShieldBreak));
+        }
+
+        public void UpdateCollisionPoint(Collision collision)
+        {
+            localCollisionPoint = transform.InverseTransformPoint(collision.GetContact(0).point);
+        }
+
+        public void UpdateCollisionPoint(Collider collider)
+        {
+            localCollisionPoint = transform.InverseTransformPoint(collider.ClosestPoint(transform.position));
+        }
+
+
         private void OnEnable()
         {
-            HitPoints.Increased += OnIncrease;
-            HitPoints.Decreased += OnDecrease;
+            HitPoints.Increased += IncreaseHandler;
             if (HitPoints > 0) StartCoroutine(nameof(ActivateShield));
         }
 
@@ -56,8 +75,7 @@ namespace SaloonSlingers.Unity
         {
             if (HitPoints == null) return;
 
-            HitPoints.Increased -= OnIncrease;
-            HitPoints.Decreased -= OnDecrease;
+            HitPoints.Increased -= IncreaseHandler;
             shieldModel.SetActive(false);
             hitRippleVFX.Stop();
             hitRippleVFX.Reinit();
@@ -82,29 +100,10 @@ namespace SaloonSlingers.Unity
             shieldMaterial.SetVector("_Position", transform.position);
         }
 
-        private void OnCollisionEnter(Collision collision)
-        {
-            localCollisionPoint = transform.InverseTransformPoint(collision.GetContact(0).point);
-        }
-
-        private void OnTriggerEnter(Collider collider)
-        {
-            localCollisionPoint = transform.InverseTransformPoint(collider.ClosestPoint(transform.position));
-        }
-
-        private void OnIncrease(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
+        private void IncreaseHandler(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
         {
             UpdateShieldStrengthColor();
             if (e.Before == 0) StartCoroutine(nameof(ActivateShield));
-        }
-
-        private void OnDecrease(IReadOnlyAttribute sender, ValueChangeEvent<uint> e)
-        {
-            if (sender.Value == sender.InitialValue) return;
-
-            UpdateShieldStrengthColor();
-            if (e.After > 0) StartCoroutine(nameof(DoShieldHit));
-            else StartCoroutine(nameof(DoShieldBreak));
         }
 
         private void UpdateShieldStrengthColor()

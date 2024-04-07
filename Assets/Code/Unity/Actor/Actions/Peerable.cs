@@ -61,7 +61,7 @@ namespace SaloonSlingers.Unity.Actor
                 {
                     display.Show();
                     var projectile = currentEnemy.GetComponentInChildren<HandProjectile>();
-                    var target = currentEnemy.GetComponent<HandProjectileDamageTarget>();
+                    var target = currentEnemy.GetComponent<HandProjectileCurseTarget>();
                     display.SetProjectiles(projectile, target.Cursed);
 
                     if (currentEnemy != null && currentEnemy != lastEnemy)
