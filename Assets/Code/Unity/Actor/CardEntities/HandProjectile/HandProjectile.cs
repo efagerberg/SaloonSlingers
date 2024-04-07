@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using SaloonSlingers.Core;
@@ -94,6 +95,17 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
+            StartCoroutine(nameof(KillNextFrame));
+        }
+
+        /// <summary>
+        /// Sometimes we want other objects to react to being hit by a projectile.
+        /// This requires the object to live for an extra frame.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator KillNextFrame()
+        {
+            yield return null;
             OnKilled.Invoke(gameObject);
         }
 

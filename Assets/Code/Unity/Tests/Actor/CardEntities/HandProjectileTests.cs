@@ -187,14 +187,16 @@ namespace SaloonSlingers.Unity.Tests
 
     public class ProjectileKillTests
     {
-        [Test]
-        public void EmitsEvent()
+        [UnityTest]
+        public IEnumerator EmitsEventNextFrame()
         {
             var subject = ProjectileTestHelpers.BuildProjectile();
+            subject.runInEditMode = true;
             var killed = false;
             void killedHandler(GameObject sender) => killed = true;
             subject.OnKilled.AddListener(killedHandler);
             subject.Kill();
+            yield return null;
 
             Assert.That(killed);
         }
@@ -284,6 +286,7 @@ namespace SaloonSlingers.Unity.Tests
             void killedHandler(GameObject sender) => killed = true;
             subject.OnKilled.AddListener(killedHandler);
             subject.HandleCollision(collidingObject);
+            yield return null;
 
             Assert.That(killed, Is.EqualTo(testCase.expected));
         }
