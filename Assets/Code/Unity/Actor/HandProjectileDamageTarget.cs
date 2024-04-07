@@ -16,7 +16,7 @@ namespace SaloonSlingers.Unity
     {
         public Attribute HitPoints { get; set; }
         public DamageMode DamageMode = DamageMode.DECREMENT;
-        public UnityEvent<GameObject, Attribute> OnDamaged = new();
+        public UnityEvent<GameObject, IReadOnlyAttribute> OnDamaged = new();
 
         private Attributes attributes;
 
