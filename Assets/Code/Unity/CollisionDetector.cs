@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity
 {
-    public class CollisionPublisher : MonoBehaviour
+    public class CollisionDetector : MonoBehaviour
     {
         public UnityEvent<Collision> OnCollided = new();
         public UnityEvent<Collider> OnTriggered = new();
