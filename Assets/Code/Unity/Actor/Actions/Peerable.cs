@@ -47,16 +47,19 @@ namespace SaloonSlingers.Unity.Actor
                 var closest = (detector.GetVisible(LayerMask.GetMask("Enemy"), xRay: true)
                                        .FirstOrDefault());
 
-                if (closest == null)
+                if (closest == null ||
+                    !closest.TryGetComponent<Enemy>(out currentEnemy))
                 {
-                    display.Hide();
-                    display.SetProjectiles(null, null);
+                    if (lastEnemy == null)
+                    {
+                        display.Hide();
+                        display.SetProjectiles(null, null);
+                    }
                     if (lastOutline != null) lastOutline.enabled = false;
                 }
                 else
                 {
                     display.Show();
-                    currentEnemy = closest.GetComponentInParent<Enemy>();
                     var projectile = currentEnemy.GetComponentInChildren<HandProjectile>();
                     var target = currentEnemy.GetComponent<HandProjectileDamageTarget>();
                     display.SetProjectiles(projectile, target.Cursed);
@@ -66,6 +69,7 @@ namespace SaloonSlingers.Unity.Actor
                         currentOutline = currentEnemy.GetComponent<Outline>();
                         currentOutline.enabled = true;
                     }
+
                 }
 
                 if (lastOutline != null && currentOutline != lastOutline) lastOutline.enabled = false;
