@@ -7,7 +7,8 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class CoroutineTask
     {
-        private bool running = false;
+        public bool Running { get; private set; } = false;
+
         private readonly Func<IEnumerator> generator;
         private readonly MonoBehaviour runner;
 
@@ -19,17 +20,17 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Run()
         {
-            if (running) return;
+            if (Running) return;
 
             runner.StartCoroutine(RunWrapped());
         }
 
         public void Stop()
         {
-            if (!running) return;
+            if (!Running) return;
 
             runner.StopCoroutine(RunWrapped());
-            running = false;
+            Running = false;
         }
 
         public void Restart()
@@ -40,9 +41,9 @@ namespace SaloonSlingers.Unity.Actor
 
         private IEnumerator RunWrapped()
         {
-            running = true;
+            Running = true;
             yield return generator();
-            running = false;
+            Running = false;
         }
     }
 }
