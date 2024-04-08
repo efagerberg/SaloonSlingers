@@ -10,7 +10,7 @@ namespace SaloonSlingers.Unity
 
         public void Drop()
         {
-            if (!attributes.Registry.TryGetValue(Core.AttributeType.Pot, out var pot))
+            if (!attributes.Registry.TryGetValue(Core.AttributeType.Pot, out var pot) || pot.Value == 0)
                 return;
 
             PickupDropper.Drop(pot,
