@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 
 using SaloonSlingers.Core;
@@ -23,9 +24,9 @@ namespace SaloonSlingers.Unity.Actor
         private LayoutGroup cursedCardLayoutGroup;
 
         private Canvas canvas;
-        private HandProjectile cursedProjectile;
+        private IReadOnlyCollection<Card> cursedCards;
 
-        public void SetProjectiles(HandProjectile enemyProjectile, HandProjectile cursedProjectile)
+        public void SetProjectiles(HandProjectile enemyProjectile, IReadOnlyCollection<Card> cursedCards)
         {
             if (projectile != null)
                 projectile.OnDraw.RemoveListener(DrawHandler);
@@ -34,7 +35,7 @@ namespace SaloonSlingers.Unity.Actor
 
             if (projectile != null)
                 projectile.OnDraw.AddListener(DrawHandler);
-            this.cursedProjectile = cursedProjectile;
+            this.cursedCards = cursedCards;
             UpdateContents();
         }
 
@@ -53,18 +54,18 @@ namespace SaloonSlingers.Unity.Actor
 
         public override void UpdateContents()
         {
-            var projectileToLayout = new (HandProjectile, LayoutGroup, Color, bool)[]
+            var projectileToLayout = new (IReadOnlyCollection<Card>, LayoutGroup, Color, bool)[]
             {
-                (projectile, peerOtherCardLayoutGroup, Color.yellow, true),
-                (cursedProjectile, cursedCardLayoutGroup, cursedCardColor, false)
+                (projectile?.Cards, peerOtherCardLayoutGroup, Color.yellow, true),
+                (cursedCards, cursedCardLayoutGroup, cursedCardColor, false)
             };
 
-            foreach (var (p, l, c, keyCardsOnly) in projectileToLayout)
-            {
-                var evaluation = p == null ? HandEvaluation.EMPTY : p.HandEvaluation;
-                handValueText.text = evaluation.DisplayName();
+            var evaluation = projectile == null ? HandEvaluation.EMPTY : projectile.HandEvaluation;
+            handValueText.text = evaluation.DisplayName();
 
-                int nCards = p == null ? 0 : p.Cards.Count;
+            foreach (var (h, l, c, keyCardsOnly) in projectileToLayout)
+            {
+                int nCards = h == null ? 0 : h.Count;
                 int delta = nCards - l.transform.childCount;
 
                 for (; delta > 0; delta--)
@@ -78,7 +79,7 @@ namespace SaloonSlingers.Unity.Actor
                     Transform element = l.transform.GetChild(i);
 
                     TextMeshProUGUI text = element.GetComponentInChildren<TextMeshProUGUI>();
-                    text.text = p.Cards.ElementAt(i).ToUnicode();
+                    text.text = h.ElementAt(i).ToUnicode();
 
                     Image background = element.GetComponentInChildren<Image>();
                     Color color;
