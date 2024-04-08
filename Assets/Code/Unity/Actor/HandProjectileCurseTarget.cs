@@ -1,4 +1,7 @@
-﻿using SaloonSlingers.Unity.Actor;
+﻿using System.Collections.Generic;
+
+using SaloonSlingers.Core;
+using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,8 +10,8 @@ namespace SaloonSlingers.Unity
 {
     public class HandProjectileCurseTarget : MonoBehaviour
     {
-        public HandProjectile Cursed { get; private set; }
-        public UnityEvent<GameObject, HandProjectile> OnCursed = new();
+        public IReadOnlyCollection<Card> Cursed { get; private set; }
+        public UnityEvent<GameObject, IReadOnlyCollection<Card>> OnCursed = new();
 
         public void HandleCollision(Collision collision)
         {
@@ -28,20 +31,11 @@ namespace SaloonSlingers.Unity
 
             if (handProjectile.Mode != HandProjectileMode.Curse) return;
 
-            Cursed = handProjectile;
-            // Melee cards can still change their mode, this ensures we do not keep cursed the target
-            // if the player changes to damage mode or comes out of it because of some restriction like
-            // only 1 card hands can be cursed cards for example.
-            Cursed.OnDamageMode.AddListener(RemoveCurse);
+            // Need to make a copy since we don't want the cards to change as the slinger
+            // draws more cards;
+            // This can happen when using the handprojectile as a melee weapon.
+            Cursed = new List<Card>(handProjectile.Cards);
             OnCursed.Invoke(gameObject, Cursed);
-        }
-
-        private void RemoveCurse(GameObject sender)
-        {
-            if (Cursed == null) return;
-
-            Cursed.OnDamageMode.RemoveListener(RemoveCurse);
-            Cursed = null;
         }
     }
 }

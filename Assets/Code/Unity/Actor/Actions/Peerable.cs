@@ -22,8 +22,9 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float startingRecoveryPeriod = 1f;
 
-        private const float Y_OFFSET = 0.075f;
-        private const float UI_DISTANCE = 0.3f;
+        private const float X_OFFSET = 0.2f;
+        private const float Y_OFFSET = 0.3f;
+        private const float UI_DISTANCE = 1f;
 
         public void CastPeer(VisibilityDetector detector, EnemyHandDisplay display, Transform peererTransform)
         {
@@ -81,7 +82,7 @@ namespace SaloonSlingers.Unity.Actor
                     if (currentEnemy)
                     {
                         var directionToEnemy = currentEnemy.transform.position - peererTransform.position;
-                        var desiredPosition = peererTransform.position + directionToEnemy.normalized * UI_DISTANCE + new Vector3(0, Y_OFFSET, 0);
+                        var desiredPosition = peererTransform.position + directionToEnemy.normalized * UI_DISTANCE + new Vector3(X_OFFSET, Y_OFFSET, 0);
                         display.transform.position = desiredPosition;
                     }
                     intervalDuration += Time.deltaTime;
