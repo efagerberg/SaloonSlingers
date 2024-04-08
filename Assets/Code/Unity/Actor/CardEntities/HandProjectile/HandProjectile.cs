@@ -76,8 +76,8 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Throw(Vector3 offset)
         {
-            rigidBody.AddForce(offset, ForceMode.VelocityChange);
             OnThrow.Invoke(gameObject);
+            rigidBody.AddForce(offset, ForceMode.VelocityChange);
         }
 
         public void Assign(Deck newDeck, IDictionary<AttributeType, Core.Attribute> newAttributeRegistry)
