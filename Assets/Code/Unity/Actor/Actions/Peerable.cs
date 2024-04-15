@@ -30,7 +30,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float startingRecoveryPeriod = 1f;
 
-        private const float UI_DISTANCE = 1f;
+        private const float UI_DISTANCE = 0.5f;
 
         public void CastPeer(VisibilityDetector detector, EnemyHandDisplay display, Transform peererTransform)
         {
