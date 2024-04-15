@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 using SaloonSlingers.Core;
@@ -8,6 +9,13 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
+    public struct EnemyData
+    {
+        public Enemy Enemy;
+        public Outline Outline;
+        public HandProjectileCurseTarget CurseTarget;
+    }
+
     public class Peerable : ActionPerformer
     {
         [field: SerializeField]
@@ -22,8 +30,6 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private float startingRecoveryPeriod = 1f;
 
-        private const float X_OFFSET = 0.2f;
-        private const float Y_OFFSET = 0.3f;
         private const float UI_DISTANCE = 1f;
 
         public void CastPeer(VisibilityDetector detector, EnemyHandDisplay display, Transform peererTransform)
@@ -37,62 +43,64 @@ namespace SaloonSlingers.Unity.Actor
 
         private IEnumerator DoPeer(VisibilityDetector detector, EnemyHandDisplay display, Transform peererTransform)
         {
-            Enemy lastEnemy = null;
-            Outline lastOutline = null;
+            int lastSeenId = -1;
+            IDictionary<int, EnemyData> seen = new Dictionary<int, EnemyData>();
 
-            Outline currentOutline = null;
-            Enemy currentEnemy = null;
             float currentDuration = MetaData.Duration;
             while (currentDuration > 0)
             {
                 var closest = (detector.GetVisible(LayerMask.GetMask("Enemy"), xRay: true)
                                        .FirstOrDefault());
-
-                if (closest == null ||
-                    !closest.TryGetComponent<Enemy>(out currentEnemy))
+                if (closest == null || !closest.TryGetComponent<Enemy>(out var currentEnemy))
                 {
-                    if (lastEnemy == null)
-                    {
-                        display.Hide();
-                        display.SetProjectiles(null, null);
-                    }
-                    if (lastOutline != null) lastOutline.enabled = false;
-                }
-                else
-                {
-                    display.Show();
-                    var projectile = currentEnemy.GetComponentInChildren<HandProjectile>();
-                    var target = currentEnemy.GetComponent<HandProjectileCurseTarget>();
-                    display.SetProjectiles(projectile, target.Cursed);
-
-                    if (currentEnemy != null && currentEnemy != lastEnemy)
-                    {
-                        currentOutline = currentEnemy.GetComponent<Outline>();
-                        currentOutline.enabled = true;
-                    }
-
+                    display.Hide();
+                    yield return new WaitForSeconds(Interval);
+                    currentDuration -= Interval;
+                    continue;
                 }
 
-                if (lastOutline != null && currentOutline != lastOutline) lastOutline.enabled = false;
-                lastEnemy = currentEnemy;
-                lastOutline = currentOutline;
-                var intervalDuration = 0f;
-                while (intervalDuration < Interval)
+                int currentId = closest.GetInstanceID();
+                if (!seen.TryGetValue(currentId, out var currentEnemyData))
                 {
-                    if (currentEnemy)
+                    currentEnemyData = seen[currentId] = new EnemyData()
                     {
-                        var directionToEnemy = currentEnemy.transform.position - peererTransform.position;
-                        var desiredPosition = peererTransform.position + directionToEnemy.normalized * UI_DISTANCE + new Vector3(X_OFFSET, Y_OFFSET, 0);
-                        display.transform.position = desiredPosition;
-                    }
-                    intervalDuration += Time.deltaTime;
+                        CurseTarget = currentEnemy.GetComponent<HandProjectileCurseTarget>(),
+                        Enemy = currentEnemy,
+                        Outline = currentEnemy.GetComponent<Outline>()
+                    };
+                }
+
+                if (lastSeenId != -1 && lastSeenId != currentId)
+                    seen[lastSeenId].Outline.enabled = false;
+                currentEnemyData.Outline.enabled = true;
+                lastSeenId = currentId;
+
+                display.Show();
+                HandProjectile projectile = null;
+                float timeWaited = 0;
+                while (timeWaited < Interval)
+                {
+                    if (projectile == null)
+                        projectile = closest.GetComponentInChildren<HandProjectile>();
+                    display.SetProjectiles(projectile, currentEnemyData.CurseTarget.Cursed);
+                    var direction = (currentEnemy.transform.position - peererTransform.position);
+                    var offset = new Vector3(0.1f, 0.1f, 0);
+                    // Make sure the UI is in front of the player when close
+                    var distance = Mathf.Min(UI_DISTANCE, direction.magnitude / 2f);
+                    var basePosition = peererTransform.position + direction.normalized * distance;
+                    display.transform.position = basePosition + offset;
                     yield return null;
+                    timeWaited += Time.deltaTime;
                 }
-                currentDuration -= intervalDuration;
+                currentDuration -= timeWaited;
             };
 
             display.Hide();
-            if (lastEnemy != null) lastOutline.enabled = false;
+            foreach (var x in seen.Values)
+            {
+                x.Outline.enabled = false;
+            }
+            seen.Clear();
         }
 
         private void Start()
