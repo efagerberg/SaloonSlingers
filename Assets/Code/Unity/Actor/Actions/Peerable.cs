@@ -11,7 +11,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public struct EnemyData
     {
-        public Enemy Enemy;
+        public Attributes Attributes;
         public Outline Outline;
         public HandProjectileCurseTarget CurseTarget;
     }
@@ -32,7 +32,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private const float UI_DISTANCE = 0.5f;
 
-        public void CastPeer(VisibilityDetector detector, EnemyHandDisplay display, Transform peererTransform)
+        public void CastPeer(VisibilityDetector detector, EnemyInfoDisplay display, Transform peererTransform)
         {
 
             IEnumerator coroutine = GetActionCoroutine(() => DoPeer(detector, display, peererTransform));
@@ -41,7 +41,7 @@ namespace SaloonSlingers.Unity.Actor
             StartCoroutine(coroutine);
         }
 
-        private IEnumerator DoPeer(VisibilityDetector detector, EnemyHandDisplay display, Transform peererTransform)
+        private IEnumerator DoPeer(VisibilityDetector detector, EnemyInfoDisplay display, Transform peererTransform)
         {
             int lastSeenId = -1;
             IDictionary<int, EnemyData> seen = new Dictionary<int, EnemyData>();
@@ -51,7 +51,7 @@ namespace SaloonSlingers.Unity.Actor
             {
                 var closest = (detector.GetVisible(LayerMask.GetMask("Enemy"), xRay: true)
                                        .FirstOrDefault());
-                if (closest == null || !closest.TryGetComponent<Enemy>(out var currentEnemy))
+                if (closest == null || !closest.TryGetComponent<Attributes>(out var currentAttributes))
                 {
                     display.Hide();
                     yield return new WaitForSeconds(Interval);
@@ -64,9 +64,9 @@ namespace SaloonSlingers.Unity.Actor
                 {
                     currentEnemyData = seen[currentId] = new EnemyData()
                     {
-                        CurseTarget = currentEnemy.GetComponent<HandProjectileCurseTarget>(),
-                        Enemy = currentEnemy,
-                        Outline = currentEnemy.GetComponent<Outline>()
+                        CurseTarget = currentAttributes.GetComponent<HandProjectileCurseTarget>(),
+                        Attributes = currentAttributes,
+                        Outline = currentAttributes.GetComponent<Outline>()
                     };
                 }
 
@@ -82,8 +82,8 @@ namespace SaloonSlingers.Unity.Actor
                 {
                     if (projectile == null)
                         projectile = closest.GetComponentInChildren<HandProjectile>();
-                    display.SetProjectiles(projectile, currentEnemyData.CurseTarget.Cursed);
-                    var direction = (currentEnemy.transform.position - peererTransform.position);
+                    display.SetTarget(currentEnemyData, projectile);
+                    var direction = (currentAttributes.transform.position - peererTransform.position);
                     var offset = new Vector3(0.1f, 0.1f, 0);
                     // Make sure the UI is in front of the player when close
                     var distance = Mathf.Min(UI_DISTANCE, direction.magnitude / 2f);

@@ -105,6 +105,7 @@ namespace SaloonSlingers.Unity.Actor
         /// <returns></returns>
         private IEnumerator KillNextFrame()
         {
+            rigidBody.isKinematic = true;
             yield return null;
             OnKilled.Invoke(gameObject);
         }
@@ -116,10 +117,18 @@ namespace SaloonSlingers.Unity.Actor
 
         public void HandleCollision(GameObject contactingObject)
         {
+            var antagonistLayer = LayerMask.LayerToName(gameObject.layer) switch
+            {
+                "PlayerProjectile" => LayerMask.NameToLayer("Enemy"),
+                "EnemyProjectile" => LayerMask.NameToLayer("Player"),
+                _ => -1,
+            };
+            var collidingWithAntagnoist = antagonistLayer != -1 && contactingObject.layer == antagonistLayer;
             var isSelfLethal = (
-                !rigidBody.isKinematic &&
-                contactingObject.layer != LayerMask.NameToLayer("Environment") &&
-                contactingObject.layer != LayerMask.NameToLayer("Hand")
+                collidingWithAntagnoist ||
+                (!rigidBody.isKinematic &&
+                 contactingObject.layer != LayerMask.NameToLayer("Environment") &&
+                 contactingObject.layer != LayerMask.NameToLayer("Hand"))
             );
             if (!isSelfLethal) return;
 

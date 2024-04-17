@@ -22,6 +22,9 @@ namespace SaloonSlingers.Unity.Actor
         private LayerMask layerMask;
         [SerializeField]
         private bool drawGizmo = false;
+        [SerializeField]
+        private float distanceWeight = 0.2f;
+
 
         private RaycastHit[] spherecastHits;
 
@@ -35,13 +38,18 @@ namespace SaloonSlingers.Unity.Actor
                                                              spherecastHits,
                                                              sightDistance,
                                                              mask);
+            float maxDistance = spherecastHits.Max(hit => hit.distance);
 
             var seen = spherecastHits.Take(nSpherecastHits)
-                                     .OrderByDescending(hit => sightTransform.GetAlignment(hit.point))
                                      .Where(hit => xRay || !IsObstructed(hit.point, sightTransform))
+                                     .OrderByDescending(hit => GetVisibilityScore(hit, maxDistance))
                                      .Select(hit => hit.transform);
             return seen.Take(maxSeeable).Distinct();
+        }
 
+        private float GetVisibilityScore(RaycastHit hit, float maxDistance)
+        {
+            return (sightTransform.GetAlignment(hit.point)) - (distanceWeight * (hit.distance / maxDistance));
         }
 
         private static bool IsObstructed(Vector3 point, Transform sightTransform)

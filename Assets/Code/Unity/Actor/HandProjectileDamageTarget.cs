@@ -44,7 +44,7 @@ namespace SaloonSlingers.Unity
                 _ => 0
             };
             attributes ??= GetComponent<Attributes>();
-            HitPoints ??= attributes?.Registry[AttributeType.Health];
+            HitPoints ??= attributes != null ? attributes.Registry[AttributeType.Health] : null;
 
             if (HitPoints == null) return;
 
