@@ -64,16 +64,12 @@ namespace SaloonSlingers.Unity.Actor
             if (!isPrimary)
             {
                 var deckGraphicGO = Instantiate(deckGraphicPrefab, deckAttachTransform);
-                var absorberGO = Instantiate(absorberPrefab, absorberAttachTransform);
-                var shieldGO = Instantiate(shieldPrefab, shieldAttachTransform);
-                var attrbutesUIGO = Instantiate(playerAttributesUIPrefab, playerAttributesUIAttachTransform);
+                instantiated.Add(deckGraphicGO);
+                instantiated.Add(Instantiate(absorberPrefab, absorberAttachTransform));
+                instantiated.Add(Instantiate(shieldPrefab, shieldAttachTransform));
+                instantiated.Add(Instantiate(playerAttributesUIPrefab, playerAttributesUIAttachTransform));
 
                 handedness.DeckGraphic = deckGraphicGO.GetComponent<DeckGraphic>();
-
-                instantiated.Add(absorberGO);
-                instantiated.Add(shieldGO);
-                instantiated.Add(deckGraphicGO);
-                instantiated.Add(attrbutesUIGO);
             }
 
             foreach (var instance in instantiated)

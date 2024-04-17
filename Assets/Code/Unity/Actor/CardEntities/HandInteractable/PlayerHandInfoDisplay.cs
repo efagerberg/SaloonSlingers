@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class PlayerHandDisplay : HandDisplay
+    public class PlayerHandInfoDisplay : HiddableDisplay
     {
         [SerializeField]
         private GameObject cardsPanel;
@@ -21,6 +21,8 @@ namespace SaloonSlingers.Unity.Actor
         private Color markCardColor;
         [SerializeField]
         private Color damageCardColor;
+
+        private HandProjectile projectile;
 
         private Color nonKeyColor
         {

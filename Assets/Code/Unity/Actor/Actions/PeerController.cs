@@ -15,7 +15,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private VisibilityDetector visibilityDetector;
         [SerializeField]
-        private EnemyHandDisplay enemyHandDisplay;
+        private EnemyInfoDisplay enemyHandDisplay;
         [SerializeField]
         private Transform peererTransform;
 

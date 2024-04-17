@@ -52,7 +52,7 @@ namespace SaloonSlingers.Unity.Actor
             placed = cardHandGO;
         }
 
-        private void HandInteractableHeldHandler(GameObject sender)
+        private void HandInteractableThrowHandler(GameObject sender)
         {
             if (sender == placed) placed = null;
 
@@ -67,7 +67,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             var instance = sender as GameObject;
             var projectile = instance.GetComponent<HandProjectile>();
-            projectile.OnPickup.RemoveListener(HandInteractableHeldHandler);
+            projectile.OnThrow.RemoveListener(HandInteractableThrowHandler);
             projectile.OnKilled.RemoveListener(HandleInteractableDeath);
         }
 
@@ -75,7 +75,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             GameObject spawned = handInteractableSpawner.Spawn();
             HandProjectile projectile = spawned.GetComponent<HandProjectile>();
-            projectile.OnPickup.AddListener(HandInteractableHeldHandler);
+            projectile.OnThrow.AddListener(HandInteractableThrowHandler);
             projectile.OnKilled.AddListener(HandleInteractableDeath);
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();
             swapper.SetController(ControllerTypes.PLAYER);

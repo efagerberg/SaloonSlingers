@@ -37,5 +37,10 @@ namespace SaloonSlingers.Unity
             Cursed = new List<Card>(handProjectile.Cards);
             OnCursed.Invoke(gameObject, Cursed);
         }
+
+        private void OnDisable()
+        {
+            Cursed = null;
+        }
     }
 }

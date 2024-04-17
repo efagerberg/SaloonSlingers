@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class EnemyHandDisplay : HandDisplay
+    public class EnemyInfoDisplay : HiddableDisplay
     {
         [SerializeField]
         private GameObject enemyPeerCardPrefab;
@@ -22,11 +22,15 @@ namespace SaloonSlingers.Unity.Actor
         private Color cursedCardColor;
         [SerializeField]
         private LayoutGroup cursedCardLayoutGroup;
+        [SerializeField]
+        private Image healthBar;
 
         private Canvas canvas;
         private IReadOnlyCollection<Card> cursedCards;
+        private HandProjectile projectile;
+        private Attribute health;
 
-        public void SetProjectiles(HandProjectile enemyProjectile, IReadOnlyCollection<Card> cursedCards)
+        public void SetTarget(EnemyData enemyData, HandProjectile enemyProjectile)
         {
             if (projectile != null)
                 projectile.OnDraw.RemoveListener(DrawHandler);
@@ -35,7 +39,8 @@ namespace SaloonSlingers.Unity.Actor
 
             if (projectile != null)
                 projectile.OnDraw.AddListener(DrawHandler);
-            this.cursedCards = cursedCards;
+            cursedCards = enemyData.CurseTarget.Cursed;
+            health = enemyData.Attributes.Registry[AttributeType.Health];
             UpdateContents();
         }
 
@@ -62,6 +67,8 @@ namespace SaloonSlingers.Unity.Actor
 
             var evaluation = projectile == null ? HandEvaluation.EMPTY : projectile.HandEvaluation;
             handValueText.text = evaluation.DisplayName();
+            if (health != null)
+                healthBar.fillAmount = health.AsPercent();
 
             foreach (var (h, l, c, keyCardsOnly) in projectileToLayout)
             {
