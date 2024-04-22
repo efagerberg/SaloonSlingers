@@ -2,6 +2,7 @@
 using System.Linq;
 
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 
 
@@ -12,6 +13,9 @@ namespace SaloonSlingers.Unity.Actor
     [RequireComponent(typeof(HandProjectile))]
     public class PlayerHandInteractableController : MonoBehaviour
     {
+        public UnityEvent<GameObject> OnPreDrawHoverEnter = new();
+        public UnityEvent<GameObject> OnPreDrawHoverExit = new();
+
         [SerializeField]
         private float maxDeckDistance = 0.08f;
         [SerializeField]
@@ -30,6 +34,7 @@ namespace SaloonSlingers.Unity.Actor
         private VisibilityDetector visibilityDetector;
         private bool initialized = false;
         private bool eventsRegistered = false;
+        private static int ENUM_COUNT = Enum.GetValues(typeof(HandProjectileMode)).Length;
 
         public void OnSelectEnter(SelectEnterEventArgs args)
         {
@@ -69,6 +74,7 @@ namespace SaloonSlingers.Unity.Actor
             handProjectile.Assign(deckGraphic.Deck, attributes.Registry);
             rb = GetComponent<Rigidbody>();
             homable = GetComponent<Homable>();
+            OnPreDrawHoverExit.Invoke(gameObject);
         }
 
         public void OnSelectExit(SelectExitEventArgs args)
@@ -87,6 +93,20 @@ namespace SaloonSlingers.Unity.Actor
             homingStrength.Calculator.StartNewThrow();
         }
 
+        public void OnHoverEntered(HoverEnterEventArgs args)
+        {
+            if (initialized) return;
+
+            OnPreDrawHoverEnter.Invoke(gameObject);
+        }
+
+        public void OnHoverExited(HoverExitEventArgs args)
+        {
+            if (initialized) return;
+
+            OnPreDrawHoverExit.Invoke(gameObject);
+        }
+
         private void OnHandProjectileDied(GameObject sender)
         {
             homable.Target = null;
@@ -103,9 +123,7 @@ namespace SaloonSlingers.Unity.Actor
                 handProjectile.TryDrawCard(deckGraphic.Spawn, GameManager.Instance.Saloon.HouseGame);
                 return;
             }
-
-            int enumCount = Enum.GetValues(typeof(HandProjectileMode)).Length;
-            int nextEnumValue = ((int)handProjectile.Mode + 1) % enumCount;
+            int nextEnumValue = ((int)handProjectile.Mode + 1) % ENUM_COUNT;
             handProjectile.Mode = (HandProjectileMode)nextEnumValue;
         }
 

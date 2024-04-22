@@ -13,7 +13,7 @@ namespace SaloonSlingers.Core
         private IList<IDrawRule> drawRules;
         private IHandEvaluator handEvaluator;
 
-        public readonly bool CanDraw(DrawContext ctx)
+        public readonly bool CanDraw(DrawContext ctx = default)
         {
             return ctx.Deck.HasCards && drawRules.All(x => x.CanDraw(ctx));
         }
