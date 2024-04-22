@@ -1,11 +1,21 @@
+using System;
+using System.Collections.Generic;
+
 using SaloonSlingers.Core;
 
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.Actor
 {
+
     public class HandInteractablePlacer : MonoBehaviour
     {
+        public static readonly IReadOnlyCollection<Card> EMPTY_HAND = new List<Card>();
+
+        [SerializeField]
+        private XRBaseInteractable hoverInteractable;
+
         private DeckGraphic deckGraphic;
         private ISpawner<GameObject> handInteractableSpawner;
         private GameObject placed;
@@ -14,13 +24,12 @@ namespace SaloonSlingers.Unity.Actor
         private void Awake()
         {
             deckGraphic = GetComponent<DeckGraphic>();
-            var emptyHand = new Card[] { };
             firstDrawContext = new()
             {
                 AttributeRegistry = LevelManager.Instance.Player.GetComponent<Attributes>().Registry,
                 Deck = deckGraphic.Deck,
-                Hand = emptyHand,
-                Evaluation = GameManager.Instance.Saloon.HouseGame.Evaluate(emptyHand)
+                Hand = EMPTY_HAND,
+                Evaluation = GameManager.Instance.Saloon.HouseGame.Evaluate(EMPTY_HAND)
             };
         }
 
@@ -28,10 +37,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             handInteractableSpawner = LevelManager.Instance.HandInteractableSpawner;
 
-            if (!deckGraphic.CanDraw ||
-                !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext)) return;
-
-            PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
+            PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable);
         }
 
         private void Update()
@@ -43,24 +49,30 @@ namespace SaloonSlingers.Unity.Actor
             }
         }
 
-        private void PlaceOnTop(Transform topCardTransform, GameObject cardHandGO)
+        private void PlaceOnTop(Transform topCardTransform, Func<GameObject> spawnFunc)
         {
-            cardHandGO.transform.SetPositionAndRotation(
+            if (deckGraphic.CanDraw &&
+                GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext) &&
+                placed == null)
+            {
+                var cardHandGO = spawnFunc();
+                cardHandGO.transform.SetPositionAndRotation(
+                    topCardTransform.position, topCardTransform.rotation
+                );
+                cardHandGO.transform.SetParent(transform);
+                placed = cardHandGO;
+            }
+            hoverInteractable.transform.SetPositionAndRotation(
                 topCardTransform.position, topCardTransform.rotation
             );
-            cardHandGO.transform.SetParent(transform);
-            placed = cardHandGO;
+
         }
 
         private void HandInteractableThrowHandler(GameObject sender)
         {
             if (sender == placed) placed = null;
 
-            if (!deckGraphic.CanDraw ||
-                !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext) ||
-                placed != null) return;
-
-            PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
+            PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable);
         }
 
         private void HandleInteractableDeath(GameObject sender)
