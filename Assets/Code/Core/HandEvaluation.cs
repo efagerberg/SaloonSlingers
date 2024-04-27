@@ -8,8 +8,6 @@ namespace SaloonSlingers.Core
 {
     public struct HandEvaluation : IEquatable<HandEvaluation>
     {
-        public static HandEvaluation EMPTY = new(HandNames.NONE, 0);
-
         public HandEvaluation(HandNames name, uint score, IEnumerable<int> keyIndexes = null)
         {
             Name = name;

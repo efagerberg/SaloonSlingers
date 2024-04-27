@@ -1,6 +1,7 @@
 {
-  "Name": "BlackJack",
+  "Name": "Black Jack",
   "MinScore": 1,
   "MaxScore": 22,
-  "HandEvaluator": "BlackJack"
+  "HandEvaluator": "BlackJack",
+  "CostTable": [ 1, 10, 50, 100, 500 ]
 }

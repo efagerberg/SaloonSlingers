@@ -2,7 +2,7 @@
   "SaloonId": "NightClub",
   "Name":  "Night Club",
   "InterestRisk": 0.05,
-  "HouseGame": "5CardPoker",
+  "HouseGame": "BlackJack",
   "EnemyManifest": {
     "Enemy": 10
   },
