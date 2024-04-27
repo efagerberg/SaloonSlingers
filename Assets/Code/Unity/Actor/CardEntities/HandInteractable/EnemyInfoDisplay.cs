@@ -65,10 +65,11 @@ namespace SaloonSlingers.Unity.Actor
                 (cursedCards, cursedCardLayoutGroup, cursedCardColor, false)
             };
 
-            var evaluation = projectile == null ? HandEvaluation.EMPTY : projectile.HandEvaluation;
-            handValueText.text = evaluation.DisplayName();
             if (health != null)
                 healthBar.fillAmount = health.AsPercent();
+
+            var evaluation = projectile?.HandEvaluation;
+            handValueText.text = evaluation?.DisplayName();
 
             foreach (var (h, l, c, keyCardsOnly) in projectileToLayout)
             {
@@ -90,8 +91,8 @@ namespace SaloonSlingers.Unity.Actor
 
                     Image background = element.GetComponentInChildren<Image>();
                     Color color;
-                    if (keyCardsOnly)
-                        color = evaluation.KeyIndexes.Contains(i) ? c : Color.white;
+                    if (keyCardsOnly && evaluation.HasValue)
+                        color = evaluation.Value.KeyIndexes.Contains(i) ? c : Color.white;
                     else
                         color = c;
                     background.color = color;

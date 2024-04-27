@@ -20,12 +20,12 @@ namespace SaloonSlingers.Core
         private Deck deck;
         private IDictionary<AttributeType, Attribute> attributeRegistry;
         private DrawContext drawCtx;
-        private bool Drawn { get => cards != null && cards.Count > 0; }
+        private bool drawn { get => cards != null && cards.Count > 0; }
         private List<Card> cards;
 
         public Card? Pickup(CardGame game)
         {
-            if (Drawn) return null;
+            if (drawn) return null;
 
             return TryDrawCard(game);
         }
@@ -33,6 +33,7 @@ namespace SaloonSlingers.Core
         public Card? TryDrawCard(CardGame game)
         {
             cards ??= new List<Card>();
+            if (cards.Count == 0) HandEvaluation = game.Evaluate(cards);
             drawCtx.Deck = deck;
             drawCtx.Evaluation = HandEvaluation;
             drawCtx.Hand = cards;
@@ -54,7 +55,7 @@ namespace SaloonSlingers.Core
         public void Reset()
         {
             cards?.Clear();
-            HandEvaluation = HandEvaluation.EMPTY;
+            HandEvaluation = new(HandNames.NONE, 0);
         }
     }
 }
