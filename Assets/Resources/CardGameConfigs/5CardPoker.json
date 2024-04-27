@@ -1,6 +1,6 @@
 {
-  "Name": "Poker",
+  "Name": "5 Card Poker",
   "MaxHandSize": 5,
   "HandEvaluator": "Poker",
-  "CostTable":  [1, 5, 10, 25, 100, 500, 1000, 5000]
+  "CostTable":  [1, 5, 10, 25, 100, 500]
 }
