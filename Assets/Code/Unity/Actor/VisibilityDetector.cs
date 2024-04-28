@@ -49,7 +49,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private float GetVisibilityScore(RaycastHit hit, float maxDistance)
         {
-            return (sightTransform.GetAlignment(hit.point)) - (distanceWeight * (hit.distance / maxDistance));
+            return sightTransform.GetAlignment(hit.point) - (distanceWeight * (hit.distance / maxDistance));
         }
 
         private static bool IsObstructed(Vector3 point, Transform sightTransform)

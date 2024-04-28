@@ -61,7 +61,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             var projectileToLayout = new (IReadOnlyCollection<Card>, LayoutGroup, Color, bool)[]
             {
-                (projectile?.Cards, peerOtherCardLayoutGroup, Color.yellow, true),
+                (projectile != null ? projectile.Cards : null, peerOtherCardLayoutGroup, Color.yellow, true),
                 (cursedCards, cursedCardLayoutGroup, cursedCardColor, false)
             };
 

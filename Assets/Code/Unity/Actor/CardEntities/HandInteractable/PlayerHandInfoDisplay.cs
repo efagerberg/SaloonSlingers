@@ -24,7 +24,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private HandProjectile projectile;
 
-        private Color nonKeyColor
+        private Color NonKeyColor
         {
             get
             {
@@ -40,11 +40,13 @@ namespace SaloonSlingers.Unity.Actor
         public override void Hide()
         {
             base.Hide();
+            if (handValueText.text == "") return;
+
             for (int i = 0; projectile != null && i < projectile.Cards.Count; i++)
             {
                 Transform element = cardsPanel.transform.GetChild(i);
                 ICardGraphic graphic = element.GetComponent<ICardGraphic>();
-                graphic.Color = nonKeyColor;
+                graphic.Color = NonKeyColor;
             }
             var coroutine = Fader.Fade((alpha) => handValueCanvasGroup.alpha = alpha, fadeDuration, endAlpha: 0);
             StartCoroutine(coroutine);
@@ -53,6 +55,8 @@ namespace SaloonSlingers.Unity.Actor
         public override void Show()
         {
             base.Show();
+            if (handValueText.text == "") return;
+
             var coroutine = Fader.Fade(
                 (alpha) => handValueCanvasGroup.alpha = alpha,
                 fadeDuration,
@@ -73,7 +77,7 @@ namespace SaloonSlingers.Unity.Actor
                 if (IsDisplaying && projectile.HandEvaluation.KeyIndexes.Contains(i))
                     color = keyCardColor;
                 else
-                    color = nonKeyColor;
+                    color = NonKeyColor;
                 ICardGraphic graphic = element.GetComponent<ICardGraphic>();
                 graphic.Color = color;
             }

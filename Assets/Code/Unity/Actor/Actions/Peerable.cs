@@ -97,9 +97,7 @@ namespace SaloonSlingers.Unity.Actor
 
             display.Hide();
             foreach (var x in seen.Values)
-            {
                 x.Outline.enabled = false;
-            }
             seen.Clear();
         }
 
