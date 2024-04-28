@@ -82,8 +82,8 @@ namespace SaloonSlingers.Unity.Actor
 
             var target = visibilityDetector.GetVisible(LayerMask.GetMask("Enemy"))
                                            .FirstOrDefault();
-            if (target != null) homable.Target = target;
 
+            homable.Target = target;
             homingStrength.Calculator.StartNewThrow();
         }
 
@@ -133,7 +133,7 @@ namespace SaloonSlingers.Unity.Actor
             if (homable != null && homable.Target && homingStrength != null)
                 homable.Strength = homingStrength.Calculator.Calculate(rb.angularVelocity.y);
 
-            if (throwOffsetCalculator != null) throwOffsetCalculator.RecordVelocity(characterController.velocity);
+            throwOffsetCalculator?.RecordVelocity(characterController.velocity);
         }
     }
 }
