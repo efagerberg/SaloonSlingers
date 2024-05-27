@@ -11,7 +11,7 @@ namespace SaloonSlingers.Unity.Actor
         [field: SerializeField]
         public Deck Deck { get; private set; }
         public Attribute ShieldHitPoints { get; set; }
-        public IDictionary<AttributeType, Attribute> AttributeRegistry { get; private set; }
+        public IReadOnlyDictionary<AttributeType, Attribute> AttributeRegistry { get; private set; }
 
         [SerializeField]
         private HoloShieldController holoShieldController;

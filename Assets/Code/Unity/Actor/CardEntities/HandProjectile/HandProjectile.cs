@@ -80,7 +80,7 @@ namespace SaloonSlingers.Unity.Actor
             rigidBody.AddForce(offset, ForceMode.VelocityChange);
         }
 
-        public void Assign(Deck newDeck, IDictionary<AttributeType, Core.Attribute> newAttributeRegistry)
+        public void Assign(Deck newDeck, IReadOnlyDictionary<AttributeType, Core.Attribute> newAttributeRegistry)
         {
             handCoordinator.Assign(newDeck, newAttributeRegistry);
         }

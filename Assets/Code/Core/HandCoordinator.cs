@@ -18,7 +18,7 @@ namespace SaloonSlingers.Core
         }
 
         private Deck deck;
-        private IDictionary<AttributeType, Attribute> attributeRegistry;
+        private IReadOnlyDictionary<AttributeType, Attribute> attributeRegistry;
         private DrawContext drawCtx;
         private bool drawn { get => cards != null && cards.Count > 0; }
         private List<Card> cards;
@@ -46,7 +46,7 @@ namespace SaloonSlingers.Core
             return card;
         }
 
-        public void Assign(Deck newDeck, IDictionary<AttributeType, Attribute> newAttributeRegistry)
+        public void Assign(Deck newDeck, IReadOnlyDictionary<AttributeType, Attribute> newAttributeRegistry)
         {
             deck = newDeck;
             attributeRegistry = newAttributeRegistry;
