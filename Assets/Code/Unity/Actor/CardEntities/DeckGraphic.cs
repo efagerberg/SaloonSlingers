@@ -7,9 +7,12 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class DeckGraphic : MonoBehaviour
+    public class DeckGraphic : MonoBehaviour, ISpawner<GameObject>
     {
-        public Transform TopCardTransform { get => cardGraphics.Peek().transform; }
+        public Transform TopCardTransform
+        {
+            get => cardGraphics.Count > 0 ? cardGraphics.Peek().transform : transform;
+        }
         public bool CanDraw { get; private set; }
         public Deck Deck { get; private set; }
 

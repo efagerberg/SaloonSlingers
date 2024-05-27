@@ -17,7 +17,11 @@ namespace SaloonSlingers.Unity.Actor
             }
         }
 
-        public Color Color { get => faceRenderer.material.color; set => faceRenderer.material.color = value; }
+        public Color Color
+        {
+            get => faceRenderer.material.color;
+            set => faceRenderer.material.color = value;
+        }
 
         [SerializeField]
         private Card card;
