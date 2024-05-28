@@ -22,21 +22,11 @@ namespace SaloonSlingers.Unity.Actor
 
         public void OnHoverEnter(Collider collider)
         {
-            UpdateIndicator(collider.gameObject);
             isHovering = true;
-        }
-
-        public void OnHoverExit(Collider collider)
-        {
-            interactabilityIndicator.Hide();
-            isHovering = false;
-        }
-
-        private void UpdateIndicator(GameObject selecting)
-        {
+            interactabilityIndicator.transform.position = deckGraphic.TopCardTransform.position;
             IReadOnlyCollection<Card> hand;
             HandEvaluation evaluation;
-            var projectile = GetProjectile(selecting);
+            var projectile = GetProjectile(collider.gameObject);
             if (projectile == null)
             {
                 hand = emptyHand;
@@ -61,9 +51,14 @@ namespace SaloonSlingers.Unity.Actor
             interactabilityIndicator.Indicate(canDraw);
         }
 
+        public void OnHoverExit(Collider collider)
+        {
+            interactabilityIndicator.Hide();
+            isHovering = false;
+        }
+
         private HandProjectile GetProjectile(GameObject selecting)
         {
-            interactabilityIndicator.transform.position = deckGraphic.TopCardTransform.position;
             var interactor = selecting.GetComponent<IXRSelectInteractor>();
             if (interactor != null && interactor.isSelectActive && interactor.interactablesSelected.Count > 0)
             {
@@ -76,6 +71,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnDrawn(HandProjectile sender, ICardGraphic drawn)
         {
+            interactabilityIndicator.transform.position = deckGraphic.TopCardTransform.position;
             if (!isHovering) return;
 
             DrawContext drawCtx = new()
@@ -86,12 +82,14 @@ namespace SaloonSlingers.Unity.Actor
                 Evaluation = sender.HandEvaluation
             };
             bool canDraw = GameManager.Instance.Saloon.HouseGame.CanDraw(drawCtx);
-            interactabilityIndicator.transform.position = deckGraphic.TopCardTransform.position;
             interactabilityIndicator.Indicate(canDraw);
         }
 
         private void OnThrown(HandProjectile sender)
         {
+            interactabilityIndicator.transform.position = deckGraphic.TopCardTransform.position;
+            sender.OnDraw.RemoveListener(OnDrawn);
+            sender.OnThrow.RemoveListener(OnThrown);
             if (!isHovering) return;
 
             DrawContext drawCtx = new()
@@ -102,10 +100,15 @@ namespace SaloonSlingers.Unity.Actor
                 Evaluation = GameManager.Instance.Saloon.HouseGame.Evaluate(emptyHand)
             };
             bool canDraw = GameManager.Instance.Saloon.HouseGame.CanDraw(drawCtx);
-            interactabilityIndicator.transform.position = deckGraphic.TopCardTransform.position;
             interactabilityIndicator.Indicate(canDraw);
-            sender.OnDraw.RemoveListener(OnDrawn);
-            sender.OnThrow.RemoveListener(OnThrown);
+
+            // Check case where we throw but do not trigger the next hover event
+            HandProjectile projectile = GetComponentInChildren<HandProjectile>();
+            if (projectile != null)
+            {
+                projectile.OnDraw.AddListener(OnDrawn);
+                projectile.OnThrow.AddListener(OnThrown);
+            }
         }
 
         private void Awake()
