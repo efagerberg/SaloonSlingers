@@ -1,3 +1,4 @@
+
 using SaloonSlingers.Core;
 
 using UnityEngine;
@@ -75,6 +76,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             GameObject spawned = handInteractableSpawner.Spawn();
             HandProjectile projectile = spawned.GetComponent<HandProjectile>();
+            projectile.InitialEvaluate(GameManager.Instance.Saloon.HouseGame);
             projectile.OnThrow.AddListener(HandInteractableThrowHandler);
             projectile.OnKilled.AddListener(HandleInteractableDeath);
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();

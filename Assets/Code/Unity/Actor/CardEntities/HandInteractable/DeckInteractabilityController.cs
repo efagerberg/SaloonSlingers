@@ -40,20 +40,22 @@ namespace SaloonSlingers.Unity.Actor
             {
                 if (!baseInteractor.interactablesSelected[0].transform.TryGetComponent(out projectile))
                 {
-                    hand = emptyHand;
-                    evaluation = GameManager.Instance.Saloon.HouseGame.Evaluate(emptyHand);
+                    if (projectile == null) return;
+
                     projectile = gameObject.GetComponentInChildren<HandProjectile>();
+                    if (projectile == null) return;
+
                     projectile.OnDraw.AddListener(OnDrawn);
                     projectile.OnThrow.AddListener(OnThrown);
                 }
-                hand = projectile.Cards;
-                evaluation = projectile.HandEvaluation;
             }
             else
             {
                 hand = emptyHand;
                 evaluation = GameManager.Instance.Saloon.HouseGame.Evaluate(emptyHand);
                 projectile = gameObject.GetComponentInChildren<HandProjectile>();
+                if (projectile == null) return;
+
                 projectile.OnDraw.AddListener(OnDrawn);
                 projectile.OnThrow.AddListener(OnThrown);
             }
@@ -62,8 +64,8 @@ namespace SaloonSlingers.Unity.Actor
             {
                 AttributeRegistry = attributeRegistry,
                 Deck = deckGraphic.Deck,
-                Hand = hand,
-                Evaluation = evaluation
+                Hand = projectile.Cards,
+                Evaluation = projectile.HandEvaluation
             };
             bool canDraw = GameManager.Instance.Saloon.HouseGame.CanDraw(drawCtx);
             interactabilityIndicator.Indicate(canDraw);

@@ -85,6 +85,11 @@ namespace SaloonSlingers.Unity.Actor
             handCoordinator.Assign(newDeck, newAttributeRegistry);
         }
 
+        public void InitialEvaluate(CardGame game)
+        {
+            handCoordinator.HandEvaluation = game.Evaluate(Cards);
+        }
+
         public override void ResetActor()
         {
             handCoordinator.Reset();

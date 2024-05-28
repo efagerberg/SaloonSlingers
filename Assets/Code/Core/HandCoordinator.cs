@@ -14,7 +14,7 @@ namespace SaloonSlingers.Core
         }
         public HandEvaluation HandEvaluation
         {
-            get; private set;
+            get; set;
         }
 
         private Deck deck;
