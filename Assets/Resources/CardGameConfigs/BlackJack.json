@@ -1,7 +1,8 @@
 {
   "Name": "Black Jack",
   "MinScore": 1,
-  "MaxScore": 22,
+  // BlackJack scores are offset by 2 and blackjack value = 22
+  "MaxScore": 24,
   "HandEvaluator": "BlackJack",
   "CostTable": [ 1, 10, 50, 100, 500 ]
 }
