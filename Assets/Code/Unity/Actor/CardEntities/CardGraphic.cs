@@ -37,7 +37,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
-            OnKilled.Invoke(gameObject);
+            OnKilled.Invoke(this);
         }
 
         public void SetTexture(Card card)

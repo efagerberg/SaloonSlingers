@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace SaloonSlingers.Unity
@@ -20,7 +19,7 @@ namespace SaloonSlingers.Unity
             enemiesLeft = new Dictionary<string, int>(enemyManifest);
         }
 
-        public void OnEnemyKilled(GameObject sender)
+        public void OnEnemyKilled(Actor.Actor sender)
         {
             enemiesLeft[sender.name]--;
             if (enemiesLeft[sender.name] == 0)
@@ -30,11 +29,10 @@ namespace SaloonSlingers.Unity
                     LevelCompleted?.Invoke(LevelResult.ALL_ENEMIES_KILLED);
             }
 
-            var actor = sender.GetComponent<Actor.Actor>();
-            actor.OnKilled.RemoveListener(OnEnemyKilled);
+            sender.OnKilled.RemoveListener(OnEnemyKilled);
         }
 
-        public void OnPlayerKilled(GameObject sender)
+        public void OnPlayerKilled(Actor.Actor sender)
         {
             LevelCompleted?.Invoke(LevelResult.PLAYER_KILLED);
         }

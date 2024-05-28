@@ -87,7 +87,7 @@ namespace SaloonSlingers.Unity.Actor
             homingStrength.Calculator.StartNewThrow();
         }
 
-        private void OnHandProjectileDied(GameObject sender)
+        private void OnHandProjectileDied(Actor sender)
         {
             homable.Target = null;
             homable.Strength = 0;

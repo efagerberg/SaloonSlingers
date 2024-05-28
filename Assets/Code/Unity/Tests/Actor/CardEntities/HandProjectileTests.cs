@@ -193,7 +193,7 @@ namespace SaloonSlingers.Unity.Tests
             var subject = ProjectileTestHelpers.BuildProjectile();
             subject.runInEditMode = true;
             var killed = false;
-            void killedHandler(GameObject sender) => killed = true;
+            void killedHandler(Actor.Actor sender) => killed = true;
             subject.OnKilled.AddListener(killedHandler);
             subject.Kill();
             yield return null;
@@ -254,10 +254,7 @@ namespace SaloonSlingers.Unity.Tests
             yield return null;
             subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
             var reset = false;
-            void resetListener(GameObject arg0)
-            {
-                reset = true;
-            }
+            void resetListener(Actor.Actor sender) => reset = true;
             subject.OnReset.AddListener(resetListener);
             subject.ResetActor();
 
@@ -284,7 +281,7 @@ namespace SaloonSlingers.Unity.Tests
                 layer = LayerMask.NameToLayer(testCase.collidingObjectLayer)
             };
             var killed = false;
-            void killedHandler(GameObject sender) => killed = true;
+            void killedHandler(Actor.Actor sender) => killed = true;
             subject.OnKilled.AddListener(killedHandler);
             subject.HandleCollision(collidingObject);
             yield return null;

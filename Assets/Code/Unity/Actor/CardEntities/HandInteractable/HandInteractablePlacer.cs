@@ -64,10 +64,9 @@ namespace SaloonSlingers.Unity.Actor
             PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
         }
 
-        private void HandleInteractableDeath(GameObject sender)
+        private void HandleInteractableDeath(Actor sender)
         {
-            var instance = sender as GameObject;
-            var projectile = instance.GetComponent<HandProjectile>();
+            var projectile = (HandProjectile)sender;
             projectile.OnThrow.RemoveListener(HandInteractableThrowHandler);
             projectile.OnKilled.RemoveListener(HandleInteractableDeath);
         }

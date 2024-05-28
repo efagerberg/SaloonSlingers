@@ -95,7 +95,7 @@ namespace SaloonSlingers.Unity.Actor
             handCoordinator.Reset();
             rigidBody.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
             Mode = HandProjectileMode.Damage;
-            OnReset.Invoke(gameObject);
+            OnReset.Invoke(this);
         }
 
         public void Kill()
@@ -112,7 +112,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             rigidBody.isKinematic = true;
             yield return null;
-            OnKilled.Invoke(gameObject);
+            OnKilled.Invoke(this);
         }
 
         public void Pause()

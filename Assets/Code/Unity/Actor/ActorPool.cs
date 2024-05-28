@@ -54,9 +54,9 @@ namespace SaloonSlingers.Unity.Actor
             SpawnedActorCount--;
         }
 
-        private void OnDeath(GameObject sender)
+        private void OnDeath(Actor sender)
         {
-            _pool.Release(sender);
+            _pool.Release(sender.gameObject);
         }
     }
 }

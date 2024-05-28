@@ -7,7 +7,6 @@ using NUnit.Framework;
 using SaloonSlingers.Core;
 using SaloonSlingers.Unity.Actor;
 
-using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace SaloonSlingers.Unity.Tests
@@ -39,7 +38,7 @@ namespace SaloonSlingers.Unity.Tests
             yield return null;
 
             bool eventEmitted = false;
-            subject.OnKilled.AddListener((GameObject sender) => eventEmitted = true);
+            subject.OnKilled.AddListener((Actor.Actor sender) => eventEmitted = true);
             attributes.Registry[AttributeType.Health].Decrease(3);
             yield return null;
             var expected = new List<string> { "OnKilled", "Killed" };
@@ -56,7 +55,7 @@ namespace SaloonSlingers.Unity.Tests
             subject.enabled = false;
 
             var eventsEmitted = 0;
-            subject.OnKilled.AddListener((GameObject sender) => eventsEmitted++);
+            subject.OnKilled.AddListener((Actor.Actor sender) => eventsEmitted++);
             attributes.Registry[AttributeType.Health].Decrease(3);
             yield return null;
             var expected = 1;
