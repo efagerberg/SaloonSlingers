@@ -317,6 +317,20 @@ namespace SaloonSlingers.Unity.Tests
         }
     }
 
+    public class ProjectileInitialEvaluateTests
+    {
+        [UnityTest]
+        public IEnumerator Evaluates_WhenEmpty()
+        {
+            var subject = ProjectileTestHelpers.BuildProjectile();
+            subject.runInEditMode = true;
+            yield return null;
+            subject.InitialEvaluate(ProjectileTestHelpers.TestPokerGame);
+
+            Assert.That(subject.Cards.Count, Is.EqualTo(0));
+            Assert.That(subject.HandEvaluation, Is.EqualTo(new HandEvaluation(HandNames.NONE, 0)));
+        }
+    }
 
     public static class ProjectileTestHelpers
     {

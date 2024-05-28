@@ -48,24 +48,27 @@ namespace SaloonSlingers.Unity.Actor
                     projectile.OnDraw.AddListener(OnDrawn);
                     projectile.OnThrow.AddListener(OnThrown);
                 }
+                hand = projectile.Cards;
+                evaluation = projectile.HandEvaluation;
             }
             else
             {
                 hand = emptyHand;
                 evaluation = GameManager.Instance.Saloon.HouseGame.Evaluate(emptyHand);
                 projectile = gameObject.GetComponentInChildren<HandProjectile>();
-                if (projectile == null) return;
-
-                projectile.OnDraw.AddListener(OnDrawn);
-                projectile.OnThrow.AddListener(OnThrown);
+                if (projectile != null)
+                {
+                    projectile.OnDraw.AddListener(OnDrawn);
+                    projectile.OnThrow.AddListener(OnThrown);
+                }
             }
 
             DrawContext drawCtx = new()
             {
                 AttributeRegistry = attributeRegistry,
                 Deck = deckGraphic.Deck,
-                Hand = projectile.Cards,
-                Evaluation = projectile.HandEvaluation
+                Hand = hand,
+                Evaluation = evaluation
             };
             bool canDraw = GameManager.Instance.Saloon.HouseGame.CanDraw(drawCtx);
             interactabilityIndicator.Indicate(canDraw);
