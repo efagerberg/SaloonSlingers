@@ -30,7 +30,7 @@ namespace SaloonSlingers.Unity.Actor
             handLayoutMediator.ApplyLayout(isStacked, cardRotationCalculator);
         }
 
-        public void AddCard(GameObject sender, ICardGraphic card)
+        public void AddCard(HandProjectile sender, ICardGraphic card)
         {
             handLayoutMediator.AddCardToLayout(card, cardRotationCalculator);
         }

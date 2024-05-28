@@ -31,21 +31,21 @@ namespace SaloonSlingers.Unity.Actor
                     return;
 
                 mode = value;
-                UnityEvent<GameObject> eventToInvoke = mode switch
+                UnityEvent<HandProjectile> eventToInvoke = mode switch
                 {
                     HandProjectileMode.Damage => OnDamageMode,
                     HandProjectileMode.Curse => OnMarkMode,
                     _ => throw new NotImplementedException(),
                 };
-                eventToInvoke.Invoke(gameObject);
+                eventToInvoke.Invoke(this);
             }
         }
-        public UnityEvent<GameObject, ICardGraphic> OnDraw = new();
-        public UnityEvent<GameObject> OnThrow = new();
-        public UnityEvent<GameObject> OnPause = new();
-        public UnityEvent<GameObject> OnPickup = new();
-        public UnityEvent<GameObject> OnMarkMode = new();
-        public UnityEvent<GameObject> OnDamageMode = new();
+        public UnityEvent<HandProjectile, ICardGraphic> OnDraw = new();
+        public UnityEvent<HandProjectile> OnThrow = new();
+        public UnityEvent<HandProjectile> OnPause = new();
+        public UnityEvent<HandProjectile> OnPickup = new();
+        public UnityEvent<HandProjectile> OnMarkMode = new();
+        public UnityEvent<HandProjectile> OnDamageMode = new();
 
         [SerializeField]
         private int maxAngularVelocity = 100;
@@ -57,7 +57,7 @@ namespace SaloonSlingers.Unity.Actor
         public void Pickup(Func<GameObject> spawnCard, CardGame game)
         {
             var card = handCoordinator.Pickup(game);
-            OnPickup.Invoke(gameObject);
+            OnPickup.Invoke(this);
             if (card != null) Draw(spawnCard, card.Value);
         }
 
@@ -71,12 +71,12 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Throw()
         {
-            OnThrow.Invoke(gameObject);
+            OnThrow.Invoke(this);
         }
 
         public void Throw(Vector3 offset)
         {
-            OnThrow.Invoke(gameObject);
+            OnThrow.Invoke(this);
             rigidBody.AddForce(offset, ForceMode.VelocityChange);
         }
 
@@ -117,7 +117,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Pause()
         {
-            OnPause.Invoke(gameObject);
+            OnPause.Invoke(this);
         }
 
         public void HandleCollision(GameObject contactingObject)
@@ -161,7 +161,7 @@ namespace SaloonSlingers.Unity.Actor
             var spawned = spawnCard();
             var cardGraphic = spawned.GetComponent<ICardGraphic>();
             cardGraphic.Card = card;
-            OnDraw.Invoke(gameObject, cardGraphic);
+            OnDraw.Invoke(this, cardGraphic);
             if (Cards.Count > 1)
                 Mode = HandProjectileMode.Damage;
         }

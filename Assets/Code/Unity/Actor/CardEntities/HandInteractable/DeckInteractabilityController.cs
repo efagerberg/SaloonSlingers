@@ -74,22 +74,21 @@ namespace SaloonSlingers.Unity.Actor
             interactabilityIndicator.Indicate(canDraw);
         }
 
-        private void OnDrawn(GameObject sender, ICardGraphic drawn)
+        private void OnDrawn(HandProjectile sender, ICardGraphic drawn)
         {
-            HandProjectile projectile = sender.GetComponent<HandProjectile>();
             DrawContext drawCtx = new()
             {
                 AttributeRegistry = attributeRegistry,
                 Deck = deckGraphic.Deck,
-                Hand = projectile.Cards,
-                Evaluation = projectile.HandEvaluation
+                Hand = sender.Cards,
+                Evaluation = sender.HandEvaluation
             };
             bool canDraw = GameManager.Instance.Saloon.HouseGame.CanDraw(drawCtx);
             interactabilityIndicator.transform.position = deckGraphic.TopCardTransform.position;
             interactabilityIndicator.Indicate(canDraw);
         }
 
-        private void OnThrown(GameObject sender)
+        private void OnThrown(HandProjectile sender)
         {
             HandProjectile projectile = sender.GetComponent<HandProjectile>();
             interactabilityIndicator.Hide();

@@ -53,9 +53,9 @@ namespace SaloonSlingers.Unity.Actor
             placed = cardHandGO;
         }
 
-        private void HandInteractableThrowHandler(GameObject sender)
+        private void HandInteractableThrowHandler(HandProjectile sender)
         {
-            if (sender == placed) placed = null;
+            if (sender.gameObject == placed) placed = null;
 
             if (!deckGraphic.CanDraw ||
                 !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext) ||
