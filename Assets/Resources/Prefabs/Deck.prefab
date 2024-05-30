@@ -74,6 +74,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deckGraphic: {fileID: 8162189074413174243}
   interactabilityIndicator: {fileID: 5036691059196399261}
+  indicationDelay: 0.45
 --- !u!1001 &25681161688086853
 PrefabInstance:
   m_ObjectHideFlags: 0
