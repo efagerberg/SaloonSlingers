@@ -8,7 +8,7 @@ namespace SaloonSlingers.Unity.Actor
     /// General idea is to assist DeckGraphic interaction to communicate when a deck is
     /// drawable.
     /// </summary>
-    public class InteractabilityIndicator : MonoBehaviour, IIndicator
+    public class InteractabilityIndicator : MonoBehaviour
     {
         [SerializeField]
         private Renderer _renderer;
