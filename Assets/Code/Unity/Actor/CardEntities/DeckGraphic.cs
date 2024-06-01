@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class DeckGraphic : MonoBehaviour, IDeckGraphic
+    public class DeckGraphic : MonoBehaviour
     {
         public Transform Peek()
         {

@@ -1,4 +1,3 @@
-
 using SaloonSlingers.Core;
 
 using UnityEngine;

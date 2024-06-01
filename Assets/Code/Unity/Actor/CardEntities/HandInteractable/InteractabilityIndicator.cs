@@ -24,6 +24,9 @@ namespace SaloonSlingers.Unity.Actor
         private AudioClip cannotInteractClip;
         [SerializeField]
         private BoxCollider scaleReference;
+        [SerializeField]
+        [Range(0, 1)]
+        private float volumeScale;
 
         public void Indicate(bool canInteract)
         {
@@ -33,7 +36,7 @@ namespace SaloonSlingers.Unity.Actor
             var clip = canInteract ? canInteractClip : cannotInteractClip;
 
             if (clip != null)
-                audioSource.PlayOneShot(clip);
+                audioSource.PlayOneShot(clip, volumeScale);
         }
 
         public void Hide()

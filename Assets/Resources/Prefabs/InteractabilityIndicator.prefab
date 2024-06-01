@@ -200,3 +200,4 @@ MonoBehaviour:
   canInteractClip: {fileID: 0}
   cannotInteractClip: {fileID: 8300000, guid: 7de6f97a62b9a8143baf15bd43be0169, type: 3}
   scaleReference: {fileID: 2050559456, guid: af626989077095b41a65ce06f6c804d1, type: 3}
+  volumeScale: 0.3
