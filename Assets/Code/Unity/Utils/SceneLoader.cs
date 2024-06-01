@@ -1,5 +1,7 @@
 using System.Collections;
 
+using SaloonSlingers.Unity.Actor;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,11 +15,13 @@ namespace SaloonSlingers.Unity
         private float transitionDuration = 2f;
 
         private AsyncOperation loadOperation;
+        private CoroutineTask loadTask;
 
         public void LoadScene(string sceneName)
         {
             if (SceneManager.GetActiveScene().name == sceneName || loadOperation != null) return;
-            StartCoroutine(PerformSceneTransition(sceneName));
+            loadTask ??= new(this);
+            loadTask.Run(() => PerformSceneTransition(sceneName));
         }
 
         public IEnumerator PerformSceneTransition(string sceneName)

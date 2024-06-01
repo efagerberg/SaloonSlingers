@@ -23,9 +23,9 @@ namespace SaloonSlingers.Unity.Tests
                 yield return null;
             }
             var runner = TestUtils.CreateComponent<TestBehaviour>();
-            var subject = new CoroutineTask(runner, generator);
-            subject.Run();
-            subject.Run();
+            var subject = new CoroutineTask(runner);
+            subject.Run(generator);
+            subject.Run(generator);
 
             Assert.That(subject.Running);
             Assert.That(runCount, Is.EqualTo(1));
@@ -42,8 +42,8 @@ namespace SaloonSlingers.Unity.Tests
                 yield return null;
             }
             var runner = TestUtils.CreateComponent<TestBehaviour>();
-            var subject = new CoroutineTask(runner, generator);
-            subject.Run();
+            var subject = new CoroutineTask(runner);
+            subject.Run(generator);
             yield return null;
             subject.Stop();
 
@@ -62,14 +62,21 @@ namespace SaloonSlingers.Unity.Tests
                 yield return null;
             }
             var runner = TestUtils.CreateComponent<TestBehaviour>();
-            var subject = new CoroutineTask(runner, generator);
-            subject.Run();
-            yield return null;
-            subject.Restart();
+            var subject = new CoroutineTask(runner);
+            subject.Run(generator);
             yield return null;
 
+            foreach (var passGeneratorToRestart in new bool[] { false, true })
+            {
+                if (passGeneratorToRestart)
+                    subject.Restart(generator);
+                else
+                    subject.Restart();
+                yield return null;
+            }
+
             Assert.That(subject.Running);
-            Assert.That(runCount, Is.EqualTo(2));
+            Assert.That(runCount, Is.EqualTo(3));
         }
     }
 }

@@ -18,8 +18,8 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Flash()
         {
-            task ??= new(this, () => DoFlash(duration));
-            task.Run();
+            task ??= new(this);
+            task.Run(() => DoFlash(duration));
         }
 
         private IEnumerator DoFlash(float duration)
