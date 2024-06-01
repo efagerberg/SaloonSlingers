@@ -111,7 +111,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private bool IsTouchingDeck()
         {
-            float dist = Mathf.Abs(Vector3.Distance(transform.position, deckGraphic.TopCardTransform.position));
+            float dist = Mathf.Abs(Vector3.Distance(transform.position, deckGraphic.Peek().position));
             return dist <= maxDeckDistance;
         }
 

@@ -54,14 +54,14 @@ namespace SaloonSlingers.Unity.Actor
         private HandCoordinator handCoordinator = new();
         private HandProjectileMode mode;
 
-        public void Pickup(Func<GameObject> spawnCard, CardGame game)
+        public void Pickup(Func<GameObject> spawnCard, ICardGame game)
         {
             var card = handCoordinator.Pickup(game);
             OnPickup.Invoke(this);
             if (card != null) Draw(spawnCard, card.Value);
         }
 
-        public void TryDrawCard(Func<GameObject> spawnCard, CardGame game)
+        public void TryDrawCard(Func<GameObject> spawnCard, ICardGame game)
         {
             var card = handCoordinator.TryDrawCard(game);
             if (card == null) return;

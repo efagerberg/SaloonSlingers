@@ -4,13 +4,14 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class DeckGraphic : MonoBehaviour, ISpawner<GameObject>
+    public class DeckGraphic : MonoBehaviour, IDeckGraphic
     {
-        public Transform TopCardTransform
+        public Transform Peek()
         {
-            get => coordinator.PeekTop(gameObject).transform;
+            return coordinator.Peek(gameObject).transform;
         }
-        public bool CanDraw { get => coordinator.PeekTop() != null; }
+
+        public bool CanDraw { get => coordinator.Peek() != null; }
         public Deck Deck { get; private set; }
 
         [SerializeField]

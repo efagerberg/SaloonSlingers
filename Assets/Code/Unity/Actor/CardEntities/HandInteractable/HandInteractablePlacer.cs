@@ -32,7 +32,7 @@ namespace SaloonSlingers.Unity.Actor
             if (!deckGraphic.CanDraw ||
                 !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext)) return;
 
-            PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
+            PlaceOnTop(deckGraphic.Peek(), SpawnInteractable());
         }
 
         private void Update()
@@ -61,7 +61,7 @@ namespace SaloonSlingers.Unity.Actor
                 !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext) ||
                 placed != null) return;
 
-            PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
+            PlaceOnTop(deckGraphic.Peek(), SpawnInteractable());
         }
 
         private void HandleInteractableDeath(Actor sender)

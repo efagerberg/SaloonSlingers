@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.Actor
 {
@@ -10,24 +11,26 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private InteractabilityIndicator interactabilityIndicator;
 
-        private DeckInteractabilityCoordinator coordinator;
+        private DeckInteractability deckInteractability;
 
         public void OnHoverEnter(Collider collider)
         {
-            coordinator.OnHoverEnter(collider.gameObject, GameManager.Instance.Saloon.HouseGame);
+            var interactor = collider.gameObject.GetComponent<IXRSelectInteractor>();
+            deckInteractability.OnHoverEnter(interactor);
         }
 
         public void OnHoverExit(Collider collider)
         {
-            coordinator.OnHoverExit();
+            deckInteractability.OnHoverExit();
         }
 
         private void Start()
         {
-            coordinator = new(interactabilityIndicator,
-                              LevelManager.Instance.HandInteractableSpawner,
-                              LevelManager.Instance.Player.GetComponent<Attributes>().Registry,
-                              deckGraphic);
+            deckInteractability = new(interactabilityIndicator,
+                                      LevelManager.Instance.HandInteractableSpawner,
+                                      LevelManager.Instance.Player.GetComponent<Attributes>().Registry,
+                                      deckGraphic,
+                                      GameManager.Instance.Saloon.HouseGame);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class DeckGraphicCoordinator
     {
-        public GameObject PeekTop(GameObject fallback = null)
+        public GameObject Peek(GameObject fallback = null)
         {
             return CardGraphics.Count > 0 ? CardGraphics.Peek() : fallback;
         }

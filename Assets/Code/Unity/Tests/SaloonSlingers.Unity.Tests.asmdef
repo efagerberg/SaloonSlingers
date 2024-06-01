@@ -9,7 +9,8 @@
         "Unity.InputSystem",
         "BehaviorDesigner",
         "Unity.TextMeshPro",
-        "Unity.XR.CoreUtils"
+        "Unity.XR.CoreUtils",
+        "Unity.XR.Interaction.Toolkit"
     ],
     "includePlatforms": [
         "Editor"

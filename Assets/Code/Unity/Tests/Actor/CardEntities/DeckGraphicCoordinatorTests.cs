@@ -69,7 +69,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
             var parent = new GameObject().transform;
             var deck = new Deck(2);
             coordinator.SpawnDeck(deck, parent, spawnerMock.Object);
-            var result = coordinator.PeekTop(parent.gameObject);
+            var result = coordinator.Peek(parent.gameObject);
 
             Assert.That(result.name, Is.EqualTo("StubCard1"));
         }

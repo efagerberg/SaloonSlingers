@@ -23,14 +23,14 @@ namespace SaloonSlingers.Core
         private bool drawn { get => cards != null && cards.Count > 0; }
         private List<Card> cards;
 
-        public Card? Pickup(CardGame game)
+        public Card? Pickup(ICardGame game)
         {
             if (drawn) return null;
 
             return TryDrawCard(game);
         }
 
-        public Card? TryDrawCard(CardGame game)
+        public Card? TryDrawCard(ICardGame game)
         {
             cards ??= new List<Card>();
             if (cards.Count == 0) HandEvaluation = game.Evaluate(cards);

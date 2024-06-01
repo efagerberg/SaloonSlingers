@@ -6,7 +6,12 @@ using System.Text.RegularExpressions;
 
 namespace SaloonSlingers.Core
 {
-    public struct CardGame : IHandEvaluator, IDrawRule
+    public interface ICardGame : IHandEvaluator, IDrawRule
+    {
+        public Card? Draw(DrawContext ctx);
+    }
+
+    public struct CardGame : ICardGame
     {
         public string Name { get; private set; }
 
