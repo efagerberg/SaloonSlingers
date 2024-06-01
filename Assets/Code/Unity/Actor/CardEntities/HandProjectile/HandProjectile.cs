@@ -31,21 +31,21 @@ namespace SaloonSlingers.Unity.Actor
                     return;
 
                 mode = value;
-                UnityEvent<GameObject> eventToInvoke = mode switch
+                UnityEvent<HandProjectile> eventToInvoke = mode switch
                 {
                     HandProjectileMode.Damage => OnDamageMode,
                     HandProjectileMode.Curse => OnMarkMode,
                     _ => throw new NotImplementedException(),
                 };
-                eventToInvoke.Invoke(gameObject);
+                eventToInvoke.Invoke(this);
             }
         }
-        public UnityEvent<GameObject, ICardGraphic> OnDraw = new();
-        public UnityEvent<GameObject> OnThrow = new();
-        public UnityEvent<GameObject> OnPause = new();
-        public UnityEvent<GameObject> OnPickup = new();
-        public UnityEvent<GameObject> OnMarkMode = new();
-        public UnityEvent<GameObject> OnDamageMode = new();
+        public UnityEvent<HandProjectile, ICardGraphic> OnDraw = new();
+        public UnityEvent<HandProjectile> OnThrow = new();
+        public UnityEvent<HandProjectile> OnPause = new();
+        public UnityEvent<HandProjectile> OnPickup = new();
+        public UnityEvent<HandProjectile> OnMarkMode = new();
+        public UnityEvent<HandProjectile> OnDamageMode = new();
 
         [SerializeField]
         private int maxAngularVelocity = 100;
@@ -54,14 +54,14 @@ namespace SaloonSlingers.Unity.Actor
         private HandCoordinator handCoordinator = new();
         private HandProjectileMode mode;
 
-        public void Pickup(Func<GameObject> spawnCard, CardGame game)
+        public void Pickup(Func<GameObject> spawnCard, ICardGame game)
         {
             var card = handCoordinator.Pickup(game);
-            OnPickup.Invoke(gameObject);
+            OnPickup.Invoke(this);
             if (card != null) Draw(spawnCard, card.Value);
         }
 
-        public void TryDrawCard(Func<GameObject> spawnCard, CardGame game)
+        public void TryDrawCard(Func<GameObject> spawnCard, ICardGame game)
         {
             var card = handCoordinator.TryDrawCard(game);
             if (card == null) return;
@@ -71,18 +71,23 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Throw()
         {
-            OnThrow.Invoke(gameObject);
+            OnThrow.Invoke(this);
         }
 
         public void Throw(Vector3 offset)
         {
-            OnThrow.Invoke(gameObject);
+            OnThrow.Invoke(this);
             rigidBody.AddForce(offset, ForceMode.VelocityChange);
         }
 
-        public void Assign(Deck newDeck, IDictionary<AttributeType, Core.Attribute> newAttributeRegistry)
+        public void Assign(Deck newDeck, IReadOnlyDictionary<AttributeType, Core.Attribute> newAttributeRegistry)
         {
             handCoordinator.Assign(newDeck, newAttributeRegistry);
+        }
+
+        public void InitialEvaluate(CardGame game)
+        {
+            handCoordinator.HandEvaluation = game.Evaluate(Cards);
         }
 
         public override void ResetActor()
@@ -90,7 +95,7 @@ namespace SaloonSlingers.Unity.Actor
             handCoordinator.Reset();
             rigidBody.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
             Mode = HandProjectileMode.Damage;
-            OnReset.Invoke(gameObject);
+            OnReset.Invoke(this);
         }
 
         public void Kill()
@@ -107,12 +112,12 @@ namespace SaloonSlingers.Unity.Actor
         {
             rigidBody.isKinematic = true;
             yield return null;
-            OnKilled.Invoke(gameObject);
+            OnKilled.Invoke(this);
         }
 
         public void Pause()
         {
-            OnPause.Invoke(gameObject);
+            OnPause.Invoke(this);
         }
 
         public void HandleCollision(GameObject contactingObject)
@@ -156,7 +161,7 @@ namespace SaloonSlingers.Unity.Actor
             var spawned = spawnCard();
             var cardGraphic = spawned.GetComponent<ICardGraphic>();
             cardGraphic.Card = card;
-            OnDraw.Invoke(gameObject, cardGraphic);
+            OnDraw.Invoke(this, cardGraphic);
             if (Cards.Count > 1)
                 Mode = HandProjectileMode.Damage;
         }

@@ -126,7 +126,7 @@ namespace SaloonSlingers.Unity.Actor
             Hide();
         }
 
-        private void DrawHandler(GameObject sender, ICardGraphic drawn)
+        private void DrawHandler(HandProjectile sender, ICardGraphic drawn)
         {
             UpdateContents();
         }

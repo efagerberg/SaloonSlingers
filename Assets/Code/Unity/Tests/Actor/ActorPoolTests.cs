@@ -72,7 +72,7 @@ namespace SaloonSlingers.Unity.Tests
     {
         public void Kill()
         {
-            OnKilled?.Invoke(gameObject);
+            OnKilled?.Invoke(this);
         }
     }
 }

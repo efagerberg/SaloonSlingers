@@ -14,23 +14,23 @@ namespace SaloonSlingers.Core
         }
         public HandEvaluation HandEvaluation
         {
-            get; private set;
+            get; set;
         }
 
         private Deck deck;
-        private IDictionary<AttributeType, Attribute> attributeRegistry;
+        private IReadOnlyDictionary<AttributeType, Attribute> attributeRegistry;
         private DrawContext drawCtx;
         private bool drawn { get => cards != null && cards.Count > 0; }
         private List<Card> cards;
 
-        public Card? Pickup(CardGame game)
+        public Card? Pickup(ICardGame game)
         {
             if (drawn) return null;
 
             return TryDrawCard(game);
         }
 
-        public Card? TryDrawCard(CardGame game)
+        public Card? TryDrawCard(ICardGame game)
         {
             cards ??= new List<Card>();
             if (cards.Count == 0) HandEvaluation = game.Evaluate(cards);
@@ -46,7 +46,7 @@ namespace SaloonSlingers.Core
             return card;
         }
 
-        public void Assign(Deck newDeck, IDictionary<AttributeType, Attribute> newAttributeRegistry)
+        public void Assign(Deck newDeck, IReadOnlyDictionary<AttributeType, Attribute> newAttributeRegistry)
         {
             deck = newDeck;
             attributeRegistry = newAttributeRegistry;

@@ -31,7 +31,7 @@ namespace SaloonSlingers.Core.Tests
 
         private static (CardGame game,
                         Deck deck,
-                        IDictionary<AttributeType, Attribute> registry) CreateDependencies()
+                        IReadOnlyDictionary<AttributeType, Attribute> registry) CreateDependencies()
         {
             CardGameConfig config = new()
             {
@@ -39,7 +39,7 @@ namespace SaloonSlingers.Core.Tests
             };
             CardGame game = CardGame.Load(config);
             Deck deck = new();
-            IDictionary<AttributeType, Attribute> registry = new Dictionary<AttributeType, Attribute>();
+            IReadOnlyDictionary<AttributeType, Attribute> registry = new Dictionary<AttributeType, Attribute>();
             return (game, deck, registry);
         }
 

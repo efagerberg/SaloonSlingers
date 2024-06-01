@@ -67,15 +67,20 @@ namespace SaloonSlingers.Unity
         private void OnEnable()
         {
             levelCompleteNotifier.LevelCompleted.AddListener(LevelCompletedHandler);
-            EnemyManager.OnEnemyKilled.AddListener(levelCompleteNotifier.OnEnemyKilled);
+            EnemyManager.OnEnemyKilled.AddListener(OnEnemyKilled);
             playerActor.OnKilled.AddListener(levelCompleteNotifier.OnPlayerKilled);
         }
 
         private void OnDisable()
         {
             levelCompleteNotifier.LevelCompleted.AddListener(LevelCompletedHandler);
-            EnemyManager.OnEnemyKilled.RemoveListener(levelCompleteNotifier.OnEnemyKilled);
+            EnemyManager.OnEnemyKilled.RemoveListener(OnEnemyKilled);
             playerActor.OnKilled.RemoveListener(levelCompleteNotifier.OnPlayerKilled);
+        }
+
+        private void OnEnemyKilled(EnemyManager sender, Actor.Actor actor)
+        {
+            levelCompleteNotifier.OnEnemyKilled(actor);
         }
 
         private void LevelCompletedHandler(LevelResult result)

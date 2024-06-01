@@ -5,8 +5,8 @@ namespace SaloonSlingers.Unity.Actor
 {
     public abstract class Actor : MonoBehaviour
     {
-        public UnityEvent<GameObject> OnKilled = new();
-        public UnityEvent<GameObject> OnReset = new();
+        public UnityEvent<Actor> OnKilled = new();
+        public UnityEvent<Actor> OnReset = new();
         public virtual void ResetActor() { }
     }
 }

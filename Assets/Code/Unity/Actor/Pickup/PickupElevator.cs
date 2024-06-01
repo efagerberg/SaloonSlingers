@@ -57,7 +57,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Kill()
         {
-            OnKilled?.Invoke(gameObject);
+            OnKilled?.Invoke(this);
         }
 
         private void Awake()

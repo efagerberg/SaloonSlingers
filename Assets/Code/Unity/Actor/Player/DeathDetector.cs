@@ -18,7 +18,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             foreach (var attribute in attributes.Registry.Values)
                 attribute.Reset();
-            OnReset?.Invoke(gameObject);
+            OnReset?.Invoke(this);
         }
 
         private void OnEnable()
@@ -49,7 +49,7 @@ namespace SaloonSlingers.Unity.Actor
         private IEnumerator DelayDeath()
         {
             yield return new WaitForSeconds(deathDelaySeconds);
-            OnKilled?.Invoke(gameObject);
+            OnKilled?.Invoke(this);
         }
     }
 }

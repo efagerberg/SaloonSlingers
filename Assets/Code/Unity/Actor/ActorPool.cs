@@ -38,7 +38,6 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnGet(GameObject instance)
         {
-            instance.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             var actor = instance.GetComponent<Actor>();
             actor.OnKilled.AddListener(OnDeath);
             SpawnedActorCount++;
@@ -51,12 +50,13 @@ namespace SaloonSlingers.Unity.Actor
             instance.SetActive(false);
             actor.ResetActor();
             instance.transform.SetParent(root);
+            instance.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             SpawnedActorCount--;
         }
 
-        private void OnDeath(GameObject sender)
+        private void OnDeath(Actor sender)
         {
-            _pool.Release(sender);
+            _pool.Release(sender.gameObject);
         }
     }
 }

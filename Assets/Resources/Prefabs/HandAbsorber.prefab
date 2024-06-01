@@ -340,7 +340,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   absorber: {fileID: 2861455382521497084}
   interactor: {fileID: 4934987028516054597}
-  errorClip: {fileID: 8300000, guid: df32b712910110e448870bb950cf618c, type: 3}
+  errorClip: {fileID: 8300000, guid: 7de6f97a62b9a8143baf15bd43be0169, type: 3}
   volumeScale: 0.3
 --- !u!1 &8723348102609186958
 GameObject:

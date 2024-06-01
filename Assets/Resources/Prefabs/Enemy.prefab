@@ -665,30 +665,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.Collider, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.DropInteractables, SaloonSlingers.Unity
-        m_MethodName: Drop
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   OnReset:
     m_PersistentCalls:
       m_Calls:
@@ -728,18 +704,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.Collider, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
   deathDelaySeconds: 0.5
 --- !u!114 &6971952490005717553
 MonoBehaviour:
@@ -765,7 +729,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddb8d4893c7c6ee4aac484dfce1fbdde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnCollided:
+  OnCollsionEntered:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 8708677591218883279}
@@ -794,7 +758,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnTriggered:
+  OnCollisionExited:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTriggerEntered:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 8708677591218883279}
@@ -823,6 +790,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnTriggerExited:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5674157687200997641
 GameObject:
   m_ObjectHideFlags: 0

@@ -31,7 +31,7 @@ namespace SaloonSlingers.Unity.Actor
             if (!deckGraphic.CanDraw ||
                 !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext)) return;
 
-            PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
+            PlaceOnTop(deckGraphic.Peek(), SpawnInteractable());
         }
 
         private void Update()
@@ -52,21 +52,20 @@ namespace SaloonSlingers.Unity.Actor
             placed = cardHandGO;
         }
 
-        private void HandInteractableThrowHandler(GameObject sender)
+        private void HandInteractableThrowHandler(HandProjectile sender)
         {
-            if (sender == placed) placed = null;
+            if (sender.gameObject == placed) placed = null;
 
             if (!deckGraphic.CanDraw ||
                 !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext) ||
                 placed != null) return;
 
-            PlaceOnTop(deckGraphic.TopCardTransform, SpawnInteractable());
+            PlaceOnTop(deckGraphic.Peek(), SpawnInteractable());
         }
 
-        private void HandleInteractableDeath(GameObject sender)
+        private void HandleInteractableDeath(Actor sender)
         {
-            var instance = sender as GameObject;
-            var projectile = instance.GetComponent<HandProjectile>();
+            var projectile = (HandProjectile)sender;
             projectile.OnThrow.RemoveListener(HandInteractableThrowHandler);
             projectile.OnKilled.RemoveListener(HandleInteractableDeath);
         }
@@ -75,6 +74,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             GameObject spawned = handInteractableSpawner.Spawn();
             HandProjectile projectile = spawned.GetComponent<HandProjectile>();
+            projectile.InitialEvaluate(GameManager.Instance.Saloon.HouseGame);
             projectile.OnThrow.AddListener(HandInteractableThrowHandler);
             projectile.OnKilled.AddListener(HandleInteractableDeath);
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();

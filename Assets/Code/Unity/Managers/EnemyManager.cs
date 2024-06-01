@@ -10,7 +10,7 @@ namespace SaloonSlingers.Unity
 {
     public class EnemyManager : MonoBehaviour, ISpawner<GameObject>
     {
-        public UnityEvent<GameObject> OnEnemyKilled;
+        public UnityEvent<EnemyManager, Actor.Actor> OnEnemyKilled;
 
         [SerializeField]
         private int maxActiveEnemies = 3;
@@ -40,10 +40,10 @@ namespace SaloonSlingers.Unity
             GameManager.Instance.Saloon.EnemyInventory.Emptied += OnInventoryEmptied;
         }
 
-        private void EnemyKilledHandler(GameObject sender)
+        private void EnemyKilledHandler(Actor.Actor sender)
         {
             enemiesSpawned--;
-            OnEnemyKilled?.Invoke(sender);
+            OnEnemyKilled?.Invoke(this, sender);
             var actor = sender.GetComponent<Actor.Actor>();
             actor.OnKilled.RemoveListener(EnemyKilledHandler);
         }

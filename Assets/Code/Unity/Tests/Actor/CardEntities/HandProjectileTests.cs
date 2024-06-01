@@ -99,7 +99,7 @@ namespace SaloonSlingers.Unity.Tests
         {
             var subject = ProjectileTestHelpers.BuildProjectile();
             ICardGraphic cardDrawn = null;
-            void drawHandler(GameObject sender, ICardGraphic c) => cardDrawn = c;
+            void drawHandler(HandProjectile sender, ICardGraphic c) => cardDrawn = c;
             subject.OnDraw.AddListener(drawHandler);
             subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
 
@@ -116,8 +116,8 @@ namespace SaloonSlingers.Unity.Tests
         {
             var subject = ProjectileTestHelpers.BuildProjectile();
             var eventsConsumed = new List<string>();
-            void pickupHandler(GameObject sender) => eventsConsumed.Add("pickup");
-            void drawHandler(GameObject sender, ICardGraphic c) => eventsConsumed.Add("draw");
+            void pickupHandler(HandProjectile sender) => eventsConsumed.Add("pickup");
+            void drawHandler(HandProjectile sender, ICardGraphic c) => eventsConsumed.Add("draw");
             subject.OnPickup.AddListener(pickupHandler);
             subject.OnDraw.AddListener(drawHandler);
             subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
@@ -131,8 +131,8 @@ namespace SaloonSlingers.Unity.Tests
             var subject = ProjectileTestHelpers.BuildProjectile();
             subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
             var eventsConsumed = new List<string>();
-            void pickupHandler(GameObject sender) => eventsConsumed.Add("pickup");
-            void drawHandler(GameObject sender, ICardGraphic c) => eventsConsumed.Add("draw");
+            void pickupHandler(HandProjectile sender) => eventsConsumed.Add("pickup");
+            void drawHandler(HandProjectile sender, ICardGraphic c) => eventsConsumed.Add("draw");
             subject.OnPickup.AddListener(pickupHandler);
             subject.OnDraw.AddListener(drawHandler);
             subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
@@ -146,8 +146,8 @@ namespace SaloonSlingers.Unity.Tests
             var subject = ProjectileTestHelpers.BuildProjectile(0);
             subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
             var eventsConsumed = new List<string>();
-            void pickupHandler(GameObject sender) => eventsConsumed.Add("pickup");
-            void drawHandler(GameObject sender, ICardGraphic c) => eventsConsumed.Add("draw");
+            void pickupHandler(HandProjectile sender) => eventsConsumed.Add("pickup");
+            void drawHandler(HandProjectile sender, ICardGraphic c) => eventsConsumed.Add("draw");
             subject.OnPickup.AddListener(pickupHandler);
             subject.OnDraw.AddListener(drawHandler);
             subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
@@ -163,7 +163,7 @@ namespace SaloonSlingers.Unity.Tests
         {
             var subject = ProjectileTestHelpers.BuildProjectile();
             var thrown = false;
-            void throwHandler(GameObject sender) => thrown = true;
+            void throwHandler(HandProjectile sender) => thrown = true;
             subject.OnThrow.AddListener(throwHandler);
             subject.Throw();
 
@@ -193,7 +193,7 @@ namespace SaloonSlingers.Unity.Tests
             var subject = ProjectileTestHelpers.BuildProjectile();
             subject.runInEditMode = true;
             var killed = false;
-            void killedHandler(GameObject sender) => killed = true;
+            void killedHandler(Actor.Actor sender) => killed = true;
             subject.OnKilled.AddListener(killedHandler);
             subject.Kill();
             yield return null;
@@ -209,7 +209,7 @@ namespace SaloonSlingers.Unity.Tests
         {
             var subject = ProjectileTestHelpers.BuildProjectile();
             var paused = false;
-            void pausedHandler(GameObject sender) => paused = true;
+            void pausedHandler(HandProjectile sender) => paused = true;
             subject.OnPause.AddListener(pausedHandler);
             subject.Pause();
 
@@ -254,10 +254,7 @@ namespace SaloonSlingers.Unity.Tests
             yield return null;
             subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
             var reset = false;
-            void resetListener(GameObject arg0)
-            {
-                reset = true;
-            }
+            void resetListener(Actor.Actor sender) => reset = true;
             subject.OnReset.AddListener(resetListener);
             subject.ResetActor();
 
@@ -284,7 +281,7 @@ namespace SaloonSlingers.Unity.Tests
                 layer = LayerMask.NameToLayer(testCase.collidingObjectLayer)
             };
             var killed = false;
-            void killedHandler(GameObject sender) => killed = true;
+            void killedHandler(Actor.Actor sender) => killed = true;
             subject.OnKilled.AddListener(killedHandler);
             subject.HandleCollision(collidingObject);
             yield return null;
@@ -317,6 +314,20 @@ namespace SaloonSlingers.Unity.Tests
         }
     }
 
+    public class ProjectileInitialEvaluateTests
+    {
+        [UnityTest]
+        public IEnumerator Evaluates_WhenEmpty()
+        {
+            var subject = ProjectileTestHelpers.BuildProjectile();
+            subject.runInEditMode = true;
+            yield return null;
+            subject.InitialEvaluate(ProjectileTestHelpers.TestPokerGame);
+
+            Assert.That(subject.Cards.Count, Is.EqualTo(0));
+            Assert.That(subject.HandEvaluation, Is.EqualTo(new HandEvaluation(HandNames.NONE, 0)));
+        }
+    }
 
     public static class ProjectileTestHelpers
     {

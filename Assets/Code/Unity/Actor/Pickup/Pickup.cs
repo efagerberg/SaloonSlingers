@@ -45,7 +45,7 @@ namespace SaloonSlingers.Unity
                 return;
 
             money.Increase(Value);
-            OnKilled?.Invoke(gameObject);
+            OnKilled?.Invoke(this);
         }
 
         public void PlayerPickup()
