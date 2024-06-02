@@ -4,7 +4,7 @@ using SaloonSlingers.Core;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class DeathDetector : Actor
+    public class ActorWithHealth : Actor
     {
         private Attributes attributes;
 

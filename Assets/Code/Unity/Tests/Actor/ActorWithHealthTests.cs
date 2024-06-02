@@ -11,8 +11,7 @@ using UnityEngine.TestTools;
 
 namespace SaloonSlingers.Unity.Tests
 {
-
-    public class DeathDetectorTests
+    public class ActorWithHealthTests
     {
         [UnityTest]
         public IEnumerator ResetActor_EmitsResetUnityEventAndResetsAttributes()
@@ -69,9 +68,9 @@ namespace SaloonSlingers.Unity.Tests
             Assert.That(eventsEmitted, Is.EqualTo(expected));
         }
 
-        private static void CreateSubject(out DeathDetector subject, out Attributes attributes)
+        private static void CreateSubject(out ActorWithHealth subject, out Attributes attributes)
         {
-            subject = TestUtils.CreateComponent<DeathDetector>();
+            subject = TestUtils.CreateComponent<ActorWithHealth>();
             attributes = subject.gameObject.AddComponent<Attributes>();
             var hp = new Core.Attribute(3);
             subject.runInEditMode = true;
