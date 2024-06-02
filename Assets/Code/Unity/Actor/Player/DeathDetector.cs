@@ -1,24 +1,18 @@
 using System;
-using System.Collections;
 
 using SaloonSlingers.Core;
-
-using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
     public class DeathDetector : Actor
     {
-        [SerializeField]
-        private float deathDelaySeconds = 0f;
-
         private Attributes attributes;
 
         public override void ResetActor()
         {
             foreach (var attribute in attributes.Registry.Values)
                 attribute.Reset();
-            OnReset?.Invoke(this);
+            base.ResetActor();
         }
 
         private void OnEnable()
@@ -44,12 +38,6 @@ namespace SaloonSlingers.Unity.Actor
         private void OnHealthDepleted(IReadOnlyAttribute sender, EventArgs e)
         {
             StartCoroutine(nameof(DelayDeath));
-        }
-
-        private IEnumerator DelayDeath()
-        {
-            yield return new WaitForSeconds(deathDelaySeconds);
-            OnKilled?.Invoke(this);
         }
     }
 }

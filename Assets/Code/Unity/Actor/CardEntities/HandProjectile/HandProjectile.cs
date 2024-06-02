@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 using SaloonSlingers.Core;
@@ -95,23 +94,13 @@ namespace SaloonSlingers.Unity.Actor
             handCoordinator.Reset();
             rigidBody.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
             Mode = HandProjectileMode.Damage;
-            OnReset.Invoke(this);
+            base.ResetActor();
         }
 
         public void Kill()
         {
-            StartCoroutine(nameof(KillNextFrame));
-        }
-
-        /// <summary>
-        /// Sometimes we want other objects to react to being hit by a projectile.
-        /// This requires the object to live for an extra frame.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator KillNextFrame()
-        {
             rigidBody.isKinematic = true;
-            yield return null;
+            StartCoroutine(nameof(DelayDeath));
             OnKilled.Invoke(this);
         }
 
