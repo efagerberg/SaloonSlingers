@@ -19,13 +19,22 @@ namespace SaloonSlingers.Unity.Actor
         }
 
         /// <summary>
-        /// Sometimes we want other objects to react to the death of an actor.
-        /// This requires the object to live for an extra frame.
+        /// Kills the actor, disabling it and moving it back to the actor pool.
+        /// 
+        /// Sometimes other objects need to react to the death of an actor.
+        /// To facilitate this, this function accepts a delay flag.
         /// </summary>
-        protected IEnumerator DelayDeath()
+        public void Kill(bool delay = false)
         {
-            yield return new WaitForSeconds(deathDelaySeconds);
-            OnKilled?.Invoke(this);
+            if (delay) StartCoroutine(nameof(DelayDeath));
+            else OnKilled.Invoke(this);
+        }
+
+        private IEnumerator DelayDeath()
+        {
+            var delay = deathDelaySeconds > 0 ? new WaitForSeconds(deathDelaySeconds) : null;
+            yield return delay;
+            OnKilled.Invoke(this);
         }
     }
 }

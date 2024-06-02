@@ -37,7 +37,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnHealthDepleted(IReadOnlyAttribute sender, EventArgs e)
         {
-            StartCoroutine(nameof(DelayDeath));
+            Kill(delay: true);
         }
     }
 }

@@ -97,13 +97,6 @@ namespace SaloonSlingers.Unity.Actor
             base.ResetActor();
         }
 
-        public void Kill()
-        {
-            rigidBody.isKinematic = true;
-            StartCoroutine(nameof(DelayDeath));
-            OnKilled.Invoke(this);
-        }
-
         public void Pause()
         {
             OnPause.Invoke(this);
@@ -126,7 +119,7 @@ namespace SaloonSlingers.Unity.Actor
             );
             if (!isSelfLethal) return;
 
-            Kill();
+            Kill(delay: true);
         }
 
         public void HandleCollision(Collision other)
