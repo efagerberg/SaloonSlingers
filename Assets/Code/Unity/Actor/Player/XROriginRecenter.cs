@@ -9,8 +9,6 @@ namespace SaloonSlingers.Unity.Actor
         public Transform OrientationReference;
         public XROrigin Origin;
 
-        private bool initialRecenteringPerformed = false;
-
         public void Recenter()
         {
             Origin.MatchOriginUpCameraForward(OrientationReference.up, OrientationReference.forward);
