@@ -9,8 +9,6 @@ namespace SaloonSlingers.Unity.Actor
         public Transform OrientationReference;
         public XROrigin Origin;
 
-        private bool initialRecenteringPerformed = false;
-
         public void Recenter()
         {
             Origin.MatchOriginUpCameraForward(OrientationReference.up, OrientationReference.forward);
@@ -22,14 +20,9 @@ namespace SaloonSlingers.Unity.Actor
             if (Origin == null) Origin = GetComponent<XROrigin>();
         }
 
-        private void LateUpdate()
+        private void OnEnable()
         {
-            // Just doing this on Awake or Start is too late to take effect
-            if (!initialRecenteringPerformed)
-            {
-                Recenter();
-                initialRecenteringPerformed = true;
-            }
+            Recenter();
         }
     }
 }

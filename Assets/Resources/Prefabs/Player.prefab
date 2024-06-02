@@ -1044,7 +1044,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8991632668934191929}
-  - component: {fileID: 8991632668934191909}
   - component: {fileID: 8991632668934191910}
   - component: {fileID: 4123621826601349042}
   - component: {fileID: 1909669490}
@@ -1055,6 +1054,7 @@ GameObject:
   - component: {fileID: 5399642706607667108}
   - component: {fileID: 1036990389628307711}
   - component: {fileID: 8535683863521498128}
+  - component: {fileID: 8991632668934191909}
   - component: {fileID: 4707500469892464433}
   - component: {fileID: 4874333808075285779}
   - component: {fileID: 4658678658134588062}
@@ -1085,23 +1085,6 @@ Transform:
   - {fileID: 8991632669422369536}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8991632668934191909
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8991632668934191930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0cb9aa70a22847b5925ee5f067c10a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Camera: {fileID: 8991632667936520026}
-  m_OriginBaseGameObject: {fileID: 8991632668934191930}
-  m_CameraFloorOffsetObject: {fileID: 8991632669422369537}
-  m_RequestedTrackingOriginMode: 0
-  m_CameraYOffset: 1.1176
 --- !u!143 &8991632668934191910
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1373,6 +1356,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transitionCanvasGroup: {fileID: 8303706262434357773}
+--- !u!114 &8991632668934191909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8991632668934191930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0cb9aa70a22847b5925ee5f067c10a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Camera: {fileID: 8991632667936520026}
+  m_OriginBaseGameObject: {fileID: 8991632668934191930}
+  m_CameraFloorOffsetObject: {fileID: 8991632669422369537}
+  m_RequestedTrackingOriginMode: 1
+  m_CameraYOffset: 1.1176
 --- !u!114 &4707500469892464433
 MonoBehaviour:
   m_ObjectHideFlags: 0

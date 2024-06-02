@@ -27,8 +27,9 @@ public class XROriginRecentererTests
     public IEnumerator CentersXROrigin_AsPartOfInitialization()
     {
         XROriginRecenter subject = BuildSubject(out Camera camera, out XROrigin origin, out GameObject referenceGO);
-        subject.runInEditMode = true;
         subject.OrientationReference = referenceGO.transform;
+        subject.Origin = origin;
+        subject.runInEditMode = true;
         yield return null;
 
         AssertCentered(camera, origin, referenceGO);

@@ -28,14 +28,14 @@ namespace SaloonSlingers.Unity.Actor
         [Range(0, 1)]
         private float volumeScale;
 
-        public void Indicate(bool canInteract)
+        public void Indicate(bool canInteract, bool playSound = true)
         {
             _renderer.enabled = true;
             var color = canInteract ? canInteractColor : cannotInteractColor;
             _renderer.material.color = color;
             var clip = canInteract ? canInteractClip : cannotInteractClip;
 
-            if (clip != null)
+            if (clip != null && playSound)
                 audioSource.PlayOneShot(clip, volumeScale);
         }
 
