@@ -374,7 +374,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddb8d4893c7c6ee4aac484dfce1fbdde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnCollided:
+  OnCollsionEntered:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4264345229043827623}
@@ -403,7 +403,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnTriggered:
+  OnCollisionExited:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTriggerEntered:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4264345229043827623}
@@ -432,6 +435,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnTriggerExited:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &4398711621201243417
 MonoBehaviour:
   m_ObjectHideFlags: 0

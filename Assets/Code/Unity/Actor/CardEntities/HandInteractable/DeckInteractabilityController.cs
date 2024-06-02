@@ -36,7 +36,7 @@ namespace SaloonSlingers.Unity.Actor
         private void OnDrawn(HandProjectile sender, ICardGraphic card)
         {
             var result = detector.OnDrawn(sender);
-            UpdateIndicator(result);
+            UpdateIndicator(result, false);
         }
 
         private void OnThrown(HandProjectile sender)
@@ -72,13 +72,13 @@ namespace SaloonSlingers.Unity.Actor
             return deckGraphic.GetComponentInChildren<HandProjectile>();
         }
 
-        private void UpdateIndicator(bool? interaxctabilityMode)
+        private void UpdateIndicator(bool? interaxctabilityMode, bool playSound = true)
         {
             if (interaxctabilityMode == null) interactabilityIndicator.Hide();
             else
             {
                 interactabilityIndicator.transform.position = deckGraphic.Peek().transform.position;
-                interactabilityIndicator.Indicate(interaxctabilityMode.Value);
+                interactabilityIndicator.Indicate(interaxctabilityMode.Value, playSound);
             }
         }
     }

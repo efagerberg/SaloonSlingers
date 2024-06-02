@@ -44,6 +44,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             cardRotationCalculator = (n) => HandRotationCalculator.CalculateRotations(n, totalCardDegrees);
         }
+
         private void OnDisable()
         {
             handLayoutMediator.Reset();
