@@ -3,7 +3,6 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.Actor
 {
-
     public class DeckInteractabilityController : MonoBehaviour
     {
         [SerializeField]
@@ -51,7 +50,8 @@ namespace SaloonSlingers.Unity.Actor
                 nextProjectile.OnDraw.AddListener(OnDrawn);
                 nextProjectile.OnThrow.AddListener(OnThrown);
             }
-            UpdateIndicator(nextProjectile);
+            var result = detector.OnThrown(nextProjectile);
+            UpdateIndicator(result);
         }
 
         private void Start()
