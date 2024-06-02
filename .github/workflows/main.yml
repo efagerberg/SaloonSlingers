@@ -30,7 +30,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**',  'Packages/manifest.json') }}
           restore-keys: |
             Library-
       - uses: game-ci/unity-test-runner@v3
