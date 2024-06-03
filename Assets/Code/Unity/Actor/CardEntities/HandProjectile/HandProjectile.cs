@@ -5,6 +5,7 @@ using SaloonSlingers.Core;
 
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace SaloonSlingers.Unity.Actor
 {
@@ -32,19 +33,25 @@ namespace SaloonSlingers.Unity.Actor
                 mode = value;
                 UnityEvent<HandProjectile> eventToInvoke = mode switch
                 {
-                    HandProjectileMode.Damage => OnDamageMode,
-                    HandProjectileMode.Curse => OnMarkMode,
+                    HandProjectileMode.Damage => SwitchedToDamageMode,
+                    HandProjectileMode.Curse => SwitchedToCurseMode,
                     _ => throw new NotImplementedException(),
                 };
                 eventToInvoke.Invoke(this);
             }
         }
-        public UnityEvent<HandProjectile, ICardGraphic> OnDraw = new();
-        public UnityEvent<HandProjectile> OnThrow = new();
-        public UnityEvent<HandProjectile> OnPause = new();
-        public UnityEvent<HandProjectile> OnPickup = new();
-        public UnityEvent<HandProjectile> OnMarkMode = new();
-        public UnityEvent<HandProjectile> OnDamageMode = new();
+        [FormerlySerializedAs("OnDraw")]
+        public UnityEvent<HandProjectile, ICardGraphic> Drawn = new();
+        [FormerlySerializedAs("OnThrow")]
+        public UnityEvent<HandProjectile> Thrown = new();
+        [FormerlySerializedAs("OnPause")]
+        public UnityEvent<HandProjectile> Paused = new();
+        [FormerlySerializedAs("OnPickup")]
+        public UnityEvent<HandProjectile> PickedUp = new();
+        [FormerlySerializedAs("OnMarkMode")]
+        public UnityEvent<HandProjectile> SwitchedToCurseMode = new();
+        [FormerlySerializedAs("OnDamageMode")]
+        public UnityEvent<HandProjectile> SwitchedToDamageMode = new();
 
         [SerializeField]
         private int maxAngularVelocity = 100;
@@ -56,7 +63,7 @@ namespace SaloonSlingers.Unity.Actor
         public void Pickup(Func<GameObject> spawnCard, ICardGame game)
         {
             var card = handCoordinator.Pickup(game);
-            OnPickup.Invoke(this);
+            PickedUp.Invoke(this);
             if (card != null) Draw(spawnCard, card.Value);
         }
 
@@ -70,12 +77,12 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Throw()
         {
-            OnThrow.Invoke(this);
+            Thrown.Invoke(this);
         }
 
         public void Throw(Vector3 offset)
         {
-            OnThrow.Invoke(this);
+            Thrown.Invoke(this);
             rigidBody.AddForce(offset, ForceMode.VelocityChange);
         }
 
@@ -98,7 +105,7 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Pause()
         {
-            OnPause.Invoke(this);
+            Paused.Invoke(this);
         }
 
         private void Awake()
@@ -112,7 +119,7 @@ namespace SaloonSlingers.Unity.Actor
             var spawned = spawnCard();
             var cardGraphic = spawned.GetComponent<ICardGraphic>();
             cardGraphic.Card = card;
-            OnDraw.Invoke(this, cardGraphic);
+            Drawn.Invoke(this, cardGraphic);
             if (Cards.Count > 1)
                 Mode = HandProjectileMode.Damage;
         }
