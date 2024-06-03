@@ -384,16 +384,16 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5390251873298114091}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.HandProjectile, SaloonSlingers.Unity
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.Actor, SaloonSlingers.Unity
         m_MethodName: Kill
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
   lifespanInSeconds: 5
 --- !u!1 &5390251873298114089
@@ -416,7 +416,9 @@ GameObject:
   - component: {fileID: 7803066593573095463}
   - component: {fileID: 2298003805780703171}
   - component: {fileID: 4134921874225974522}
+  - component: {fileID: 7029709375160896283}
   - component: {fileID: 6483888452169677458}
+  - component: {fileID: 2800447118953497448}
   m_Layer: 12
   m_Name: HandInteractable
   m_TagString: HandInteractable
@@ -732,85 +734,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4b13192fd1528e4594ce5e8f164b34d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnKilled:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8203442522624692134}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.PickupElevatorPlacer,
-          SaloonSlingers.Unity
-        m_MethodName: Return
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnReset:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7442632222886414389}
-        m_TargetAssemblyTypeName: UnityEngine.Renderer, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 5390251873298114084}
-        m_TargetAssemblyTypeName: UnityEngine.Rigidbody, UnityEngine
-        m_MethodName: set_isKinematic
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 2050559456}
-        m_TargetAssemblyTypeName: UnityEngine.Collider, UnityEngine
-        m_MethodName: set_isTrigger
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 7925813237032216816}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.HandLayout, SaloonSlingers.Unity
-        m_MethodName: Unstack
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 2082247821616192928}
-        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   OnDraw:
     m_PersistentCalls:
       m_Calls:
@@ -1379,6 +1302,18 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8192
   maxSpeed: 0.8
+--- !u!114 &7029709375160896283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5390251873298114089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6043f346effd92d489cb4f3a4afa6d79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6483888452169677458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1394,8 +1329,8 @@ MonoBehaviour:
   OnCollsionEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5390251873298114091}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.HandProjectile, SaloonSlingers.Unity
+      - m_Target: {fileID: 7029709375160896283}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.DieOnCollision, SaloonSlingers.Unity
         m_MethodName: HandleCollision
         m_Mode: 0
         m_Arguments:
@@ -1412,8 +1347,8 @@ MonoBehaviour:
   OnTriggerEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5390251873298114091}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.HandProjectile, SaloonSlingers.Unity
+      - m_Target: {fileID: 7029709375160896283}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.DieOnCollision, SaloonSlingers.Unity
         m_MethodName: HandleCollision
         m_Mode: 0
         m_Arguments:
@@ -1427,6 +1362,110 @@ MonoBehaviour:
   OnTriggerExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2800447118953497448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5390251873298114089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27ef86e6c8849504c9d5b266eb74cdb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnKilled:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8203442522624692134}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.PickupElevatorPlacer,
+          SaloonSlingers.Unity
+        m_MethodName: Return
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnReset:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7442632222886414389}
+        m_TargetAssemblyTypeName: UnityEngine.Renderer, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 5390251873298114084}
+        m_TargetAssemblyTypeName: UnityEngine.Rigidbody, UnityEngine
+        m_MethodName: set_isKinematic
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 2050559456}
+        m_TargetAssemblyTypeName: UnityEngine.Collider, UnityEngine
+        m_MethodName: set_isTrigger
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 7925813237032216816}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.HandLayout, SaloonSlingers.Unity
+        m_MethodName: Unstack
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 2082247821616192928}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 5390251873298114091}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.HandProjectile, SaloonSlingers.Unity
+        m_MethodName: ResetProjectile
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  deathDelaySeconds: 0
 --- !u!1 &6000878715123780798
 GameObject:
   m_ObjectHideFlags: 0

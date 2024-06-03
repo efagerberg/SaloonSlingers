@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class CardGraphic : Actor, ICardGraphic
+    public class CardGraphic : MonoBehaviour, ICardGraphic
     {
         public Card Card
         {
@@ -30,14 +30,9 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private Material faceMaterial;
 
-        public override void ResetActor()
+        public void ResetColor()
         {
             Color = Color.white;
-        }
-
-        public void Kill()
-        {
-            OnKilled.Invoke(this);
         }
 
         public void SetTexture(Card card)

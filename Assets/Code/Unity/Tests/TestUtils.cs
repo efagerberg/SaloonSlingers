@@ -15,10 +15,9 @@ namespace SaloonSlingers.Unity.Tests
             return comp;
         }
 
-        class TestCardGraphic : MonoBehaviour, ICardGraphic
+        public class TestCardGraphic : MonoBehaviour, ICardGraphic
         {
             public Card Card { get; set; }
-            public void Kill() { }
             public Color Color { get; set; }
         }
     }

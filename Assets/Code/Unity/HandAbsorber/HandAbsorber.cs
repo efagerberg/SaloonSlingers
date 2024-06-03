@@ -26,7 +26,8 @@ namespace SaloonSlingers.Unity
 
             projectile.Pause();
             stacker.Stack(absorbingAttribute, projectile.HandEvaluation.Score);
-            projectile.Kill();
+            var actor = projectile.GetComponent<Actor.Actor>();
+            actor.Kill();
         }
     }
 }

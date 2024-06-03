@@ -188,9 +188,10 @@ GameObject:
   - component: {fileID: -883808863907568941}
   - component: {fileID: 7215838528679591572}
   - component: {fileID: 3574851712341966721}
-  - component: {fileID: 3485553852539469270}
   - component: {fileID: 6971952490005717553}
   - component: {fileID: 2594188523647539709}
+  - component: {fileID: 3129359547149549444}
+  - component: {fileID: 6391341686307807714}
   m_Layer: 8
   m_Name: Enemy
   m_TagString: Enemy
@@ -602,7 +603,7 @@ MonoBehaviour:
   FlashColor: {r: 0.42417622, g: 0, b: 1, a: 0}
   _renderer: {fileID: 2711048196415836419}
   duration: 0.25
---- !u!114 &3485553852539469270
+--- !u!114 &6971952490005717553
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -611,7 +612,95 @@ MonoBehaviour:
   m_GameObject: {fileID: 4046418689365348181}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f7aeea175b2b1a4baaacedb107e7b8c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0f080dcfd03020b469a05ec641d455b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2594188523647539709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4046418689365348181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddb8d4893c7c6ee4aac484dfce1fbdde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnCollsionEntered:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8708677591218883279}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.HandProjectileDamageTarget,
+          SaloonSlingers.Unity
+        m_MethodName: HandleCollision
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 6671748024049958501}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.HandProjectileCurseTarget,
+          SaloonSlingers.Unity
+        m_MethodName: HandleCollision
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnCollisionExited:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTriggerEntered:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8708677591218883279}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.HandProjectileDamageTarget,
+          SaloonSlingers.Unity
+        m_MethodName: HandleCollision
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 6671748024049958501}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.HandProjectileCurseTarget,
+          SaloonSlingers.Unity
+        m_MethodName: HandleCollision
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnTriggerExited:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &3129359547149549444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4046418689365348181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27ef86e6c8849504c9d5b266eb74cdb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   OnKilled:
@@ -705,7 +794,7 @@ MonoBehaviour:
           m_BoolArgument: 1
         m_CallState: 2
   deathDelaySeconds: 0.5
---- !u!114 &6971952490005717553
+--- !u!114 &6391341686307807714
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -714,85 +803,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4046418689365348181}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f080dcfd03020b469a05ec641d455b2, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f7aeea175b2b1a4baaacedb107e7b8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2594188523647539709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4046418689365348181}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddb8d4893c7c6ee4aac484dfce1fbdde, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnCollsionEntered:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8708677591218883279}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.HandProjectileDamageTarget,
-          SaloonSlingers.Unity
-        m_MethodName: HandleCollision
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 6671748024049958501}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.HandProjectileCurseTarget,
-          SaloonSlingers.Unity
-        m_MethodName: HandleCollision
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnCollisionExited:
-    m_PersistentCalls:
-      m_Calls: []
-  OnTriggerEntered:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8708677591218883279}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.HandProjectileDamageTarget,
-          SaloonSlingers.Unity
-        m_MethodName: HandleCollision
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 6671748024049958501}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.HandProjectileCurseTarget,
-          SaloonSlingers.Unity
-        m_MethodName: HandleCollision
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnTriggerExited:
-    m_PersistentCalls:
-      m_Calls: []
+  actor: {fileID: 0}
 --- !u!1 &5674157687200997641
 GameObject:
   m_ObjectHideFlags: 0

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6623766968052128401}
   - component: {fileID: 8027102531898034401}
   - component: {fileID: 5709450200336865331}
+  - component: {fileID: 2437921788023091481}
   m_Layer: 0
   m_Name: PickupElevator
   m_TagString: Untagged
@@ -177,12 +178,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fdd7299a2068c49a216508351b4e35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnKilled:
-    m_PersistentCalls:
-      m_Calls: []
-  OnReset:
-    m_PersistentCalls:
-      m_Calls: []
   interactable: {fileID: 0}
   elevateLayerMask:
     serializedVersion: 2
@@ -195,3 +190,34 @@ MonoBehaviour:
   peakPauseSeconds: 0.5
   constraint: {fileID: 8027102531898034401}
   lineRenderer: {fileID: 6623766968052128401}
+--- !u!114 &2437921788023091481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5672856239090527364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27ef86e6c8849504c9d5b266eb74cdb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnKilled:
+    m_PersistentCalls:
+      m_Calls: []
+  OnReset:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5709450200336865331}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.PickupElevator, SaloonSlingers.Unity
+        m_MethodName: ResetElevator
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  deathDelaySeconds: 0

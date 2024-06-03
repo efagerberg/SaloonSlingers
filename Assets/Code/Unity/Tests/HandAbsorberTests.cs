@@ -48,9 +48,12 @@ namespace SaloonSlingers.Unity
             Assert.False(subject.CanAbsorb);
         }
 
-        private static void SetupProjectile(out HandProjectile projectile, out CardGame game)
+        private static void SetupProjectile(out HandProjectile projectile,
+                                            out CardGame game)
         {
             var rb = TestUtils.CreateComponent<Rigidbody>();
+            var actor = rb.gameObject.AddComponent<Actor.Actor>();
+            actor.runInEditMode = true;
             projectile = rb.gameObject.AddComponent<HandProjectile>();
             projectile.runInEditMode = true;
             var gameConfig = new CardGameConfig()
@@ -64,15 +67,8 @@ namespace SaloonSlingers.Unity
 
         private static GameObject SpawnCardGraphic()
         {
-            var toSpawn = TestUtils.CreateComponent<TestCardGraphic>();
+            var toSpawn = TestUtils.CreateComponent<TestUtils.TestCardGraphic>();
             return toSpawn.gameObject;
         }
-    }
-
-    class TestCardGraphic : MonoBehaviour, ICardGraphic
-    {
-        public Card Card { get; set; }
-        public void Kill() { }
-        public Color Color { get; set; }
     }
 }
