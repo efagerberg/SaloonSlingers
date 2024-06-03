@@ -68,11 +68,5 @@ namespace SaloonSlingers.Unity.Tests
         }
     }
 
-    class TestActor : Actor.Actor
-    {
-        public void Kill()
-        {
-            OnKilled?.Invoke(this);
-        }
-    }
+    class TestActor : Actor.Actor { }
 }

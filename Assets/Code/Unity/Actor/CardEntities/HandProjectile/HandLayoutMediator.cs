@@ -60,7 +60,8 @@ namespace SaloonSlingers.Unity.Actor
                     GetRevertedLocalPosition(cardGraphic.transform),
                     GetRevertedLocalRotation(cardGraphic.transform)
                 );
-                cardGraphic.Kill();
+                var actor = cardGraphic.GetComponent<Actor>();
+                actor.Kill();
                 cardGraphics.RemoveAt(i);
             }
             handPanelRectTransform.sizeDelta = new Vector2(originalPanelWidth, handPanelRectTransform.sizeDelta.y);

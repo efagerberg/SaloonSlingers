@@ -186,7 +186,6 @@ namespace SaloonSlingers.Unity.Actor.Tests
 
             public Card Card { get => card; set => card = value; }
             public Color Color { get; set; }
-            public void Kill() { }
         }
 
         private static (Func<Card, ICardGraphic> spawner, IList<ICardGraphic> spawned) GetSpawnerWithExpectedSpawned()
@@ -195,6 +194,7 @@ namespace SaloonSlingers.Unity.Actor.Tests
             ICardGraphic cardSpawner(Card c)
             {
                 ICardGraphic t = TestUtils.CreateComponent<TestCardGraphic>();
+                t.gameObject.AddComponent<Actor>();
                 t.gameObject.AddComponent<RectTransform>();
                 t.Card = c;
                 spawned.Add(t);

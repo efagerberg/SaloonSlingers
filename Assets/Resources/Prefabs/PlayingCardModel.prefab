@@ -258,6 +258,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8710243208541491618}
+  - component: {fileID: 5517559624812730226}
   - component: {fileID: 8714360226599134801}
   m_Layer: 0
   m_Name: PlayingCardModel
@@ -284,6 +285,37 @@ Transform:
   - {fileID: 3681533286715132788}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5517559624812730226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8712904994303800696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27ef86e6c8849504c9d5b266eb74cdb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnKilled:
+    m_PersistentCalls:
+      m_Calls: []
+  OnReset:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8714360226599134801}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.CardGraphic, SaloonSlingers.Unity
+        m_MethodName: ResetColor
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  deathDelaySeconds: 0
 --- !u!114 &8714360226599134801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -296,12 +328,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b565eb6fd3d6a3498aa19d8db97d119, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnKilled:
-    m_PersistentCalls:
-      m_Calls: []
-  OnReset:
-    m_PersistentCalls:
-      m_Calls: []
   card:
     Suit: 0
     Value: 1

@@ -64,15 +64,8 @@ namespace SaloonSlingers.Unity
 
         private static GameObject SpawnCardGraphic()
         {
-            var toSpawn = TestUtils.CreateComponent<TestCardGraphic>();
+            var toSpawn = TestUtils.CreateComponent<TestUtils.TestCardGraphic>();
             return toSpawn.gameObject;
         }
-    }
-
-    class TestCardGraphic : MonoBehaviour, ICardGraphic
-    {
-        public Card Card { get; set; }
-        public void Kill() { }
-        public Color Color { get; set; }
     }
 }

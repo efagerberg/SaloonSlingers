@@ -301,12 +301,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b565eb6fd3d6a3498aa19d8db97d119, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnKilled:
-    m_PersistentCalls:
-      m_Calls: []
-  OnReset:
-    m_PersistentCalls:
-      m_Calls: []
   card:
     Suit: 0
     Value: 1

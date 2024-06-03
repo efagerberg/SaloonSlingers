@@ -331,7 +331,7 @@ namespace SaloonSlingers.Unity.Tests
 
     public static class ProjectileTestHelpers
     {
-        public static GameObject TestCardSpawner() => TestUtils.CreateComponent<TestCardGraphic>().gameObject;
+        public static GameObject TestCardSpawner() => TestUtils.CreateComponent<TestUtils.TestCardGraphic>().gameObject;
         public static CardGame TestPokerGame = CardGame.Load(new CardGameConfig() { HandEvaluator = "poker" });
         public static HandProjectile BuildProjectile(int nCards = 10)
         {
