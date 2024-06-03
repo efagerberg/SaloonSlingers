@@ -45,8 +45,6 @@ namespace SaloonSlingers.Unity.Actor
         public UnityEvent<HandProjectile> OnPickup = new();
         public UnityEvent<HandProjectile> OnMarkMode = new();
         public UnityEvent<HandProjectile> OnDamageMode = new();
-        public UnityEvent<Actor> OnReset => actor.OnReset;
-        public UnityEvent<Actor> OnKilled => actor.OnKilled;
 
         [SerializeField]
         private int maxAngularVelocity = 100;
@@ -54,7 +52,6 @@ namespace SaloonSlingers.Unity.Actor
         private Rigidbody rigidBody;
         private HandCoordinator handCoordinator = new();
         private HandProjectileMode mode;
-        private Actor actor;
 
         public void Pickup(Func<GameObject> spawnCard, ICardGame game)
         {
@@ -104,41 +101,10 @@ namespace SaloonSlingers.Unity.Actor
             OnPause.Invoke(this);
         }
 
-        public void HandleCollision(GameObject contactingObject)
-        {
-            var antagonistLayer = LayerMask.LayerToName(gameObject.layer) switch
-            {
-                "PlayerProjectile" => LayerMask.NameToLayer("Enemy"),
-                "EnemyProjectile" => LayerMask.NameToLayer("Player"),
-                _ => -1,
-            };
-            var collidingWithAntagnoist = antagonistLayer != -1 && contactingObject.layer == antagonistLayer;
-            var isSelfLethal = (
-                collidingWithAntagnoist ||
-                (!rigidBody.isKinematic &&
-                 contactingObject.layer != LayerMask.NameToLayer("Environment") &&
-                 contactingObject.layer != LayerMask.NameToLayer("Hand"))
-            );
-            if (!isSelfLethal) return;
-
-            actor.Kill(delay: true);
-        }
-
-        public void HandleCollision(Collision other)
-        {
-            HandleCollision(other.gameObject);
-        }
-
-        public void HandleCollision(Collider other)
-        {
-            HandleCollision(other.gameObject);
-        }
-
         private void Awake()
         {
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
-            actor = GetComponent<Actor>();
         }
 
         private void Draw(Func<GameObject> spawnCard, Card card)

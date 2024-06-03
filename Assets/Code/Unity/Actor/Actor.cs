@@ -26,7 +26,7 @@ namespace SaloonSlingers.Unity.Actor
         /// </summary>
         public void Kill(bool delay = false)
         {
-            if (delay) StartCoroutine(nameof(DelayDeath));
+            if (delay) StartCoroutine(DelayDeath());
             else OnKilled.Invoke(this);
         }
 

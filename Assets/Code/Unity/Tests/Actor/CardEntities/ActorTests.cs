@@ -6,19 +6,49 @@ using UnityEngine.TestTools;
 
 namespace SaloonSlingers.Unity.Tests
 {
-    public class ActorTests
+    public class ActorKillTests
     {
-        [UnityTest]
-        public IEnumerator EmitsEventNextFrame()
+        [Test]
+        public void WhenDelayIsFalse_EmitsEventRightAway()
         {
             var subject = TestUtils.CreateComponent<Actor.Actor>();
             var killed = false;
             void killedHandler(Actor.Actor sender) => killed = true;
             subject.OnKilled.AddListener(killedHandler);
-            subject.Kill();
+            subject.Kill(delay: false);
+
+            Assert.That(killed);
+        }
+
+        [UnityTest]
+        public IEnumerator WhenDelayIsTrue_EmitsEventNextFrame()
+        {
+            var subject = TestUtils.CreateComponent<Actor.Actor>();
+            var killed = false;
+            void killedHandler(Actor.Actor sender) => killed = true;
+            subject.OnKilled.AddListener(killedHandler);
+            subject.Kill(delay: true);
+            Assert.That(killed, Is.False);
             yield return null;
 
             Assert.That(killed);
+        }
+    }
+
+    public class ResetActorTests
+    {
+        [UnityTest]
+        public IEnumerator EmitsResetEvent()
+        {
+            var subject = TestUtils.CreateComponent<Actor.Actor>();
+            subject.runInEditMode = true;
+            yield return null;
+            var reset = false;
+            void resetListener(Actor.Actor sender) => reset = true;
+            subject.OnReset.AddListener(resetListener);
+            subject.ResetActor();
+
+            Assert.That(reset);
         }
     }
 }

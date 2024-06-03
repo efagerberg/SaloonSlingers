@@ -14,17 +14,12 @@ namespace SaloonSlingers.Unity.Tests
     public class DieOnHealthDepletedTests
     {
         [UnityTest]
-        public IEnumerator ResetActor_EmitsResetUnityEventAndResetsAttributes()
+        public IEnumerator ResetActor_ResetsAttributes()
         {
             CreateSubject(out var subject, out var actor, out var attributes);
             yield return null;
-
-            var eventsEmitted = new List<string>(2);
-            bool eventEmitted = false;
-            actor.OnReset.AddListener((subject) => eventEmitted = true);
             actor.ResetActor();
 
-            Assert.That(eventEmitted);
             Assert.That(attributes.Registry.Values.Select(a => a.Value),
                         Is.EqualTo(attributes.Registry.Values.Select(a => a.InitialValue)));
         }
