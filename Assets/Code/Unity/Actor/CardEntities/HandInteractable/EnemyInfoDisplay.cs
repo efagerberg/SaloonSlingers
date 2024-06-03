@@ -39,7 +39,7 @@ namespace SaloonSlingers.Unity.Actor
 
             if (projectile != null)
                 projectile.Drawn.AddListener(DrawHandler);
-            cursedCards = enemyData.CurseTarget.Cursed;
+            cursedCards = enemyData.CurseTarget.Cards;
             health = enemyData.Attributes.Registry[AttributeType.Health];
             UpdateContents();
         }
