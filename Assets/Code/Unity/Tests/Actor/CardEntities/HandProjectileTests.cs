@@ -101,7 +101,7 @@ namespace SaloonSlingers.Unity.Tests
             var subject = ProjectileTestHelpers.BuildProjectile();
             ICardGraphic cardDrawn = null;
             void drawHandler(HandProjectile sender, ICardGraphic c) => cardDrawn = c;
-            subject.OnDraw.AddListener(drawHandler);
+            subject.Drawn.AddListener(drawHandler);
             subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
 
             Assert.IsNotNull(cardDrawn);
@@ -119,8 +119,8 @@ namespace SaloonSlingers.Unity.Tests
             var eventsConsumed = new List<string>();
             void pickupHandler(HandProjectile sender) => eventsConsumed.Add("pickup");
             void drawHandler(HandProjectile sender, ICardGraphic c) => eventsConsumed.Add("draw");
-            subject.OnPickup.AddListener(pickupHandler);
-            subject.OnDraw.AddListener(drawHandler);
+            subject.PickedUp.AddListener(pickupHandler);
+            subject.Drawn.AddListener(drawHandler);
             subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
 
             Assert.That(eventsConsumed, Is.EqualTo(new List<string> { "pickup", "draw" }));
@@ -134,8 +134,8 @@ namespace SaloonSlingers.Unity.Tests
             var eventsConsumed = new List<string>();
             void pickupHandler(HandProjectile sender) => eventsConsumed.Add("pickup");
             void drawHandler(HandProjectile sender, ICardGraphic c) => eventsConsumed.Add("draw");
-            subject.OnPickup.AddListener(pickupHandler);
-            subject.OnDraw.AddListener(drawHandler);
+            subject.PickedUp.AddListener(pickupHandler);
+            subject.Drawn.AddListener(drawHandler);
             subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
 
             Assert.That(eventsConsumed, Is.EqualTo(new List<string> { "pickup" }));
@@ -149,8 +149,8 @@ namespace SaloonSlingers.Unity.Tests
             var eventsConsumed = new List<string>();
             void pickupHandler(HandProjectile sender) => eventsConsumed.Add("pickup");
             void drawHandler(HandProjectile sender, ICardGraphic c) => eventsConsumed.Add("draw");
-            subject.OnPickup.AddListener(pickupHandler);
-            subject.OnDraw.AddListener(drawHandler);
+            subject.PickedUp.AddListener(pickupHandler);
+            subject.Drawn.AddListener(drawHandler);
             subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
 
             Assert.That(eventsConsumed, Is.EqualTo(new List<string> { "pickup" }));
@@ -165,7 +165,7 @@ namespace SaloonSlingers.Unity.Tests
             var subject = ProjectileTestHelpers.BuildProjectile();
             var thrown = false;
             void throwHandler(HandProjectile sender) => thrown = true;
-            subject.OnThrow.AddListener(throwHandler);
+            subject.Thrown.AddListener(throwHandler);
             subject.Throw();
 
             Assert.That(thrown);
@@ -194,7 +194,7 @@ namespace SaloonSlingers.Unity.Tests
             var subject = ProjectileTestHelpers.BuildProjectile();
             var paused = false;
             void pausedHandler(HandProjectile sender) => paused = true;
-            subject.OnPause.AddListener(pausedHandler);
+            subject.Paused.AddListener(pausedHandler);
             subject.Pause();
 
             Assert.That(paused);

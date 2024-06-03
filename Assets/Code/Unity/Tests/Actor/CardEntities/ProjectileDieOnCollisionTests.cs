@@ -29,7 +29,7 @@ namespace SaloonSlingers.Unity.Tests
             };
             var killed = false;
             void killedHandler(Actor.Actor sender) => killed = true;
-            actor.OnKilled.AddListener(killedHandler);
+            actor.Killed.AddListener(killedHandler);
             subject.HandleCollision(collidingObject);
             yield return null;
 

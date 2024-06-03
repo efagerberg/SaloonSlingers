@@ -5,13 +5,15 @@ using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace SaloonSlingers.Unity
 {
     public class HandProjectileCurseTarget : MonoBehaviour
     {
-        public IReadOnlyCollection<Card> Cursed { get; private set; }
-        public UnityEvent<GameObject, IReadOnlyCollection<Card>> OnCursed = new();
+        public IReadOnlyCollection<Card> Cards { get; private set; }
+        [FormerlySerializedAs("OnCursed")]
+        public UnityEvent<GameObject, IReadOnlyCollection<Card>> Cursed = new();
 
         public void HandleCollision(Collision collision)
         {
@@ -34,13 +36,13 @@ namespace SaloonSlingers.Unity
             // Need to make a copy since we don't want the cards to change as the slinger
             // draws more cards;
             // This can happen when using the handprojectile as a melee weapon.
-            Cursed = new List<Card>(handProjectile.Cards);
-            OnCursed.Invoke(gameObject, Cursed);
+            Cards = new List<Card>(handProjectile.Cards);
+            Cursed.Invoke(gameObject, Cards);
         }
 
         private void OnDisable()
         {
-            Cursed = null;
+            Cards = null;
         }
     }
 }

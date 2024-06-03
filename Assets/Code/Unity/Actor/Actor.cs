@@ -2,20 +2,23 @@
 
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace SaloonSlingers.Unity.Actor
 {
     public class Actor : MonoBehaviour
     {
-        public UnityEvent<Actor> OnKilled = new();
-        public UnityEvent<Actor> OnReset = new();
+        [FormerlySerializedAs("OnKilled")]
+        public UnityEvent<Actor> Killed = new();
+        [FormerlySerializedAs("OnReset")]
+        public UnityEvent<Actor> Reset = new();
 
         [SerializeField]
         protected float deathDelaySeconds = 0f;
 
         public virtual void ResetActor()
         {
-            OnReset.Invoke(this);
+            Reset.Invoke(this);
         }
 
         /// <summary>
@@ -27,14 +30,14 @@ namespace SaloonSlingers.Unity.Actor
         public void Kill(bool delay = false)
         {
             if (delay) StartCoroutine(DelayDeath());
-            else OnKilled.Invoke(this);
+            else Killed.Invoke(this);
         }
 
         private IEnumerator DelayDeath()
         {
             var delay = deathDelaySeconds > 0 ? new WaitForSeconds(deathDelaySeconds) : null;
             yield return delay;
-            OnKilled.Invoke(this);
+            Killed.Invoke(this);
         }
     }
 }

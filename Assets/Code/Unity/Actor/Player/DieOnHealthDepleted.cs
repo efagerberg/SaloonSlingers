@@ -28,7 +28,7 @@ namespace SaloonSlingers.Unity.Actor
             if (attributes != null)
                 attributes.Registry[AttributeType.Health].Depleted += OnHealthDepleted;
             if (actor != null)
-                actor.OnReset.AddListener(OnReset);
+                actor.Reset.AddListener(OnReset);
         }
 
         private void OnDisable()
@@ -36,7 +36,7 @@ namespace SaloonSlingers.Unity.Actor
             if (attributes != null)
                 attributes.Registry[AttributeType.Health].Depleted -= OnHealthDepleted;
             if (actor != null)
-                actor.OnReset.RemoveListener(OnReset);
+                actor.Reset.RemoveListener(OnReset);
         }
 
         private void Start()

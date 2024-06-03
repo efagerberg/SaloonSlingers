@@ -35,7 +35,7 @@ namespace SaloonSlingers.Unity.Tests
             subject.LevelCompleted.AddListener(CompletedHandler);
             for (int i = 0; i < nEnemies; i++)
             {
-                actors[i].OnKilled.AddListener(subject.OnEnemyKilled);
+                actors[i].Killed.AddListener(subject.OnEnemyKilled);
                 actors[i].Kill();
             }
 
@@ -55,7 +55,7 @@ namespace SaloonSlingers.Unity.Tests
             void CompletedHandler(LevelResult r) => levelResult = r;
 
             var subject = new LevelCompleteNotifier(manifest);
-            actor.OnKilled.AddListener(subject.OnEnemyKilled);
+            actor.Killed.AddListener(subject.OnEnemyKilled);
             subject.LevelCompleted.AddListener(CompletedHandler);
             actor.Kill();
             actor.Kill();
@@ -75,7 +75,7 @@ namespace SaloonSlingers.Unity.Tests
             void CompletedHandler(LevelResult r) => levelResult = r;
 
             var subject = new LevelCompleteNotifier(manifest);
-            actor.OnKilled.AddListener(subject.OnPlayerKilled);
+            actor.Killed.AddListener(subject.OnPlayerKilled);
             subject.LevelCompleted.AddListener(CompletedHandler);
             actor.Kill();
 

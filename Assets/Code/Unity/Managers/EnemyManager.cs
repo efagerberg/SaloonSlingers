@@ -5,12 +5,14 @@ using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace SaloonSlingers.Unity
 {
     public class EnemyManager : MonoBehaviour, ISpawner<GameObject>
     {
-        public UnityEvent<EnemyManager, Actor.Actor> OnEnemyKilled;
+        [FormerlySerializedAs("OnEnemyKilled")]
+        public UnityEvent<EnemyManager, Actor.Actor> EnemyKilled;
 
         [SerializeField]
         private int maxActiveEnemies = 3;
@@ -28,7 +30,7 @@ namespace SaloonSlingers.Unity
             var go = enemySpawner.Spawn();
             enemiesSpawned++;
             var actor = go.GetComponent<Actor.Actor>();
-            actor.OnKilled.AddListener(EnemyKilledHandler);
+            actor.Killed.AddListener(EnemyKilledHandler);
             return go;
         }
 
@@ -43,9 +45,9 @@ namespace SaloonSlingers.Unity
         private void EnemyKilledHandler(Actor.Actor sender)
         {
             enemiesSpawned--;
-            OnEnemyKilled?.Invoke(this, sender);
+            EnemyKilled?.Invoke(this, sender);
             var actor = sender.GetComponent<Actor.Actor>();
-            actor.OnKilled.RemoveListener(EnemyKilledHandler);
+            actor.Killed.RemoveListener(EnemyKilledHandler);
         }
 
         private void OnInventoryEmptied(object sender, EventArgs e)

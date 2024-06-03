@@ -14,7 +14,7 @@ namespace SaloonSlingers.Unity.Tests
             var subject = TestUtils.CreateComponent<Actor.Actor>();
             var killed = false;
             void killedHandler(Actor.Actor sender) => killed = true;
-            subject.OnKilled.AddListener(killedHandler);
+            subject.Killed.AddListener(killedHandler);
             subject.Kill(delay: false);
 
             Assert.That(killed);
@@ -26,7 +26,7 @@ namespace SaloonSlingers.Unity.Tests
             var subject = TestUtils.CreateComponent<Actor.Actor>();
             var killed = false;
             void killedHandler(Actor.Actor sender) => killed = true;
-            subject.OnKilled.AddListener(killedHandler);
+            subject.Killed.AddListener(killedHandler);
             subject.Kill(delay: true);
             Assert.That(killed, Is.False);
             yield return null;
@@ -45,7 +45,7 @@ namespace SaloonSlingers.Unity.Tests
             yield return null;
             var reset = false;
             void resetListener(Actor.Actor sender) => reset = true;
-            subject.OnReset.AddListener(resetListener);
+            subject.Reset.AddListener(resetListener);
             subject.ResetActor();
 
             Assert.That(reset);

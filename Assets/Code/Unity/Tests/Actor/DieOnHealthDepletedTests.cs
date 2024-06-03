@@ -32,7 +32,7 @@ namespace SaloonSlingers.Unity.Tests
             yield return null;
 
             bool eventEmitted = false;
-            actor.OnKilled.AddListener((Actor.Actor sender) => eventEmitted = true);
+            actor.Killed.AddListener((Actor.Actor sender) => eventEmitted = true);
             attributes.Registry[AttributeType.Health].Decrease(3);
             yield return null;
             var expected = new List<string> { "OnKilled", "Killed" };
@@ -49,7 +49,7 @@ namespace SaloonSlingers.Unity.Tests
             subject.enabled = false;
 
             var eventsEmitted = 0;
-            actor.OnKilled.AddListener((Actor.Actor sender) => eventsEmitted++);
+            actor.Killed.AddListener((Actor.Actor sender) => eventsEmitted++);
             attributes.Registry[AttributeType.Health].Decrease(3);
             yield return null;
             var expected = 1;

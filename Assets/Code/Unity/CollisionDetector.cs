@@ -1,32 +1,38 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace SaloonSlingers.Unity
 {
     public class CollisionDetector : MonoBehaviour
     {
-        public UnityEvent<Collision> OnCollsionEntered = new();
-        public UnityEvent<Collision> OnCollisionExited = new();
-        public UnityEvent<Collider> OnTriggerEntered = new();
-        public UnityEvent<Collider> OnTriggerExited = new();
+        [FormerlySerializedAs("OnCollsionEntered")]
+        public UnityEvent<Collision> CollisionEntered = new();
+        [FormerlySerializedAs("OnCollisionExited")]
+        public UnityEvent<Collision> CollisionExited = new();
+        [FormerlySerializedAs("OnTriggerEntered")]
+        public UnityEvent<Collider> TriggerEntered = new();
+        [FormerlySerializedAs("OnTriggerExited")]
+        public UnityEvent<Collider> TriggerExited = new();
 
         private void OnCollisionEnter(Collision other)
         {
-            OnCollsionEntered.Invoke(other);
+            CollisionEntered.Invoke(other);
         }
 
         private void OnCollisionExit(Collision other)
         {
-            OnCollisionExited.Invoke(other);
+            CollisionExited.Invoke(other);
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            OnTriggerEntered.Invoke(other);
+            TriggerEntered.Invoke(other);
         }
+
         private void OnTriggerExit(Collider other)
         {
-            OnTriggerExited.Invoke(other);
+            TriggerExited.Invoke(other);
         }
     }
 }

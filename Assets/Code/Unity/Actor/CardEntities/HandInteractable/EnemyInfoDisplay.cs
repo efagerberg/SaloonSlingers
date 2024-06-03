@@ -33,13 +33,13 @@ namespace SaloonSlingers.Unity.Actor
         public void SetTarget(EnemyData enemyData, HandProjectile enemyProjectile)
         {
             if (projectile != null)
-                projectile.OnDraw.RemoveListener(DrawHandler);
+                projectile.Drawn.RemoveListener(DrawHandler);
 
             projectile = enemyProjectile;
 
             if (projectile != null)
-                projectile.OnDraw.AddListener(DrawHandler);
-            cursedCards = enemyData.CurseTarget.Cursed;
+                projectile.Drawn.AddListener(DrawHandler);
+            cursedCards = enemyData.CurseTarget.Cards;
             health = enemyData.Attributes.Registry[AttributeType.Health];
             UpdateContents();
         }
@@ -111,14 +111,14 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (projectile == null) return;
 
-            projectile.OnDraw.AddListener(DrawHandler);
+            projectile.Drawn.AddListener(DrawHandler);
         }
 
         private void OnDisable()
         {
             if (projectile == null) return;
 
-            projectile.OnDraw.RemoveListener(DrawHandler);
+            projectile.Drawn.RemoveListener(DrawHandler);
         }
 
         private void Start()

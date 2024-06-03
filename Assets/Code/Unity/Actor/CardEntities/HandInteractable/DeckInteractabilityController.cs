@@ -18,8 +18,8 @@ namespace SaloonSlingers.Unity.Actor
             var projectileInvolved = GetHandProjectileFromHover(interactor);
             if (projectileInvolved != null)
             {
-                projectileInvolved.OnDraw.AddListener(OnDrawn);
-                projectileInvolved.OnThrow.AddListener(OnThrown);
+                projectileInvolved.Drawn.AddListener(OnDrawn);
+                projectileInvolved.Thrown.AddListener(OnThrown);
             }
 
             var result = detector.OnHoverEnter(projectileInvolved);
@@ -40,15 +40,15 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnThrown(HandProjectile sender)
         {
-            sender.OnDraw.RemoveListener(OnDrawn);
-            sender.OnThrow.RemoveListener(OnThrown);
+            sender.Drawn.RemoveListener(OnDrawn);
+            sender.Thrown.RemoveListener(OnThrown);
 
             // Check case where we throw but do not trigger the next hover event
             HandProjectile nextProjectile = deckGraphic.GetComponentInChildren<HandProjectile>();
             if (nextProjectile != null)
             {
-                nextProjectile.OnDraw.AddListener(OnDrawn);
-                nextProjectile.OnThrow.AddListener(OnThrown);
+                nextProjectile.Drawn.AddListener(OnDrawn);
+                nextProjectile.Thrown.AddListener(OnThrown);
             }
             var result = detector.OnThrown(nextProjectile);
             UpdateIndicator(result);

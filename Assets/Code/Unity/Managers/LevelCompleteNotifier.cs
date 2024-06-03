@@ -29,7 +29,7 @@ namespace SaloonSlingers.Unity
                     LevelCompleted?.Invoke(LevelResult.ALL_ENEMIES_KILLED);
             }
 
-            sender.OnKilled.RemoveListener(OnEnemyKilled);
+            sender.Killed.RemoveListener(OnEnemyKilled);
         }
 
         public void OnPlayerKilled(Actor.Actor sender)
