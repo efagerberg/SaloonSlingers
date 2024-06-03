@@ -121,12 +121,7 @@ namespace SaloonSlingers.Unity.Actor
             );
             if (!isSelfLethal) return;
 
-            Kill(delay: true);
-        }
-
-        public void Kill(bool delay = false)
-        {
-            actor.Kill(delay);
+            actor.Kill(delay: true);
         }
 
         public void HandleCollision(Collision other)

@@ -38,8 +38,8 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (!deckGraphic.CanDraw && placed != null)
             {
-                var unusableProjectile = placed.GetComponent<HandProjectile>();
-                unusableProjectile.Kill();
+                var unusavle = placed.GetComponent<Actor>();
+                unusavle.Kill();
             }
         }
 

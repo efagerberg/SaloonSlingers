@@ -13,6 +13,7 @@ using UnityEngine.TestTools;
 
 namespace SaloonSlingers.Unity.Tests
 {
+
     public class ProjectileModeTests
     {
         [Test]
@@ -182,22 +183,6 @@ namespace SaloonSlingers.Unity.Tests
             yield return new WaitForFixedUpdate();
 
             Assert.That(rb.velocity, Is.EqualTo(offset));
-        }
-    }
-
-    public class ProjectileKillTests
-    {
-        [UnityTest]
-        public IEnumerator EmitsEventNextFrame()
-        {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            var killed = false;
-            void killedHandler(Actor.Actor sender) => killed = true;
-            subject.OnKilled.AddListener(killedHandler);
-            subject.Kill();
-            yield return null;
-
-            Assert.That(killed);
         }
     }
 
