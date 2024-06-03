@@ -24608,6 +24608,21 @@ PrefabInstance:
       propertyPath: OnKilled.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 5350297829060738311}
+    - target: {fileID: 4874333808075285779, guid: 1a1d62b3b85a36b4e8df5ce4efd6f853,
+        type: 3}
+      propertyPath: OnKilled.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5194919542498062152, guid: 1a1d62b3b85a36b4e8df5ce4efd6f853,
+        type: 3}
+      propertyPath: OnReset.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 4109682151021272254}
+    - target: {fileID: 5194919542498062152, guid: 1a1d62b3b85a36b4e8df5ce4efd6f853,
+        type: 3}
+      propertyPath: OnKilled.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 5350297829060738311}
     - target: {fileID: 5688015345260286423, guid: 1a1d62b3b85a36b4e8df5ce4efd6f853,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -24729,7 +24744,7 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 2025648131167599815, guid: 1a1d62b3b85a36b4e8df5ce4efd6f853, type: 3}
+    - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
