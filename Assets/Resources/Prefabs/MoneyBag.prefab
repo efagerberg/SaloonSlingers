@@ -280,6 +280,7 @@ GameObject:
   - component: {fileID: 2347827597563985338}
   - component: {fileID: 4580711516969774404}
   - component: {fileID: 8349136955357268771}
+  - component: {fileID: -5957649999184846726}
   - component: {fileID: 2766858077530645}
   - component: {fileID: 466463690416409450}
   - component: {fileID: 567342750503680162}
@@ -537,6 +538,25 @@ MonoBehaviour:
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
+--- !u!114 &-5957649999184846726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4998795141390715190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27ef86e6c8849504c9d5b266eb74cdb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnKilled:
+    m_PersistentCalls:
+      m_Calls: []
+  OnReset:
+    m_PersistentCalls:
+      m_Calls: []
+  deathDelaySeconds: 0
 --- !u!114 &2766858077530645
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -549,14 +569,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b541726753b3fd64786d466b763fce55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnKilled:
+  PickedUp:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1264885842349640338}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.PickupElevatorPlacer,
-          SaloonSlingers.Unity
-        m_MethodName: Return
-        m_Mode: 1
+      - m_Target: {fileID: -5957649999184846726}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.Actor, SaloonSlingers.Unity
+        m_MethodName: Kill
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -565,9 +584,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnReset:
-    m_PersistentCalls:
-      m_Calls: []
   rigidBody: {fileID: 2347827597563985338}
   scaleByValue: {fileID: 466463690416409450}
   _value: 0

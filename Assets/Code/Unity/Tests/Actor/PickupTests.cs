@@ -11,13 +11,13 @@ namespace SaloonSlingers.Unity.Tests
         {
             var subject = TestUtils.CreateComponent<Pickup>();
             subject.Value = 5;
-            var pickupKilled = false;
-            void KilledHandler(Actor.Actor sender) => pickupKilled = true;
-            subject.OnKilled.AddListener(KilledHandler);
+            var pickedUp = false;
+            void OnPickUp(Pickup sender) => pickedUp = true;
+            subject.PickedUp.AddListener(OnPickUp);
             var grabber = new GameObject();
             subject.TryPickup(grabber);
 
-            Assert.That(pickupKilled, Is.False);
+            Assert.That(pickedUp, Is.False);
         }
 
         [Test]
@@ -25,13 +25,13 @@ namespace SaloonSlingers.Unity.Tests
         {
             var subject = TestUtils.CreateComponent<Pickup>();
             subject.Value = 5;
-            var pickupKilled = false;
-            void KilledHandler(Actor.Actor sender) => pickupKilled = true;
-            subject.OnKilled.AddListener(KilledHandler);
+            var pickedUp = false;
+            void OnPIckUp(Pickup sender) => pickedUp = true;
+            subject.PickedUp.AddListener(OnPIckUp);
             var attributes = TestUtils.CreateComponent<Attributes>();
             subject.TryPickup(attributes.gameObject);
 
-            Assert.That(pickupKilled, Is.False);
+            Assert.That(pickedUp, Is.False);
         }
 
         [Test]
@@ -39,14 +39,14 @@ namespace SaloonSlingers.Unity.Tests
         {
             var subject = TestUtils.CreateComponent<Pickup>();
             subject.Value = 5;
-            var pickupKilled = false;
-            void KilledHandler(Actor.Actor sender) => pickupKilled = true;
-            subject.OnKilled.AddListener(KilledHandler);
+            var pickedUp = false;
+            void OnPickUp(Pickup sender) => pickedUp = true;
+            subject.PickedUp.AddListener(OnPickUp);
             var attributes = TestUtils.CreateComponent<Attributes>();
             attributes.Registry[Core.AttributeType.Money] = new Core.Attribute(10, uint.MaxValue);
             subject.TryPickup(attributes.gameObject);
 
-            Assert.That(pickupKilled);
+            Assert.That(pickedUp);
             Assert.That(attributes.Registry[Core.AttributeType.Money].Value, Is.EqualTo(15));
         }
 
