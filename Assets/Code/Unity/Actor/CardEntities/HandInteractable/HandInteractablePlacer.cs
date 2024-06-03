@@ -65,7 +65,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void HandleInteractableDeath(Actor sender)
         {
-            var projectile = (HandProjectile)sender;
+            var projectile = sender.GetComponent<HandProjectile>();
             projectile.OnThrow.RemoveListener(HandInteractableThrowHandler);
             projectile.OnKilled.RemoveListener(HandleInteractableDeath);
         }

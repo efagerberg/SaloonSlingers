@@ -191,7 +191,6 @@ namespace SaloonSlingers.Unity.Tests
         public IEnumerator EmitsEventNextFrame()
         {
             var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.runInEditMode = true;
             var killed = false;
             void killedHandler(Actor.Actor sender) => killed = true;
             subject.OnKilled.AddListener(killedHandler);
@@ -235,30 +234,14 @@ namespace SaloonSlingers.Unity.Tests
         public IEnumerator ResetsState()
         {
             var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.runInEditMode = true;
             yield return null;
             subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
             var rb = subject.GetComponent<Rigidbody>();
-            subject.ResetActor();
+            subject.ResetProjectile();
 
             Assert.That(subject.HandEvaluation.Name, Is.EqualTo(HandNames.NONE));
             Assert.That(rb.gameObject.layer, Is.EqualTo(LayerMask.NameToLayer("UnassignedProjectile")));
             Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
-        }
-
-        [UnityTest]
-        public IEnumerator Emits()
-        {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.runInEditMode = true;
-            yield return null;
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
-            var reset = false;
-            void resetListener(Actor.Actor sender) => reset = true;
-            subject.OnReset.AddListener(resetListener);
-            subject.ResetActor();
-
-            Assert.That(reset);
         }
     }
 
@@ -272,7 +255,6 @@ namespace SaloonSlingers.Unity.Tests
         {
             var subject = ProjectileTestHelpers.BuildProjectile();
             subject.gameObject.layer = LayerMask.NameToLayer(testCase.layer);
-            subject.runInEditMode = true;
             yield return null;
             var rb = subject.GetComponent<Rigidbody>();
             rb.isKinematic = testCase.isKinematic;
@@ -320,7 +302,6 @@ namespace SaloonSlingers.Unity.Tests
         public IEnumerator Evaluates_WhenEmpty()
         {
             var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.runInEditMode = true;
             yield return null;
             subject.InitialEvaluate(ProjectileTestHelpers.TestPokerGame);
 
@@ -337,7 +318,10 @@ namespace SaloonSlingers.Unity.Tests
         {
             var rb = TestUtils.CreateComponent<Rigidbody>();
             rb.useGravity = false;
+            var actor = rb.gameObject.AddComponent<Actor.Actor>();
+            actor.runInEditMode = true;
             var subject = rb.gameObject.AddComponent<HandProjectile>();
+            subject.runInEditMode = true;
             subject.Assign(new Deck(nCards), new Dictionary<AttributeType, Core.Attribute> { });
             return subject;
         }

@@ -48,9 +48,12 @@ namespace SaloonSlingers.Unity
             Assert.False(subject.CanAbsorb);
         }
 
-        private static void SetupProjectile(out HandProjectile projectile, out CardGame game)
+        private static void SetupProjectile(out HandProjectile projectile,
+                                            out CardGame game)
         {
             var rb = TestUtils.CreateComponent<Rigidbody>();
+            var actor = rb.gameObject.AddComponent<Actor.Actor>();
+            actor.runInEditMode = true;
             projectile = rb.gameObject.AddComponent<HandProjectile>();
             projectile.runInEditMode = true;
             var gameConfig = new CardGameConfig()

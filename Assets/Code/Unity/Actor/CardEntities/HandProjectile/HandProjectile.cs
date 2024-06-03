@@ -14,7 +14,7 @@ namespace SaloonSlingers.Unity.Actor
         Curse = 1
     }
 
-    public class HandProjectile : Actor
+    public class HandProjectile : MonoBehaviour
     {
         public IReadOnlyCollection<Card> Cards { get => handCoordinator.Cards; }
         public HandEvaluation HandEvaluation { get => handCoordinator.HandEvaluation; }
@@ -45,6 +45,8 @@ namespace SaloonSlingers.Unity.Actor
         public UnityEvent<HandProjectile> OnPickup = new();
         public UnityEvent<HandProjectile> OnMarkMode = new();
         public UnityEvent<HandProjectile> OnDamageMode = new();
+        public UnityEvent<Actor> OnReset => actor.OnReset;
+        public UnityEvent<Actor> OnKilled => actor.OnKilled;
 
         [SerializeField]
         private int maxAngularVelocity = 100;
@@ -52,6 +54,7 @@ namespace SaloonSlingers.Unity.Actor
         private Rigidbody rigidBody;
         private HandCoordinator handCoordinator = new();
         private HandProjectileMode mode;
+        private Actor actor;
 
         public void Pickup(Func<GameObject> spawnCard, ICardGame game)
         {
@@ -89,12 +92,11 @@ namespace SaloonSlingers.Unity.Actor
             handCoordinator.HandEvaluation = game.Evaluate(Cards);
         }
 
-        public override void ResetActor()
+        public void ResetProjectile()
         {
             handCoordinator.Reset();
             rigidBody.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
             Mode = HandProjectileMode.Damage;
-            base.ResetActor();
         }
 
         public void Pause()
@@ -122,6 +124,11 @@ namespace SaloonSlingers.Unity.Actor
             Kill(delay: true);
         }
 
+        public void Kill(bool delay = false)
+        {
+            actor.Kill(delay);
+        }
+
         public void HandleCollision(Collision other)
         {
             HandleCollision(other.gameObject);
@@ -136,6 +143,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.maxAngularVelocity = maxAngularVelocity;
+            actor = GetComponent<Actor>();
         }
 
         private void Draw(Func<GameObject> spawnCard, Card card)
