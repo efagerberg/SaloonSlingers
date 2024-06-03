@@ -67,7 +67,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             var projectile = sender.GetComponent<HandProjectile>();
             projectile.OnThrow.RemoveListener(HandInteractableThrowHandler);
-            sender.OnKilled.RemoveListener(HandleInteractableDeath);
+            sender.Killed.RemoveListener(HandleInteractableDeath);
         }
 
         private GameObject SpawnInteractable()
@@ -77,7 +77,7 @@ namespace SaloonSlingers.Unity.Actor
             HandProjectile projectile = spawned.GetComponent<HandProjectile>();
             projectile.InitialEvaluate(GameManager.Instance.Saloon.HouseGame);
             projectile.OnThrow.AddListener(HandInteractableThrowHandler);
-            actor.OnKilled.AddListener(HandleInteractableDeath);
+            actor.Killed.AddListener(HandleInteractableDeath);
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();
             swapper.SetController(ControllerTypes.PLAYER);
             return spawned;

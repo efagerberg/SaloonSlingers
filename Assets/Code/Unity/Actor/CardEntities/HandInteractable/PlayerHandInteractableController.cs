@@ -47,7 +47,7 @@ namespace SaloonSlingers.Unity.Actor
             if (!eventsRegistered)
             {
                 var actor = handProjectile.GetComponent<Actor>();
-                actor.OnKilled.AddListener(OnHandProjectileDied);
+                actor.Killed.AddListener(OnHandProjectileDied);
                 eventsRegistered = true;
             }
         }
@@ -94,7 +94,7 @@ namespace SaloonSlingers.Unity.Actor
             homable.Strength = 0;
             homable.enabled = false;
             eventsRegistered = false;
-            sender.OnKilled.RemoveListener(OnHandProjectileDied);
+            sender.Killed.RemoveListener(OnHandProjectileDied);
         }
 
         public void OnActivate()

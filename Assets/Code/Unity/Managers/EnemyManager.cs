@@ -28,7 +28,7 @@ namespace SaloonSlingers.Unity
             var go = enemySpawner.Spawn();
             enemiesSpawned++;
             var actor = go.GetComponent<Actor.Actor>();
-            actor.OnKilled.AddListener(EnemyKilledHandler);
+            actor.Killed.AddListener(EnemyKilledHandler);
             return go;
         }
 
@@ -45,7 +45,7 @@ namespace SaloonSlingers.Unity
             enemiesSpawned--;
             OnEnemyKilled?.Invoke(this, sender);
             var actor = sender.GetComponent<Actor.Actor>();
-            actor.OnKilled.RemoveListener(EnemyKilledHandler);
+            actor.Killed.RemoveListener(EnemyKilledHandler);
         }
 
         private void OnInventoryEmptied(object sender, EventArgs e)

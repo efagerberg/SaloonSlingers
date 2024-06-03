@@ -39,14 +39,14 @@ namespace SaloonSlingers.Unity.Actor
         private void OnGet(GameObject instance)
         {
             var actor = instance.GetComponent<Actor>();
-            actor.OnKilled.AddListener(OnDeath);
+            actor.Killed.AddListener(OnDeath);
             SpawnedActorCount++;
         }
 
         private void OnRelease(GameObject instance)
         {
             var actor = instance.GetComponent<Actor>();
-            actor.OnKilled.RemoveListener(OnDeath);
+            actor.Killed.RemoveListener(OnDeath);
             instance.SetActive(false);
             actor.ResetActor();
             instance.transform.SetParent(root);
