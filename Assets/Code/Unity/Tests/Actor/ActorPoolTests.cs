@@ -11,7 +11,7 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void Get_ReturnsActiveInstanceOfPrefabInRoot()
         {
-            TestActor actor = TestUtils.CreateComponent<TestActor>();
+            Actor.Actor actor = TestUtils.CreateComponent<Actor.Actor>();
             var prefab = actor.gameObject;
             var root = new GameObject("PoolRoot").transform;
             ActorPool subject = new(1, prefab, root);
@@ -24,12 +24,12 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void CountSpawned_EqualsNumberOfActiveActors()
         {
-            TestActor actor = TestUtils.CreateComponent<TestActor>();
+            Actor.Actor actor = TestUtils.CreateComponent<Actor.Actor>();
             var prefab = actor.gameObject;
             var root = new GameObject("PoolRoot").transform;
             ActorPool subject = new(3, prefab, root);
             subject.Get();
-            var toDespawn = subject.Get().GetComponent<TestActor>();
+            var toDespawn = subject.Get().GetComponent<Actor.Actor>();
             toDespawn.Kill();
 
             Assert.That(subject.SpawnedActorCount, Is.EqualTo(1));
@@ -38,13 +38,13 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void OnActorDeath_ReturnsToPool()
         {
-            TestActor actor = TestUtils.CreateComponent<TestActor>();
+            Actor.Actor actor = TestUtils.CreateComponent<Actor.Actor>();
             var prefab = actor.gameObject;
             var root = new GameObject("PoolRoot").transform;
             ActorPool subject = new(1, prefab, root);
 
             var instance = subject.Get();
-            var actorInstance = instance.GetComponent<TestActor>();
+            var actorInstance = instance.GetComponent<Actor.Actor>();
             actorInstance.transform.SetParent(null);
             actorInstance.Kill();
 
@@ -57,7 +57,7 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void Get_WhenAskedForInactive_ReturnsInactiveInstanceOfPrefabInRoot()
         {
-            TestActor actor = TestUtils.CreateComponent<TestActor>();
+            Actor.Actor actor = TestUtils.CreateComponent<Actor.Actor>();
             var prefab = actor.gameObject;
             var root = new GameObject("PoolRoot").transform;
             ActorPool subject = new(1, prefab, root);
@@ -67,6 +67,4 @@ namespace SaloonSlingers.Unity.Tests
             Assert.That(instance.transform.parent, Is.EqualTo(root));
         }
     }
-
-    class TestActor : Actor.Actor { }
 }

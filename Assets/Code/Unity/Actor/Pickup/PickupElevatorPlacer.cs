@@ -8,6 +8,7 @@ namespace SaloonSlingers.Unity.Actor
         private GameObject interactable;
 
         private PickupElevator placed;
+        private Actor placedActor;
 
         public void Place()
         {
@@ -15,6 +16,7 @@ namespace SaloonSlingers.Unity.Actor
 
             var spawned = LevelManager.Instance.PickupElevatorSpawner.Spawn();
             placed = spawned.GetComponent<PickupElevator>();
+            placedActor = spawned.GetComponent<Actor>();
             placed.Associate(interactable);
         }
 
@@ -22,8 +24,9 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (placed == null) return;
 
-            placed.Kill();
+            placedActor.Kill();
             placed = null;
+            placedActor = null;
         }
     }
 }

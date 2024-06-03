@@ -6,7 +6,7 @@ using UnityEngine.Animations;
 namespace SaloonSlingers.Unity.Actor
 {
 
-    public class PickupElevator : Actor
+    public class PickupElevator : MonoBehaviour
     {
         [SerializeField]
         private GameObject interactable;
@@ -43,7 +43,7 @@ namespace SaloonSlingers.Unity.Actor
             lineRenderer.enabled = true;
         }
 
-        public override void ResetActor()
+        public void ResetElevator()
         {
             lineRenderer.enabled = false;
             constraint.constraintActive = false;
@@ -53,11 +53,6 @@ namespace SaloonSlingers.Unity.Actor
             interactableRigidBody = null;
             interactable = null;
             isPerforming = false;
-        }
-
-        public void Kill()
-        {
-            OnKilled?.Invoke(this);
         }
 
         private void Awake()
