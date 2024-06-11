@@ -17,11 +17,12 @@ public class CharacterControllerThrowOffsetCalculatorTests
     [Test]
     public void WhenVelocitiesRecorded_CalculatesOffsetFromVelocityAvg()
     {
-        var subject = new CharacterControllerThrowOffsetCalculator();
+        int nFrames = 2;
+        var subject = new CharacterControllerThrowOffsetCalculator(nFrames);
         subject.RecordVelocity(new Vector3(1, 2, 3));
         subject.RecordVelocity(new Vector3(4, 5, 6));
         var scale = 2;
-        var expected = -(new Vector3(5, 7, 9) / 2f) * scale;
+        var expected = -(new Vector3(5, 7, 9) / nFrames) * scale;
 
         Assert.That(subject.Calculate(scale), Is.EqualTo(expected));
     }

@@ -18,6 +18,9 @@ namespace SaloonSlingers.Unity.Actor
         private XRBaseInteractable mainInteractable;
         [SerializeField]
         private XRBaseInteractable peerInteractable;
+        [SerializeField]
+        [Range(0, 4500)]
+        private int nVelocityFramesToTrack = 256;
 
         private HandProjectile handProjectile;
         private DeckGraphic deckGraphic;
@@ -61,7 +64,7 @@ namespace SaloonSlingers.Unity.Actor
             initialized = true;
             ActorHandedness handedness = player.GetComponent<ActorHandedness>();
             homingStrength = player.GetComponent<HomingStrength>();
-            throwOffsetCalculator = new();
+            throwOffsetCalculator = new(nVelocityFramesToTrack);
             characterController = player.GetComponent<CharacterController>();
             visibilityDetector = player.GetComponent<VisibilityDetector>();
             deckGraphic = handedness.DeckGraphic;

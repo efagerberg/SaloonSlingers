@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
@@ -13,12 +12,12 @@ namespace SaloonSlingers.Unity.Actor
     {
         private readonly int nFramesToTrack;
         private int currentCharacterControllerVelocityIndex = 0;
-        private readonly IList<Vector3> characterControllerVelocityFrames;
+        private readonly Vector3[] characterControllerVelocityFrames;
 
         public CharacterControllerThrowOffsetCalculator(int nFramesToTrack = 32)
         {
             this.nFramesToTrack = nFramesToTrack;
-            characterControllerVelocityFrames = new List<Vector3>();
+            characterControllerVelocityFrames = new Vector3[nFramesToTrack];
         }
 
         /// <summary>
@@ -27,7 +26,7 @@ namespace SaloonSlingers.Unity.Actor
         /// </summary>
         public Vector3 Calculate(float throwVelocityScale)
         {
-            int nFramesTracked = characterControllerVelocityFrames.Count;
+            int nFramesTracked = characterControllerVelocityFrames.Length;
             if (nFramesTracked == 0) return Vector3.zero;
 
             var velocitySum = characterControllerVelocityFrames.Aggregate(Vector3.zero, (acc, v) => v == null ? acc : acc += v);
@@ -39,10 +38,7 @@ namespace SaloonSlingers.Unity.Actor
         public void RecordVelocity(Vector3 velocity)
         {
             currentCharacterControllerVelocityIndex = (currentCharacterControllerVelocityIndex + 1) % nFramesToTrack;
-            if (currentCharacterControllerVelocityIndex > characterControllerVelocityFrames.Count - 1)
-                characterControllerVelocityFrames.Add(velocity);
-            else
-                characterControllerVelocityFrames[currentCharacterControllerVelocityIndex] = velocity;
+            characterControllerVelocityFrames[currentCharacterControllerVelocityIndex] = velocity;
         }
     }
 }
