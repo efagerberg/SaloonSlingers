@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using SaloonSlingers.Core;
 
@@ -10,40 +11,37 @@ namespace SaloonSlingers.Unity.Actor
     {
         [SerializeField]
         private Actor actor;
-        private Attributes attributes;
+        private IReadOnlyDictionary<AttributeType, Core.Attribute> attributes;
 
         private void Awake()
         {
-            actor = GetComponent<Actor>();
+            if (actor == null) actor = GetComponent<Actor>();
         }
 
         private void OnEnable()
         {
             if (attributes != null)
-                attributes.Registry[AttributeType.Health].Depleted += OnHealthDepleted;
-            if (actor != null)
-                actor.Reset.AddListener(OnReset);
+                attributes[AttributeType.Health].Depleted += OnHealthDepleted;
+            actor.Killed.AddListener(OnKilled);
         }
 
         private void OnDisable()
         {
             if (attributes != null)
-                attributes.Registry[AttributeType.Health].Depleted -= OnHealthDepleted;
-            if (actor != null)
-                actor.Reset.RemoveListener(OnReset);
+                attributes[AttributeType.Health].Depleted -= OnHealthDepleted;
+            actor.Killed.RemoveListener(OnKilled);
         }
 
         private void Start()
         {
             // Attributes are set up dynamically after object initialization
-            if (attributes == null)
-                attributes = GetComponent<Attributes>();
-            attributes.Registry[AttributeType.Health].Depleted += OnHealthDepleted;
+            attributes ??= GetComponent<Attributes>().Registry;
+            attributes[AttributeType.Health].Depleted += OnHealthDepleted;
         }
 
-        private void OnReset(Actor sender)
+        private void OnKilled(Actor sender)
         {
-            foreach (var attribute in attributes.Registry.Values)
+            foreach (var attribute in attributes.Values)
                 attribute.Reset();
         }
 
