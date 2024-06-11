@@ -19,8 +19,8 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private XRBaseInteractable peerInteractable;
         [SerializeField]
-        [Range(0, 4500)]
-        private int nVelocityFramesToTrack = 256;
+        [Range(0, 256)]
+        private int nVelocityFramesToTrack = 128;
 
         private HandProjectile handProjectile;
         private DeckGraphic deckGraphic;

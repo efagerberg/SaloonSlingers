@@ -67,6 +67,24 @@ namespace SaloonSlingers.Unity.Tests
     public class DeckInteractabilityOnDrawnTests
     {
         [Test]
+        public void WhenProjectileNull_ReturnsNull()
+        {
+            var deck = new Deck(1);
+            var gameMock = new Mock<ICardGame>();
+            gameMock.Setup(instance => instance.CanDraw(It.IsAny<DrawContext>()))
+                    .Returns((DrawContext ctx) => ctx.Hand.Count == 1);
+
+            var subject = new DeckInteractabilityDetector(
+                 new Dictionary<AttributeType, Attribute>(),
+                 deck,
+                gameMock.Object
+             );
+            var result = subject.OnDrawn(null);
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
         public void WhenNotHovering_ReturnsNull()
         {
             var deck = new Deck(1);
@@ -109,6 +127,24 @@ namespace SaloonSlingers.Unity.Tests
 
     public class DeckInteractabilityOnThrown
     {
+        [Test]
+        public void WhenProjectilNull_ReturnsNull()
+        {
+            var deck = new Deck(1);
+            var gameMock = new Mock<ICardGame>();
+            gameMock.Setup(instance => instance.CanDraw(It.IsAny<DrawContext>()))
+                    .Returns((DrawContext ctx) => ctx.Hand.Count == 1);
+
+            var subject = new DeckInteractabilityDetector(
+                 new Dictionary<AttributeType, Attribute>(),
+                 deck,
+                gameMock.Object
+             );
+            var result = subject.OnThrown(null);
+
+            Assert.That(result, Is.Null);
+        }
+
         [Test]
         public void WhenNotHovering_ReturnsNull()
         {

@@ -25,7 +25,7 @@ namespace SaloonSlingers.Unity.Actor
         {
             AttributeRegistry ??= GetComponent<Attributes>().Registry;
             holoShieldController ??= GetComponent<HoloShieldController>();
-            ShieldHitPoints ??= holoShieldController?.HitPoints;
+            ShieldHitPoints ??= holoShieldController != null ? holoShieldController.HitPoints : null;
         }
 
         public void ResetEnemy()

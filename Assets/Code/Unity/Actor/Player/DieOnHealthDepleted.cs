@@ -12,12 +12,6 @@ namespace SaloonSlingers.Unity.Actor
         private Actor actor;
         private Attributes attributes;
 
-        private void OnReset(Actor sender)
-        {
-            foreach (var attribute in attributes.Registry.Values)
-                attribute.Reset();
-        }
-
         private void Awake()
         {
             actor = GetComponent<Actor>();
@@ -45,6 +39,12 @@ namespace SaloonSlingers.Unity.Actor
             if (attributes == null)
                 attributes = GetComponent<Attributes>();
             attributes.Registry[AttributeType.Health].Depleted += OnHealthDepleted;
+        }
+
+        private void OnReset(Actor sender)
+        {
+            foreach (var attribute in attributes.Registry.Values)
+                attribute.Reset();
         }
 
         private void OnHealthDepleted(IReadOnlyAttribute sender, EventArgs e)
