@@ -7,7 +7,6 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.Actor
 {
-
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Homable))]
     [RequireComponent(typeof(HandProjectile))]
