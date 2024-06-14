@@ -1400,7 +1400,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27ef86e6c8849504c9d5b266eb74cdb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnKilled:
+  Killed:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -1475,7 +1475,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnReset:
+  Reset:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -1553,7 +1553,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DamageMode: 0
-  OnDamaged:
+  Damaged:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4123621826601349042}
@@ -1593,7 +1593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 362ed09ebded0384b8372db31c63c4f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnCursed:
+  Cursed:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4123621826601349042}
@@ -1634,6 +1634,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DropPositionReference: {fileID: 8991632667936520029}
+  layer: PlayerInteractable
 --- !u!114 &2191930431759894900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1658,7 +1659,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddb8d4893c7c6ee4aac484dfce1fbdde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnCollsionEntered:
+  CollisionEntered:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4658678658134588062}
@@ -1687,10 +1688,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnCollisionExited:
+  CollisionExited:
     m_PersistentCalls:
       m_Calls: []
-  OnTriggerEntered:
+  TriggerEntered:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4658678658134588062}
@@ -1719,7 +1720,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnTriggerExited:
+  TriggerExited:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &8991632669065610213

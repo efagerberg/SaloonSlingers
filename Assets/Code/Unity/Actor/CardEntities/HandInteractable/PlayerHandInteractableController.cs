@@ -44,7 +44,7 @@ namespace SaloonSlingers.Unity.Actor
             if (!initialized) Initialize(player);
 
             handProjectile.Pickup(deckGraphic.Spawn, GameManager.Instance.Saloon.HouseGame);
-            handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
+            handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerInteractable");
             peerInteractable.enabled = true;
             homable.enabled = true;
             if (!eventsRegistered)

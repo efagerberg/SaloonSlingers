@@ -24,14 +24,14 @@ TagManager:
   - SpawnPoint
   - Enemy
   - HandDisplay
-  - EnemyProjectile
-  - PlayerProjectile
-  - UnassignedProjectile
+  - EnemyInteractable
+  - PlayerInteractable
+  - UnassignedInteractable
   - Environment
   - Invincible
   - Hand
-  - Pickup
   - DeckInteractabilityIndicator
+  - 
   - 
   - 
   - 

@@ -20,7 +20,7 @@ namespace SaloonSlingers.Unity.Actor
             {
                 handProjectile.Assign(deck, attributeRegistry);
                 handProjectile.Pickup(spawn, GameManager.Instance.Saloon.HouseGame);
-                handProjectile.gameObject.layer = LayerMask.NameToLayer("EnemyProjectile");
+                handProjectile.gameObject.layer = LayerMask.NameToLayer("EnemyInteractable");
             }
             else
                 handProjectile.TryDrawCard(spawn, GameManager.Instance.Saloon.HouseGame);

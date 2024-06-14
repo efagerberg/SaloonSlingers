@@ -14,7 +14,7 @@ namespace SaloonSlingers.Unity
                 projectile.Throw();
                 projectile.transform.parent = null;
                 var swapper = projectile.GetComponent<ControllerSwapper>();
-                projectile.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
+                projectile.gameObject.layer = LayerMask.NameToLayer("UnassignedInteractable");
                 swapper.SetController(ControllerTypes.PLAYER);
             }
         }
