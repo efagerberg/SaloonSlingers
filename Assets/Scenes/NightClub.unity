@@ -23901,16 +23901,6 @@ PrefabInstance:
       propertyPath: enemySpawner
       value: 
       objectReference: {fileID: 1632510003}
-    - target: {fileID: 6879834128450485692, guid: c5fc8d9e998f3254ea4c940047f6b669,
-        type: 3}
-      propertyPath: spawnPerSecond
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 6879834128450485692, guid: c5fc8d9e998f3254ea4c940047f6b669,
-        type: 3}
-      propertyPath: maxActiveEnemies
-      value: 3
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

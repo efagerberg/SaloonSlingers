@@ -225,7 +225,7 @@ namespace SaloonSlingers.Unity.Tests
             subject.ResetProjectile();
 
             Assert.That(subject.HandEvaluation.Name, Is.EqualTo(HandNames.NONE));
-            Assert.That(rb.gameObject.layer, Is.EqualTo(LayerMask.NameToLayer("UnassignedProjectile")));
+            Assert.That(rb.gameObject.layer, Is.EqualTo(LayerMask.NameToLayer("UnassignedInteractable")));
             Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
         }
     }

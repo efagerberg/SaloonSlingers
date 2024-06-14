@@ -99,7 +99,7 @@ namespace SaloonSlingers.Unity.Actor
         public void ResetProjectile()
         {
             handCoordinator.Reset();
-            rigidBody.gameObject.layer = LayerMask.NameToLayer("UnassignedProjectile");
+            rigidBody.gameObject.layer = LayerMask.NameToLayer("UnassignedInteractable");
             Mode = HandProjectileMode.Damage;
         }
 

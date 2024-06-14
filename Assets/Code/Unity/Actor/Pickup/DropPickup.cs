@@ -5,6 +5,7 @@ namespace SaloonSlingers.Unity
     public class DropPickup : MonoBehaviour
     {
         public Transform DropPositionReference;
+        public string layer;
 
         private Attributes attributes;
 
@@ -15,7 +16,7 @@ namespace SaloonSlingers.Unity
 
             PickupDropper.Drop(pot,
                                LevelManager.Instance.PickupSpawner,
-                               gameObject.layer,
+                               LayerMask.NameToLayer(layer),
                                DropPositionReference.position);
         }
 

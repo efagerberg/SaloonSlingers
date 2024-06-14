@@ -26,9 +26,7 @@ namespace SaloonSlingers.Core
             private set
             {
                 uint before = _value;
-
-                if (value == uint.MaxValue && before == 0) _value = 0;
-                else _value = System.Math.Clamp(value, 0, MaxValue);
+                _value = System.Math.Clamp(value, 0, MaxValue);
 
                 var e = new ValueChangeEvent<uint>(before, _value);
                 if (e.Before == e.After) return;

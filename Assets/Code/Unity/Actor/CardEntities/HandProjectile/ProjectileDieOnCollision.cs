@@ -11,8 +11,8 @@ namespace SaloonSlingers.Unity.Actor
         {
             var antagonistLayer = LayerMask.LayerToName(gameObject.layer) switch
             {
-                "PlayerProjectile" => LayerMask.NameToLayer("Enemy"),
-                "EnemyProjectile" => LayerMask.NameToLayer("Player"),
+                "PlayerInteractable" => LayerMask.NameToLayer("Enemy"),
+                "EnemyInteractable" => LayerMask.NameToLayer("Player"),
                 _ => -1,
             };
             var collidingWithAntagnoist = antagonistLayer != -1 && contactingObject.layer == antagonistLayer;

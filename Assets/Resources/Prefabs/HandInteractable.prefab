@@ -383,7 +383,7 @@ MonoBehaviour:
   OnLifespanEnded:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5390251873298114091}
+      - m_Target: {fileID: 2800447118953497448}
         m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.Actor, SaloonSlingers.Unity
         m_MethodName: Kill
         m_Mode: 6
@@ -734,7 +734,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4b13192fd1528e4594ce5e8f164b34d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnDraw:
+  Drawn:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5714042689939733474}
@@ -774,7 +774,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnThrow:
+  Thrown:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5714042689939733474}
@@ -850,7 +850,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-  OnPause:
+  Paused:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7442632222886414389}
@@ -901,7 +901,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnPickup:
+  PickedUp:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7442632222886414389}
@@ -964,7 +964,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnMarkMode:
+  SwitchedToCurseMode:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5600205379820495295}
@@ -979,7 +979,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnDamageMode:
+  SwitchedToDamageMode:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5600205379820495295}
@@ -1326,7 +1326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddb8d4893c7c6ee4aac484dfce1fbdde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnCollsionEntered:
+  CollisionEntered:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7029709375160896283}
@@ -1341,10 +1341,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnCollisionExited:
+  CollisionExited:
     m_PersistentCalls:
       m_Calls: []
-  OnTriggerEntered:
+  TriggerEntered:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7029709375160896283}
@@ -1359,7 +1359,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnTriggerExited:
+  TriggerExited:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &2800447118953497448

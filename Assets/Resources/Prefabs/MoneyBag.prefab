@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2170495689901185819}
   - component: {fileID: 3859373483467506935}
   - component: {fileID: 2805222572893842324}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,7 +112,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5280602873690293050}
-  m_Layer: 16
+  m_Layer: 12
   m_Name: AttachTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -145,7 +145,7 @@ GameObject:
   - component: {fileID: 8345548589214799407}
   - component: {fileID: 5574170686488494940}
   - component: {fileID: 4351422016341437065}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MoneyLogo2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -285,7 +285,7 @@ GameObject:
   - component: {fileID: 466463690416409450}
   - component: {fileID: 567342750503680162}
   - component: {fileID: 5095372196031053466}
-  m_Layer: 16
+  m_Layer: 12
   m_Name: MoneyBag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -550,12 +550,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27ef86e6c8849504c9d5b266eb74cdb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnKilled:
+  Killed:
     m_PersistentCalls:
-      m_Calls: []
-  OnReset:
+      m_Calls:
+      - m_Target: {fileID: 1264885842349640338}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.PickupElevatorPlacer,
+          SaloonSlingers.Unity
+        m_MethodName: Return
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  Reset:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2766858077530645}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Pickup, SaloonSlingers.Unity
+        m_MethodName: ResetActor
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   deathDelaySeconds: 0
 --- !u!114 &2766858077530645
 MonoBehaviour:
@@ -660,7 +685,7 @@ GameObject:
   - component: {fileID: 4893103378341411450}
   - component: {fileID: 8806420470182458583}
   - component: {fileID: 2788439775634941941}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MoneyLogo1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -851,6 +876,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bag
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6ee6f5c1ca407fd47967b648f86ab84a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -929,6 +959,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PickupElevatorPlacer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656540619645685820, guid: 38f818f8238f2c44396a827c5898f8e0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

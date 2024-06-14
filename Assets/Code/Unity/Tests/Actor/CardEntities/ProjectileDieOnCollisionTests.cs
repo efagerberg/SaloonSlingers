@@ -53,14 +53,14 @@ namespace SaloonSlingers.Unity.Tests
             yield return new CollisionTestCase { isKinematic = false, layer = "Default", collidingObjectLayer = "Hand", expected = false };
             yield return new CollisionTestCase { isKinematic = true, layer = "Default", collidingObjectLayer = "Default", expected = false };
             yield return new CollisionTestCase { isKinematic = false, layer = "Default", collidingObjectLayer = "Default", expected = true };
-            yield return new CollisionTestCase { isKinematic = false, layer = "EnemyProjectile", collidingObjectLayer = "Player", expected = true };
-            yield return new CollisionTestCase { isKinematic = false, layer = "PlayerProjectile", collidingObjectLayer = "Enemy", expected = true };
-            yield return new CollisionTestCase { isKinematic = true, layer = "EnemyProjectile", collidingObjectLayer = "Player", expected = true };
-            yield return new CollisionTestCase { isKinematic = true, layer = "PlayerProjectile", collidingObjectLayer = "Enemy", expected = true };
-            yield return new CollisionTestCase { isKinematic = true, layer = "PlayerProjectile", collidingObjectLayer = "Player", expected = false };
-            yield return new CollisionTestCase { isKinematic = true, layer = "EnemyProjectile", collidingObjectLayer = "Enemy", expected = false };
-            yield return new CollisionTestCase { isKinematic = false, layer = "PlayerProjectile", collidingObjectLayer = "Player", expected = true };
-            yield return new CollisionTestCase { isKinematic = false, layer = "EnemyProjectile", collidingObjectLayer = "Enemy", expected = true };
+            yield return new CollisionTestCase { isKinematic = false, layer = "EnemyInteractable", collidingObjectLayer = "Player", expected = true };
+            yield return new CollisionTestCase { isKinematic = false, layer = "PlayerInteractable", collidingObjectLayer = "Enemy", expected = true };
+            yield return new CollisionTestCase { isKinematic = true, layer = "EnemyInteractable", collidingObjectLayer = "Player", expected = true };
+            yield return new CollisionTestCase { isKinematic = true, layer = "PlayerInteractable", collidingObjectLayer = "Enemy", expected = true };
+            yield return new CollisionTestCase { isKinematic = true, layer = "PlayerInteractable", collidingObjectLayer = "Player", expected = false };
+            yield return new CollisionTestCase { isKinematic = true, layer = "EnemyInteractable", collidingObjectLayer = "Enemy", expected = false };
+            yield return new CollisionTestCase { isKinematic = false, layer = "PlayerInteractable", collidingObjectLayer = "Player", expected = true };
+            yield return new CollisionTestCase { isKinematic = false, layer = "EnemyInteractable", collidingObjectLayer = "Enemy", expected = true };
         }
 
         public struct CollisionTestCase

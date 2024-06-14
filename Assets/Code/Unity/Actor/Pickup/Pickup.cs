@@ -38,7 +38,7 @@ namespace SaloonSlingers.Unity
             transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             // Pickups have a nested object that moves
             rigidBody.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-            gameObject.layer = LayerMask.NameToLayer("Pickup");
+            gameObject.layer = LayerMask.NameToLayer("UnassignedInteractable");
         }
 
         public void TryPickup(GameObject grabber)

@@ -49,11 +49,15 @@ namespace SaloonSlingers.Unity.Actor
 
         public bool? OnDrawn(HandProjectile projectile)
         {
+            if (projectile == null) return null;
+
             return Detect(projectile.Cards, projectile.HandEvaluation);
         }
 
         public bool? OnThrown(HandProjectile nextProjectile)
         {
+            if (nextProjectile == null) return null;
+
             return Detect(nextProjectile.Cards, nextProjectile.HandEvaluation);
         }
 
