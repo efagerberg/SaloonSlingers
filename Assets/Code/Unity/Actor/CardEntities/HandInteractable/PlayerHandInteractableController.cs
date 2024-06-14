@@ -7,6 +7,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SaloonSlingers.Unity.Actor
 {
+
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Homable))]
     [RequireComponent(typeof(HandProjectile))]
@@ -18,9 +19,6 @@ namespace SaloonSlingers.Unity.Actor
         private XRBaseInteractable mainInteractable;
         [SerializeField]
         private XRBaseInteractable peerInteractable;
-        [SerializeField]
-        [Range(0, 256)]
-        private int nVelocityFramesToTrack = 128;
 
         private HandProjectile handProjectile;
         private DeckGraphic deckGraphic;
@@ -28,9 +26,8 @@ namespace SaloonSlingers.Unity.Actor
 
         private Rigidbody rb;
         private HomingStrength homingStrength;
-        private CharacterControllerThrowOffsetCalculator throwOffsetCalculator;
-        private CharacterController characterController;
         private VisibilityDetector visibilityDetector;
+        private CharacterControllerAverageVelocity ccAverageVelocity;
         private bool initialized = false;
         private bool eventsRegistered = false;
 
@@ -64,11 +61,10 @@ namespace SaloonSlingers.Unity.Actor
             initialized = true;
             ActorHandedness handedness = player.GetComponent<ActorHandedness>();
             homingStrength = player.GetComponent<HomingStrength>();
-            throwOffsetCalculator = new(nVelocityFramesToTrack);
-            characterController = player.GetComponent<CharacterController>();
             visibilityDetector = player.GetComponent<VisibilityDetector>();
             deckGraphic = handedness.DeckGraphic;
             var attributes = player.GetComponent<Attributes>();
+            ccAverageVelocity = player.GetComponent<CharacterControllerAverageVelocity>();
             handProjectile = GetComponent<HandProjectile>();
             handProjectile.Assign(deckGraphic.Deck, attributes.Registry);
             rb = GetComponent<Rigidbody>();
@@ -80,7 +76,7 @@ namespace SaloonSlingers.Unity.Actor
             if (args.interactorObject.GetType().IsAssignableFrom(typeof(XRSocketInteractor))) return;
 
             var asGrabbable = (XRGrabInteractable)args.interactableObject;
-            Vector3 offset = throwOffsetCalculator.Calculate(asGrabbable.throwVelocityScale);
+            Vector3 offset = -ccAverageVelocity.AverageVelocity * asGrabbable.throwVelocityScale;
             handProjectile.Throw(offset);
             peerInteractable.enabled = false;
 
@@ -136,8 +132,6 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (homable != null && homable.Target && homingStrength != null)
                 homable.Strength = homingStrength.Calculator.Calculate(rb.angularVelocity.y);
-
-            throwOffsetCalculator?.RecordVelocity(characterController.velocity);
         }
     }
 }

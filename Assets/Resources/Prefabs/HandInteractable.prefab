@@ -1215,7 +1215,6 @@ MonoBehaviour:
   maxDeckDistance: 0.08
   mainInteractable: {fileID: 9130390494511029585}
   peerInteractable: {fileID: 2901588232102863693}
-  nVelocityFramesToTrack: 32
 --- !u!114 &2847897556172580906
 MonoBehaviour:
   m_ObjectHideFlags: 0
