@@ -26,7 +26,7 @@ namespace SaloonSlingers.Unity.Actor
         private Rigidbody rb;
         private HomingStrength homingStrength;
         private VisibilityDetector visibilityDetector;
-        private CharacterControllerAverageVelocity ccAverageVelocity;
+        private VelocityTracker ccAverageVelocity;
         private bool initialized = false;
         private bool eventsRegistered = false;
 
@@ -63,7 +63,7 @@ namespace SaloonSlingers.Unity.Actor
             visibilityDetector = player.GetComponent<VisibilityDetector>();
             deckGraphic = handedness.DeckGraphic;
             var attributes = player.GetComponent<Attributes>();
-            ccAverageVelocity = player.GetComponent<CharacterControllerAverageVelocity>();
+            ccAverageVelocity = player.GetComponent<VelocityTracker>();
             handProjectile = GetComponent<HandProjectile>();
             handProjectile.Assign(deckGraphic.Deck, attributes.Registry);
             rb = GetComponent<Rigidbody>();
