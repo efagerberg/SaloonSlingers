@@ -16,13 +16,13 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
         public override void OnStart()
         {
             absorber = Enemy.Value.GetComponent<HandAbsorber>();
-            if (Controller.Value == null) return;
             projectile = Controller.Value.GetComponent<HandProjectile>();
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (absorber == null || projectile == null) return TaskStatus.Failure;
+            if (absorber == null || projectile == null || projectile.HandEvaluation.Name == Core.HandNames.BUST)
+                return TaskStatus.Failure;
 
             absorber.Absorb(Enemy.Value.ShieldHitPoints, projectile);
             Controller.Value = null;

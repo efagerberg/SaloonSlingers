@@ -1,6 +1,7 @@
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 
+using SaloonSlingers.Unity;
 using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
@@ -9,8 +10,8 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 {
     public class Throw : Action
     {
-        public float ThrowSpeed = 20f;
-        public Vector3 ThrowOffset = new(0, 0.25f, 0f);
+        public Vector3 ThrowOffset = new(0, -0.25f, 0f);
+        public (float Min, float Max) ThrowSpeedRange;
         public SharedGameObject Target;
         public SharedEnemyHandInteractableController Controller;
 
@@ -29,20 +30,35 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
                 return TaskStatus.Failure;
             }
 
-            DoThrow();
-            return TaskStatus.Success;
+            return DoThrow();
         }
 
-        private void DoThrow()
+        private TaskStatus DoThrow()
         {
-            if (Controller == null) return;
+            if (Controller == null) return TaskStatus.Failure;
+
             Controller.Value.transform.SetParent(null, true);
-            // Aim for more center mass
-            Vector3 heightOffset = new(0, 0.25f, 0);
-            Vector3 direction = (Target.Value.transform.position - transform.position - heightOffset).normalized;
-            Controller.Value.Throw(direction * ThrowSpeed);
+            var throwSpeed = Random.Range(ThrowSpeedRange.Min, ThrowSpeedRange.Max);
+            var launchAngle = ProjectileMotion.CalculateLaunchAngle(
+                Controller.Value.transform.position,
+                Target.Value.transform.position + ThrowOffset,
+                throwSpeed,
+                low: true
+            );
+            if (launchAngle == float.NaN) return TaskStatus.Failure;
+
+            var originalRotation = Controller.Value.transform.localEulerAngles;
+            Controller.Value.transform.localEulerAngles = new Vector3(
+                // Negate angle to rotate counter clockwise
+                -launchAngle,
+                originalRotation.y,
+                // Make sure to throw face down
+                originalRotation.z + 180
+            );
+            Controller.Value.Throw(Controller.Value.transform.forward * throwSpeed);
             swapper.SetController(ControllerTypes.PLAYER);
             Controller.Value = null;
+            return TaskStatus.Success;
         }
     }
 }

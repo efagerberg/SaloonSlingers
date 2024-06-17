@@ -24605,6 +24605,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5194919542498062152, guid: 1a1d62b3b85a36b4e8df5ce4efd6f853,
         type: 3}
+      propertyPath: Reset.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 4109682151021272254}
+    - target: {fileID: 5194919542498062152, guid: 1a1d62b3b85a36b4e8df5ce4efd6f853,
+        type: 3}
+      propertyPath: Killed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 5350297829060738311}
+    - target: {fileID: 5194919542498062152, guid: 1a1d62b3b85a36b4e8df5ce4efd6f853,
+        type: 3}
       propertyPath: OnReset.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 4109682151021272254}
