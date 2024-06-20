@@ -57,8 +57,8 @@ namespace SaloonSlingers.Unity.Tests
                  deck,
                 gameMock.Object
              );
-            var projectile = TestUtils.CreateComponent<CardHand>();
-            var result = subject.OnHoverEnter(projectile);
+            var hand = TestUtils.CreateComponent<CardHand>();
+            var result = subject.OnHoverEnter(hand);
 
             Assert.That(result, Is.False);
         }
@@ -97,9 +97,9 @@ namespace SaloonSlingers.Unity.Tests
                  deck,
                 gameMock.Object
              );
-            var projectile = TestUtils.CreateComponent<CardHand>();
+            var hand = TestUtils.CreateComponent<CardHand>();
             subject.OnHoverExit();
-            var result = subject.OnDrawn(projectile);
+            var result = subject.OnDrawn(hand);
 
             Assert.That(result, Is.Null);
         }
@@ -158,9 +158,9 @@ namespace SaloonSlingers.Unity.Tests
                  deck,
                 gameMock.Object
              );
-            var projectile = TestUtils.CreateComponent<CardHand>();
+            var hand = TestUtils.CreateComponent<CardHand>();
             subject.OnHoverExit();
-            var result = subject.OnThrown(projectile);
+            var result = subject.OnThrown(hand);
 
             Assert.That(result, Is.Null);
         }
@@ -178,9 +178,9 @@ namespace SaloonSlingers.Unity.Tests
                  deck,
                 gameMock.Object
              );
-            var projectile = TestUtils.CreateComponent<CardHand>();
-            subject.OnHoverEnter(projectile);
-            var result = subject.OnThrown(projectile);
+            var hand = TestUtils.CreateComponent<CardHand>();
+            subject.OnHoverEnter(hand);
+            var result = subject.OnThrown(hand);
 
             Assert.That(result, Is.True);
         }

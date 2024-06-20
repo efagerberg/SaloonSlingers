@@ -15,15 +15,15 @@ namespace SaloonSlingers.Unity.Actor
         public void OnHoverEnter(Collider collider)
         {
             var interactor = collider.gameObject.GetComponent<IXRSelectInteractor>();
-            var interactableInvolved = GetInteractable(interactor);
-            if (interactableInvolved != null)
+            var cardHand = GetCardHand(interactor);
+            if (cardHand != null)
             {
-                interactableInvolved.Drawn.AddListener(OnDrawn);
-                var projectile = interactableInvolved.GetComponent<Projectile>();
+                cardHand.Drawn.AddListener(OnDrawn);
+                var projectile = cardHand.GetComponent<Projectile>();
                 projectile.Thrown.AddListener(OnThrown);
             }
 
-            var result = detector.OnHoverEnter(interactableInvolved);
+            var result = detector.OnHoverEnter(cardHand);
             UpdateIndicator(result);
         }
 
@@ -64,7 +64,7 @@ namespace SaloonSlingers.Unity.Actor
                                       GameManager.Instance.Saloon.HouseGame);
         }
 
-        private CardHand GetInteractable(IXRSelectInteractor interactor)
+        private CardHand GetCardHand(IXRSelectInteractor interactor)
         {
             if (interactor != null && interactor.isSelectActive && interactor.interactablesSelected.Count > 0)
             {

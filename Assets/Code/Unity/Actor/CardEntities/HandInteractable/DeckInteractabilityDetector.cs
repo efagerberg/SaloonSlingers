@@ -35,7 +35,7 @@ namespace SaloonSlingers.Unity.Actor
             else
             {
                 hand = projectile.Cards;
-                evaluation = projectile.HandEvaluation;
+                evaluation = projectile.Evaluation;
             }
 
             return Detect(hand, evaluation);
@@ -51,14 +51,14 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (projectile == null) return null;
 
-            return Detect(projectile.Cards, projectile.HandEvaluation);
+            return Detect(projectile.Cards, projectile.Evaluation);
         }
 
         public bool? OnThrown(CardHand nextProjectile)
         {
             if (nextProjectile == null) return null;
 
-            return Detect(nextProjectile.Cards, nextProjectile.HandEvaluation);
+            return Detect(nextProjectile.Cards, nextProjectile.Evaluation);
         }
 
         private bool? Detect(IReadOnlyCollection<Card> hand, HandEvaluation evaluation)

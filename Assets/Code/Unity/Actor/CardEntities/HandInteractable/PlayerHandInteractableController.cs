@@ -20,6 +20,7 @@ namespace SaloonSlingers.Unity.Actor
         private XRBaseInteractable peerInteractable;
 
         private CardHand hand;
+        private CardHandStatusType collisionEffect;
         private Projectile projectile;
         private DeckGraphic deckGraphic;
         private Homable homable;
@@ -47,7 +48,7 @@ namespace SaloonSlingers.Unity.Actor
             if (!eventsRegistered)
             {
                 var actor = hand.GetComponent<Actor>();
-                actor.Killed.AddListener(OnHandProjectileDied);
+                actor.Killed.AddListener(OnActorDeath);
                 eventsRegistered = true;
             }
         }
@@ -68,6 +69,7 @@ namespace SaloonSlingers.Unity.Actor
             hand = GetComponent<CardHand>();
             hand.Assign(deckGraphic.Deck, attributes.Registry);
             projectile = hand.GetComponent<Projectile>();
+            collisionEffect = hand.GetComponent<CardHandStatusType>();
             rb = GetComponent<Rigidbody>();
             homable = GetComponent<Homable>();
         }
@@ -88,13 +90,13 @@ namespace SaloonSlingers.Unity.Actor
             homingStrength.Calculator.StartNewThrow();
         }
 
-        private void OnHandProjectileDied(Actor sender)
+        private void OnActorDeath(Actor sender)
         {
             homable.Target = null;
             homable.Strength = 0;
             homable.enabled = false;
             eventsRegistered = false;
-            sender.Killed.RemoveListener(OnHandProjectileDied);
+            sender.Killed.RemoveListener(OnActorDeath);
         }
 
         public void OnActivate()
@@ -105,9 +107,9 @@ namespace SaloonSlingers.Unity.Actor
                 return;
             }
 
-            int enumCount = Enum.GetValues(typeof(HandProjectileMode)).Length;
-            int nextEnumValue = ((int)hand.Mode + 1) % enumCount;
-            hand.Mode = (HandProjectileMode)nextEnumValue;
+            int enumCount = Enum.GetValues(typeof(StatusType)).Length;
+            int nextEnumValue = ((int)collisionEffect.Current + 1) % enumCount;
+            collisionEffect.Current = (StatusType)nextEnumValue;
         }
 
         private bool IsTouchingDeck()

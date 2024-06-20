@@ -9,50 +9,18 @@ using UnityEngine.Serialization;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public enum HandProjectileMode
-    {
-        Damage = 0,
-        Curse = 1
-    }
-
     public class CardHand : MonoBehaviour
     {
         public IReadOnlyCollection<Card> Cards { get => handCoordinator.Cards; }
-        public HandEvaluation HandEvaluation { get => handCoordinator.HandEvaluation; }
-        public HandProjectileMode Mode
-        {
-            get => mode;
-            set
-            {
-                if (value == mode) return;
-
-                var canCurse = value == HandProjectileMode.Curse && Cards.Count == 1;
-                if (!canCurse && value == HandProjectileMode.Curse)
-                    return;
-
-                mode = value;
-                UnityEvent<CardHand> eventToInvoke = mode switch
-                {
-                    HandProjectileMode.Damage => SwitchedToDamageMode,
-                    HandProjectileMode.Curse => SwitchedToCurseMode,
-                    _ => throw new NotImplementedException(),
-                };
-                eventToInvoke.Invoke(this);
-            }
-        }
+        public HandEvaluation Evaluation { get => handCoordinator.HandEvaluation; }
         [FormerlySerializedAs("OnDraw")]
         public UnityEvent<CardHand, ICardGraphic> Drawn = new();
         [FormerlySerializedAs("OnPause")]
         public UnityEvent<CardHand> Paused = new();
         [FormerlySerializedAs("OnPickup")]
         public UnityEvent<CardHand> PickedUp = new();
-        [FormerlySerializedAs("OnMarkMode")]
-        public UnityEvent<CardHand> SwitchedToCurseMode = new();
-        [FormerlySerializedAs("OnDamageMode")]
-        public UnityEvent<CardHand> SwitchedToDamageMode = new();
 
         private HandCoordinator handCoordinator = new();
-        private HandProjectileMode mode;
 
         public void Pickup(Func<GameObject> spawnCard, ICardGame game)
         {
@@ -82,7 +50,6 @@ namespace SaloonSlingers.Unity.Actor
         public void ResetHand()
         {
             handCoordinator.Reset();
-            Mode = HandProjectileMode.Damage;
         }
 
         public void Pause()
@@ -96,8 +63,6 @@ namespace SaloonSlingers.Unity.Actor
             var cardGraphic = spawned.GetComponent<ICardGraphic>();
             cardGraphic.Card = card;
             Drawn.Invoke(this, cardGraphic);
-            if (Cards.Count > 1)
-                Mode = HandProjectileMode.Damage;
         }
     }
 }

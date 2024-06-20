@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,91 +13,21 @@ using UnityEngine.TestTools;
 namespace SaloonSlingers.Unity.Tests
 {
 
-    public class HandModeTests
-    {
-        [Test]
-        public void Getter_DefaultsToDamageMode()
-        {
-            var subject = HandTestHelper.BuildHand();
-
-            Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
-        }
-
-        [TestCase(0)]
-        [TestCase(2)]
-        [TestCase(2)]
-        public void Setter_DoesNotSetCursed_WhenHandDoesNotHave1Card(int nCards)
-        {
-            var subject = HandTestHelper.BuildHand();
-            for (int i = 0; i < nCards; i++)
-            {
-                subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
-            }
-            subject.Mode = HandProjectileMode.Curse;
-
-            Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
-        }
-
-        [Test]
-        public void Setter_SetsCursed_WhenHandOnlyHas1Card()
-        {
-            var subject = HandTestHelper.BuildHand();
-            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
-            subject.Mode = HandProjectileMode.Curse;
-
-            Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Curse));
-        }
-
-        [Test]
-        public void Setter_AlwaysChangingToDamageMode()
-        {
-            var subject = HandTestHelper.BuildHand();
-            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
-            subject.Mode = HandProjectileMode.Curse;
-            subject.Mode = HandProjectileMode.Damage;
-
-            Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
-        }
-
-        [Test]
-        public void Setter_Throws_WhenGivenInvalidMode()
-        {
-            var subject = HandTestHelper.BuildHand();
-            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
-
-            Assert.Throws<NotImplementedException>(() =>
-            {
-                subject.Mode = (HandProjectileMode)100;
-            });
-        }
-    }
-
     public class HandTryDrawTests
     {
         [Test]
         public void AddsCard_ToProjectile()
         {
-            var subject = HandTestHelper.BuildHand();
+            var subject = HandTestHelper.BuildSubject();
             subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
 
             Assert.That(subject.Cards.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public void ChangesModeBackToDamage_WhenDrawResultsInMoreThanOneCard()
-        {
-            var subject = HandTestHelper.BuildHand();
-            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
-            subject.Mode = HandProjectileMode.Curse;
-            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
-
-            Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
-        }
-
-        [Test]
         public void EmitsDrawEvent()
         {
-            var subject = HandTestHelper.BuildHand();
+            var subject = HandTestHelper.BuildSubject();
             ICardGraphic cardDrawn = null;
             void drawHandler(CardHand sender, ICardGraphic c) => cardDrawn = c;
             subject.Drawn.AddListener(drawHandler);
@@ -115,7 +44,7 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void WhenEmptyHand_EmitsPickupAndDrawEvents()
         {
-            var subject = HandTestHelper.BuildHand();
+            var subject = HandTestHelper.BuildSubject();
             var eventsConsumed = new List<string>();
             void pickupHandler(CardHand sender) => eventsConsumed.Add("pickup");
             void drawHandler(CardHand sender, ICardGraphic c) => eventsConsumed.Add("draw");
@@ -129,7 +58,7 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void WhenNotEmptyHand_EmitsOnlyPickupEvent()
         {
-            var subject = HandTestHelper.BuildHand();
+            var subject = HandTestHelper.BuildSubject();
             subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
             var eventsConsumed = new List<string>();
             void pickupHandler(CardHand sender) => eventsConsumed.Add("pickup");
@@ -144,7 +73,7 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void WhenNoCardsToDraw_EmitsOnlyPickupEvent()
         {
-            var subject = HandTestHelper.BuildHand(0);
+            var subject = HandTestHelper.BuildSubject(0);
             subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
             var eventsConsumed = new List<string>();
             void pickupHandler(CardHand sender) => eventsConsumed.Add("pickup");
@@ -162,7 +91,7 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void EmitsEvent()
         {
-            var subject = HandTestHelper.BuildHand();
+            var subject = HandTestHelper.BuildSubject();
             var paused = false;
             void pausedHandler(CardHand sender) => paused = true;
             subject.Paused.AddListener(pausedHandler);
@@ -177,10 +106,10 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void GetsCurrentEvaluation()
         {
-            var subject = HandTestHelper.BuildHand();
+            var subject = HandTestHelper.BuildSubject();
             subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
 
-            Assert.That(subject.HandEvaluation.Name, Is.EqualTo(HandNames.HIGH_CARD));
+            Assert.That(subject.Evaluation.Name, Is.EqualTo(HandNames.HIGH_CARD));
         }
     }
 
@@ -189,14 +118,13 @@ namespace SaloonSlingers.Unity.Tests
         [UnityTest]
         public IEnumerator ResetsState()
         {
-            var subject = HandTestHelper.BuildHand();
+            var subject = HandTestHelper.BuildSubject();
             yield return null;
             subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
             var rb = subject.GetComponent<Rigidbody>();
             subject.ResetHand();
 
-            Assert.That(subject.HandEvaluation.Name, Is.EqualTo(HandNames.NONE));
-            Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
+            Assert.That(subject.Evaluation.Name, Is.EqualTo(HandNames.NONE));
         }
     }
 
@@ -205,12 +133,12 @@ namespace SaloonSlingers.Unity.Tests
         [UnityTest]
         public IEnumerator Evaluates_WhenEmpty()
         {
-            var subject = HandTestHelper.BuildHand();
+            var subject = HandTestHelper.BuildSubject();
             yield return null;
             subject.InitialEvaluate(HandTestHelper.TestPokerGame);
 
             Assert.That(subject.Cards.Count, Is.EqualTo(0));
-            Assert.That(subject.HandEvaluation, Is.EqualTo(new HandEvaluation(HandNames.NONE, 0)));
+            Assert.That(subject.Evaluation, Is.EqualTo(new HandEvaluation(HandNames.NONE, 0)));
         }
     }
 
@@ -218,13 +146,9 @@ namespace SaloonSlingers.Unity.Tests
     {
         public static GameObject TestCardSpawner() => TestUtils.CreateComponent<TestUtils.TestCardGraphic>().gameObject;
         public static CardGame TestPokerGame = CardGame.Load(new CardGameConfig() { HandEvaluator = "poker" });
-        public static CardHand BuildHand(int nCards = 10)
+        public static CardHand BuildSubject(int nCards = 10)
         {
-            var rb = TestUtils.CreateComponent<Rigidbody>();
-            rb.useGravity = false;
-            var actor = rb.gameObject.AddComponent<Actor.Actor>();
-            actor.runInEditMode = true;
-            var subject = rb.gameObject.AddComponent<CardHand>();
+            var subject = TestUtils.CreateComponent<CardHand>();
             subject.runInEditMode = true;
             subject.Assign(new Deck(nCards), new Dictionary<AttributeType, Core.Attribute> { });
             return subject;

@@ -21,7 +21,7 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
 
         public override TaskStatus OnUpdate()
         {
-            if (absorber == null || cardHand == null || cardHand.HandEvaluation.Name == Core.HandNames.BUST)
+            if (absorber == null || cardHand == null || cardHand.Evaluation.Name == Core.HandNames.BUST)
                 return TaskStatus.Failure;
 
             absorber.Absorb(Enemy.Value.ShieldHitPoints, cardHand);

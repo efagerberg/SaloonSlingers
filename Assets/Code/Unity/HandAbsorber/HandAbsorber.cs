@@ -20,13 +20,13 @@ namespace SaloonSlingers.Unity
             stacker = new AttributeStacker(startingStacks);
         }
 
-        public void Absorb(Attribute absorbingAttribute, CardHand projectile)
+        public void Absorb(Attribute absorbingAttribute, CardHand hand)
         {
             if (!CanAbsorb) return;
 
-            projectile.Pause();
-            stacker.Stack(absorbingAttribute, projectile.HandEvaluation.Score);
-            var actor = projectile.GetComponent<Actor.Actor>();
+            hand.Pause();
+            stacker.Stack(absorbingAttribute, hand.Evaluation.Score);
+            var actor = hand.GetComponent<Actor.Actor>();
             actor.Kill();
         }
     }

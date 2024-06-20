@@ -410,6 +410,7 @@ GameObject:
   - component: {fileID: 2050559456}
   - component: {fileID: 5714042689939733474}
   - component: {fileID: 2800447118953497448}
+  - component: {fileID: 8182737046825074444}
   - component: {fileID: 953112396660871194}
   - component: {fileID: 5390251873298114091}
   - component: {fileID: 9130390494511029585}
@@ -851,6 +852,34 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   deathDelaySeconds: 0
+--- !u!114 &8182737046825074444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5390251873298114089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01c1dd8cf491f5340afb2cd26652cb78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionEffectChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5600205379820495295}
+        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.PlayerHandInfoDisplay,
+          SaloonSlingers.Unity
+        m_MethodName: UpdateContents
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &953112396660871194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1086,36 +1115,6 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
         m_MethodName: set_enabled
         m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  SwitchedToCurseMode:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5600205379820495295}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.PlayerHandDisplay, SaloonSlingers.Unity
-        m_MethodName: UpdateContents
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  SwitchedToDamageMode:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5600205379820495295}
-        m_TargetAssemblyTypeName: SaloonSlingers.Unity.Actor.PlayerHandDisplay, SaloonSlingers.Unity
-        m_MethodName: UpdateContents
-        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

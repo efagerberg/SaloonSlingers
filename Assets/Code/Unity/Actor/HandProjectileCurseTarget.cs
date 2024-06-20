@@ -29,14 +29,15 @@ namespace SaloonSlingers.Unity
         {
             if (!collidingObject.CompareTag("HandInteractable")) return;
 
-            CardHand handProjectile = collidingObject.GetComponent<CardHand>();
+            CardHand hand = collidingObject.GetComponent<CardHand>();
+            CardHandStatusType statusType = hand.GetComponent<CardHandStatusType>();
 
-            if (handProjectile.Mode != HandProjectileMode.Curse) return;
+            if (statusType.Current != StatusType.Curse) return;
 
             // Need to make a copy since we don't want the cards to change as the slinger
             // draws more cards;
             // This can happen when using the handprojectile as a melee weapon.
-            Cards = new List<Card>(handProjectile.Cards);
+            Cards = new List<Card>(hand.Cards);
             Cursed.Invoke(gameObject, Cards);
         }
 

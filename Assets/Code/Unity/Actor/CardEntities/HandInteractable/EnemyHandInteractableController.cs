@@ -9,21 +9,21 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class EnemyHandInteractableController : MonoBehaviour
     {
-        public IReadOnlyCollection<Card> Cards { get => handProjectile.Cards; }
+        public IReadOnlyCollection<Card> Cards { get => hand.Cards; }
 
-        private CardHand handProjectile;
+        private CardHand hand;
         private Projectile projectile;
 
         public void Draw(Deck deck, IReadOnlyDictionary<AttributeType, Core.Attribute> attributeRegistry, Func<GameObject> spawn)
         {
             if (Cards.Count == 0)
             {
-                handProjectile.Assign(deck, attributeRegistry);
-                handProjectile.Pickup(spawn, GameManager.Instance.Saloon.HouseGame);
-                handProjectile.gameObject.layer = LayerMask.NameToLayer("EnemyInteractable");
+                hand.Assign(deck, attributeRegistry);
+                hand.Pickup(spawn, GameManager.Instance.Saloon.HouseGame);
+                hand.gameObject.layer = LayerMask.NameToLayer("EnemyInteractable");
             }
             else
-                handProjectile.TryDrawCard(spawn, GameManager.Instance.Saloon.HouseGame);
+                hand.TryDrawCard(spawn, GameManager.Instance.Saloon.HouseGame);
         }
 
         public void Throw(Vector3 velocity)
@@ -33,7 +33,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Awake()
         {
-            handProjectile = GetComponent<CardHand>();
+            hand = GetComponent<CardHand>();
             projectile = GetComponent<Projectile>();
         }
     }
