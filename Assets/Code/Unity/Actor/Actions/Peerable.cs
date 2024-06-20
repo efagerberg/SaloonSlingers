@@ -76,13 +76,13 @@ namespace SaloonSlingers.Unity.Actor
                 lastSeenId = currentId;
 
                 display.Show();
-                HandProjectile projectile = null;
+                CardHand cardHand = null;
                 float timeWaited = 0;
                 while (timeWaited < Interval)
                 {
-                    if (projectile == null)
-                        projectile = closest.GetComponentInChildren<HandProjectile>();
-                    display.SetTarget(currentEnemyData, projectile);
+                    if (cardHand == null)
+                        cardHand = closest.GetComponentInChildren<CardHand>();
+                    display.SetTarget(currentEnemyData, cardHand);
                     var direction = (currentAttributes.transform.position - peererTransform.position);
                     var offset = new Vector3(0.1f, 0.1f, 0);
                     // Make sure the UI is in front of the player when close

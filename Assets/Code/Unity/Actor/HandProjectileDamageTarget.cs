@@ -36,7 +36,7 @@ namespace SaloonSlingers.Unity
         {
             if (!collidingObject.CompareTag("HandInteractable")) return;
 
-            HandProjectile handProjectile = collidingObject.GetComponent<HandProjectile>();
+            CardHand handProjectile = collidingObject.GetComponent<CardHand>();
             if (handProjectile.Mode != HandProjectileMode.Damage) return;
 
             uint damage = DamageMode switch

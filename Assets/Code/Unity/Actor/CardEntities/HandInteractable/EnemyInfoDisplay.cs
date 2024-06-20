@@ -27,10 +27,10 @@ namespace SaloonSlingers.Unity.Actor
 
         private Canvas canvas;
         private IReadOnlyCollection<Card> cursedCards;
-        private HandProjectile projectile;
+        private CardHand projectile;
         private Attribute health;
 
-        public void SetTarget(EnemyData enemyData, HandProjectile enemyProjectile)
+        public void SetTarget(EnemyData enemyData, CardHand enemyProjectile)
         {
             if (projectile != null)
                 projectile.Drawn.RemoveListener(DrawHandler);
@@ -126,7 +126,7 @@ namespace SaloonSlingers.Unity.Actor
             Hide();
         }
 
-        private void DrawHandler(HandProjectile sender, ICardGraphic drawn)
+        private void DrawHandler(CardHand sender, ICardGraphic drawn)
         {
             UpdateContents();
         }

@@ -1,11 +1,5 @@
-using SaloonSlingers.Core;
-using System;
-
-using SaloonSlingers.Unity.Actor;
-
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 namespace SaloonSlingers.Unity
 {
@@ -18,16 +12,21 @@ namespace SaloonSlingers.Unity
 
         private Rigidbody rigidBody;
 
+        public void Throw()
+        {
+            rigidBody.isKinematic = false;
+            Thrown.Invoke(this);
+        }
+
         public void Throw(Vector3 offset)
         {
-            Thrown.Invoke(this);
+            Throw();
             rigidBody.AddForce(offset, ForceMode.VelocityChange);
         }
 
-        public void Throw()
-        {
-            rigidBody.isKinematic = true;
-            Thrown.Invoke(this);
+        public void Throw(Vector3 offset, Vector3 torque) {
+            Throw(offset);
+            rigidBody.AddTorque(torque, ForceMode.VelocityChange);
         }
 
         private void Awake()

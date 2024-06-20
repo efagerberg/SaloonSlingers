@@ -14,12 +14,12 @@ using UnityEngine.TestTools;
 namespace SaloonSlingers.Unity.Tests
 {
 
-    public class ProjectileModeTests
+    public class HandModeTests
     {
         [Test]
         public void Getter_DefaultsToDamageMode()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
+            var subject = HandTestHelper.BuildHand();
 
             Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
         }
@@ -29,10 +29,10 @@ namespace SaloonSlingers.Unity.Tests
         [TestCase(2)]
         public void Setter_DoesNotSetCursed_WhenHandDoesNotHave1Card(int nCards)
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
+            var subject = HandTestHelper.BuildHand();
             for (int i = 0; i < nCards; i++)
             {
-                subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+                subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
             }
             subject.Mode = HandProjectileMode.Curse;
 
@@ -42,8 +42,8 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void Setter_SetsCursed_WhenHandOnlyHas1Card()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            var subject = HandTestHelper.BuildHand();
+            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
             subject.Mode = HandProjectileMode.Curse;
 
             Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Curse));
@@ -52,8 +52,8 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void Setter_AlwaysChangingToDamageMode()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            var subject = HandTestHelper.BuildHand();
+            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
             subject.Mode = HandProjectileMode.Curse;
             subject.Mode = HandProjectileMode.Damage;
 
@@ -63,8 +63,8 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void Setter_Throws_WhenGivenInvalidMode()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            var subject = HandTestHelper.BuildHand();
+            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
 
             Assert.Throws<NotImplementedException>(() =>
             {
@@ -73,13 +73,13 @@ namespace SaloonSlingers.Unity.Tests
         }
     }
 
-    public class ProjectileTryDrawTests
+    public class HandTryDrawTests
     {
         [Test]
         public void AddsCard_ToProjectile()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            var subject = HandTestHelper.BuildHand();
+            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
 
             Assert.That(subject.Cards.Count, Is.EqualTo(1));
         }
@@ -87,10 +87,10 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void ChangesModeBackToDamage_WhenDrawResultsInMoreThanOneCard()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            var subject = HandTestHelper.BuildHand();
+            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
             subject.Mode = HandProjectileMode.Curse;
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
 
             Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
         }
@@ -98,11 +98,11 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void EmitsDrawEvent()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
+            var subject = HandTestHelper.BuildHand();
             ICardGraphic cardDrawn = null;
-            void drawHandler(HandProjectile sender, ICardGraphic c) => cardDrawn = c;
+            void drawHandler(CardHand sender, ICardGraphic c) => cardDrawn = c;
             subject.Drawn.AddListener(drawHandler);
-            subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            subject.Pickup(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
 
             Assert.IsNotNull(cardDrawn);
             Assert.That(cardDrawn.Card, Is.EqualTo(subject.Cards.ElementAt(0)));
@@ -110,18 +110,18 @@ namespace SaloonSlingers.Unity.Tests
 
     }
 
-    public class ProjectilePickupTests
+    public class HandPickupTests
     {
         [Test]
         public void WhenEmptyHand_EmitsPickupAndDrawEvents()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
+            var subject = HandTestHelper.BuildHand();
             var eventsConsumed = new List<string>();
-            void pickupHandler(HandProjectile sender) => eventsConsumed.Add("pickup");
-            void drawHandler(HandProjectile sender, ICardGraphic c) => eventsConsumed.Add("draw");
+            void pickupHandler(CardHand sender) => eventsConsumed.Add("pickup");
+            void drawHandler(CardHand sender, ICardGraphic c) => eventsConsumed.Add("draw");
             subject.PickedUp.AddListener(pickupHandler);
             subject.Drawn.AddListener(drawHandler);
-            subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            subject.Pickup(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
 
             Assert.That(eventsConsumed, Is.EqualTo(new List<string> { "pickup", "draw" }));
         }
@@ -129,14 +129,14 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void WhenNotEmptyHand_EmitsOnlyPickupEvent()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            var subject = HandTestHelper.BuildHand();
+            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
             var eventsConsumed = new List<string>();
-            void pickupHandler(HandProjectile sender) => eventsConsumed.Add("pickup");
-            void drawHandler(HandProjectile sender, ICardGraphic c) => eventsConsumed.Add("draw");
+            void pickupHandler(CardHand sender) => eventsConsumed.Add("pickup");
+            void drawHandler(CardHand sender, ICardGraphic c) => eventsConsumed.Add("draw");
             subject.PickedUp.AddListener(pickupHandler);
             subject.Drawn.AddListener(drawHandler);
-            subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            subject.Pickup(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
 
             Assert.That(eventsConsumed, Is.EqualTo(new List<string> { "pickup" }));
         }
@@ -144,56 +144,27 @@ namespace SaloonSlingers.Unity.Tests
         [Test]
         public void WhenNoCardsToDraw_EmitsOnlyPickupEvent()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile(0);
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            var subject = HandTestHelper.BuildHand(0);
+            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
             var eventsConsumed = new List<string>();
-            void pickupHandler(HandProjectile sender) => eventsConsumed.Add("pickup");
-            void drawHandler(HandProjectile sender, ICardGraphic c) => eventsConsumed.Add("draw");
+            void pickupHandler(CardHand sender) => eventsConsumed.Add("pickup");
+            void drawHandler(CardHand sender, ICardGraphic c) => eventsConsumed.Add("draw");
             subject.PickedUp.AddListener(pickupHandler);
             subject.Drawn.AddListener(drawHandler);
-            subject.Pickup(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            subject.Pickup(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
 
             Assert.That(eventsConsumed, Is.EqualTo(new List<string> { "pickup" }));
         }
     }
 
-    public class ProjectileThrowTests
+    public class HandPauseTests
     {
         [Test]
         public void EmitsEvent()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            var thrown = false;
-            void throwHandler(HandProjectile sender) => thrown = true;
-            subject.Thrown.AddListener(throwHandler);
-            subject.Throw();
-
-            Assert.That(thrown);
-        }
-
-        [UnityTest]
-        [RequiresPlayMode]
-        public IEnumerator AddsOffsetForce_WhenOffsetSupplied()
-        {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            var rb = subject.GetComponent<Rigidbody>();
-            yield return null;
-            var offset = new Vector3(1, 2, 3);
-            subject.Throw(offset);
-            yield return new WaitForFixedUpdate();
-
-            Assert.That(rb.velocity, Is.EqualTo(offset));
-        }
-    }
-
-    public class ProjectilePauseTests
-    {
-        [Test]
-        public void EmitsEvent()
-        {
-            var subject = ProjectileTestHelpers.BuildProjectile();
+            var subject = HandTestHelper.BuildHand();
             var paused = false;
-            void pausedHandler(HandProjectile sender) => paused = true;
+            void pausedHandler(CardHand sender) => paused = true;
             subject.Paused.AddListener(pausedHandler);
             subject.Pause();
 
@@ -201,60 +172,59 @@ namespace SaloonSlingers.Unity.Tests
         }
     }
 
-    public class ProjectileHandEvaluationTests
+    public class HandEvaluationTests
     {
         [Test]
         public void GetsCurrentEvaluation()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            var subject = HandTestHelper.BuildHand();
+            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
 
             Assert.That(subject.HandEvaluation.Name, Is.EqualTo(HandNames.HIGH_CARD));
         }
     }
 
-    public class ProjectileResetTests
+    public class ResetHandTests
     {
         [UnityTest]
         public IEnumerator ResetsState()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
+            var subject = HandTestHelper.BuildHand();
             yield return null;
-            subject.TryDrawCard(ProjectileTestHelpers.TestCardSpawner, ProjectileTestHelpers.TestPokerGame);
+            subject.TryDrawCard(HandTestHelper.TestCardSpawner, HandTestHelper.TestPokerGame);
             var rb = subject.GetComponent<Rigidbody>();
-            subject.ResetProjectile();
+            subject.ResetHand();
 
             Assert.That(subject.HandEvaluation.Name, Is.EqualTo(HandNames.NONE));
-            Assert.That(rb.gameObject.layer, Is.EqualTo(LayerMask.NameToLayer("UnassignedInteractable")));
             Assert.That(subject.Mode, Is.EqualTo(HandProjectileMode.Damage));
         }
     }
 
-    public class ProjectileInitialEvaluateTests
+    public class HandInitialEvaluateTests
     {
         [UnityTest]
         public IEnumerator Evaluates_WhenEmpty()
         {
-            var subject = ProjectileTestHelpers.BuildProjectile();
+            var subject = HandTestHelper.BuildHand();
             yield return null;
-            subject.InitialEvaluate(ProjectileTestHelpers.TestPokerGame);
+            subject.InitialEvaluate(HandTestHelper.TestPokerGame);
 
             Assert.That(subject.Cards.Count, Is.EqualTo(0));
             Assert.That(subject.HandEvaluation, Is.EqualTo(new HandEvaluation(HandNames.NONE, 0)));
         }
     }
 
-    public static class ProjectileTestHelpers
+    public static class HandTestHelper
     {
         public static GameObject TestCardSpawner() => TestUtils.CreateComponent<TestUtils.TestCardGraphic>().gameObject;
         public static CardGame TestPokerGame = CardGame.Load(new CardGameConfig() { HandEvaluator = "poker" });
-        public static HandProjectile BuildProjectile(int nCards = 10)
+        public static CardHand BuildHand(int nCards = 10)
         {
             var rb = TestUtils.CreateComponent<Rigidbody>();
             rb.useGravity = false;
             var actor = rb.gameObject.AddComponent<Actor.Actor>();
             actor.runInEditMode = true;
-            var subject = rb.gameObject.AddComponent<HandProjectile>();
+            var subject = rb.gameObject.AddComponent<CardHand>();
             subject.runInEditMode = true;
             subject.Assign(new Deck(nCards), new Dictionary<AttributeType, Core.Attribute> { });
             return subject;

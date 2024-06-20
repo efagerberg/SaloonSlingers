@@ -11,8 +11,8 @@ namespace SaloonSlingers.Unity.Actor
     {
         public IReadOnlyCollection<Card> Cards { get => handProjectile.Cards; }
 
-        private HandProjectile handProjectile;
-        private Rigidbody rb;
+        private CardHand handProjectile;
+        private Projectile projectile;
 
         public void Draw(Deck deck, IReadOnlyDictionary<AttributeType, Core.Attribute> attributeRegistry, Func<GameObject> spawn)
         {
@@ -28,15 +28,13 @@ namespace SaloonSlingers.Unity.Actor
 
         public void Throw(Vector3 velocity)
         {
-            handProjectile.Throw();
-            rb.AddTorque(velocity.magnitude * transform.up, ForceMode.VelocityChange);
-            rb.AddForce(velocity, ForceMode.VelocityChange);
+            projectile.Throw(velocity, velocity.magnitude * transform.up);
         }
 
         private void Awake()
         {
-            handProjectile = GetComponent<HandProjectile>();
-            rb = GetComponent<Rigidbody>();
+            handProjectile = GetComponent<CardHand>();
+            projectile = GetComponent<Projectile>();
         }
     }
 }

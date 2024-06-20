@@ -22,7 +22,7 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private Color damageCardColor;
 
-        private HandProjectile projectile;
+        private CardHand projectile;
 
         private Color NonKeyColor
         {
@@ -85,7 +85,7 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            projectile = transform.parent.GetComponent<HandProjectile>();
+            projectile = transform.parent.GetComponent<CardHand>();
         }
 
         private void OnDisable()

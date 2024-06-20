@@ -22,7 +22,7 @@ namespace SaloonSlingers.Unity.Actor
             this.deck = deck;
         }
 
-        public bool? OnHoverEnter(HandProjectile projectile)
+        public bool? OnHoverEnter(CardHand projectile)
         {
             isHovering = true;
             IReadOnlyCollection<Card> hand;
@@ -47,14 +47,14 @@ namespace SaloonSlingers.Unity.Actor
             return null;
         }
 
-        public bool? OnDrawn(HandProjectile projectile)
+        public bool? OnDrawn(CardHand projectile)
         {
             if (projectile == null) return null;
 
             return Detect(projectile.Cards, projectile.HandEvaluation);
         }
 
-        public bool? OnThrown(HandProjectile nextProjectile)
+        public bool? OnThrown(CardHand nextProjectile)
         {
             if (nextProjectile == null) return null;
 

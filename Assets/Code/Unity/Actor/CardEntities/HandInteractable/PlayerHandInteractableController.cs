@@ -9,7 +9,7 @@ namespace SaloonSlingers.Unity.Actor
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Homable))]
-    [RequireComponent(typeof(HandProjectile))]
+    [RequireComponent(typeof(CardHand))]
     public class PlayerHandInteractableController : MonoBehaviour
     {
         [SerializeField]
@@ -19,7 +19,8 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private XRBaseInteractable peerInteractable;
 
-        private HandProjectile handProjectile;
+        private CardHand hand;
+        private Projectile projectile;
         private DeckGraphic deckGraphic;
         private Homable homable;
 
@@ -39,13 +40,13 @@ namespace SaloonSlingers.Unity.Actor
             int newSlingerId = player.transform.GetInstanceID();
             if (!initialized) Initialize(player);
 
-            handProjectile.Pickup(deckGraphic.Spawn, GameManager.Instance.Saloon.HouseGame);
-            handProjectile.gameObject.layer = LayerMask.NameToLayer("PlayerInteractable");
+            hand.Pickup(deckGraphic.Spawn, GameManager.Instance.Saloon.HouseGame);
+            hand.gameObject.layer = LayerMask.NameToLayer("PlayerInteractable");
             peerInteractable.enabled = true;
             homable.enabled = true;
             if (!eventsRegistered)
             {
-                var actor = handProjectile.GetComponent<Actor>();
+                var actor = hand.GetComponent<Actor>();
                 actor.Killed.AddListener(OnHandProjectileDied);
                 eventsRegistered = true;
             }
@@ -64,8 +65,9 @@ namespace SaloonSlingers.Unity.Actor
             deckGraphic = handedness.DeckGraphic;
             var attributes = player.GetComponent<Attributes>();
             ccAverageVelocity = player.GetComponent<VelocityTracker>();
-            handProjectile = GetComponent<HandProjectile>();
-            handProjectile.Assign(deckGraphic.Deck, attributes.Registry);
+            hand = GetComponent<CardHand>();
+            hand.Assign(deckGraphic.Deck, attributes.Registry);
+            projectile = hand.GetComponent<Projectile>();
             rb = GetComponent<Rigidbody>();
             homable = GetComponent<Homable>();
         }
@@ -76,7 +78,7 @@ namespace SaloonSlingers.Unity.Actor
 
             var asGrabbable = (XRGrabInteractable)args.interactableObject;
             Vector3 offset = -ccAverageVelocity.AverageVelocity * asGrabbable.throwVelocityScale;
-            handProjectile.Throw(offset);
+            projectile.Throw(offset);
             peerInteractable.enabled = false;
 
             var target = visibilityDetector.GetVisible(LayerMask.GetMask("Enemy"))
@@ -99,13 +101,13 @@ namespace SaloonSlingers.Unity.Actor
         {
             if (deckGraphic.CanDraw && IsTouchingDeck())
             {
-                handProjectile.TryDrawCard(deckGraphic.Spawn, GameManager.Instance.Saloon.HouseGame);
+                hand.TryDrawCard(deckGraphic.Spawn, GameManager.Instance.Saloon.HouseGame);
                 return;
             }
 
             int enumCount = Enum.GetValues(typeof(HandProjectileMode)).Length;
-            int nextEnumValue = ((int)handProjectile.Mode + 1) % enumCount;
-            handProjectile.Mode = (HandProjectileMode)nextEnumValue;
+            int nextEnumValue = ((int)hand.Mode + 1) % enumCount;
+            hand.Mode = (HandProjectileMode)nextEnumValue;
         }
 
         private bool IsTouchingDeck()
