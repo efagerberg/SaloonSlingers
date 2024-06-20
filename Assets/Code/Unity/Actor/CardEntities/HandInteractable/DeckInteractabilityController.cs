@@ -15,14 +15,15 @@ namespace SaloonSlingers.Unity.Actor
         public void OnHoverEnter(Collider collider)
         {
             var interactor = collider.gameObject.GetComponent<IXRSelectInteractor>();
-            var projectileInvolved = GetHandProjectileFromHover(interactor);
-            if (projectileInvolved != null)
+            var cardHand = GetCardHand(interactor);
+            if (cardHand != null)
             {
-                projectileInvolved.Drawn.AddListener(OnDrawn);
-                projectileInvolved.Thrown.AddListener(OnThrown);
+                cardHand.Drawn.AddListener(OnDrawn);
+                var projectile = cardHand.GetComponent<Projectile>();
+                projectile.Thrown.AddListener(OnThrown);
             }
 
-            var result = detector.OnHoverEnter(projectileInvolved);
+            var result = detector.OnHoverEnter(cardHand);
             UpdateIndicator(result);
         }
 
@@ -32,25 +33,27 @@ namespace SaloonSlingers.Unity.Actor
             UpdateIndicator(result);
         }
 
-        private void OnDrawn(HandProjectile sender, ICardGraphic card)
+        private void OnDrawn(CardHand sender, ICardGraphic card)
         {
             var result = detector.OnDrawn(sender);
             UpdateIndicator(result, false);
         }
 
-        private void OnThrown(HandProjectile sender)
+        private void OnThrown(Projectile sender)
         {
-            sender.Drawn.RemoveListener(OnDrawn);
+            var hand = sender.GetComponent<CardHand>();
+            hand.Drawn.RemoveListener(OnDrawn);
             sender.Thrown.RemoveListener(OnThrown);
 
             // Check case where we throw but do not trigger the next hover event
-            HandProjectile nextProjectile = deckGraphic.GetComponentInChildren<HandProjectile>();
-            if (nextProjectile != null)
+            CardHand nextHand = deckGraphic.GetComponentInChildren<CardHand>();
+            Projectile nextProjectile = nextHand.GetComponentInChildren<Projectile>();
+            if (nextHand != null)
             {
-                nextProjectile.Drawn.AddListener(OnDrawn);
+                nextHand.Drawn.AddListener(OnDrawn);
                 nextProjectile.Thrown.AddListener(OnThrown);
             }
-            var result = detector.OnThrown(nextProjectile);
+            var result = detector.OnThrown(nextHand);
             UpdateIndicator(result);
         }
 
@@ -61,15 +64,15 @@ namespace SaloonSlingers.Unity.Actor
                                       GameManager.Instance.Saloon.HouseGame);
         }
 
-        private HandProjectile GetHandProjectileFromHover(IXRSelectInteractor interactor)
+        private CardHand GetCardHand(IXRSelectInteractor interactor)
         {
             if (interactor != null && interactor.isSelectActive && interactor.interactablesSelected.Count > 0)
             {
-                if (interactor.interactablesSelected[0].transform.TryGetComponent(out HandProjectile projectile))
+                if (interactor.interactablesSelected[0].transform.TryGetComponent(out CardHand projectile))
                     return projectile;
             }
 
-            return deckGraphic.GetComponentInChildren<HandProjectile>();
+            return deckGraphic.GetComponentInChildren<CardHand>();
         }
 
         private void UpdateIndicator(bool? interaxctabilityMode, bool playSound = true)

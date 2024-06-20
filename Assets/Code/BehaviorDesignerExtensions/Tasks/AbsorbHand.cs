@@ -11,20 +11,20 @@ namespace SaloonSlingers.BehaviorDesignerExtensions
         public SharedEnemyHandInteractableController Controller;
 
         private HandAbsorber absorber;
-        private HandProjectile projectile;
+        private CardHand cardHand;
 
         public override void OnStart()
         {
             absorber = Enemy.Value.GetComponent<HandAbsorber>();
-            projectile = Controller.Value.GetComponent<HandProjectile>();
+            cardHand = Controller.Value.GetComponent<CardHand>();
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (absorber == null || projectile == null || projectile.HandEvaluation.Name == Core.HandNames.BUST)
+            if (absorber == null || cardHand == null || cardHand.Evaluation.Name == Core.HandNames.BUST)
                 return TaskStatus.Failure;
 
-            absorber.Absorb(Enemy.Value.ShieldHitPoints, projectile);
+            absorber.Absorb(Enemy.Value.ShieldHitPoints, cardHand);
             Controller.Value = null;
             return TaskStatus.Success;
         }

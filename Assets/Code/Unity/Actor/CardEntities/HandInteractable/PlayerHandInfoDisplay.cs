@@ -22,16 +22,17 @@ namespace SaloonSlingers.Unity.Actor
         [SerializeField]
         private Color damageCardColor;
 
-        private HandProjectile projectile;
+        private CardHand hand;
+        private CardHandStatusType collisionEffect;
 
         private Color NonKeyColor
         {
             get
             {
-                return projectile.Mode switch
+                return collisionEffect.Current switch
                 {
-                    HandProjectileMode.Damage => damageCardColor,
-                    HandProjectileMode.Curse => markCardColor,
+                    StatusType.Damage => damageCardColor,
+                    StatusType.Curse => markCardColor,
                     _ => throw new System.NotImplementedException(),
                 };
             }
@@ -42,7 +43,7 @@ namespace SaloonSlingers.Unity.Actor
             base.Hide();
             if (handValueText.text == "") return;
 
-            for (int i = 0; projectile != null && i < projectile.Cards.Count; i++)
+            for (int i = 0; hand != null && i < hand.Cards.Count; i++)
             {
                 Transform element = cardsPanel.transform.GetChild(i);
                 ICardGraphic graphic = element.GetComponent<ICardGraphic>();
@@ -67,14 +68,14 @@ namespace SaloonSlingers.Unity.Actor
 
         public override void UpdateContents()
         {
-            if (projectile == null) return;
+            if (hand == null) return;
 
-            handValueText.text = projectile.HandEvaluation.DisplayName();
-            for (int i = 0; i < projectile.Cards.Count; i++)
+            handValueText.text = hand.Evaluation.DisplayName();
+            for (int i = 0; i < hand.Cards.Count; i++)
             {
                 Transform element = cardsPanel.transform.GetChild(i);
                 Color color;
-                if (IsDisplaying && projectile.HandEvaluation.KeyIndexes.Contains(i))
+                if (IsDisplaying && hand.Evaluation.KeyIndexes.Contains(i))
                     color = keyCardColor;
                 else
                     color = NonKeyColor;
@@ -85,7 +86,8 @@ namespace SaloonSlingers.Unity.Actor
 
         private void Start()
         {
-            projectile = transform.parent.GetComponent<HandProjectile>();
+            hand = transform.parent.GetComponent<CardHand>();
+            collisionEffect = transform.parent.GetComponent<CardHandStatusType>();
         }
 
         private void OnDisable()

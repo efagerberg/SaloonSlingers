@@ -41,7 +41,7 @@ namespace SaloonSlingers.Unity.Actor
             cardHandGO.transform.SetParent(transform);
         }
 
-        private void OnThrow(HandProjectile sender)
+        private void OnThrow(Projectile sender)
         {
             if (!deckGraphic.CanDraw ||
                 !GameManager.Instance.Saloon.HouseGame.CanDraw(firstDrawContext))
@@ -52,7 +52,8 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnKilled(Actor sender)
         {
-            var projectile = sender.GetComponent<HandProjectile>();
+            var hand = sender.GetComponent<CardHand>();
+            var projectile = sender.GetComponent<Projectile>();
             projectile.Thrown.RemoveListener(OnThrow);
             sender.Killed.RemoveListener(OnKilled);
         }
@@ -61,8 +62,9 @@ namespace SaloonSlingers.Unity.Actor
         {
             GameObject spawned = handInteractableSpawner.Spawn();
             Actor actor = spawned.GetComponent<Actor>();
-            HandProjectile projectile = spawned.GetComponent<HandProjectile>();
-            projectile.InitialEvaluate(GameManager.Instance.Saloon.HouseGame);
+            CardHand hand = spawned.GetComponent<CardHand>();
+            hand.InitialEvaluate(GameManager.Instance.Saloon.HouseGame);
+            Projectile projectile = hand.GetComponent<Projectile>();
             projectile.Thrown.AddListener(OnThrow);
             actor.Killed.AddListener(OnKilled);
             ControllerSwapper swapper = spawned.GetComponent<ControllerSwapper>();

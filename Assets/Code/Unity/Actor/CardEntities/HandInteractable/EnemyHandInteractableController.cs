@@ -9,34 +9,32 @@ namespace SaloonSlingers.Unity.Actor
 {
     public class EnemyHandInteractableController : MonoBehaviour
     {
-        public IReadOnlyCollection<Card> Cards { get => handProjectile.Cards; }
+        public IReadOnlyCollection<Card> Cards { get => hand.Cards; }
 
-        private HandProjectile handProjectile;
-        private Rigidbody rb;
+        private CardHand hand;
+        private Projectile projectile;
 
         public void Draw(Deck deck, IReadOnlyDictionary<AttributeType, Core.Attribute> attributeRegistry, Func<GameObject> spawn)
         {
             if (Cards.Count == 0)
             {
-                handProjectile.Assign(deck, attributeRegistry);
-                handProjectile.Pickup(spawn, GameManager.Instance.Saloon.HouseGame);
-                handProjectile.gameObject.layer = LayerMask.NameToLayer("EnemyInteractable");
+                hand.Assign(deck, attributeRegistry);
+                hand.Pickup(spawn, GameManager.Instance.Saloon.HouseGame);
+                hand.gameObject.layer = LayerMask.NameToLayer("EnemyInteractable");
             }
             else
-                handProjectile.TryDrawCard(spawn, GameManager.Instance.Saloon.HouseGame);
+                hand.TryDrawCard(spawn, GameManager.Instance.Saloon.HouseGame);
         }
 
         public void Throw(Vector3 velocity)
         {
-            handProjectile.Throw();
-            rb.AddTorque(velocity.magnitude * transform.up, ForceMode.VelocityChange);
-            rb.AddForce(velocity, ForceMode.VelocityChange);
+            projectile.Throw(velocity, velocity.magnitude * transform.up);
         }
 
         private void Awake()
         {
-            handProjectile = GetComponent<HandProjectile>();
-            rb = GetComponent<Rigidbody>();
+            hand = GetComponent<CardHand>();
+            projectile = GetComponent<Projectile>();
         }
     }
 }

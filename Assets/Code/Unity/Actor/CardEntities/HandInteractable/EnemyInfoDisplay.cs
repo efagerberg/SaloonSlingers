@@ -27,18 +27,18 @@ namespace SaloonSlingers.Unity.Actor
 
         private Canvas canvas;
         private IReadOnlyCollection<Card> cursedCards;
-        private HandProjectile projectile;
+        private CardHand hand;
         private Attribute health;
 
-        public void SetTarget(EnemyData enemyData, HandProjectile enemyProjectile)
+        public void SetTarget(EnemyData enemyData, CardHand enemyHand)
         {
-            if (projectile != null)
-                projectile.Drawn.RemoveListener(DrawHandler);
+            if (hand != null)
+                hand.Drawn.RemoveListener(DrawHandler);
 
-            projectile = enemyProjectile;
+            hand = enemyHand;
 
-            if (projectile != null)
-                projectile.Drawn.AddListener(DrawHandler);
+            if (hand != null)
+                hand.Drawn.AddListener(DrawHandler);
             cursedCards = enemyData.CurseTarget.Cards;
             health = enemyData.Attributes.Registry[AttributeType.Health];
             UpdateContents();
@@ -59,19 +59,19 @@ namespace SaloonSlingers.Unity.Actor
 
         public override void UpdateContents()
         {
-            var projectileToLayout = new (IReadOnlyCollection<Card>, LayoutGroup, Color, bool)[]
+            var handToLayout = new (IReadOnlyCollection<Card>, LayoutGroup, Color, bool)[]
             {
-                (projectile != null ? projectile.Cards : null, peerOtherCardLayoutGroup, Color.yellow, true),
+                (hand != null ? hand.Cards : null, peerOtherCardLayoutGroup, Color.yellow, true),
                 (cursedCards, cursedCardLayoutGroup, cursedCardColor, false)
             };
 
             if (health != null)
                 healthBar.fillAmount = health.AsPercent();
 
-            var evaluation = projectile?.HandEvaluation;
+            var evaluation = hand?.Evaluation;
             handValueText.text = evaluation?.DisplayName();
 
-            foreach (var (h, l, c, keyCardsOnly) in projectileToLayout)
+            foreach (var (h, l, c, keyCardsOnly) in handToLayout)
             {
                 int nCards = h == null ? 0 : h.Count;
                 int delta = nCards - l.transform.childCount;
@@ -109,16 +109,16 @@ namespace SaloonSlingers.Unity.Actor
 
         private void OnEnable()
         {
-            if (projectile == null) return;
+            if (hand == null) return;
 
-            projectile.Drawn.AddListener(DrawHandler);
+            hand.Drawn.AddListener(DrawHandler);
         }
 
         private void OnDisable()
         {
-            if (projectile == null) return;
+            if (hand == null) return;
 
-            projectile.Drawn.RemoveListener(DrawHandler);
+            hand.Drawn.RemoveListener(DrawHandler);
         }
 
         private void Start()
@@ -126,7 +126,7 @@ namespace SaloonSlingers.Unity.Actor
             Hide();
         }
 
-        private void DrawHandler(HandProjectile sender, ICardGraphic drawn)
+        private void DrawHandler(CardHand sender, ICardGraphic drawn)
         {
             UpdateContents();
         }
