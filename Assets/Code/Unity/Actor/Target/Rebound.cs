@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace SaloonSlingers.Unity.Actor
 {
-    public class RaycastRebound : MonoBehaviour
+    public class Rebound : MonoBehaviour
     {
         [SerializeField]
         private float speed = 1.0f;
@@ -11,18 +11,11 @@ namespace SaloonSlingers.Unity.Actor
 
         private bool switchDirection = false;
 
-        private void FixedUpdate()
+        private void Update()
         {
             if (switchDirection == false && Physics.Raycast(transform.position, transform.forward, out _, raycastDistance))
             {
                 switchDirection = true;
-            }
-        }
-
-        private void Update()
-        {
-            if (switchDirection)
-            {
                 transform.Rotate(Vector3.up, 180);
                 switchDirection = false;
             }

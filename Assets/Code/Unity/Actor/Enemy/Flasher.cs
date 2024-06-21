@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SaloonSlingers.Unity.Actor
 {
 
-    public class EnemyFlasher : MonoBehaviour, IFlasher
+    public class Flasher : MonoBehaviour, IFlasher
     {
         public Color FlashColor;
 
@@ -15,21 +15,26 @@ namespace SaloonSlingers.Unity.Actor
         private float duration;
 
         private CoroutineTask task;
+        private Core.Timer timer;
 
         public void Flash()
         {
-            task ??= new(this);
             task.Run(() => DoFlash(duration));
+        }
+
+        private void Awake()
+        {
+            timer = new();
+            task = new(this);
         }
 
         private IEnumerator DoFlash(float duration)
         {
-            float timer = 0;
             var originalColor = _renderer.material.color;
-            while (timer < duration)
+            timer.Reset(duration);
+            while (!timer.Tick(Time.deltaTime))
             {
-                _renderer.material.color = Color.Lerp(FlashColor, originalColor, timer / duration);
-                timer += Time.deltaTime;
+                _renderer.material.color = Color.Lerp(FlashColor, originalColor, timer.Elapsed / timer.Duration);
                 yield return null;
             }
         }

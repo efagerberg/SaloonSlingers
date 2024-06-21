@@ -5,30 +5,33 @@ namespace SaloonSlingers.Core
 {
     public struct Timer
     {
-        public float DurationInSeconds;
+        public float Remaining { get; private set; }
+        public float Elapsed { get; private set; }
+        public float Duration { get; private set; }
 
-        private float originalDurationInSeconds;
-
-        public Timer(float duration)
+        public Timer(float? duration)
         {
-            DurationInSeconds = duration;
-            originalDurationInSeconds = duration;
+            Duration = duration.Value;
+            Elapsed = 0f;
+            Remaining = Duration;
         }
 
-        public bool CheckPassed(float deltaTime)
+        public bool Tick(float deltaTime)
         {
-            DurationInSeconds = MathF.Max(0, DurationInSeconds - deltaTime);
-            return (DurationInSeconds <= 0);
+            Remaining = MathF.Max(0, Remaining - deltaTime);
+            Elapsed += deltaTime;
+            return Remaining <= 0;
         }
 
         public void Reset(float? newDuration = null)
         {
+            Elapsed = 0f;
             if (newDuration == null)
-                DurationInSeconds = originalDurationInSeconds;
+                Remaining = Duration;
             else
             {
-                DurationInSeconds = newDuration.Value;
-                originalDurationInSeconds = newDuration.Value;
+                Remaining = newDuration.Value;
+                Duration = newDuration.Value;
             }
         }
     }
