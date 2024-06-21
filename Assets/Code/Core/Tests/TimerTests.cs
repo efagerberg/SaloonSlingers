@@ -16,6 +16,30 @@ namespace SaloonSlingers.Core.Tests
         }
 
         [Test]
+        public void Tick_IncreasesElapsed()
+        {
+            var subject = new Timer(10);
+            subject.Tick(2);
+
+            Assert.That(subject.Elapsed, Is.EqualTo(2));
+
+            subject.Tick(3);
+            Assert.That(subject.Elapsed, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void Tick_DecreasesRemaining()
+        {
+            var subject = new Timer(10);
+            subject.Tick(2);
+
+            Assert.That(subject.Remaining, Is.EqualTo(8));
+
+            subject.Tick(3);
+            Assert.That(subject.Elapsed, Is.EqualTo(5));
+        }
+
+        [Test]
         public void Reset_ResetsToOriginalTime()
         {
             float original = 0.1f;
@@ -24,6 +48,7 @@ namespace SaloonSlingers.Core.Tests
             subject.Reset();
 
             Assert.That(subject.Remaining, Is.EqualTo(original));
+            Assert.That(subject.Elapsed, Is.EqualTo(0));
         }
 
         [Test]
@@ -34,6 +59,7 @@ namespace SaloonSlingers.Core.Tests
             subject.Reset(expectedTime);
 
             Assert.That(subject.Remaining, Is.EqualTo(expectedTime));
+            Assert.That(subject.Elapsed, Is.EqualTo(0));
         }
     }
 }
