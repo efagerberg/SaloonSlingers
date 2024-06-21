@@ -3,7 +3,6 @@ using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 namespace SaloonSlingers.Unity
 {
@@ -17,7 +16,6 @@ namespace SaloonSlingers.Unity
     {
         public Attribute HitPoints { get; set; }
         public DamageMode DamageMode = DamageMode.DECREMENT;
-        [FormerlySerializedAs("OnDamaged")]
         public UnityEvent<GameObject, IReadOnlyAttribute> Damaged = new();
 
         private Attributes attributes;
@@ -46,7 +44,8 @@ namespace SaloonSlingers.Unity
                 DamageMode.HAND_VALUE => hand.Evaluation.Score,
                 _ => 0
             };
-            attributes ??= GetComponent<Attributes>();
+            if (attributes == null)
+                attributes = GetComponent<Attributes>();
             HitPoints ??= attributes != null ? attributes.Registry[AttributeType.Health] : null;
 
             if (HitPoints == null) return;

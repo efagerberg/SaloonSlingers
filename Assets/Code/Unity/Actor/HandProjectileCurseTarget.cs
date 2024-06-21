@@ -5,14 +5,12 @@ using SaloonSlingers.Unity.Actor;
 
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 namespace SaloonSlingers.Unity
 {
     public class HandProjectileCurseTarget : MonoBehaviour
     {
         public IReadOnlyCollection<Card> Cards { get; private set; }
-        [FormerlySerializedAs("OnCursed")]
         public UnityEvent<GameObject, IReadOnlyCollection<Card>> Cursed = new();
 
         public void HandleCollision(Collision collision)
