@@ -31,7 +31,7 @@ namespace SaloonSlingers.Unity.Actor
         private IEnumerator DoFlash(float duration)
         {
             var originalColor = _renderer.material.color;
-            timer.Start(duration);
+            timer.Reset(duration);
             while (!timer.Tick(Time.deltaTime))
             {
                 _renderer.material.color = Color.Lerp(FlashColor, originalColor, timer.Elapsed / timer.Duration);

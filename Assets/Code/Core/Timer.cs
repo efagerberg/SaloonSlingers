@@ -23,7 +23,7 @@ namespace SaloonSlingers.Core
             return Remaining <= 0;
         }
 
-        public void Start(float? newDuration = null)
+        public void Reset(float? newDuration = null)
         {
             Elapsed = 0f;
             if (newDuration == null)

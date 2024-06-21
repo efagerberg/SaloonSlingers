@@ -29,13 +29,13 @@ namespace SaloonSlingers.Unity.Actor
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            timer.Start(duration);
+            timer.Reset(duration);
         }
 #endif
 
         private void OnDisable()
         {
-            timer.Start(duration);
+            timer.Reset(duration);
         }
     }
 }

@@ -16,22 +16,22 @@ namespace SaloonSlingers.Core.Tests
         }
 
         [Test]
-        public void Start_ResetsToOriginalTime()
+        public void Reset_ResetsToOriginalTime()
         {
             float original = 0.1f;
             var subject = new Timer(original);
             subject.Tick(0.05f);
-            subject.Start();
+            subject.Reset();
 
             Assert.That(subject.Remaining, Is.EqualTo(original));
         }
 
         [Test]
-        public void Start_OverridesDurationWhenGiven()
+        public void Reset_OverridesDurationWhenGiven()
         {
             var subject = new Timer(0.1f);
             var expectedTime = 2f;
-            subject.Start(expectedTime);
+            subject.Reset(expectedTime);
 
             Assert.That(subject.Remaining, Is.EqualTo(expectedTime));
         }
